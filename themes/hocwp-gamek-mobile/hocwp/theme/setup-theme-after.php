@@ -22,6 +22,12 @@ function hocwp_theme_check_load_facebook_javascript_sdk() {
             }
         }
     }
+    $comment_system = hocwp_theme_get_option('comment_system', 'discussion');
+    if('facebook' == $comment_system || 'default_and_facebook' == $comment_system) {
+        if(comments_open() || get_comments_number()) {
+            return true;
+        }
+    }
     return false;
 }
 add_filter('hocwp_use_facebook_javascript_sdk', 'hocwp_theme_check_load_facebook_javascript_sdk');
@@ -126,65 +132,7 @@ add_action('save_post', 'hocwp_theme_save_post_featured_meta');
 function hocwp_theme_last_widget_fixed() {
     $fixed = apply_filters('hocwp_theme_last_widget_fixed', true);
     if($fixed) {
-        ?>
-        <script>
-            (function($) {
-                var $window = $(window),
-                    window_top = $window.scrollTop(),
-                    $content_area = $('.sidebar').prev(),
-                    content_area_height = $content_area.height(),
-                    content_area_offset_top = $content_area.offset().top,
-                    $last_widget = $('.hocwp .sidebar .widget:last'),
-                    widget_width = $last_widget.width(),
-                    widget_offset_top = $last_widget.offset().top,
-                    widget_height = $last_widget.height(),
-                    $admin_bar = $('#wpadminbar'),
-                    $site_footer = $('.site-footer'),
-                    site_footer_margin_top = parseInt($site_footer.css('margin-top').replace('px', '')),
-                    site_footer_height = $site_footer.height(),
-                    site_footer_offset_top = $site_footer.offset().top,
-                    last_scroll_top = 0;
-                if(content_area_height < widget_height || 0 == widget_width) {
-                    return false;
-                }
-                if($admin_bar.length) {
-                    widget_offset_top -= $admin_bar.height();
-                }
-                if(window_top > widget_offset_top) {
-                    $last_widget.addClass('fixed');
-                } else {
-                    $last_widget.removeClass('fixed');
-                }
-                $window.scroll(function() {
-                    window_top = $(this).scrollTop();
-                    var scroll_down = true;
-                    if(window_top > last_scroll_top) {
-                        scroll_down = true;
-                    } else {
-                        scroll_down = false;
-                    }
-                    last_scroll_top = window_top;
-                    content_area_height = $content_area.height();
-                    if(window_top > (content_area_height - content_area_offset_top + site_footer_height)) {
-                        $last_widget.addClass('fixed-bottom');
-                    } else {
-                        $last_widget.removeClass('fixed-bottom');
-                        $last_widget.css({'top' : '0', 'bottom' : 'auto'});
-                    }
-                    if(window_top > widget_offset_top) {
-                        $last_widget.addClass('fixed');
-                    } else {
-                        $last_widget.removeClass('fixed');
-                    }
-                    if($last_widget.hasClass('fixed-bottom')) {
-                        var bottom = (site_footer_height + site_footer_margin_top),
-                            white_space = site_footer_offset_top - window_top;
-                        $last_widget.css({'bottom' : bottom + 'px', 'top' : 'auto'});
-                    }
-                });
-            })(jQuery);
-        </script>
-        <?php
+        get_template_part('hocwp/theme/fixed-widget');
     }
 }
 add_action('hocwp_close_body', 'hocwp_theme_last_widget_fixed');

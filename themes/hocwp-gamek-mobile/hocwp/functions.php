@@ -90,6 +90,12 @@ function hocwp_array_has_value($arr) {
     return false;
 }
 
+function hocwp_get_plugin_info($plugin_file, $default = '') {
+    $plugin = get_plugin_data($plugin_file);
+    $plugin_name = isset($plugin['Name']) ? $plugin['Name'] : $default;
+    return $plugin_name;
+}
+
 function hocwp_get_value_by_key($arr, $key, $default = '') {
     $value = $default;
     $tmp = $arr;
@@ -1090,7 +1096,15 @@ function hocwp_get_first_image_source($content) {
 
 function hocwp_comments_template() {
     if(comments_open() || get_comments_number()) {
-        comments_template();
+        $comment_system = hocwp_theme_get_option('comment_system', 'discussion');
+        if('facebook' == $comment_system) {
+            hocwp_facebook_comment();
+        } else {
+            if('default_and_facebook') {
+                hocwp_facebook_comment();
+            }
+            comments_template();
+        }
     }
 }
 
@@ -1293,6 +1307,13 @@ function hocwp_sanitize_file_name($name) {
     return $name;
 }
 
+function hocwp_menu_page_exists($slug) {
+    if(empty($GLOBALS['admin_page_hooks'][$slug])) {
+        return false;
+    }
+    return true;
+}
+
 function hocwp_callback_exists($callback) {
     if(empty($callback) || (!is_array($callback) && !function_exists($callback)) || (is_array($callback) && count($callback) != 2) || (is_array($callback) && !method_exists($callback[0], $callback[1]))) {
         return false;
@@ -1322,6 +1343,55 @@ function hocwp_add_string_with_space_before(&$string, $add) {
 
 function hocwp_get_current_admin_page() {
     return isset($_REQUEST['page']) ? $_REQUEST['page'] : '';
+}
+
+function hocwp_get_plugins() {
+    if(!function_exists('get_plugins')) {
+        require_once(ABSPATH . 'wp-admin/includes/plugin.php');
+    }
+    return get_plugins();
+}
+
+function hocwp_get_my_plugins() {
+    $result = array();
+    $lists = hocwp_get_plugins();
+    foreach($lists as $file => $plugin) {
+        if(hocwp_is_my_plugin($plugin)) {
+            $result[$file] = $plugin;
+        }
+    }
+    return $result;
+}
+
+function hocwp_is_my_plugin($plugin_data) {
+    $result = false;
+    $author_uri = isset($plugin_data['AuthorURI']) ? $plugin_data['AuthorURI'] : '';
+    if(hocwp_get_root_domain_name($author_uri) == hocwp_get_root_domain_name(HOCWP_HOMEPAGE)) {
+        $result = true;
+    }
+    return $result;
+}
+
+function hocwp_has_plugin() {
+    $result = false;
+    $plugins = hocwp_get_plugins();
+    foreach($plugins as $plugin) {
+        if(hocwp_is_my_plugin($plugin)) {
+            $result = true;
+            break;
+        }
+    }
+    return $result;
+}
+
+function hocwp_has_plugin_activated() {
+    $plugins = get_option('active_plugins');
+    foreach($plugins as $base_name) {
+        if(hocwp_string_contain($base_name, 'hocwp')) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function hocwp_admin_notice($args = array()) {
@@ -1605,4 +1675,13 @@ function hocwp_update_permalink_struct($struct) {
     $wp_rewrite->set_permalink_structure( $struct );
     update_option('permalink_structure', $struct);
     flush_rewrite_rules();
+}
+
+function hocwp_flush_rewrite_rules_after_site_url_changed() {
+    $old_url = get_option('hocwp_site_url');
+    $defined_url = (defined('WP_SITEURL')) ? WP_SITEURL : get_option('siteurl');
+    if(empty($old_url) || $old_url != $defined_url) {
+        update_option('hocwp_site_url', $defined_url);
+        flush_rewrite_rules();
+    }
 }

@@ -12,7 +12,24 @@ if(version_compare($GLOBALS['wp_version'], HOCWP_REQUIRE_WP_VERSION, '<')) {
 
 define('HOCWP_THEME_VERSION', '2.3.1');
 
+function hocwp_theme_missing_core_notice() {
+    ?>
+    <div class="updated notice settings-error error">
+        <p><strong><?php _e('Error:', 'hocwp'); ?></strong> <?php _e('Current theme cannot be run properly because of missing core.', 'hocwp'); ?></p>
+    </div>
+    <?php
+}
+
 if(!defined('HOCWP_PATH')) {
+    if(!file_exists(get_template_directory() . '/hocwp/load.php')) {
+        if(is_admin()) {
+            add_action('admin_notices', 'hocwp_theme_missing_core_notice');
+        } else {
+            wp_die(__('Theme cannot be displayed because of missing core.', 'hocwp'), __('Missing Core', 'hocwp'));
+            exit;
+        }
+        return;
+    }
     require_once(get_template_directory() . '/hocwp/load.php');
 }
 

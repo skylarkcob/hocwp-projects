@@ -194,7 +194,13 @@ function hocwp_theme_invalid_license_redirect() {
     }
 }
 
-function hocwp_theme_license_valid() {
+function hocwp_theme_license_valid($data = array()) {
     $license = new HOCWP_License();
-    return $license->check_valid();
+    return $license->check_valid($data);
+}
+
+function hocwp_theme_get_license_defined_data() {
+    $data = (defined('HOCWP_THEME_LICENSE_DATA')) ? HOCWP_THEME_LICENSE_DATA : array();
+    $data = apply_filters('hocwp_theme_license_defined_data', $data);
+    return $data;
 }

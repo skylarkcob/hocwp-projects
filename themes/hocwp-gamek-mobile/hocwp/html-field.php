@@ -589,6 +589,21 @@ function hocwp_field_select_theme($args = array()) {
     hocwp_field_select($args);
 }
 
+function hocwp_field_select_plugin($args = array()) {
+    $lists = hocwp_get_my_plugins();
+    $choose_text = __('Choose plugin', 'hocwp');
+    $choose_text = apply_filters('hocwp_theme_select_plugin_text', $choose_text);
+    $all_option = '<option value="0">-- ' . $choose_text . ' --</option>';
+    $value = isset($args['value']) ? $args['value'] : '';
+    if(hocwp_array_has_value($lists)) {
+        foreach($lists as $name => $data) {
+            $all_option .= '<option value="' . esc_attr($name) . '" ' . selected($value, $name, false) . '>' . $data['Name'] . '</option>';
+        }
+    }
+    $args['all_option'] = $all_option;
+    hocwp_field_select($args);
+}
+
 function hocwp_field_select_term($args = array()) {
     hocwp_field_sanitize_args($args);
     $taxonomy = isset($args['taxonomy']) ? $args['taxonomy'] : 'category';

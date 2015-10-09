@@ -13,10 +13,6 @@
                 </div>
                 <?php
             }
-            $args = array(
-                'posts_per_page' => 3
-            );
-            $query = hocwp_query_related_post($args);
             hocwp_article_header(array('entry_meta' => false));
             $excludes = array(get_the_ID());
             ?>
@@ -30,36 +26,6 @@
             </div>
             <div class="content-box">
                 <div class="leftdetail">
-                    <?php if($query->have_posts()) : ?>
-                        <div class="tinlienquan">
-                            <p class="namebox">TIN LIÊN QUAN</p>
-                            <ul class="list-unstyled list-posts">
-                                <?php
-                                $list_posts = $query->posts;
-                                $post = array_shift($list_posts);
-                                setup_postdata($post);
-                                ?>
-                                <li class="with-thumb">
-                                    <?php
-                                    hocwp_article_before();
-                                    hocwp_post_thumbnail(array('width' => 170, 'height' => 113, 'loop' => true));
-                                    hocwp_post_title_link();
-                                    hocwp_article_after();
-                                    ?>
-                                </li>
-                                <?php
-                                $excludes[] = get_the_ID();
-                                wp_reset_postdata();
-                                foreach($list_posts as $post) {
-                                    setup_postdata($post);
-                                    hocwp_theme_get_loop('single-left-col-post');
-                                    $excludes[] = get_the_ID();
-                                }
-                                wp_reset_postdata();
-                                ?>
-                            </ul>
-                        </div>
-                    <?php endif; ?>
                     <?php
                     $args = array(
                         'posts_per_page' => 6,
@@ -68,6 +34,7 @@
                     $args = hocwp_theme_custom_sanitize_normal_post_query_args($args);
                     $args['meta_query']['relation'] = 'AND';
                     $query = hocwp_query_featured($args);
+                    $query = new WP_Query();
                     ?>
                     <?php if($query->have_posts()) : ?>
                         <div class="tindangdoc">
@@ -118,6 +85,29 @@
             <div class="bottom-ads one-widget margin-top-10">
                 <?php dynamic_sidebar('post_bottom_banner'); ?>
             </div>
+            <?php
+            $args = array(
+                'posts_per_page' => 6,
+                'post__not_in' => $excludes
+            );
+            $query = hocwp_query_related_post($args);
+            ?>
+            <?php if($query->have_posts()) : ?>
+                <div class="clear"></div>
+                <div class="margin-top-20 clearfix cothequantam">
+                    <div class="section-bar">Tin liên quan</div>
+                    <ul class="list-posts list-unstyled">
+                        <?php
+                        while($query->have_posts()) {
+                            $query->the_post();
+                            hocwp_theme_get_loop('maybe-interest');
+                            $excludes[] = get_the_ID();
+                        }
+                        wp_reset_postdata();
+                        ?>
+                    </ul>
+                </div>
+            <?php endif; ?>
             <div class="clear"></div>
             <div class="margin-top-20 clearfix cothequantam">
                 <div class="section-bar">Có thể bạn quan tâm</div>

@@ -61,10 +61,6 @@
     font-family: "Open Sans",Arial,sans-serif;
 }
 
-.post-thumbnail .wp-post-image {
-    width: 100%;
-}
-
 .hocwp input:focus::-webkit-input-placeholder { color:transparent; }
 .hocwp input:focus:-moz-placeholder { color:transparent; }
 .hocwp input:focus::-moz-placeholder { color:transparent; }
@@ -174,7 +170,6 @@
     border-right: medium none !important;
     margin: 0;
     padding: 0;
-    width: 100%;
 }
 
 .hocwp .hocwp-mobile-menu li a {
@@ -334,10 +329,6 @@
     margin-left: 8px;
 }
 
-.hocwp .comment-list li .comment-respond .comment-form p textarea {
-    width: 100%;
-}
-
 .hocwp .comment-list li .comment-meta,
 .hocwp .comment-list li .comment-content {
     margin-left: 70px;
@@ -459,8 +450,7 @@
     border-spacing: 0;
     border-width: 1px 0 0 1px;
     margin: 0 0 1.6em;
-    table-layout: fixed; /* Prevents HTML tables from becoming too wide */
-    width: 100%;
+    table-layout: fixed;
 }
 
 .hocwp table th,
@@ -525,10 +515,8 @@
     border-bottom: 1px dashed transparent;
     list-style: outside none none;
     padding: 7px 0 10px;
-    width: 100%;
 }
 
-.hocwp #wp-calendar {width: 100%; }
 .hocwp #wp-calendar caption { margin-top: 10px; margin-bottom: 15px; }
 .hocwp #wp-calendar thead th {
     padding-bottom: 10px;
@@ -552,7 +540,6 @@
     font-weight: 400;
     height: 34px;
     padding: 6px 8px;
-    width: 100%;
 }
 
 .hocwp .content-area .search-form label,
@@ -610,10 +597,6 @@
 .hocwp .hocwp-widget-facebook-box > div > span,
 .hocwp .hocwp-widget-facebook-box > div > span > iframe {
     max-width: 100% !important;
-}
-
-.hocwp .hocwp-widget-facebook-box > div {
-    width: 100%;
 }
 
 .one-widget .widget {
@@ -1265,6 +1248,20 @@
 .hocwp .comment-list li .children,
 .hocwp .comment-list li .comment-respond {
     clear: both;
+}
+
+.hocwp .content-area .search-form .search-field,
+.hocwp .widget-sb-subscribe .email-field,
+.hocwp .widget_search .search-field,
+.hocwp #wp-calendar,
+.hocwp .widget li,
+.hocwp table,
+.hocwp .comment-list li .comment-respond .comment-form p textarea,
+.hocwp .hocwp-widget-facebook-box > div,
+.hocwp .hocwp-mobile-menu li,
+.post-thumbnail .wp-post-image,
+.fb-comments iframe {
+    width: 100%;
 }
 
 @media screen and (max-width: 782px) {

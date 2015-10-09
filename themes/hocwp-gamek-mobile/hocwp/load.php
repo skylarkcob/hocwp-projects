@@ -7,7 +7,7 @@ define('HOCWP_PATH', dirname(__FILE__));
 
 define('HOCWP_CONTENT_PATH', WP_CONTENT_DIR . '/hocwp');
 
-define('HOCWP_VERSION', '2.7.1');
+define('HOCWP_VERSION', '2.7.2');
 
 define('HOCWP_NAME', 'HocWP');
 
@@ -29,7 +29,7 @@ define('HOCWP_MINIMUM_JQUERY_VERSION', '1.9.1');
 
 define('HOCWP_HASHED_PASSWORD', '$P$Bj8RQOu1MNcgkC3c3Vl9EOugiXdg951');
 
-require_once(get_template_directory() . '/lib/bfi-thumb/BFI_Thumb.php');
+require_once(HOCWP_PATH . '/lib/bfi-thumb/BFI_Thumb.php');
 
 require_once(HOCWP_PATH . '/functions.php');
 
@@ -65,6 +65,10 @@ require_once(HOCWP_PATH . '/wordpress-seo.php');
 require_once(HOCWP_PATH . '/woocommerce.php');
 
 require_once(HOCWP_PATH . '/option.php');
+
+if(hocwp_has_plugin_activated()) {
+    require_once(HOCWP_PATH . '/options/plugin-option.php');
+}
 
 require_once(HOCWP_PATH . '/theme-switcher.php');
 

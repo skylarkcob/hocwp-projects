@@ -34,4 +34,28 @@ window.hocwp = window.hocwp || {};
     (function() {
         $('.sortable').hocwpSortable();
     })();
+
+    (function() {
+        $('#hocwp_plugin_license_use_for').on('change', function(e) {
+            e.preventDefault();
+            var $element = $(this),
+                $customer_email = $('#hocwp_plugin_license_customer_email'),
+                $license_code = $('#hocwp_plugin_license_license_code');
+            $customer_email.val('');
+            $license_code.val('');
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: hocwp.ajax_url,
+                data: {
+                    action: 'hocwp_fetch_plugin_license',
+                    use_for: $element.val()
+                },
+                success: function(response){
+                    $customer_email.val(response.customer_email);
+                    $license_code.val(response.license_code);
+                }
+            });
+        });
+    })();
 })(jQuery);

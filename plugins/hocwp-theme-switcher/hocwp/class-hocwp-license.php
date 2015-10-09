@@ -322,9 +322,11 @@ class HOCWP_License {
         return false;
     }
 
-    public function check_valid() {
+    public function check_valid($data = array()) {
         $valid = false;
-        $data = $this->get_saved_generated_data();
+        if(!hocwp_array_has_value($data)) {
+            $data = $this->get_saved_generated_data();
+        }
         $hashed_license = hocwp_get_value_by_key($data, 'hashed');
         if(!empty($hashed_license)) {
             $key_map = hocwp_get_value_by_key($data, 'key_map');

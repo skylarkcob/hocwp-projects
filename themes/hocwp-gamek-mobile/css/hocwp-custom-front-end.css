@@ -1730,6 +1730,19 @@ p.search_result {
     width: 100%;
 }
 
+.single .site-main .leftdetail {
+    display: none;
+}
+
+.single .site-main .rightdetail {
+    width: 100% !important;
+}
+
+.single .fb-comments {
+    clear: both;
+    margin: 10px 0;
+}
+
 /* ==================== Responsive ==================== */
 
 @media only screen and (max-width: 1403px) {

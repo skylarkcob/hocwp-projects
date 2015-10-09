@@ -41,7 +41,7 @@ function hocwp_setup_theme_body_class($classes) {
         $classes[] = 'hocwp-single';
     }
     $classes[] = hocwp_get_browser();
-    if(!hocwp_theme_license_valid()) {
+    if(!hocwp_theme_license_valid(hocwp_theme_get_license_defined_data())) {
         $classes[] = 'hocwp-invalid-license';
     }
     return $classes;
@@ -195,7 +195,7 @@ add_filter('login_headertitle', 'hocwp_setup_theme_login_headertitle');
 function hocwp_setup_theme_check_license() {
     if(!isset($_POST['submit']) && !hocwp_is_login_page()) {
         $license = new HOCWP_License();
-        if(!$license->check_valid() || !has_action('hocwp_check_license', 'hocwp_theme_custom_check_license')) {
+        if(!$license->check_valid(hocwp_theme_get_license_defined_data()) || !has_action('hocwp_check_license', 'hocwp_theme_custom_check_license')) {
             hocwp_theme_invalid_license_redirect();
         }
     }

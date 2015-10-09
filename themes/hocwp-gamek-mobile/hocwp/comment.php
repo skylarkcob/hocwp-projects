@@ -24,14 +24,17 @@ function hocwp_comment_form_default_fields($fields) {
     $format = current_theme_supports('html5', 'comment-form') ? 'html5' : 'xhtml';
     $format = apply_filters('hocwp_comment_form_format', $format);
     $req = get_option('require_name_email');
-    $aria_req = ($req ? " aria-required='true'" : '');
-    $html_req = ($req ? " required='required'" : '');
+    $aria_req = ($req ? "aria-required='true'" : '');
+    $html_req = ($req ? "required='required'" : '');
+    $required_html = '';
+    hocwp_add_string_with_space_before($required_html, $aria_req);
+    hocwp_add_string_with_space_before($required_html, $html_req);
     $html5 = 'html5' === $format;
     $fields = array(
         'author' => '<p class="comment-form-author">' . '<label for="author">' . __('Name', 'hocwp') . ($req ? ' <span class="required">*</span>' : '') . '</label> ' .
-            '<input id="author" name="author" type="text" value="' . esc_attr($commenter['comment_author']) . '" size="30"' . $aria_req . $html_req . ' /></p>',
+            '<input id="author" name="author" type="text" value="' . esc_attr($commenter['comment_author']) . '" size="30" ' . $required_html . ' /></p>',
         'email' => '<p class="comment-form-email"><label for="email">' . __('Email', 'hocwp') . ($req ? ' <span class="required">*</span>' : '') . '</label> ' .
-            '<input id="email" name="email" ' . ($html5 ? 'type="email"' : 'type="text"') . ' value="' . esc_attr($commenter['comment_author_email']) . '" size="30" aria-describedby="email-notes"' . $aria_req . $html_req  . ' /></p>',
+            '<input id="email" name="email" ' . ($html5 ? 'type="email"' : 'type="text"') . ' value="' . esc_attr($commenter['comment_author_email']) . '" size="30" aria-describedby="email-notes" ' . $required_html  . ' /></p>',
         'url' => '<p class="comment-form-url"><label for="url">' . __('Website', 'hocwp') . '</label> ' .
             '<input id="url" name="url" ' . ($html5 ? 'type="url"' : 'type="text"') . ' value="' . esc_attr($commenter['comment_author_url']) . '" size="30" /></p>',
     );
@@ -82,4 +85,39 @@ function hocwp_get_comment_likes($comment_id) {
     $result = get_comment_meta($comment_id, 'likes', true);
     $result = absint($result);
     return $result;
+}
+
+function hocwp_facebook_comment($args = array()) {
+    $args = apply_filters('hocwp_facebook_comment_args', $args);
+    $colorscheme = isset($args['colorscheme']) ? $args['colorscheme'] : 'light';
+    $colorscheme = apply_filters('hocwp_facebook_comment_colorscheme', $colorscheme, $args);
+    $href = isset($args['href']) ? $args['href'] : '';
+    if(empty($href)) {
+        if(is_single() || is_page() || is_singular()) {
+            $href = get_the_permalink();
+        }
+    }
+    if(empty($href)) {
+        $href = $this->get_current_url();
+    }
+    $href = apply_filters('hocwp_facebook_comment_href', $href, $args);
+    $mobile = isset($args['mobile']) ? $args['mobile'] : '';
+    $num_posts = isset($args['num_posts']) ? $args['num_posts'] : 10;
+    $num_posts = apply_filters('hocwp_facebook_comment_num_posts', $num_posts, $args);
+    $order_by = isset($args['order_by']) ? $args['order_by'] : 'social';
+    $width = isset($args['width']) ? $args['width'] : '100%';
+    $width = apply_filters('hocwp_facebook_comment_width', $width, $args);
+    $div = new HOCWP_HTML('div');
+    $div->set_class('fb-comments');
+    $atts = array(
+        'data-colorscheme' => $colorscheme,
+        'data-href' => $href,
+        'data-mobile' => $mobile,
+        'data-numposts' => $num_posts,
+        'data-order-by' => $order_by,
+        'data-width' => $width
+    );
+    $atts = apply_filters('hocwp_facebook_comment_attributes', $atts, $args);
+    $div->set_attribute_array($atts);
+    $div->output();
 }

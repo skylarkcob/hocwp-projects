@@ -184,7 +184,9 @@ class HOCWP_License {
         $this->set_customer_url(home_url('/'));
         $this->set_customer_email(get_option('admin_email'));
         $option = hocwp_option_get_object_from_list('theme_license');
-        $this->set_option($option);
+        if(hocwp_object_valid($option)) {
+            $this->set_option($option);
+        }
         if(hocwp_object_valid($option)) {
             $this->set_option_name($option->get_option_name());
         }
@@ -313,18 +315,36 @@ class HOCWP_License {
         return $result;
     }
 
-    public function check_valid() {
+    public function for_theme() {
+        if('theme' == $this->get_type()) {
+            return true;
+        }
+        return false;
+    }
+
+    public function check_valid($data = array()) {
         $valid = false;
-        $data = $this->get_saved_generated_data();
+        if(!hocwp_array_has_value($data)) {
+            $data = $this->get_saved_generated_data();
+        }
         $hashed_license = hocwp_get_value_by_key($data, 'hashed');
         if(!empty($hashed_license)) {
             $key_map = hocwp_get_value_by_key($data, 'key_map');
             $this->set_key_map($key_map);
             $license_info = $this->get_saved_license_data();
-            $code = hocwp_get_value_by_key($license_info, 'license_code');
-            $this->set_code($code);
-            $email = hocwp_get_value_by_key($license_info, 'customer_email');
-            $this->set_customer_email($email);
+            if($this->for_theme()) {
+                $code = hocwp_get_value_by_key($license_info, 'license_code');
+                $this->set_code($code);
+                $email = hocwp_get_value_by_key($license_info, 'customer_email');
+                $this->set_customer_email($email);
+            } else {
+                $use_for = $this->get_use_for();
+                $use_for_key = md5($use_for);
+                $code = hocwp_get_value_by_key($license_info, array($use_for_key, 'license_code'));
+                $this->set_code($code);
+                $email = hocwp_get_value_by_key($license_info, array($use_for_key, 'customer_email'));
+                $this->set_customer_email($email);
+            }
             $this->create_key();
             $key = $this->get_key();
             if(wp_check_password($key, $hashed_license)) {
