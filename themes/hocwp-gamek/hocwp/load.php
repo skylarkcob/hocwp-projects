@@ -66,7 +66,7 @@ require_once(HOCWP_PATH . '/woocommerce.php');
 
 require_once(HOCWP_PATH . '/option.php');
 
-if(hocwp_has_plugin()) {
+if(hocwp_has_plugin_activated()) {
     require_once(HOCWP_PATH . '/options/plugin-option.php');
 }
 

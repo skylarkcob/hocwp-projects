@@ -1384,6 +1384,16 @@ function hocwp_has_plugin() {
     return $result;
 }
 
+function hocwp_has_plugin_activated() {
+    $plugins = get_option('active_plugins');
+    foreach($plugins as $base_name) {
+        if(hocwp_string_contain($base_name, 'hocwp')) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function hocwp_admin_notice($args = array()) {
     $class = isset($args['class']) ? $args['class'] : '';
     hocwp_add_string_with_space_before($class, 'updated notice');
