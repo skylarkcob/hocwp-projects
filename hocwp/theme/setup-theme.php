@@ -1,4 +1,6 @@
 <?php
+global $hocwp_theme_license;
+
 function hocwp_theme_after_switch() {
     if(!current_user_can('switch_themes')) {
         return;
@@ -194,8 +196,7 @@ add_filter('login_headertitle', 'hocwp_setup_theme_login_headertitle');
 
 function hocwp_setup_theme_check_license() {
     if(!isset($_POST['submit']) && !hocwp_is_login_page()) {
-        $license = new HOCWP_License();
-        if(!$license->check_valid(hocwp_theme_get_license_defined_data()) || !has_action('hocwp_check_license', 'hocwp_theme_custom_check_license')) {
+        if(!hocwp_theme_license_valid(hocwp_theme_get_license_defined_data()) || !has_action('hocwp_check_license', 'hocwp_theme_custom_check_license')) {
             hocwp_theme_invalid_license_redirect();
         }
     }
