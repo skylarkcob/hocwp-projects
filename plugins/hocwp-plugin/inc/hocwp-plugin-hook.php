@@ -7,7 +7,7 @@ function hocwp_plugin_default_admin_bar_menu($wp_admin_bar) {
     $args = array(
         'id' => 'plugin-license',
         'title' => __('Plugin Licenses', 'hocwp-plugin-default'),
-        'href' => HOCWP_PLUGIN_DEFAULT_LICENSE_ADMIN_URL,
+        'href' => HOCWP_PLUGIN_LICENSE_ADMIN_URL,
         'parent' => 'plugins'
     );
     $wp_admin_bar->add_node($args);

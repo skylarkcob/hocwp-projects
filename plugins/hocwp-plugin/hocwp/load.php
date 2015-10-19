@@ -35,6 +35,8 @@ define('HOCWP_REQUIRED_HTML', '<span style="color:#FF0000">*</span>');
 
 define('HOCWP_PLUGIN_LICENSE_OPTION_NAME', 'hocwp_plugin_licenses');
 
+define('HOCWP_PLUGIN_LICENSE_ADMIN_URL', admin_url('plugins.php?page=hocwp_plugin_license'));
+
 require_once(HOCWP_PATH . '/lib/bfi-thumb/BFI_Thumb.php');
 
 require_once(HOCWP_PATH . '/functions.php');
