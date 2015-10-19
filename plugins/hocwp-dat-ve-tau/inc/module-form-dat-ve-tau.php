@@ -95,12 +95,14 @@ $calendar_image = hocwp_plugin_get_image_url(HOCWP_DAT_VE_TAU_URL, 'calendar.gif
                     ?>
                 </select>
             </div>
+            <!--
             <div style="clear:both"></div>
             <div class="form_kh">Mã an toàn&nbsp;(<?php echo HOCWP_REQUIRED_HTML; ?>):</div>
             <div class="form_kh_r">
                 <?php hocwp_field_captcha(array('placeholder' => '', 'input_width' => 47)); ?>
             </div>
             <div></div>
+            -->
         </div>
         <div style="clear:both"></div>
         <div class="form-submit">

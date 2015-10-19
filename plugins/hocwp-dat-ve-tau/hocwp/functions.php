@@ -1,5 +1,14 @@
 <?php
+function hocwp_use_session() {
+    $use_session = apply_filters('hocwp_use_session', false);
+    return $use_session;
+}
+
 function hocwp_session_start() {
+    $use_session = hocwp_use_session();
+    if(!$use_session) {
+        return;
+    }
     $session_start = true;
     if(version_compare(PHP_VERSION, '5.4', '>=')) {
         if(session_status() == PHP_SESSION_NONE) {
@@ -11,6 +20,7 @@ function hocwp_session_start() {
         }
     }
     if(!$session_start) {
+        do_action('hocwp_session_start_before');
         session_start();
     }
 }
@@ -90,10 +100,13 @@ function hocwp_array_has_value($arr) {
     return false;
 }
 
-function hocwp_get_plugin_info($plugin_file, $default = '') {
-    $plugin = get_plugin_data($plugin_file);
-    $plugin_name = isset($plugin['Name']) ? $plugin['Name'] : $default;
-    return $plugin_name;
+function hocwp_get_plugin_info($plugin_file) {
+    return get_plugin_data($plugin_file);
+}
+
+function hocwp_get_plugin_name($plugin_file, $default = '') {
+    $plugin = hocwp_get_plugin_info($plugin_file);
+    return hocwp_get_value_by_key($plugin, 'Name', $default);
 }
 
 function hocwp_get_value_by_key($arr, $key, $default = '') {

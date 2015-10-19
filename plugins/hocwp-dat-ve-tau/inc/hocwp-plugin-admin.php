@@ -7,4 +7,4 @@ $option_dat_ve_tau->add_field(array('id' => 'form_footer', 'title' => __('Form F
 $option_dat_ve_tau->init();
 hocwp_option_add_object_to_list($option_dat_ve_tau);
 
-hocwp_add_option_page_smtp_email('options-general.php');
+hocwp_add_option_page_smtp_email();

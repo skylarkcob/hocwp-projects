@@ -3,11 +3,11 @@ if(defined('HOCWP_PATH')) {
     return;
 }
 
+define('HOCWP_VERSION', '2.7.4');
+
 define('HOCWP_PATH', dirname(__FILE__));
 
 define('HOCWP_CONTENT_PATH', WP_CONTENT_DIR . '/hocwp');
-
-define('HOCWP_VERSION', '2.7.3');
 
 define('HOCWP_NAME', 'HocWP');
 
@@ -32,6 +32,8 @@ define('HOCWP_JQUERY_LATEST_VERSION', '1.11.4');
 define('HOCWP_HASHED_PASSWORD', '$P$Bj8RQOu1MNcgkC3c3Vl9EOugiXdg951');
 
 define('HOCWP_REQUIRED_HTML', '<span style="color:#FF0000">*</span>');
+
+define('HOCWP_PLUGIN_LICENSE_OPTION_NAME', 'hocwp_plugin_licenses');
 
 require_once(HOCWP_PATH . '/lib/bfi-thumb/BFI_Thumb.php');
 

@@ -4,7 +4,7 @@ add_action('init', 'hocwp_session_start');
 function hocwp_dat_ve_tau_admin_bar_menu($wp_admin_bar) {
     $args = array(
         'id' => 'theme-license',
-        'title' => __('Plugin Licenses', 'hocwp-theme-switcher'),
+        'title' => __('Plugin Licenses', 'hocwp-dat-ve-tau'),
         'href' => admin_url('plugins.php?page=hocwp_plugin_license'),
         'parent' => 'plugins'
     );
@@ -26,7 +26,7 @@ function hocwp_dat_ve_tau_check_license() {
 add_action('hocwp_check_license', 'hocwp_dat_ve_tau_check_license');
 
 function hocwp_dat_ve_tau_invalid_license_notice() {
-    $plugin_name = hocwp_get_plugin_info(HOCWP_DAT_VE_TAU_FILE, HOCWP_DAT_VE_TAU_BASENAME);
+    $plugin_name = hocwp_get_plugin_name(HOCWP_DAT_VE_TAU_FILE, HOCWP_DAT_VE_TAU_BASENAME);
     $plugin_name = hocwp_wrap_tag($plugin_name, 'strong');
     $args = array(
         'error' => true,
@@ -76,7 +76,6 @@ function hocwp_dat_ve_tau_post_type_and_taxonomy() {
         'name' => __('Ga', 'hocwp-dat-ve-tau'),
         'slug' => 'ga',
         'post_types' => 've_tau',
-        'show_ui' => false,
         'show_admin_column' => false
     );
     hocwp_register_taxonomy($args);
@@ -85,7 +84,6 @@ function hocwp_dat_ve_tau_post_type_and_taxonomy() {
         'name' => __('Hạng ghế', 'hocwp-dat-ve-tau'),
         'slug' => 'hang_ghe',
         'post_types' => 've_tau',
-        'show_ui' => false,
         'show_admin_column' => false
     );
     hocwp_register_taxonomy($args);
@@ -94,7 +92,6 @@ function hocwp_dat_ve_tau_post_type_and_taxonomy() {
         'name' => __('Địa chỉ', 'hocwp-dat-ve-tau'),
         'slug' => 'dia_chi',
         'post_types' => 've_tau',
-        'show_ui' => false,
         'show_admin_column' => false
     );
     hocwp_register_taxonomy($args);

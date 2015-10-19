@@ -35,7 +35,7 @@
         } else if(!$.trim($phone.val())) {
             alert('Xin vui lòng nhập số điện thoại.');
             return false;
-        } else if(!$.trim($captcha.val())) {
+        } else if($captcha.length && !$.trim($captcha.val())) {
             alert('Xin vui lòng nhập mã bảo mật.');
             return false;
         } else {

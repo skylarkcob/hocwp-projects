@@ -188,12 +188,15 @@ function hocwp_theme_invalid_license_redirect() {
 }
 
 function hocwp_theme_license_valid($data = array()) {
-    $license = new HOCWP_License();
-    return $license->check_valid($data);
+    global $hocwp_theme_license;
+    if(!hocwp_object_valid($hocwp_theme_license)) {
+        $hocwp_theme_license = new HOCWP_License();
+    }
+    return $hocwp_theme_license->check_valid($data);
 }
 
 function hocwp_theme_get_license_defined_data() {
-    $data = (defined('HOCWP_THEME_LICENSE_DATA')) ? HOCWP_THEME_LICENSE_DATA : array();
-    $data = apply_filters('hocwp_theme_license_defined_data', $data);
-    return $data;
+    global $hocwp_theme_license_data;
+    $hocwp_theme_license_data = hocwp_sanitize_array($hocwp_theme_license_data);
+    return apply_filters('hocwp_theme_license_defined_data', $hocwp_theme_license_data);
 }
