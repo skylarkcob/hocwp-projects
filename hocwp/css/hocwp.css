@@ -296,6 +296,30 @@ label.label-input-size {
 }
 
 /**
+ * Backgrounds
+ */
+
+.bg-success {
+
+}
+
+/**
+ * Icons
+ */
+
+.icon-circle {
+    background-color: #ddd;
+    border-radius: 50%;
+    display: inline-block;
+    height: 14px;
+    width: 14px;
+}
+
+.icon-circle-success {
+    background-color: #7ad03a;
+}
+
+/**
  * Media Queries
  */
 
