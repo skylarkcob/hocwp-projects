@@ -1385,6 +1385,18 @@ function hocwp_is_my_plugin($plugin_data) {
     return $result;
 }
 
+function hocwp_is_my_theme($stylesheet = null, $theme_root = null) {
+    $result = false;
+    $theme = wp_get_theme($stylesheet, $theme_root);
+    $theme_uri = $theme->get('ThemeURI');
+    $text_domain = $theme->get('TextDomain');
+    $author_uri = $theme->get('AuthorURI');
+    if((hocwp_string_contain($theme_uri, 'hocwp') && hocwp_string_contain($author_uri, 'hocwp')) || (hocwp_string_contain($text_domain, 'hocwp') && hocwp_string_contain($theme_uri, 'hocwp')) || (hocwp_string_contain($text_domain, 'hocwp') && hocwp_string_contain($author_uri, 'hocwp'))) {
+        $result = true;
+    }
+    return $result;
+}
+
 function hocwp_has_plugin() {
     $result = false;
     $plugins = hocwp_get_plugins();
@@ -1648,6 +1660,58 @@ function hocwp_enqueue_jquery_ui_style() {
 
 function hocwp_enqueue_jquery_ui_datepicker() {
     wp_enqueue_script('jquery-ui-datepicker');
+}
+
+function hocwp_get_recaptcha_language() {
+    $lang = apply_filters('hocwp_recaptcha_language', hocwp_get_language());
+    return $lang;
+}
+
+function hocwp_enqueue_recaptcha() {
+    $lang = hocwp_get_recaptcha_language();
+    $url = 'https://www.google.com/recaptcha/api.js';
+    $url = add_query_arg(array('hl' => $lang), $url);
+    $multiple = apply_filters('hocwp_multiple_recaptcha', false);
+    if($multiple) {
+        $url = add_query_arg(array('onload' => 'CaptchaCallback', 'render' => 'explicit'), $url);
+    }
+    wp_enqueue_script('recaptcha', $url, array(), false, true);
+}
+
+function hocwp_recaptcha_response($secret_key) {
+    $result = false;
+    $response = @file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=' . $secret_key . '&response=' . $_POST['g-recaptcha-response']);
+    $response = json_decode($response, true);
+    if(true === $response['success']) {
+        $result = true;
+    }
+    return $result;
+}
+
+function hocwp_admin_enqueue_scripts() {
+    global $pagenow;
+    $current_page = hocwp_get_current_admin_page();
+    $use = apply_filters('hocwp_use_jquery_ui', false);
+    if($use || ('themes.php' == $pagenow && 'hocwp_theme_setting' == $current_page)) {
+        wp_enqueue_script('jquery-ui-core');
+    }
+    $use = apply_filters('hocwp_use_jquery_ui_sortable', false);
+    if($use) {
+        wp_enqueue_script('jquery-ui-sortable');
+    }
+    $wp_enqueue_media = apply_filters('hocwp_wp_enqueue_media', false);
+    if($wp_enqueue_media) {
+        wp_enqueue_media();
+    }
+    hocwp_register_core_style_and_script();
+    wp_register_style('hocwp-admin-style', get_template_directory_uri() . '/hocwp/css/hocwp-admin'. HOCWP_CSS_SUFFIX, array('hocwp-style'));
+    wp_register_script('hocwp-admin', get_template_directory_uri() . '/hocwp/js/hocwp-admin' . HOCWP_JS_SUFFIX, array('jquery', 'hocwp'), false, true);
+    wp_localize_script('hocwp', 'hocwp', hocwp_default_script_localize_object());
+    $use = apply_filters('hocwp_use_admin_style_and_script', false);
+    if($use) {
+        wp_enqueue_style('hocwp-admin-style');
+        wp_enqueue_script('hocwp-admin');
+    }
 }
 
 function hocwp_get_admin_email() {

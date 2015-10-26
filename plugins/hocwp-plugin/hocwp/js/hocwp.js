@@ -282,6 +282,22 @@ hocwp.media_items = {};
         $input_result.val(value);
         return value;
     };
+
+    hocwp.sortablePostTypeStop = function(container) {
+        var $input_result = container.find('.input-result'),
+            $sortable_result = container.find('.connected-result'),
+            value = [];
+        $sortable_result.find('li').each(function(index, el) {
+            var $element = $(el),
+                item = {
+                    id: $element.attr('data-id')
+                };
+            value.push(item);
+        });
+        value = JSON.stringify(value);
+        $input_result.val(value);
+        return value;
+    };
 })(jQuery);
 
 (function($) {
@@ -480,6 +496,8 @@ hocwp.media_items = {};
                     var $sortable_result = $container.find('.connected-result');
                     if($sortable_result.hasClass('term-sortable')) {
                         hocwp.sortableTermStop($container);
+                    } else if($sortable_result.hasClass('post-type-sortable')) {
+                        hocwp.sortablePostTypeStop($container);
                     }
                 }
             };
