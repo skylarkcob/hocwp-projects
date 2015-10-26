@@ -3,7 +3,9 @@ if(!file_exists(HOCWP_CONTENT_PATH)) {
     mkdir(HOCWP_CONTENT_PATH);
 }
 
-add_action('init', 'hocwp_session_start');
+if(!has_action('init', 'hocwp_session_start')) {
+    add_action('init', 'hocwp_session_start');
+}
 
 function hocwp_setup_widget_title($title) {
     $first_char = hocwp_get_first_char($title);
@@ -67,3 +69,13 @@ function hocwp_setup_login_redirect($redirect_to, $request, $user) {
 }
 
 add_filter('login_redirect', 'hocwp_setup_login_redirect', 10, 3);
+
+function hocwp_setup_script_loader_tag($tag, $handle) {
+    switch($handle) {
+        case 'recaptcha':
+            $tag = str_replace(' src',' defer async src', $tag);
+            break;
+    }
+    return $tag;
+}
+add_filter('script_loader_tag', 'hocwp_setup_script_loader_tag', 10, 2);

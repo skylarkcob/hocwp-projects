@@ -19,30 +19,44 @@ function hocwp_get_smtp_mail_data() {
     $defaults = hocwp_smtp_mail_defaults();
     $option = hocwp_get_option('option_smtp_email');
     $result = wp_parse_args($option, $defaults);
-    return $result;
+    return apply_filters('hocwp_smtp_mail_args', $result);
+}
+
+function hocwp_get_mail_from_name() {
+    $data = hocwp_get_smtp_mail_data();
+    $name = get_bloginfo('name');
+    if(isset($data['mail_from_name']) && !empty($data['mail_from_name'])) {
+        $name = $data['mail_from_name'];
+    }
+    return $name;
 }
 
 function hocwp_mail_from_name($name) {
-    $data = hocwp_get_smtp_mail_data();
-    if(isset($data['mail_from_name']) && !empty($data['mail_from_name'])) {
-        $name = $data['mail_from_name'];
-    } elseif('wordpress' == strtolower($name)) {
-        $name = get_bloginfo('name');
-    }
+    $name = hocwp_get_mail_from_name();
     return $name;
 }
 add_filter('wp_mail_from_name', 'hocwp_mail_from_name');
 
-function hocwp_mail_from($email) {
+function hocwp_get_mail_from() {
     $data = hocwp_get_smtp_mail_data();
+    $email = get_bloginfo('admin_email');
     if(isset($data['mail_from']) && !empty($data['mail_from'])) {
         $email = $data['mail_from'];
-    } else {
-        $email = get_bloginfo('admin_email');
     }
     return $email;
 }
+
+function hocwp_mail_from($email) {
+    $email = hocwp_get_mail_from();
+    return $email;
+}
 add_filter('wp_mail_from', 'hocwp_mail_from');
+
+function hocwp_get_mailer() {
+    $data = hocwp_get_smtp_mail_data();
+    $mailer = hocwp_get_value_by_key($data, 'mailer');
+    return apply_filters('hocwp_mailer', $mailer);
+}
 
 function hocwp_phpmailer_init_change_info($phpmailer) {
     $data = hocwp_get_smtp_mail_data();
@@ -96,4 +110,47 @@ function hocwp_mail_test_smtp_setting($to_email) {
     $test_message .= '<p>' . __('The SMTP debugging output is shown below:', 'hocwp') . '</p>';
     $test_message .= '<pre>' . $smtp_debug . '</pre>';
     return $test_message;
+}
+
+function hocwp_set_html_mail_content_type() {
+    return 'text/html';
+}
+
+function hocwp_send_html_mail($to, $subject, $message, $headers = '', $attachments = '') {
+    $result = false;
+    $mailer = hocwp_get_mailer();
+    if('smtp' == $mailer) {
+        add_filter('wp_mail_content_type', 'hocwp_set_html_mail_content_type');
+        $result = wp_mail($to, $subject, $message, $headers, $attachments);
+        remove_filter('wp_mail_content_type', 'hocwp_set_html_mail_content_type');
+    } else {
+        $result = hocwp_send_mail($to, $subject, $message);
+    }
+    return $result;
+}
+
+function hocwp_build_html_mail_headers(&$headers = '') {
+    $headers .= 'MIME-Version: 1.0' . "\r\n";
+    $headers .= 'Content-type: text/html; charset=utf-8' . "\r\n";
+    return $headers;
+}
+
+function hocwp_build_mail_headers(&$headers = '') {
+    $from_name = hocwp_get_mail_from_name();
+    $from = hocwp_get_mail_from();
+    $headers .= "From: " . $from_name . " < " . $from . " >\r\n";
+    hocwp_build_html_mail_headers($headers);
+    $headers = apply_filters('hocwp_mail_headers', $headers);
+    return $headers;
+}
+
+function hocwp_send_mail($to, $subject, $message) {
+    $mailer = hocwp_get_mailer();
+    if('smtp' == $mailer) {
+        $result = hocwp_send_html_mail($to, $subject, $message);
+    } else {
+        $headers = hocwp_build_mail_headers();
+        $result = mail($to, $subject, $message, $headers);
+    }
+    return $result;
 }

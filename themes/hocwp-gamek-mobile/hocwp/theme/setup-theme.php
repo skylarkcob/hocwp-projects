@@ -1,4 +1,6 @@
 <?php
+global $hocwp_theme_license;
+
 function hocwp_theme_after_switch() {
     if(!current_user_can('switch_themes')) {
         return;
@@ -194,8 +196,7 @@ add_filter('login_headertitle', 'hocwp_setup_theme_login_headertitle');
 
 function hocwp_setup_theme_check_license() {
     if(!isset($_POST['submit']) && !hocwp_is_login_page()) {
-        $license = new HOCWP_License();
-        if(!$license->check_valid(hocwp_theme_get_license_defined_data()) || !has_action('hocwp_check_license', 'hocwp_theme_custom_check_license')) {
+        if(!hocwp_theme_license_valid(hocwp_theme_get_license_defined_data()) || !has_action('hocwp_check_license', 'hocwp_theme_custom_check_license')) {
             hocwp_theme_invalid_license_redirect();
         }
     }
@@ -274,6 +275,37 @@ function hocwp_setup_theme_admin_bar_menu($wp_admin_bar) {
         );
         $wp_admin_bar->add_node($args);
     }
+    $option = hocwp_option_get_object_from_list('option_smtp_email');
+    if(hocwp_object_valid($option) && current_user_can($option->get_capability())) {
+        $args = array(
+            'id' => hocwp_sanitize_id($option->get_menu_slug()),
+            'title' => $option->get_menu_title(),
+            'href' => $option->get_page_url(),
+            'parent' => 'options-general'
+        );
+        $wp_admin_bar->add_node($args);
+    }
+    $args = array(
+        'id' => 'options-writing',
+        'title' => __('Writing', 'hocwp'),
+        'href' => admin_url('options-writing.php'),
+        'parent' => 'options-general'
+    );
+    $wp_admin_bar->add_node($args);
+    $args = array(
+        'id' => 'options-reading',
+        'title' => __('Reading', 'hocwp'),
+        'href' => admin_url('options-reading.php'),
+        'parent' => 'options-general'
+    );
+    $wp_admin_bar->add_node($args);
+    $args = array(
+        'id' => 'options-discussion',
+        'title' => __('Discussion', 'hocwp'),
+        'href' => admin_url('options-discussion.php'),
+        'parent' => 'options-general'
+    );
+    $wp_admin_bar->add_node($args);
     $args = array(
         'id' => 'options-permalink',
         'title' => __('Permalinks', 'hocwp'),

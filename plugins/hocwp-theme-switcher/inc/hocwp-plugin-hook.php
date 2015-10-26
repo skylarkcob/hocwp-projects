@@ -1,6 +1,25 @@
 <?php
 add_action('init', 'hocwp_session_start');
 
+function hocwp_theme_switcher_admin_bar_menu($wp_admin_bar) {
+    $args = array(
+        'id' => 'theme-switcher',
+        'title' => __('Theme Switcher', 'hocwp-theme-switcher'),
+        'href' => admin_url('options-general.php?page=hocwp_theme_switcher'),
+        'parent' => 'options-general'
+    );
+    $wp_admin_bar->add_node($args);
+
+    $args = array(
+        'id' => 'theme-license',
+        'title' => __('Plugin Licenses', 'hocwp-theme-switcher'),
+        'href' => admin_url('plugins.php?page=hocwp_plugin_license'),
+        'parent' => 'plugins'
+    );
+    $wp_admin_bar->add_node($args);
+}
+if(!is_admin()) add_action('admin_bar_menu', 'hocwp_theme_switcher_admin_bar_menu', 99);
+
 function hocwp_theme_switcher_plugins_loaded() {
     global $hocwp_theme_switcher_type, $hocwp_theme_switcher_time, $hocwp_theme_switcher_license_valid;
 
@@ -79,9 +98,9 @@ function hocwp_theme_switcher_home_url($url, $path, $orig_scheme, $blog_id) {
 
 function hocwp_theme_switcher_buttons() {
     $home_url = home_url('/');
-    $mobile_text = apply_filters('hocwp_theme_switcher_mobile_button_text', __('Mobile', 'hocwp'));
+    $mobile_text = apply_filters('hocwp_theme_switcher_mobile_button_text', __('Mobile', 'hocwp-theme-switcher'));
     $mobile_url = add_query_arg(array('mobile' => 'true'), $home_url);
-    $desktop_text = apply_filters('hocwp_theme_switcher_desktop_button_text', __('Desktop', 'hocwp'));
+    $desktop_text = apply_filters('hocwp_theme_switcher_desktop_button_text', __('Desktop', 'hocwp-theme-switcher'));
     $desktop_url = add_query_arg(array('mobile' => 'false'), $home_url);
     $desktop_url = str_replace('m.', '', $desktop_url);
     ?>
@@ -115,8 +134,8 @@ function hocwp_theme_switcher_invalid_license_notice() {
     $plugin_name = hocwp_wrap_tag($plugin_name, 'strong');
     $args = array(
         'error' => true,
-        'title' => __('Error', 'hocwp'),
-        'text' => sprintf(__('Plugin %1$s is using an invalid license key! If you does not have one, please contact %2$s via email address %3$s for more information.', 'hocwp'), $plugin_name, '<strong>' . HOCWP_NAME . '</strong>', '<a href="mailto:' . esc_attr(HOCWP_EMAIL) . '">' . HOCWP_EMAIL . '</a>')
+        'title' => __('Error', 'hocwp-theme-switcher'),
+        'text' => sprintf(__('Plugin %1$s is using an invalid license key! If you does not have one, please contact %2$s via email address %3$s for more information.', 'hocwp-theme-switcher'), $plugin_name, '<strong>' . HOCWP_NAME . '</strong>', '<a href="mailto:' . esc_attr(HOCWP_EMAIL) . '">' . HOCWP_EMAIL . '</a>')
     );
     hocwp_admin_notice($args);
 }

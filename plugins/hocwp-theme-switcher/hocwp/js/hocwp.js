@@ -159,8 +159,7 @@ hocwp.media_items = {};
     };
 
     hocwp.isEmail = function(email) {
-        var regex = '/^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/';
-        return regex.test(email);
+        return this.test(email, '^[-!#$%&\'*+\\./0-9=?A-Z^_`a-z{|}~]+@[-!#$%&\'*+\\/0-9=?A-Z^_`a-z{|}~]+\.[-!#$%&\'*+\\./0-9=?A-Z^_`a-z{|}~]+$');
     };
 
     hocwp.isEmpty = function(text) {
@@ -276,6 +275,22 @@ hocwp.media_items = {};
                 item = {
                     id: $element.attr('data-id'),
                     taxonomy: $element.attr('data-taxonomy')
+                };
+            value.push(item);
+        });
+        value = JSON.stringify(value);
+        $input_result.val(value);
+        return value;
+    };
+
+    hocwp.sortablePostTypeStop = function(container) {
+        var $input_result = container.find('.input-result'),
+            $sortable_result = container.find('.connected-result'),
+            value = [];
+        $sortable_result.find('li').each(function(index, el) {
+            var $element = $(el),
+                item = {
+                    id: $element.attr('data-id')
                 };
             value.push(item);
         });
@@ -481,6 +496,8 @@ hocwp.media_items = {};
                     var $sortable_result = $container.find('.connected-result');
                     if($sortable_result.hasClass('term-sortable')) {
                         hocwp.sortableTermStop($container);
+                    } else if($sortable_result.hasClass('post-type-sortable')) {
+                        hocwp.sortablePostTypeStop($container);
                     }
                 }
             };

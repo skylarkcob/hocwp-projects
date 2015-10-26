@@ -26,6 +26,8 @@ class HOCWP_Option {
     private $help_sidebar;
     private $use_style_and_script;
     private $use_media_upload;
+    private $use_jquery_ui;
+    private $use_jquery_ui_sortable;
 
     private $exists;
     private $page;
@@ -51,7 +53,23 @@ class HOCWP_Option {
     }
 
     public function get_use_style_and_script() {
-        return $this->use_style_and_script;
+        return (bool)$this->use_style_and_script;
+    }
+
+    public function set_use_jquery_ui_sortable($use) {
+        $this->use_jquery_ui_sortable = $use;
+    }
+
+    public function get_use_jquery_ui_sortable() {
+        return $this->use_jquery_ui_sortable;
+    }
+
+    public function set_use_jquery_ui($use) {
+        $this->use_jquery_ui = $use;
+    }
+
+    public function get_use_jquery_ui() {
+        return (bool)$this->use_jquery_ui;
     }
 
     public function set_use_media_upload($use_media_upload) {
@@ -59,7 +77,7 @@ class HOCWP_Option {
     }
 
     public function get_use_media_upload() {
-        return $this->use_media_upload;
+        return (bool)$this->use_media_upload;
     }
 
     public function set_help_sidebar($help_sidebar) {
@@ -320,6 +338,15 @@ class HOCWP_Option {
         }
         if($this->get_use_media_upload()) {
             add_filter('hocwp_wp_enqueue_media', '__return_true');
+        }
+        if($this->get_use_jquery_ui()) {
+            add_filter('hocwp_use_jquery_ui', '__return_true');
+        }
+        if($this->get_use_jquery_ui_sortable()) {
+            add_filter('hocwp_use_jquery_ui_sortable', '__return_true');
+        }
+        if(!hocwp_is_my_theme()) {
+            add_action('admin_print_scripts', 'hocwp_admin_enqueue_scripts');
         }
     }
 

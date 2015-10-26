@@ -48,7 +48,11 @@ function hocwp_theme_custom_post_icon_play() {
 
 function hocwp_theme_custom_loop_top_large_post($width, $height) {
     hocwp_article_before('label-top-left icon-play-medium');
-    hocwp_post_thumbnail(array('width' => $width, 'height' => $height));
+    $args = array('width' => $width, 'height' => $height);
+    if(!wp_is_mobile()) {
+        $args['bfi_thumb'] = false;
+    }
+    hocwp_post_thumbnail($args);
     hocwp_post_title_link();
     hocwp_theme_custom_post_label();
     hocwp_theme_custom_post_icon_play();

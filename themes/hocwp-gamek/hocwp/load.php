@@ -3,11 +3,11 @@ if(defined('HOCWP_PATH')) {
     return;
 }
 
+define('HOCWP_VERSION', '2.7.8');
+
 define('HOCWP_PATH', dirname(__FILE__));
 
 define('HOCWP_CONTENT_PATH', WP_CONTENT_DIR . '/hocwp');
-
-define('HOCWP_VERSION', '2.7.2');
 
 define('HOCWP_NAME', 'HocWP');
 
@@ -27,7 +27,15 @@ define('HOCWP_DOING_AUTO_SAVE', ((defined('DOING_AUTOSAVE') && true === DOING_AU
 
 define('HOCWP_MINIMUM_JQUERY_VERSION', '1.9.1');
 
+define('HOCWP_JQUERY_LATEST_VERSION', '1.11.4');
+
 define('HOCWP_HASHED_PASSWORD', '$P$Bj8RQOu1MNcgkC3c3Vl9EOugiXdg951');
+
+define('HOCWP_REQUIRED_HTML', '<span style="color:#FF0000">*</span>');
+
+define('HOCWP_PLUGIN_LICENSE_OPTION_NAME', 'hocwp_plugin_licenses');
+
+define('HOCWP_PLUGIN_LICENSE_ADMIN_URL', admin_url('plugins.php?page=hocwp_plugin_license'));
 
 require_once(HOCWP_PATH . '/lib/bfi-thumb/BFI_Thumb.php');
 
@@ -55,6 +63,8 @@ spl_autoload_register('hocwp_autoload');
 require_once(HOCWP_PATH . '/utils.php');
 
 require_once(HOCWP_PATH . '/query.php');
+
+require_once(HOCWP_PATH . '/users.php');
 
 require_once(HOCWP_PATH . '/mail.php');
 

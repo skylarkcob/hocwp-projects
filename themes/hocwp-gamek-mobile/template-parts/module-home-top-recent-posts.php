@@ -25,11 +25,11 @@ if($query->have_posts()) {
             <?php
             $post = array_shift($left_posts);
             setup_postdata($post);
-            hocwp_theme_custom_loop_top_large_post(339, 262);
+            hocwp_theme_custom_loop_top_large_post(539, 462);
             wp_reset_postdata();
             $post = array_shift($left_posts);
             setup_postdata($post);
-            hocwp_theme_custom_loop_top_large_post(339, 163);
+            hocwp_theme_custom_loop_top_large_post(539, 363);
             wp_reset_postdata();
             ?>
         </div>
@@ -37,11 +37,11 @@ if($query->have_posts()) {
             <?php
             $post = array_shift($right_posts);
             setup_postdata($post);
-            hocwp_theme_custom_loop_top_large_post(278, 262);
+            hocwp_theme_custom_loop_top_large_post(478, 462);
             wp_reset_postdata();
             $post = array_shift($right_posts);
             setup_postdata($post);
-            hocwp_theme_custom_loop_top_large_post(278, 163);
+            hocwp_theme_custom_loop_top_large_post(478, 363);
             wp_reset_postdata();
             ?>
         </div>

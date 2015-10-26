@@ -1336,6 +1336,10 @@ p.search_result {
     width: 100%;
 }
 
+.single .site-main .bottom-ads .widget * {
+    margin: 0 auto;
+}
+
 .leftdetail p.namebox {
     border-bottom: 1px solid #dad9d9;
     border-top: 3px solid #ec5f5f;
@@ -1532,37 +1536,6 @@ p.search_result {
     color: #ed4848;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 .site-footer {
     background: #525252 none repeat scroll 0 0;
     clear: both;
@@ -1741,6 +1714,14 @@ p.search_result {
 .single .fb-comments {
     clear: both;
     margin: 10px 0;
+}
+
+.single .list-posts .hocwp-post .wp-post-image {
+    height: 160px;
+}
+
+.six-recent-posts .col-left .post .wp-post-image {
+    height: 145px;
 }
 
 /* ==================== Responsive ==================== */
@@ -1943,6 +1924,10 @@ p.search_result {
     .single .tinnoibatdetail {
         width: 48%;
     }
+
+    .six-recent-posts .col-left .post .wp-post-image {
+        height: 300px;
+    }
 }
 
 @media only screen and (max-width: 955px) {
@@ -1989,7 +1974,9 @@ p.search_result {
 }
 
 @media only screen and (max-width: 720px) {
-
+    .six-recent-posts .col-left .post .wp-post-image {
+        height: 250px;
+    }
 }
 
 @media only screen and (max-width: 640px) {
@@ -2032,6 +2019,10 @@ p.search_result {
     .single .site-main .bottom-ads * {
         max-width: 100%;
     }
+
+    .single .list-posts .hocwp-post .wp-post-image {
+        height: 140px;
+    }
 }
 
 @media only screen and (max-width: 568px) {
@@ -2053,6 +2044,10 @@ p.search_result {
 
     .single .site-main .rightdetail {
         width: 100%;
+    }
+
+    .six-recent-posts .col-left .post .wp-post-image {
+        height: 200px;
     }
 }
 
@@ -2139,6 +2134,10 @@ p.search_result {
         clear: both;
         margin-left: 0;
     }
+
+    .six-recent-posts .col-left .post .wp-post-image {
+        height: 150px;
+    }
 }
 
 @media only screen and (max-width: 360px) {
@@ -2209,6 +2208,14 @@ p.search_result {
     .most-view-most-new .hocwp-post .entry-title {
         font-size: 14px;
         line-height: 19px;
+    }
+
+    .single .list-posts .hocwp-post .wp-post-image {
+        height: 105px;
+    }
+
+    .six-recent-posts .col-left .post .wp-post-image {
+        height: 110px;
     }
 }
 

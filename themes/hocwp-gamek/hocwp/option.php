@@ -15,13 +15,18 @@ function hocwp_option_get_object_from_list($key) {
     return isset($hocwp_options[$key]) ? $hocwp_options[$key] : null;
 }
 
-function hocwp_option_get_value($base, $key) {
-    $result = '';
-    $option = hocwp_option_get_object_from_list($base);
+function hocwp_option_get_data($base_slug) {
+    $data = array();
+    $option = hocwp_option_get_object_from_list($base_slug);
     if(hocwp_object_valid($option)) {
         $data = $option->get();
-        $result = hocwp_get_value_by_key($data, $key);
     }
+    return $data;
+}
+
+function hocwp_option_get_value($base, $key) {
+    $data = hocwp_option_get_data($base);
+    $result = hocwp_get_value_by_key($data, $key);
     return $result;
 }
 
@@ -46,4 +51,11 @@ function hocwp_get_option($base_name) {
         return $option->get();
     }
     return array();
+}
+
+function hocwp_add_option_page_smtp_email($parent_slug = null) {
+    if(null != $parent_slug) {
+        _deprecated_argument(__FUNCTION__, '2.7.4', __('Please do not use $parent_slug argument since core version 2.7.4 or later.', 'hocwp'));
+    }
+    require_once(HOCWP_PATH . '/options/setting-smtp-email.php');
 }

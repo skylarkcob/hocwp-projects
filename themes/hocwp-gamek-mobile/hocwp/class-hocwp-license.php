@@ -310,6 +310,8 @@ class HOCWP_License {
             }
             $result['code'] = $this->get_code();
             $result['customer_email'] = $this->get_customer_email();
+            $result['hashed'] = $this->get_hashed_code();
+            $result['key_map'] = $this->get_key_map();
         }
         $this->set_generated($result);
         return $result;
@@ -329,7 +331,7 @@ class HOCWP_License {
         }
         $hashed_license = hocwp_get_value_by_key($data, 'hashed');
         if(!empty($hashed_license)) {
-            $key_map = hocwp_get_value_by_key($data, 'key_map');
+            $key_map = maybe_unserialize(hocwp_get_value_by_key($data, 'key_map'));
             $this->set_key_map($key_map);
             $license_info = $this->get_saved_license_data();
             if($this->for_theme()) {
@@ -347,6 +349,9 @@ class HOCWP_License {
             }
             $this->create_key();
             $key = $this->get_key();
+            if(!function_exists('wp_check_password')) {
+                require_once(ABSPATH . WPINC . '/pluggable.php');
+            }
             if(wp_check_password($key, $hashed_license)) {
                 $valid = true;
             }

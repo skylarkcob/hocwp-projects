@@ -183,3 +183,36 @@ function hocwp_post_author_box() {
         get_template_part('hocwp/theme/biography');
     }
 }
+
+function hocwp_insert_post($args = array()) {
+    $post_title = '';
+    $post_content = '';
+    $post_status = 'pending';
+    $post_type = 'post';
+    $post_author = 1;
+    $first_admin = hocwp_get_first_admin();
+    if($first_admin) {
+        $post_author = $first_admin->ID;
+    }
+    $defaults = array(
+        'post_title' => $post_title,
+        'post_content' => $post_content,
+        'post_status' => $post_status,
+        'post_type' => $post_type,
+        'post_author' => $post_author,
+        'ping_status' => get_option('default_ping_status'),
+        'post_parent' => 0,
+        'menu_order' => 0,
+        'to_ping' =>  '',
+        'pinged' => '',
+        'post_password' => '',
+        'guid' => '',
+        'post_content_filtered' => '',
+        'post_excerpt' => '',
+        'import_id' => 0
+    );
+    $args = wp_parse_args($args, $defaults);
+    $args['post_title'] = wp_strip_all_tags($args['post_title']);
+    $post_id = wp_insert_post($args);
+    return $post_id;
+}

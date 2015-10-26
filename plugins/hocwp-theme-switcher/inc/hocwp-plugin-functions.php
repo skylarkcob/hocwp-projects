@@ -1,6 +1,8 @@
 <?php
 function hocwp_theme_switcher_get_license_defined_data() {
-    $data = (defined('HOCWP_THEME_SWITCHER_LICENSE_DATA')) ? HOCWP_THEME_SWITCHER_LICENSE_DATA : array();
+    global $hocwp_theme_switcher_license_data;
+    $hocwp_theme_switcher_license_data = hocwp_sanitize_array($hocwp_theme_switcher_license_data);
+    $data = $hocwp_theme_switcher_license_data;
     $data = apply_filters('hocwp_theme_switcher_license_defined_data', $data);
     return $data;
 }

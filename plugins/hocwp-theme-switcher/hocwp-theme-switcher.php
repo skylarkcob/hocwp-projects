@@ -4,12 +4,12 @@ Plugin Name: HocWP Theme Switcher
 Plugin URI: http://hocwp.net/
 Description: This plugin is created by HocWP.
 Author: HocWP
-Version: 1.2
+Version: 1.6
 Author URI: http://hocwp.net/
 Text Domain: hocwp-theme-switcher
 Domain Path: /languages/
 */
-define('HOCWP_THEME_SWITCHER_VERSION', '1.0');
+define('HOCWP_THEME_SWITCHER_VERSION', '1.6');
 
 define('HOCWP_THEME_SWITCHER_FILE', __FILE__);
 

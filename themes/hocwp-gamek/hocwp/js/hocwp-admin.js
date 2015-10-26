@@ -2,6 +2,14 @@ window.wp = window.wp || {};
 window.hocwp = window.hocwp || {};
 
 (function($) {
+    hocwp.addBulkAction = function(actions) {
+        actions = actions || [];
+        for(var i = 0; i < actions.length; i++) {
+            $('<option>').val(actions[i][0]).text(actions[i][1]).appendTo("select[name='action']");
+            $('<option>').val(actions[i][0]).text(actions[i][1]).appendTo("select[name='action2']");
+        }
+    };
+
     (function() {
         $(document).on('widget-updated', function(e, widget) {
             $(this).find('.btn-insert-media').live('click', function(e) {

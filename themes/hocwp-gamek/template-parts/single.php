@@ -108,26 +108,30 @@
                     </ul>
                 </div>
             <?php endif; ?>
-            <div class="clear"></div>
-            <div class="margin-top-20 clearfix cothequantam">
-                <div class="section-bar">Có thể bạn quan tâm</div>
-                <ul class="list-posts list-unstyled">
-                    <?php
-                    $args = array(
-                        'posts_per_page' => 6,
-                        'post__not_in' => $excludes,
-                        'offset' => get_option('posts_per_page') * 2
-                    );
-                    $query = hocwp_query_related_post($args);
-                    while($query->have_posts()) {
-                        $query->the_post();
-                        hocwp_theme_get_loop('maybe-interest');
-                        $excludes[] = get_the_ID();
-                    }
-                    wp_reset_postdata();
-                    ?>
-                </ul>
-            </div>
+            <?php
+            $args = array(
+                'posts_per_page' => 6,
+                'post__not_in' => $excludes,
+                'offset' => get_option('posts_per_page') * 2
+            );
+            $query = hocwp_query_related_post($args);
+            ?>
+            <?php if($query->have_posts()) : ?>
+                <div class="clear"></div>
+                <div class="margin-top-20 clearfix cothequantam">
+                    <div class="section-bar">Có thể bạn quan tâm</div>
+                    <ul class="list-posts list-unstyled">
+                        <?php
+                        while($query->have_posts()) {
+                            $query->the_post();
+                            hocwp_theme_get_loop('maybe-interest');
+                            $excludes[] = get_the_ID();
+                        }
+                        wp_reset_postdata();
+                        ?>
+                    </ul>
+                </div>
+            <?php endif; ?>
             <div class="clear"></div>
             <div class="margin-top-20 clearfix">
                 <div class="section-bar">Bình luận về bài viết</div>

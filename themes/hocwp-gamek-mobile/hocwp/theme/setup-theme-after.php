@@ -106,7 +106,7 @@ function hocwp_theme_post_submitbox_misc_actions() {
     $post_types = hocwp_post_type_no_featured_field();
     if(!in_array($post_type, $post_types)) {
         $key = 'featured';
-        $value = get_post_meta($post->ID, 'featured', true);
+        $value = get_post_meta($post->ID, $key, true);
         $args = array(
             'id' => 'hocwp_featured_post',
             'name' => $key,

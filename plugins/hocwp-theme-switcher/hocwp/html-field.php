@@ -22,6 +22,24 @@ function hocwp_field_after($args = array()) {
     echo $after;
 }
 
+function hocwp_field_captcha($args = array()) {
+    hocwp_sanitize_field_args($args);
+    $captcha = new HOCWP_Captcha();
+    $id = isset($args['id']) ? $args['id'] : 'hocwp_captcha';
+    $placeholder = isset($args['placeholder']) ? $args['placeholder'] : __('Enter captcha code', 'hocwp');
+    $class = isset($args['class']) ? $args['class'] : '';
+    $input_width = isset($args['input_width']) ? absint($args['input_width']) : 115;
+    hocwp_add_string_with_space_before($class, 'hocwp-captcha-code');
+    hocwp_field_before($args);
+    $image_url = $captcha->generate_image();
+    ?>
+    <input autocomplete="off" id="<?php echo esc_attr($id); ?>" name="captcha" placeholder="<?php echo esc_attr($placeholder); ?>" class="<?php echo esc_attr($class); ?>" type="text" style="width: <?php echo $input_width; ?>px;">
+    <img class="hocwp-captcha-image" src="<?php echo $image_url; ?>">
+    <img class="hocwp-captcha-reload" src="<?php echo HOCWP_URL . '/images/icon-refresh-captcha.png'; ?>">
+    <?php
+    hocwp_field_after($args);
+}
+
 function hocwp_field_label($args = array()) {
     hocwp_sanitize_field_args($args);
     $text = isset($args['text']) ? $args['text'] : '';
@@ -172,6 +190,84 @@ function hocwp_field_sortable_term($args = array()) {
     hocwp_add_string_with_space_before($class, 'term-sortable');
     $args['class'] = $class;
     hocwp_field_sortable($args);
+}
+
+function hocwp_field_sortable_post_type($args = array()) {
+    $value = isset($args['value']) ? $args['value'] : '';
+    $items = isset($args['items']) ? $args['items'] : '';
+    if(empty($items)) {
+        $active_items = hocwp_json_string_to_array($value);
+        $post_type_args = isset($args['post_type_args']) ? $args['post_type_args'] : array();
+        $lists = get_post_types($post_type_args, 'objects');
+        unset($lists['nav_menu_item']);
+        unset($lists['attachment']);
+        unset($lists['revision']);
+        foreach($active_items as $aitem) {
+            unset($lists[$aitem['id']]);
+        }
+        foreach($lists as $key => $list_item) {
+            $li = new HOCWP_HTML('li');
+            $li->set_class('ui-state-default');
+            $attributes = array(
+                'data-id' => $key
+            );
+            $li->set_attribute_array($attributes);
+            $li->set_text($list_item->labels->singular_name);
+            $items .= $li->build();
+        }
+    }
+    $active_items = isset($args['active_items']) ? $args['active_items'] : '';
+    if(empty($active_items)) {
+        $lists = hocwp_json_string_to_array($value);
+        foreach($lists as $data) {
+            $id = isset($data['id']) ? $data['id'] : '';
+            $post_type = get_post_type_object($id);
+            if(hocwp_object_valid($post_type)) {
+                $li = new HOCWP_HTML('li');
+                $li->set_class('ui-state-default');
+                $attributes = array(
+                    'data-id' => $id
+                );
+                $li->set_attribute_array($attributes);
+                $li->set_text($post_type->labels->singular_name);
+                $active_items .= $li->build();
+            }
+        }
+    }
+    $args['items'] = $items;
+    $args['active_items'] = $active_items;
+    $class = isset($args['class']) ? $args['class'] : '';
+    hocwp_add_string_with_space_before($class, 'post-type-sortable');
+    $args['class'] = $class;
+    hocwp_field_sortable($args);
+}
+
+function hocwp_field_recaptcha($args = array()) {
+    $site_key = isset($args['site_key']) ? $args['site_key'] : '';
+    if(empty($site_key)) {
+        return;
+    }
+    $div = new HOCWP_HTML('div');
+    $div->set_class('g-recaptcha');
+    $div->set_attribute('data-sitekey', $site_key);
+    if(isset($args['id'])) {
+        $div->set_attribute('id', $args['id']);
+    }
+    $div->output();
+    ?>
+    <noscript>
+        <div style="width: 302px; height: 425px;">
+            <div style="width: 302px; height: 425px; position: relative;">
+                <div style="width: 302px; height: 425px; position: absolute;">
+                    <iframe src="https://www.google.com/recaptcha/api/fallback?k=<?php echo $site_key; ?>&hl=<?php echo hocwp_get_recaptcha_language(); ?>" frameborder="0" scrolling="no" style="width: 302px; height:425px; border-style: none;"></iframe>
+                </div>
+                <div style="width: 300px; height: 60px; bottom: 12px; left: 25px; margin: 0; padding: 0; right: 25px; background: #f9f9f9; border: 1px solid #c1c1c1; border-radius: 3px;">
+                    <textarea id="g-recaptcha-response" name="g-recaptcha-response" class="g-recaptcha-response" style="width: 250px; height: 40px; border: 1px solid #c1c1c1; margin: 10px 25px; padding: 0; resize: none;"></textarea>
+                </div>
+            </div>
+        </div>
+    </noscript>
+    <?php
 }
 
 function hocwp_field_size($args = array()) {

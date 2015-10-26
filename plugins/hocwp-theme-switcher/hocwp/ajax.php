@@ -37,3 +37,21 @@ function hocwp_fetch_plugin_license_ajax_callback() {
     die();
 }
 add_action('wp_ajax_hocwp_fetch_plugin_license', 'hocwp_fetch_plugin_license_ajax_callback');
+
+function hocwp_change_captcha_image_ajax_callback() {
+    $result = array(
+        'success' => false
+    );
+    $captcha = new HOCWP_Captcha();
+    $url = $captcha->generate_image();
+    if(!empty($url)) {
+        $result['success'] = true;
+        $result['captcha_image_url'] = $url;
+    } else {
+        $result['message'] = __('Sorry, cannot generate captcha image, please try again or contact administrator!', 'hocwp');
+    }
+    echo json_encode($result);
+    die();
+}
+add_action('wp_ajax_hocwp_change_captcha_image', 'hocwp_change_captcha_image_ajax_callback');
+add_action('wp_ajax_nopriv_hocwp_change_captcha_image', 'hocwp_change_captcha_image_ajax_callback');

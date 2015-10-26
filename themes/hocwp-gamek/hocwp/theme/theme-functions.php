@@ -15,24 +15,17 @@ function hocwp_theme_register_lib_font_awesome() {
 }
 
 function hocwp_theme_default_script_localize_object() {
+    $defaults = hocwp_default_script_localize_object();
     $args = array(
-        'ajax_url' => admin_url('admin-ajax.php'),
         'login_logo_url' => hocwp_get_login_logo_url(),
-        'mobile_menu_icon' => '<button class="menu-toggle mobile-menu-button" aria-expanded="false" aria-controls=""><i class="fa fa fa-bars"></i><span class="text">' . __('Menu', 'hocwp') . '</span></button>',
-        'i18n' => array(
-            'jquery_undefined_error' => __('HocWP\'s JavaScript requires jQuery', 'hocwp'),
-            'jquery_version_error' => sprintf(__('HocWP\'s JavaScript requires jQuery version %s or higher', 'hocwp'), HOCWP_MINIMUM_JQUERY_VERSION),
-            'insert_media_title' => __('Insert media', 'hocwp'),
-            'insert_media_button_text' => __('Use this media', 'hocwp'),
-            'insert_media_button_texts' => __('Use these medias', 'hocwp')
-        )
+        'mobile_menu_icon' => '<button class="menu-toggle mobile-menu-button" aria-expanded="false" aria-controls=""><i class="fa fa fa-bars"></i><span class="text">' . __('Menu', 'hocwp') . '</span></button>'
     );
-    return apply_filters('hocwp_default_script_object', $args);
+    $args = wp_parse_args($args, $defaults);
+    return apply_filters('hocwp_theme_default_script_object', $args);
 }
 
 function hocwp_theme_register_core_style_and_script() {
-    wp_register_style('hocwp-style', get_template_directory_uri() . '/hocwp/css/hocwp' . HOCWP_CSS_SUFFIX);
-    wp_register_script('hocwp', get_template_directory_uri() . '/hocwp/js/hocwp' . HOCWP_JS_SUFFIX, array('jquery'), false, true);
+    hocwp_register_core_style_and_script();
 }
 
 function hocwp_theme_get_template($slug, $name = '') {
@@ -195,12 +188,15 @@ function hocwp_theme_invalid_license_redirect() {
 }
 
 function hocwp_theme_license_valid($data = array()) {
-    $license = new HOCWP_License();
-    return $license->check_valid($data);
+    global $hocwp_theme_license;
+    if(!hocwp_object_valid($hocwp_theme_license)) {
+        $hocwp_theme_license = new HOCWP_License();
+    }
+    return $hocwp_theme_license->check_valid($data);
 }
 
 function hocwp_theme_get_license_defined_data() {
-    $data = (defined('HOCWP_THEME_LICENSE_DATA')) ? HOCWP_THEME_LICENSE_DATA : array();
-    $data = apply_filters('hocwp_theme_license_defined_data', $data);
-    return $data;
+    global $hocwp_theme_license_data;
+    $hocwp_theme_license_data = hocwp_sanitize_array($hocwp_theme_license_data);
+    return apply_filters('hocwp_theme_license_defined_data', $hocwp_theme_license_data);
 }
