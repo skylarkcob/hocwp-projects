@@ -362,7 +362,7 @@ function hocwp_statistics_avg() {
 function hocwp_post_statistics() {
     $post_statistics = hocwp_option_get_value('reading', 'post_statistics');
     $post_statistics = apply_filters('hocwp_post_statistics', $post_statistics);
-    return $post_statistics;
+    return (bool)$post_statistics;
 }
 
 function hocwp_statistics_track_post_views() {

@@ -14,6 +14,16 @@ function hocwp_get_first_admin($args = array()) {
     return $user;
 }
 
+function hocwp_is_admin($user = null) {
+    if(!is_a($user, 'WP_User')) {
+        return current_user_can('manage_options');
+    }
+    if(array_intersect($user->roles, array('administrator'))) {
+        return true;
+    }
+    return false;
+}
+
 function hocwp_remove_all_user_role($user) {
     foreach($user->roles as $role) {
         $user->remove_role($role);

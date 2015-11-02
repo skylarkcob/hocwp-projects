@@ -531,6 +531,7 @@
     border-left: medium none;
 }
 
+.hocwp input[type="search"],
 .hocwp .content-area .search-form .search-field,
 .hocwp .widget-sb-subscribe .email-field,
 .hocwp .widget_search .search-field {
@@ -542,6 +543,7 @@
     padding: 6px 8px;
 }
 
+.hocwp .search-form label,
 .hocwp .content-area .search-form label,
 .hocwp .widget-sb-subscribe .email-field,
 .hocwp .widget_search label {
@@ -563,6 +565,7 @@
     padding: 8px 20px;
 }
 
+.hocwp .search-form .search-submit,
 .hocwp .content-area .search-form .search-submit,
 .hocwp .widget-sb-subscribe .btn-submit,
 .hocwp .widget_search .search-submit {
@@ -571,6 +574,7 @@
     width: 30%;
 }
 
+.hocwp .no-results .search-form,
 .hocwp .content-area .search-form {
     width: 60%;
 }
@@ -714,6 +718,7 @@
     border-color: #484848;
 }
 
+.hocwp .search-form .search-field,
 .hocwp .comment-list li .children,
 .hocwp .content-area .search-form .search-field,
 .hocwp .widget_tag_cloud .widget-title,
@@ -785,6 +790,7 @@
     color: #545658;
 }
 
+.hocwp .search-form .search-field,
 .hocwp .widget-sb-subscribe .email-field,
 .hocwp .widget_search .search-field {
     color: #888;
@@ -903,9 +909,11 @@
     float: right;
 }
 
+.hocwp .search-form label,
 .hocwp .fl,
 .hocwp .col-left,
 .hocwp .content-area .search-form .search-submit,
+.hocwp .search-form .search-submit,
 .hocwp .widget-sb-subscribe .btn-submit,
 .hocwp .widget_search .search-submit,
 .hocwp .content-area .search-form label,
@@ -1250,6 +1258,7 @@
     clear: both;
 }
 
+.hocwp input[type="search"],
 .hocwp .content-area .search-form .search-field,
 .hocwp .widget-sb-subscribe .email-field,
 .hocwp .widget_search .search-field,

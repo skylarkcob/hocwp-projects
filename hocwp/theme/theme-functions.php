@@ -122,6 +122,10 @@ function hocwp_theme_add_setting_field_mobile_logo() {
     hocwp_theme_add_setting_field(array('id' => 'mobile_logo', 'title' => __('Mobile Logo', 'hocwp'), 'field_callback' => 'hocwp_field_media_upload'));
 }
 
+function hocwp_theme_add_setting_field_footer_logo() {
+    hocwp_theme_add_setting_field(array('title' => __('Footer Logo', 'hocwp'), 'id' => 'footer_logo', 'field_callback' => 'hocwp_field_media_upload'));
+}
+
 function hocwp_theme_add_setting_field_footer_text() {
     hocwp_theme_add_setting_field(array('title' => __('Footer Text', 'hocwp'), 'id' => 'footer_text', 'field_callback' => 'hocwp_field_editor'));
 }

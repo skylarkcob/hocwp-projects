@@ -21,6 +21,37 @@ function hocwp_post_change_content_url($old_url, $new_url) {
     return $wpdb->query("UPDATE $wpdb->posts SET post_content = (REPLACE (post_content, '$old_url', '$new_url'))");
 }
 
+function hocwp_get_post_views($post_id = null) {
+    if(!is_numeric($post_id)) {
+        $post_id = get_the_ID();
+    }
+    $result = get_post_meta($post_id, 'views', true);
+    $result = absint($result);
+    if(is_single() && $result < 1) {
+        $result = 1;
+        update_post_meta($post_id, 'views', 1);
+    }
+    return $result;
+}
+
+function hocwp_get_post_likes($post_id = null) {
+    if(!is_numeric($post_id)) {
+        $post_id = get_the_ID();
+    }
+    $result = get_post_meta($post_id, 'likes', true);
+    $result = absint($result);
+    return $result;
+}
+
+function hocwp_get_post_dislikes($post_id = null) {
+    if(!is_numeric($post_id)) {
+        $post_id = get_the_ID();
+    }
+    $result = get_post_meta($post_id, 'dislikes', true);
+    $result = absint($result);
+    return $result;
+}
+
 function hocwp_get_post_thumbnail_url($post_id = '', $size = 'full') {
     $result = '';
     if(empty($post_id)) {
@@ -34,6 +65,9 @@ function hocwp_get_post_thumbnail_url($post_id = '', $size = 'full') {
                 $result = $image_attributes[0];
             }
         }
+    }
+    if(empty($result)) {
+        $result = get_post_meta($post_id, 'thumbnail_url', true);
     }
     if(empty($result)) {
         $post = get_post($post_id);

@@ -262,6 +262,7 @@ function hocwp_field_recaptcha($args = array()) {
                     <iframe src="https://www.google.com/recaptcha/api/fallback?k=<?php echo $site_key; ?>&hl=<?php echo hocwp_get_recaptcha_language(); ?>" frameborder="0" scrolling="no" style="width: 302px; height:425px; border-style: none;"></iframe>
                 </div>
                 <div style="width: 300px; height: 60px; bottom: 12px; left: 25px; margin: 0; padding: 0; right: 25px; background: #f9f9f9; border: 1px solid #c1c1c1; border-radius: 3px;">
+                    <label for="g-recaptcha-response" style="display: none"></label>
                     <textarea id="g-recaptcha-response" name="g-recaptcha-response" class="g-recaptcha-response" style="width: 250px; height: 40px; border: 1px solid #c1c1c1; margin: 10px 25px; padding: 0; resize: none;"></textarea>
                 </div>
             </div>
@@ -635,6 +636,23 @@ function hocwp_field_select($args = array()) {
     }
     $html->output();
     hocwp_field_after($args);
+}
+
+function hocwp_field_select_language($args = array()) {
+    hocwp_field_sanitize_args($args);
+    $class = isset($args['class']) ? $args['class'] : '';
+    hocwp_add_string_with_space_before($class, 'select-language');
+    $args['field_class'] = $class;
+    $select_none = isset($args['select_none']) ? $args['select_none'] : '<option value="">--' . __('Choose language', 'hocwp') . '--</option>';
+    $lists = hocwp_supported_languages();
+    $value = isset($args['value']) ? $args['value'] : '';
+    $all_option = $select_none;
+    foreach($lists as $key => $data) {
+        $option = hocwp_field_get_option(array('value' => $key, 'text' => $data, 'selected' => $value));
+        $all_option .= $option;
+    }
+    $args['all_option'] = $all_option;
+    hocwp_field_select($args);
 }
 
 function hocwp_field_select_country($args = array()) {

@@ -40,7 +40,10 @@ window.hocwp = window.hocwp || {};
     })();
 
     (function() {
-        $('.sortable').hocwpSortable();
+        var $sortable = $('.sortable');
+        if($sortable.length) {
+            $sortable.hocwpSortable();
+        }
     })();
 
     (function() {
@@ -65,5 +68,9 @@ window.hocwp = window.hocwp || {};
                 }
             });
         });
+    })();
+
+    (function() {
+        hocwp.switcherAjax();
     })();
 })(jQuery);

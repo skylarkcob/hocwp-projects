@@ -46,6 +46,13 @@ function hocwp_setup_theme_body_class($classes) {
     if(!hocwp_theme_license_valid(hocwp_theme_get_license_defined_data())) {
         $classes[] = 'hocwp-invalid-license';
     }
+    if(is_user_logged_in()) {
+        $classes[] = 'hocwp-user';
+        global $current_user;
+        if(hocwp_is_admin($current_user)) {
+            $classes[] = 'hocwp-user-admin';
+        }
+    }
     return $classes;
 }
 add_filter('body_class', 'hocwp_setup_theme_body_class');
