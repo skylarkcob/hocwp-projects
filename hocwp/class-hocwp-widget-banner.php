@@ -1,13 +1,25 @@
 <?php
 class HOCWP_Widget_Banner extends WP_Widget {
+    public $args = array();
+
+    private function get_defaults() {
+        $defaults = array(
+            'admin_width' => 400
+        );
+        $args = apply_filters('hocwp_widget_banner_args', array());
+        $args = wp_parse_args($args, $defaults);
+        return $args;
+    }
+
     public function __construct() {
+        $this->args = $this->get_defaults();
         parent::__construct('hocwp_banner_widget', 'HOCWP Banner',
             array(
                 'classname' => 'hocwp-banner-widget',
                 'description' => __('Display banner on sidebar.', 'hocwp'),
             ),
             array(
-                'width' => 400
+                'width' => $this->args['admin_width']
             )
         );
     }

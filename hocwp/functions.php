@@ -1504,9 +1504,8 @@ function hocwp_sanitize_field_args(&$args) {
         return $args;
     }
     $field_class = isset($args['field_class']) ? $args['field_class'] : '';
-    if(empty($field_class)) {
-        $field_class = isset($args['class']) ? $args['class'] : '';
-    }
+    $class = isset($args['class']) ? $args['class'] : '';
+    hocwp_add_string_with_space_before($field_class, $class);
     $widefat = isset($args['widefat']) ? (bool)$args['widefat'] : true;
     $id = isset($args['id']) ? $args['id'] : '';
     $label = isset($args['label']) ? $args['label'] : '';

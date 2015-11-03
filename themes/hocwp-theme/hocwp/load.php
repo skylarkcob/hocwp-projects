@@ -3,7 +3,7 @@ if(defined('HOCWP_PATH')) {
     return;
 }
 
-define('HOCWP_VERSION', '2.7.8');
+define('HOCWP_VERSION', '2.8.0');
 
 define('HOCWP_PATH', dirname(__FILE__));
 
@@ -37,11 +37,11 @@ define('HOCWP_PLUGIN_LICENSE_OPTION_NAME', 'hocwp_plugin_licenses');
 
 define('HOCWP_PLUGIN_LICENSE_ADMIN_URL', admin_url('plugins.php?page=hocwp_plugin_license'));
 
-require_once(HOCWP_PATH . '/lib/bfi-thumb/BFI_Thumb.php');
+require(HOCWP_PATH . '/lib/bfi-thumb/BFI_Thumb.php');
 
-require_once(HOCWP_PATH . '/functions.php');
+require(HOCWP_PATH . '/functions.php');
 
-require_once(HOCWP_PATH . '/setup.php');
+require(HOCWP_PATH . '/setup.php');
 
 function hocwp_autoload($class_name) {
     $base_path = HOCWP_PATH;
@@ -60,11 +60,13 @@ function hocwp_autoload($class_name) {
 
 spl_autoload_register('hocwp_autoload');
 
-require_once(HOCWP_PATH . '/utils.php');
+require(HOCWP_PATH . '/lib.php');
 
-require_once(HOCWP_PATH . '/query.php');
+require(HOCWP_PATH . '/utils.php');
 
-require_once(HOCWP_PATH . '/users.php');
+require(HOCWP_PATH . '/query.php');
+
+require(HOCWP_PATH . '/users.php');
 
 require_once(HOCWP_PATH . '/mail.php');
 

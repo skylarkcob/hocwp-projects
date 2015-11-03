@@ -169,6 +169,77 @@ hocwp.media_items = {};
         return true;
     };
 
+    hocwp.switcherAjax = function() {
+        $('.hocwp-switcher-ajax .icon-circle').on('click', function(e) {
+            e.preventDefault();
+            var $element = $(this),
+                opacity = '0.5';
+            if($element.hasClass('icon-circle-success')) {
+                opacity = '0.25';
+            }
+            $element.css({'opacity' : opacity});
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: hocwp.ajax_url,
+                data: {
+                    action: 'hocwp_switcher_ajax',
+                    post_id: $element.attr('data-id'),
+                    value: $element.attr('data-value'),
+                    key: $element.attr('data-key')
+                },
+                success: function(response){
+                    if(response.success) {
+                        $element.toggleClass('icon-circle-success');
+                    }
+                    $element.css({'opacity' : '1'});
+                }
+            });
+        });
+    };
+
+    hocwp.chosenSelectOptions = function() {
+        return {
+            width: '100%',
+            disable_search: false
+        };
+    };
+
+    hocwp.chosenSelectUpdated = function(el) {
+        var $element = el,
+            values = $element.chosen().val();
+        var $parent = $element.parent(),
+            $result = $parent.find('.chosen-result');
+        if(null == values) {
+            $result.val('');
+            return;
+        }
+        var new_value = [],
+            taxonomy = null,
+            $option = null,
+            i = 0,
+            count_value = values.length,
+            is_term = false;
+        for(i; i <= count_value; i++) {
+            var current_value = values[i],
+                new_item = {value: current_value};
+            $option = $parent.find('option[value="' + current_value + '"]');
+            taxonomy = $option.attr('data-taxonomy');
+            if($.trim(taxonomy)) {
+                new_item.taxonomy = taxonomy;
+                is_term = true;
+            }
+            new_value.push(new_item);
+        }
+        $result.val(JSON.stringify(new_value));
+    };
+
+    hocwp.chosenSelect = function() {
+        $('.chosen-select').chosen(hocwp.chosenSelectOptions()).on('change', function(evt, params) {
+            hocwp.chosenSelectUpdated($(this));
+        });
+    };
+
     hocwp.mediaRemove = function(upload, remove, preview, url, id) {
         preview.html('');
         url.val('');
@@ -478,6 +549,9 @@ hocwp.media_items = {};
         this.$element = $(element);
         this._defaults = SortableList.DEFAULTS;
         this._name = SortableList.NAME;
+        if(this.$element.hasClass('manage-column')) {
+            return;
+        }
         this.init();
         var $element = this.$element,
             $container = $element.parent(),

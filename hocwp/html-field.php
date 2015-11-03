@@ -81,6 +81,9 @@ function hocwp_field_sanitize_args(&$args = array()) {
 function hocwp_field_sanitize_widget_args(&$args = array()) {
     $args['before'] = isset($args['before']) ? $args['before'] : '<p>';
     $args['after'] = isset($args['after']) ? $args['after'] : '</p>';
+    $class = isset($args['class']) ? $args['class'] : '';
+    hocwp_add_string_with_space_before($class, 'widefat');
+    $args['class'] = $class;
     $args['sanitize_id'] = false;
     return $args;
 }
@@ -400,7 +403,7 @@ function hocwp_field_input($args) {
     }
     $atts['id'] = $id;
     $atts['name'] = $name;
-    $label = $args['label'];
+    $label = isset($args['label']) ? $args['label'] : '';
     if($right_label) {
         unset($args['label']);
     }
@@ -589,6 +592,35 @@ function hocwp_field_get_option($args = array()) {
 
 function hocwp_field_option($args = array()) {
     echo hocwp_field_get_option($args);
+}
+
+function hocwp_field_select_chosen($args = array()) {
+    hocwp_field_sanitize_args($args);
+    $class = isset($args['class']) ? $args['class'] : '';
+    hocwp_add_string_with_space_before($class, 'chosen-select');
+    $args['field_class'] = $class;
+    $multiple = isset($args['multiple']) ? $args['multiple'] : false;
+    $attributes = isset($args['attributes']) ? $args['attributes'] : array();
+    if((bool)$multiple) {
+        $attributes['multiple'] = 'multiple';
+    }
+    $placeholder = isset($args['placeholder']) ? $args['placeholder'] : '';
+    if(!empty($placeholder)) {
+        $attributes['data-placeholder'] = $placeholder;
+    }
+    $args['attributes'] = $attributes;
+    $name = isset($args['name']) ? $args['name'] : '';
+    $id = isset($args['id']) ? $args['id'] : '';
+    $args['name'] = $name . '_chosen';
+    $args['id'] = $id . '_chosen';
+    $after = isset($args['after']) ? $args['after'] : '';
+    $value = isset($args['value']) ? $args['value'] : '';
+    if(is_array($value)) {
+        $value = json_encode($value);
+    }
+    $input_result = '<input type="hidden" id="' . esc_attr($id) . '" name="' . esc_attr($name) . '" class="chosen-result" value="' . esc_attr($value) . '">';
+    $args['after'] = $input_result . $after;
+    hocwp_field_select($args);
 }
 
 function hocwp_field_select($args = array()) {

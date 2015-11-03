@@ -65,6 +65,7 @@ add_action('after_setup_theme', 'hocwp_setup_theme_content_width', 0);
 function hocwp_setup_theme_widgets_init() {
     register_widget('HOCWP_Widget_Banner');
     register_widget('HOCWP_Widget_Facebook_Box');
+    register_widget('HOCWP_Widget_Post');
     hocwp_register_sidebar('primary', __('Primary sidebar', 'hocwp'), __('Primary sidebar on your site.', 'hocwp'));
     hocwp_register_sidebar('secondary', __('Secondary sidebar', 'hocwp'), __('Secondary sidebar on your site.', 'hocwp'));
     hocwp_register_sidebar('footer', __('Footer widget area', 'hocwp'), __('The widget area contains footer widgets.', 'hocwp'));

@@ -46,6 +46,13 @@ function hocwp_setup_theme_body_class($classes) {
     if(!hocwp_theme_license_valid(hocwp_theme_get_license_defined_data())) {
         $classes[] = 'hocwp-invalid-license';
     }
+    if(is_user_logged_in()) {
+        $classes[] = 'hocwp-user';
+        global $current_user;
+        if(hocwp_is_admin($current_user)) {
+            $classes[] = 'hocwp-user-admin';
+        }
+    }
     return $classes;
 }
 add_filter('body_class', 'hocwp_setup_theme_body_class');
@@ -58,6 +65,7 @@ add_action('after_setup_theme', 'hocwp_setup_theme_content_width', 0);
 function hocwp_setup_theme_widgets_init() {
     register_widget('HOCWP_Widget_Banner');
     register_widget('HOCWP_Widget_Facebook_Box');
+    register_widget('HOCWP_Widget_Post');
     hocwp_register_sidebar('primary', __('Primary sidebar', 'hocwp'), __('Primary sidebar on your site.', 'hocwp'));
     hocwp_register_sidebar('secondary', __('Secondary sidebar', 'hocwp'), __('Secondary sidebar on your site.', 'hocwp'));
     hocwp_register_sidebar('footer', __('Footer widget area', 'hocwp'), __('The widget area contains footer widgets.', 'hocwp'));

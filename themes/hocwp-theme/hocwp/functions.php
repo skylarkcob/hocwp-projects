@@ -1,7 +1,7 @@
 <?php
 function hocwp_use_session() {
     $use_session = apply_filters('hocwp_use_session', false);
-    return $use_session;
+    return (bool)$use_session;
 }
 
 function hocwp_session_start() {
@@ -279,6 +279,11 @@ function hocwp_carousel_bootstrap($args = array()) {
         <?php echo $controls; ?>
     </div>
     <?php
+}
+
+function hocwp_get_copyright_text() {
+    $text = '&copy; ' . date('Y') . ' ' . get_bloginfo('name') . '. All rights reserved.';
+    return apply_filters('hocwp_copyright_text', $text);
 }
 
 function hocwp_get_countries() {
@@ -583,6 +588,10 @@ function hocwp_number_format_vietnamese_currency($number) {
 function hocwp_number_format_vietnamese($number) {
     $number = floatval($number);
     return number_format($number, 0, '.', ',');
+}
+
+function hocwp_std_object_to_array($object) {
+    return hocwp_json_string_to_array(json_encode($object));
 }
 
 function hocwp_json_string_to_array($json_string) {
@@ -1495,9 +1504,8 @@ function hocwp_sanitize_field_args(&$args) {
         return $args;
     }
     $field_class = isset($args['field_class']) ? $args['field_class'] : '';
-    if(empty($field_class)) {
-        $field_class = isset($args['class']) ? $args['class'] : '';
-    }
+    $class = isset($args['class']) ? $args['class'] : '';
+    hocwp_add_string_with_space_before($field_class, $class);
     $widefat = isset($args['widefat']) ? (bool)$args['widefat'] : true;
     $id = isset($args['id']) ? $args['id'] : '';
     $label = isset($args['label']) ? $args['label'] : '';
@@ -1626,8 +1634,20 @@ function hocwp_get_sidebar_widgets($sidebar) {
     return $widgets;
 }
 
+function hocwp_supported_languages() {
+    $languages = array(
+        'vi' => __('Vietnamese', 'hocwp'),
+        'en' => __('English', 'hocwp')
+    );
+    return apply_filters('hocwp_supported_languages', $languages);
+}
+
 function hocwp_get_language() {
-    return apply_filters('hocwp_language', 'vi');
+    $lang = hocwp_option_get_value('theme_setting', 'language');
+    if(empty($lang)) {
+        $lang = 'vi';
+    }
+    return apply_filters('hocwp_language', $lang);
 }
 
 function hocwp_register_core_style_and_script() {
@@ -1797,4 +1817,50 @@ function hocwp_flush_rewrite_rules_after_site_url_changed() {
         update_option('hocwp_site_url', $defined_url);
         flush_rewrite_rules();
     }
+}
+
+function hocwp_the_footer_logo() {
+    $footer_logo = hocwp_get_footer_logo_url();
+    if(!empty($footer_logo)) {
+        $a = new HOCWP_HTML('a');
+        $a->set_attribute('href', home_url('/'));
+        $img = new HOCWP_HTML('img');
+        $img->set_attribute('src', $footer_logo);
+        $a->set_text($img->build());
+        $a->output();
+    }
+}
+
+function hocwp_find_valid_value_in_array($arr, $key) {
+    $result = '';
+    if(is_array($arr)) {
+        if(isset($arr[$key])) {
+            $result = $arr[$key];
+        } else {
+            $result = array_pop($arr);
+        }
+    }
+    return $result;
+}
+
+function hocwp_get_last_part_in_url($url) {
+    return substr(parse_url($url, PHP_URL_PATH), 1);
+}
+
+function hocwp_icon_circle_ajax($post_id, $meta_key) {
+    $div = new HOCWP_HTML('div');
+    $div->set_attribute('style', 'text-align: center');
+    $div->set_class('hocwp-switcher-ajax');
+    $span = new HOCWP_HTML('span');
+    $circle_class = 'icon-circle';
+    $result = get_post_meta($post_id, $meta_key, true);
+    if(1 == $result) {
+        $circle_class .= ' icon-circle-success';
+    }
+    $span->set_attribute('data-id', $post_id);
+    $span->set_attribute('data-value', $result);
+    $span->set_attribute('data-key', $meta_key);
+    $span->set_class($circle_class);
+    $div->set_text($span->build());
+    $div->output();
 }

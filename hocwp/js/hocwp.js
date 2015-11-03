@@ -198,6 +198,48 @@ hocwp.media_items = {};
         });
     };
 
+    hocwp.chosenSelectOptions = function() {
+        return {
+            width: '100%',
+            disable_search: false
+        };
+    };
+
+    hocwp.chosenSelectUpdated = function(el) {
+        var $element = el,
+            values = $element.chosen().val();
+        var $parent = $element.parent(),
+            $result = $parent.find('.chosen-result');
+        if(null == values) {
+            $result.val('');
+            return;
+        }
+        var new_value = [],
+            taxonomy = null,
+            $option = null,
+            i = 0,
+            count_value = values.length,
+            is_term = false;
+        for(i; i <= count_value; i++) {
+            var current_value = values[i],
+                new_item = {value: current_value};
+            $option = $parent.find('option[value="' + current_value + '"]');
+            taxonomy = $option.attr('data-taxonomy');
+            if($.trim(taxonomy)) {
+                new_item.taxonomy = taxonomy;
+                is_term = true;
+            }
+            new_value.push(new_item);
+        }
+        $result.val(JSON.stringify(new_value));
+    };
+
+    hocwp.chosenSelect = function() {
+        $('.chosen-select').chosen(hocwp.chosenSelectOptions()).on('change', function(evt, params) {
+            hocwp.chosenSelectUpdated($(this));
+        });
+    };
+
     hocwp.mediaRemove = function(upload, remove, preview, url, id) {
         preview.html('');
         url.val('');

@@ -517,6 +517,16 @@
     padding: 7px 0 10px;
 }
 
+.hocwp .widget li:last-child {
+    border-bottom: medium none;
+    padding-bottom: 0;
+}
+
+.hocwp .widget li:first-child {
+    border-top: medium none;
+    padding-top: 0;
+}
+
 .hocwp #wp-calendar caption { margin-top: 10px; margin-bottom: 15px; }
 .hocwp #wp-calendar thead th {
     padding-bottom: 10px;

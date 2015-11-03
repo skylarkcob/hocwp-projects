@@ -5,6 +5,7 @@ $option_social = new HOCWP_Option(__('Socials', 'hocwp'), 'hocwp_option_social')
 $option_social->set_parent_slug($parent_slug);
 $option_social->add_section(array('id' => 'account', 'title' => __('Account', 'hocwp'), 'description' => __('Your social accounts to config API on website.', 'hocwp')));
 $option_social->add_section(array('id' => 'facebook', 'title' => __('Facebook', 'hocwp'), 'description' => __('All information about Facebook account and Facebook Insights Admins.', 'hocwp')));
+$option_social->add_section(array('id' => 'google', 'title' => __('Google', 'hocwp'), 'description' => __('All information about Google account and Google console.', 'hocwp')));
 $option_social->add_field(array('id' => 'facebook_site', 'title' => __('Facebook page URL', 'hocwp'), 'value' => hocwp_get_wpseo_social_value('facebook_site')));
 $twitter_account = hocwp_get_wpseo_social_value('twitter_site');
 if(!empty($twitter_account) && !hocwp_url_valid($twitter_account)) {
@@ -20,6 +21,7 @@ $option_social->add_field(array('id' => 'google_plus_url', 'title' => __('Google
 $option_social->add_field(array('id' => 'rss_url', 'title' => __('RSS URL', 'hocwp')));
 $option_social->add_field(array('id' => 'addthis_id', 'title' => __('AddThis ID', 'hocwp'), 'section' => 'account'));
 $option_social->add_field(array('id' => 'fbadminapp', 'title' => __('Facebook App ID', 'hocwp'), 'section' => 'facebook', 'value' => hocwp_get_wpseo_social_value('fbadminapp')));
+$option_social->add_field(array('id' => 'google_api_key', 'title' => __('Google API Key', 'hocwp'), 'section' => 'google'));
 $option_social->init();
 hocwp_option_add_object_to_list($option_social);
 

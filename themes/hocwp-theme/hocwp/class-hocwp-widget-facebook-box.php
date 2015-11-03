@@ -1,14 +1,33 @@
 <?php
 class HOCWP_Widget_Facebook_Box extends WP_Widget {
+    public $args = array();
+
+    private function get_defaults() {
+        $defaults = array(
+            'admin_width' => 400,
+            'width' => 340,
+            'height' => 500,
+            'hide_cover' => false,
+            'show_facepile' => true,
+            'show_posts' => false,
+            'hide_cta' => false,
+            'small_header' => false,
+            'adapt_container_width' => true
+        );
+        $args = apply_filters('hocwp_widget_facebook_box_args', array());
+        $args = wp_parse_args($args, $defaults);
+        return $args;
+    }
 
     public function __construct() {
+        $this->args = $this->get_defaults();
         parent::__construct('hocwp_widget_facebook_box', 'HocWP Facebook Box',
             array(
                 'classname' => 'hocwp-facebook-box hocwp-widget-facebook-box',
                 'description' => __('Facebook fanpage box widget.', 'hocwp'),
             ),
             array(
-                'width' => 400
+                'width' => $this->args['admin_width']
             )
         );
     }
@@ -18,14 +37,14 @@ class HOCWP_Widget_Facebook_Box extends WP_Widget {
         $title  = apply_filters('widget_title', $instance['title']);
         $page_name = isset($instance['page_name']) ? $instance['page_name'] : '';
         $href = isset($instance['href']) ? $instance['href'] : '';
-        $width = isset($instance['width']) ? $instance['width'] : 340;
-        $height = isset($instance['height']) ? $instance['height'] : 500;
-        $hide_cover = (bool)(isset($instance['hide_cover']) ? $instance['hide_cover'] : false);
-        $show_facepile = (bool)(isset($instance['show_facepile']) ? $instance['show_facepile'] : true);
-        $show_posts = (bool)(isset($instance['show_posts']) ? $instance['show_posts'] : false);
-        $hide_cta = (bool)(isset($instance['hide_cta']) ? $instance['hide_cta'] : false);
-        $small_header = (bool)(isset($instance['small_header']) ? $instance['small_header'] : false);
-        $adapt_container_width = (bool)(isset($instance['adapt_container_width']) ? $instance['adapt_container_width'] : true);
+        $width = isset($instance['width']) ? $instance['width'] : $this->args['width'];
+        $height = isset($instance['height']) ? $instance['height'] : $this->args['height'];
+        $hide_cover = (bool)(isset($instance['hide_cover']) ? $instance['hide_cover'] : $this->args['hide_cover']);
+        $show_facepile = (bool)(isset($instance['show_facepile']) ? $instance['show_facepile'] : $this->args['show_facepile']);
+        $show_posts = (bool)(isset($instance['show_posts']) ? $instance['show_posts'] : $this->args['show_posts']);
+        $hide_cta = (bool)(isset($instance['hide_cta']) ? $instance['hide_cta'] : $this->args['hide_cta']);
+        $small_header = (bool)(isset($instance['small_header']) ? $instance['small_header'] : $this->args['small_header']);
+        $adapt_container_width = (bool)(isset($instance['adapt_container_width']) ? $instance['adapt_container_width'] : $this->args['adapt_container_width']);
         echo $args['before_widget'];
         if(!empty($title)) {
             echo $args['before_title'] . $title . $args['after_title'];
@@ -50,14 +69,14 @@ class HOCWP_Widget_Facebook_Box extends WP_Widget {
         $title = isset($instance['title']) ? $instance['title'] : '';
         $page_name = isset($instance['page_name']) ? $instance['page_name'] : '';
         $href = isset($instance['href']) ? $instance['href'] : '';
-        $width = isset($instance['width']) ? $instance['width'] : 340;
-        $height = isset($instance['height']) ? $instance['height'] : 500;
-        $hide_cover = (bool)(isset($instance['hide_cover']) ? $instance['hide_cover'] : false);
-        $show_facepile = (bool)(isset($instance['show_facepile']) ? $instance['show_facepile'] : true);
-        $show_posts = (bool)(isset($instance['show_posts']) ? $instance['show_posts'] : false);
-        $hide_cta = (bool)(isset($instance['hide_cta']) ? $instance['hide_cta'] : false);
-        $small_header = (bool)(isset($instance['small_header']) ? $instance['small_header'] : false);
-        $adapt_container_width = (bool)(isset($instance['adapt_container_width']) ? $instance['adapt_container_width'] : true);
+        $width = isset($instance['width']) ? $instance['width'] : $this->args['width'];
+        $height = isset($instance['height']) ? $instance['height'] : $this->args['height'];
+        $hide_cover = (bool)(isset($instance['hide_cover']) ? $instance['hide_cover'] : $this->args['hide_cover']);
+        $show_facepile = (bool)(isset($instance['show_facepile']) ? $instance['show_facepile'] : $this->args['show_facepile']);
+        $show_posts = (bool)(isset($instance['show_posts']) ? $instance['show_posts'] : $this->args['show_posts']);
+        $hide_cta = (bool)(isset($instance['hide_cta']) ? $instance['hide_cta'] : $this->args['hide_cta']);
+        $small_header = (bool)(isset($instance['small_header']) ? $instance['small_header'] : $this->args['small_header']);
+        $adapt_container_width = (bool)(isset($instance['adapt_container_width']) ? $instance['adapt_container_width'] : $this->args['adapt_container_width']);
         hocwp_field_widget_before();
         hocwp_widget_field_title($this->get_field_id('title'), $this->get_field_name('title'), $title);
 
@@ -143,15 +162,14 @@ class HOCWP_Widget_Facebook_Box extends WP_Widget {
         $instance['title'] = isset($new_instance['title']) ? strip_tags($new_instance['title']) : '';
         $instance['page_name'] = isset($new_instance['page_name']) ? $new_instance['page_name'] : '';
         $instance['href'] = isset($new_instance['href']) ? $new_instance['href'] : '';
-        $instance['width'] = isset($new_instance['width']) ? $new_instance['width'] : 340;
-        $instance['height'] = isset($new_instance['height']) ? $new_instance['height'] : 500;
-        $instance['hide_cover'] = isset($new_instance['hide_cover']) ? 1 : 0;
-        $instance['show_facepile'] = isset($new_instance['show_facepile']) ? 1 : 0;
-        $instance['show_posts'] = isset($new_instance['show_posts']) ? 1 : 0;
-        $instance['hide_cta'] = isset($new_instance['hide_cta']) ? 1 : 0;
-        $instance['small_header'] = isset($new_instance['small_header']) ? 1 : 0;
-        $instance['adapt_container_width'] = isset($new_instance['adapt_container_width']) ? 1 : 0;
-        //$instance['show_title'] = isset($new_instance['show_title']) ? 1 : 0;
+        $instance['width'] = isset($new_instance['width']) ? $new_instance['width'] : $this->args['width'];
+        $instance['height'] = isset($new_instance['height']) ? $new_instance['height'] : $this->args['height'];
+        $instance['hide_cover'] = isset($new_instance['hide_cover']) ? 1 : hocwp_bool_to_int($this->args['hide_cover']);
+        $instance['show_facepile'] = isset($new_instance['show_facepile']) ? 1 : hocwp_bool_to_int($this->args['show_facepile']);
+        $instance['show_posts'] = isset($new_instance['show_posts']) ? 1 : hocwp_bool_to_int($this->args['show_posts']);
+        $instance['hide_cta'] = isset($new_instance['hide_cta']) ? 1 : hocwp_bool_to_int($this->args['hide_cta']);
+        $instance['small_header'] = isset($new_instance['small_header']) ? 1 : hocwp_bool_to_int($this->args['small_header']);
+        $instance['adapt_container_width'] = isset($new_instance['adapt_container_width']) ? 1 : hocwp_bool_to_int($this->args['adapt_container_width']);
         return $instance;
     }
 }

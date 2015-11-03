@@ -20,6 +20,8 @@ function hocwp_option_get_data($base_slug) {
     $option = hocwp_option_get_object_from_list($base_slug);
     if(hocwp_object_valid($option)) {
         $data = $option->get();
+    } else {
+        $data = get_option('hocwp_' . $base_slug);
     }
     return $data;
 }
@@ -58,4 +60,17 @@ function hocwp_add_option_page_smtp_email($parent_slug = null) {
         _deprecated_argument(__FUNCTION__, '2.7.4', __('Please do not use $parent_slug argument since core version 2.7.4 or later.', 'hocwp'));
     }
     require_once(HOCWP_PATH . '/options/setting-smtp-email.php');
+}
+
+function hocwp_get_google_api_key() {
+    $key = hocwp_option_get_value('option_social', 'google_api_key');
+    $key = apply_filters('hocwp_google_api_key', $key);
+    return $key;
+}
+
+function hocwp_get_footer_logo_url() {
+    $result = hocwp_theme_get_option('footer_logo');
+    $result = hocwp_sanitize_media_value($result);
+    $result = $result['url'];
+    return $result;
 }
