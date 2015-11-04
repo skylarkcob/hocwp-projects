@@ -10,6 +10,7 @@ class HOCWP_Widget_Post extends WP_Widget {
                 'random' => __('Random posts', 'hocwp'),
                 'comment' => __('Most comment posts', 'hocwp'),
                 'category' => __('Posts by category', 'hocwp'),
+                'related' => __('Related posts', 'hocwp'),
                 'like' => __('Most likes posts', 'hocwp'),
                 'view' => __('Most views posts', 'hocwp'),
                 'favorite' => __('Most favorite posts', 'hocwp'),
@@ -77,22 +78,113 @@ class HOCWP_Widget_Post extends WP_Widget {
     public function widget($args, $instance) {
         $title = isset($instance['title']) ? $instance['title'] : '';
         $title  = apply_filters('widget_title', $instance['title']);
-        $post_type = isset($instance['post_type']) ? $instance['post_type'] : $this->args['post_type'];
+        $post_type = isset($instance['post_type']) ? $instance['post_type'] : json_encode($this->args['post_type']);
+        $post_type = hocwp_json_string_to_array($post_type);
+        $post_types = array();
+        foreach($post_type as $fvdata) {
+            $ptvalue = isset($fvdata['value']) ? $fvdata['value'] : '';
+            if(!empty($ptvalue)) {
+                $post_types[] = $ptvalue;
+            }
+        }
         $number = isset($instance['number']) ? $instance['number'] : $this->args['number'];
         $by = isset($instance['by']) ? $instance['by'] : $this->args['by'];
-        $category = isset($instance['category']) ? $instance['category'] : $this->args['category'];
+        $category = isset($instance['category']) ? $instance['category'] : json_encode($this->args['category']);
+        $category = hocwp_json_string_to_array($category);
+        $sidebar = isset($args['id']) ? $args['id'] : 'default';
         $widget_html = $args['before_widget'];
         if(!empty($title)) {
             $widget_html .= $args['before_title'] . $title . $args['after_title'];
         }
+        $widget_html .= '<div class="widget-content">';
         $query_args = array(
-            'posts_per_page' => $number
+            'posts_per_page' => $number,
+            'post_type' => $post_types
         );
+        $w_query = new WP_Query();
+        $get_by = false;
+        switch($by) {
+            case 'recent':
+                $get_by = true;
+                break;
+            case 'random':
+                $get_by = true;
+                $query_args['orderby'] = 'rand';
+                break;
+            case 'comment':
+                $get_by = true;
+                $query_args['orderby'] = 'comment_count';
+                break;
+            case 'category':
+                foreach($category as $cvalue) {
+                    $term_id = isset($cvalue['value']) ? $cvalue['value'] : '';
+                    $term_id = absint($term_id);
+                    if($term_id > 0) {
+                        $taxonomy = isset($cvalue['taxonomy']) ? $cvalue['taxonomy'] : '';
+                        if(!empty($taxonomy)) {
+                            $tax_item = array(
+                                'taxonomy' => $taxonomy,
+                                'field' => 'term_id',
+                                'terms' => $term_id
+                            );
+                            $query_args = hocwp_query_sanitize_tax_query($tax_item, $query_args);
+                            $get_by = true;
+                        }
+                    }
+                }
+                break;
+            case 'related':
+                $get_by = true;
+                break;
+            case 'like':
+                $get_by = true;
+                $query_args['meta_key'] = 'likes';
+                $query_args['orderby'] = 'meta_value_num';
+                break;
+            case 'view':
+                $get_by = true;
+                $query_args['meta_key'] = 'views';
+                $query_args['orderby'] = 'meta_value_num';
+                break;
+            case 'favorite':
+                break;
+            case 'rate':
+                break;
+        }
+        if($get_by) {
+            $query_args = apply_filters('hocwp_sidebar_' . $sidebar . '_widget_post_query_args', $query_args, $instance, $widget_args = $args);
+            if('related' == $by) {
+                $w_query = hocwp_query_related_post($query_args);
+            } else {
+                $w_query = hocwp_query($query_args);
+            }
+        }
+        if($w_query->have_posts()) {
+            $list_class = 'list-unstyled';
+            foreach($post_types as $ptvalue) {
+                hocwp_add_string_with_space_before($list_class, 'list-' . $ptvalue . 's');
+            }
+            $list_class = apply_filters('hocwp_widget_post_list_class', $list_class);
+            $widget_html .= '<ul class="' . $list_class . '">';
+            $loop_html = apply_filters('hocwp_sidebar_' . $sidebar . '_widget_post_loop_html', '', $w_query, $data = $instance);
+            if(empty($loop_html)) {
+                ob_start();
+                while($w_query->have_posts()) {
+                    $w_query->the_post();
+                }
+                wp_reset_postdata();
+                $loop_html .= ob_get_clean();
+            }
+            $widget_html .= $loop_html;
+            $widget_html .= '</ul>';
+        } else {
+            $widget_html .= '<p class="nothing-found">' . __('Nothing found!', 'hocwp') . '</p>';
+        }
+        $widget_html .= '</div>';
         $widget_html .= $args['after_widget'];
-        $sidebar = isset($args['id']) ? $args['id'] : 'default';
-        $widget_html = apply_filters('hocwp_widget_html', $widget_html, $instance, $args, $this->option_name, $widget_number = $this->number, $sidebar_id = $sidebar);
-        $widget_html = apply_filters($this->option_name . '_html', $widget_html, $instance, $args, $widget_number = $this->number, $sidebar_id = $sidebar);
-        $widget_html = apply_filters($this->option_name . '_' . $sidebar . '_html', $widget_html, $instance, $args, $widget_number = $this->number);
+        $widget_html = apply_filters('hocwp_widget_html', $widget_html, $instance, $query = $w_query, $widget_args = $args, $option_name = $this->option_name, $widget_number = $this->number, $sidebar_id = $sidebar);
+        $widget_html = apply_filters($this->option_name . '_html', $widget_html, $instance, $query = $w_query, $widget_args = $args, $widget_number = $this->number, $sidebar_id = $sidebar);
+        $widget_html = apply_filters($this->option_name . '_' . $sidebar . '_html', $widget_html, $instance, $query = $w_query, $widget_args = $args, $widget_number = $this->number);
         echo $widget_html;
     }
 

@@ -1837,7 +1837,12 @@ function hocwp_find_valid_value_in_array($arr, $key) {
         if(isset($arr[$key])) {
             $result = $arr[$key];
         } else {
-            $result = array_pop($arr);
+            $index = absint(count($arr)/2);
+            if(isset($arr[$index])) {
+                $result = $arr[$index];
+            } else {
+                $result = current($arr);
+            }
         }
     }
     return $result;
@@ -1863,4 +1868,8 @@ function hocwp_icon_circle_ajax($post_id, $meta_key) {
     $span->set_class($circle_class);
     $div->set_text($span->build());
     $div->output();
+}
+
+function hocwp_get_posts_per_page() {
+    return get_option('posts_per_page');
 }

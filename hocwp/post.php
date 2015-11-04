@@ -122,13 +122,20 @@ function hocwp_post_thumbnail($args = array()) {
     $img->set_class('attachment-post-thumbnail wp-post-image');
     $img->set_attribute('src', $thumbnail_url);
     $loop = isset($args['loop']) ? $args['loop'] : true;
+    $custom_html = isset($args['custom_html']) ? $args['custom_html'] : '';
     if(is_singular() && !$loop) : ?>
         <div class="post-thumbnail">
-            <?php $img->output(); ?>
+            <?php
+            $img->output();
+            echo $custom_html;
+            ?>
         </div>
     <?php else : ?>
         <a class="post-thumbnail" href="<?php echo get_permalink($post_id); ?>" aria-hidden="true">
-            <?php $img->output(); ?>
+            <?php
+            $img->output();
+            echo $custom_html;
+            ?>
         </a>
     <?php endif;
 }

@@ -121,18 +121,25 @@ function hocwp_save_video_default_meta($post_id) {
     update_post_meta($post_id, 'video_id', $video_id);
     if(!has_post_thumbnail($post_id)) {
         $thumbnail_url = '';
+        $thumbnails = array();
         switch($server_name) {
             case 'youtube':
-                $thumbnail_url = hocwp_get_youtube_thumbnail_url(hocwp_get_google_api_key(), $video_id);
+                $api_key = hocwp_get_google_api_key();
+                $data = hocwp_get_youtube_thumbnail_data_object($api_key, $video_id);
+                $thumbnails = hocwp_get_youtube_thumbnails($api_key, $video_id, $data);
+                $thumbnail_url = hocwp_get_youtube_thumbnail($api_key, $video_id, 'medium', $thumbnails);
                 break;
             case 'vimeo':
-                $thumbnail_url = hocwp_get_vimeo_thumbnail($video_id);
+                $thumbnails = hocwp_get_vimeo_thumbnails($video_id);
+                $thumbnail_url = hocwp_get_vimeo_thumbnail($video_id, 'medium', $thumbnails);
                 break;
             case 'dailymotion':
-                $thumbnail_url = hocwp_get_dailymotion_thumbnail($video_id);
+                $thumbnails = hocwp_get_dailymotion_thumbnails($video_id);
+                $thumbnail_url = hocwp_get_dailymotion_thumbnail($video_id, 'medium', $thumbnails);
                 break;
         }
         update_post_meta($post_id, 'thumbnail_url', $thumbnail_url);
+        update_post_meta($post_id, 'thumbnails', $thumbnails);
     }
 }
 
@@ -176,16 +183,49 @@ function hocwp_get_valid_youtube_thumbnail($arr, $key) {
         if(isset($arr[$key])) {
             $result = isset($arr[$key]['url']) ? $arr[$key]['url'] : '';
         } else {
-            $last = array_pop($arr);
+            $index = absint(count($arr)/2);
+            if(isset($arr[$index])) {
+                $last = $arr[$index];
+            } else {
+                $last = current($arr);
+            }
             $result = isset($last['url']) ? $last['url'] : '';
         }
     }
     return $result;
 }
 
-function hocwp_get_youtube_thumbnail_url($api_key, $video_id, $type = 'maxres') {
-    $data = hocwp_get_youtube_thumbnail_data_object($api_key, $video_id);
-    $data = hocwp_std_object_to_array($data);
+function hocwp_get_youtube_thumbnails($api_key, $video_id, $data = null) {
+    if(null == $data) {
+        $data = hocwp_get_youtube_thumbnail_data_object($api_key, $video_id);
+        $data = hocwp_std_object_to_array($data);
+    } elseif(is_object($data)) {
+        $data = hocwp_std_object_to_array($data);
+    }
+    $result = array(
+        'small' => hocwp_get_value_by_key($data, array('default', 'url')),
+        'medium' => hocwp_get_value_by_key($data, array('medium', 'url')),
+        'high' => hocwp_get_value_by_key($data, array('high', 'url')),
+        'standard' => hocwp_get_value_by_key($data, array('standard', 'url')),
+        'large' => hocwp_get_value_by_key($data, array('maxres', 'url'))
+    );
+    return $result;
+}
+
+function hocwp_get_youtube_thumbnail($api_key, $video_id, $type = 'medium', $thumbnails = null) {
+    if(!is_array($thumbnails)) {
+        $thumbnails = hocwp_get_youtube_thumbnails($api_key, $video_id);
+    }
+    return hocwp_get_valid_video_thumbnail_data($thumbnails, $type);
+}
+
+function hocwp_get_youtube_thumbnail_url($api_key, $video_id, $type = 'medium', $data = null) {
+    if(null == $data) {
+        $data = hocwp_get_youtube_thumbnail_data_object($api_key, $video_id);
+        $data = hocwp_std_object_to_array($data);
+    } elseif(is_object($data)) {
+        $data = hocwp_std_object_to_array($data);
+    }
     $result = hocwp_get_valid_youtube_thumbnail($data, $type);
     return $result;
 }
@@ -204,17 +244,25 @@ function hocwp_get_vimeo_data($id) {
 
 function hocwp_get_vimeo_thumbnails($id) {
     $data = hocwp_get_vimeo_data($id);
+    $small = hocwp_get_value_by_key($data, 'thumbnail_small');
+    $medium = hocwp_get_value_by_key($data, 'thumbnail_medium');
+    $large = hocwp_get_value_by_key($data, 'thumbnail_large');
     $result = array(
-        'thumbnail_small' => isset($data['thumbnail_small']) ? $data['thumbnail_small'] : '',
-        'thumbnail_medium' => isset($data['thumbnail_medium']) ? $data['thumbnail_medium'] : '',
-        'thumbnail_large' => isset($data['thumbnail_large']) ? $data['thumbnail_large'] : ''
+        'thumbnail_small' => $small,
+        'thumbnail_medium' => $medium,
+        'thumbnail_large' => $large,
+        'small' => $small,
+        'medium' => $medium,
+        'large' => $large
     );
     return $result;
 }
 
-function hocwp_get_vimeo_thumbnail($id, $type = 'thumbnail_large') {
-    $thumbnails = hocwp_get_vimeo_thumbnails($id);
-    return $thumbnails[$type];
+function hocwp_get_vimeo_thumbnail($id, $type = 'medium', $thumbnails = null) {
+    if(!is_array($thumbnails)) {
+        $thumbnails = hocwp_get_vimeo_thumbnails($id);
+    }
+    return hocwp_get_valid_video_thumbnail_data($thumbnails, $type);
 }
 
 function hocwp_get_dailymotion_data($id) {
@@ -239,15 +287,23 @@ function hocwp_get_dailymotion_data($id) {
 
 function hocwp_get_dailymotion_thumbnails($id) {
     $data = hocwp_get_dailymotion_data($id);
+    $small = hocwp_get_value_by_key($data, 'thumbnail_small_url');
+    $medium = hocwp_get_value_by_key($data, 'thumbnail_medium_url');
+    $large = hocwp_get_value_by_key($data, 'thumbnail_large_url');
     $result = array(
-        'thumbnail_small' => isset($data['thumbnail_small_url']) ? $data['thumbnail_small_url'] : '',
-        'thumbnail_medium' => isset($data['thumbnail_medium_url']) ? $data['thumbnail_medium_url'] : '',
-        'thumbnail_large' => isset($data['thumbnail_large_url']) ? $data['thumbnail_large_url'] : ''
+        'thumbnail_small' => $small,
+        'thumbnail_medium' => $medium,
+        'thumbnail_large' => $large,
+        'small' => $small,
+        'medium' => $medium,
+        'large' => $large
     );
     return $result;
 }
 
-function hocwp_get_dailymotion_thumbnail($id, $type = 'thumbnail_large') {
-    $thumbnails = hocwp_get_dailymotion_thumbnails($id);
+function hocwp_get_dailymotion_thumbnail($id, $type = 'medium', $thumbnails = null) {
+    if(!is_array($thumbnails)) {
+        $thumbnails = hocwp_get_dailymotion_thumbnails($id);
+    }
     return hocwp_get_valid_video_thumbnail_data($thumbnails, $type);
 }

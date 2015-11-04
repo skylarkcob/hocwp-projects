@@ -55,3 +55,35 @@ function hocwp_change_captcha_image_ajax_callback() {
 }
 add_action('wp_ajax_hocwp_change_captcha_image', 'hocwp_change_captcha_image_ajax_callback');
 add_action('wp_ajax_nopriv_hocwp_change_captcha_image', 'hocwp_change_captcha_image_ajax_callback');
+
+function hocwp_vote_post_ajax_callback() {
+    $result = array(
+        'success' => false
+    );
+    $post_id = isset($_POST['post_id']) ? $_POST['post_id'] : '';
+    $post_id = absint($post_id);
+    if($post_id > 0) {
+        $type = isset($_POST['type']) ? $_POST['type'] : '';
+        $session_name = 'hocwp_vote_' . $type . '_post_' . $post_id;
+        if(!isset($_SESSION[$session_name]) || 1 != $_SESSION[$session_name]) {
+            $value = isset($_POST['value']) ? $_POST['value'] : '';
+            $value = absint($value);
+            $value++;
+            if('up' == $type || 'like' == $type) {
+                update_post_meta($post_id, 'likes', $value);
+            } elseif('down' == $type || 'dislike' == $type) {
+                update_post_meta($post_id, 'dislikes', $value);
+            }
+            $result['value'] = $value;
+            $result['type'] = $type;
+            $result['post_id'] = $post_id;
+            $result['value_html'] = number_format($value);
+            $_SESSION[$session_name] = 1;
+            $result['success'] = true;
+        }
+    }
+    echo json_encode($result);
+    die();
+}
+add_action('wp_ajax_hocwp_vote_post', 'hocwp_vote_post_ajax_callback');
+add_action('wp_ajax_nopriv_hocwp_vote_post', 'hocwp_vote_post_ajax_callback');
