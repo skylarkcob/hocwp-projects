@@ -13,7 +13,7 @@ class HOCWP_Widget_Banner extends WP_Widget {
 
     public function __construct() {
         $this->args = $this->get_defaults();
-        parent::__construct('hocwp_banner_widget', 'HOCWP Banner',
+        parent::__construct('hocwp_widget_banner', 'HOCWP Banner',
             array(
                 'classname' => 'hocwp-banner-widget',
                 'description' => __('Display banner on sidebar.', 'hocwp'),

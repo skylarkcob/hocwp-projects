@@ -16,7 +16,7 @@ class HOCWP_Widget_Post extends WP_Widget {
                 'favorite' => __('Most favorite posts', 'hocwp'),
                 'rate' => __('Most rate posts', 'hocwp')
             ),
-            'post_type' => array('post'),
+            'post_type' => array(array('value' => 'post')),
             'by' => 'recent',
             'number' => 5,
             'category' => array(),
@@ -75,11 +75,23 @@ class HOCWP_Widget_Post extends WP_Widget {
         );
     }
 
+    private function get_post_type_from_instance($instance) {
+        $post_type = isset($instance['post_type']) ? $instance['post_type'] : json_encode($this->args['post_type']);
+        $post_type = hocwp_json_string_to_array($post_type);
+        if(!hocwp_array_has_value($post_type)) {
+            $post_type = array(
+                array(
+                    'value' => apply_filters('hocwp_widget_post_default_post_type', 'post')
+                )
+            );
+        }
+        return $post_type;
+    }
+
     public function widget($args, $instance) {
         $title = isset($instance['title']) ? $instance['title'] : '';
         $title  = apply_filters('widget_title', $instance['title']);
-        $post_type = isset($instance['post_type']) ? $instance['post_type'] : json_encode($this->args['post_type']);
-        $post_type = hocwp_json_string_to_array($post_type);
+        $post_type = $this->get_post_type_from_instance($instance);
         $post_types = array();
         foreach($post_type as $fvdata) {
             $ptvalue = isset($fvdata['value']) ? $fvdata['value'] : '';
@@ -190,13 +202,12 @@ class HOCWP_Widget_Post extends WP_Widget {
 
     public function form($instance) {
         $title = isset($instance['title']) ? $instance['title'] : '';
-        $post_type = isset($instance['post_type']) ? $instance['post_type'] : json_encode($this->args['post_type']);
-        $post_type = hocwp_json_string_to_array($post_type);
+        $post_type = $this->get_post_type_from_instance($instance);
         $number = isset($instance['number']) ? $instance['number'] : $this->args['number'];
         $by = isset($instance['by']) ? $instance['by'] : $this->args['by'];
         $category = isset($instance['category']) ? $instance['category'] : json_encode($this->args['category']);
         $category = hocwp_json_string_to_array($category);
-        hocwp_field_widget_before();
+        hocwp_field_widget_before('hocwp-widget-post');
         hocwp_widget_field_title($this->get_field_id('title'), $this->get_field_name('title'), $title);
         $lists = get_post_types(array('_builtin' => false, 'public' => true), 'objects');
         if(!array_key_exists('post', $lists)) {
@@ -244,7 +255,8 @@ class HOCWP_Widget_Post extends WP_Widget {
             'name' => $this->get_field_name('by'),
             'value' => $by,
             'all_option' => $all_option,
-            'label' => __('Get by:', 'hocwp')
+            'label' => __('Get by:', 'hocwp'),
+            'class' => 'get-by'
         );
         hocwp_widget_field('hocwp_field_select', $args);
         $all_option = '';
@@ -276,8 +288,12 @@ class HOCWP_Widget_Post extends WP_Widget {
             'value' => $category,
             'label' => __('Category:', 'hocwp'),
             'placeholder' => __('Choose terms', 'hocwp'),
-            'multiple' => true
+            'multiple' => true,
+            'class' => 'select-category'
         );
+        if('category' != $by) {
+            $args['hidden'] = true;
+        }
         hocwp_widget_field('hocwp_field_select_chosen', $args);
         hocwp_field_widget_after();
     }

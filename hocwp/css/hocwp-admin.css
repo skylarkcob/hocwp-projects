@@ -177,3 +177,29 @@
 .hocwp-widget .media-preview img {
     max-height: 315px;
 }
+
+/**
+ * Chosen select
+ */
+
+.hocwp-widget .chosen-container .chosen-choices {
+    background: #fff none repeat scroll 0 0;
+    border: 1px solid #ddd;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07) inset;
+    padding: 2px 5px;
+}
+
+.hocwp-widget .chosen-container-multi .chosen-choices li.search-choice {
+    background: #eee none repeat scroll 0 0;
+    border: 1px solid #ccc;
+    border-radius: 0;
+}
+
+.hocwp-widget .hocwp-widget-field {
+    margin: 1em 0;
+}
+
+.hocwp-widget .hocwp-widget-field label {
+    line-height: 1.5;
+    vertical-align: middle;
+}

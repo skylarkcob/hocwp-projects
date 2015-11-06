@@ -597,7 +597,10 @@ function hocwp_field_option($args = array()) {
 function hocwp_field_select_chosen($args = array()) {
     hocwp_field_sanitize_args($args);
     $class = isset($args['class']) ? $args['class'] : '';
-    hocwp_add_string_with_space_before($class, 'chosen-select');
+    $controller_class = isset($args['controller_class']) ? $args['controller_class'] : 'chosen-select';
+    $controller_class = apply_filters('hocwp_chosen_select_controller_class', $controller_class);
+    hocwp_add_string_with_space_before($class, $controller_class);
+    hocwp_add_string_with_space_before($class, 'chooseable');
     $args['field_class'] = $class;
     $multiple = isset($args['multiple']) ? $args['multiple'] : false;
     $attributes = isset($args['attributes']) ? $args['attributes'] : array();
@@ -618,7 +621,7 @@ function hocwp_field_select_chosen($args = array()) {
     if(is_array($value)) {
         $value = json_encode($value);
     }
-    $input_result = '<input type="hidden" id="' . esc_attr($id) . '" name="' . esc_attr($name) . '" class="chosen-result" value="' . esc_attr($value) . '">';
+    $input_result = '<input type="hidden" id="' . esc_attr($id) . '" name="' . esc_attr($name) . '" class="chosen-result" value="' . esc_attr($value) . '" autocomplete="off">';
     $args['after'] = $input_result . $after;
     hocwp_field_select($args);
 }
@@ -837,8 +840,12 @@ function hocwp_field_select_term($args = array()) {
     hocwp_field_select($args);
 }
 
-function hocwp_field_widget_before($class = '') {
-    hocwp_add_string_with_space_before($class, 'hocwp-widget');
+function hocwp_field_widget_before($class = '', $inner = false) {
+    if($inner) {
+        hocwp_add_string_with_space_before($class, 'hocwp-widget-field-group');
+    } else {
+        hocwp_add_string_with_space_before($class, 'hocwp-widget');
+    }
     echo '<div class="' . $class . '">';
 }
 
@@ -848,8 +855,17 @@ function hocwp_field_widget_after() {
 
 function hocwp_widget_field($callback, $args) {
     if(hocwp_callback_exists($callback)) {
-        hocwp_field_widget_before();
+        $hidden = isset($args['hidden']) ? $args['hidden'] : false;
+        $container_class = '';
+        if($hidden) {
+            hocwp_add_string_with_space_before($container_class, 'hidden');
+        }
+        hocwp_field_widget_before($container_class, true);
         $args = hocwp_field_sanitize_widget_args($args);
+        if('hocwp_field_select_chosen' == $callback) {
+            $args['before'] = '<div class="hocwp-widget-field">';
+            $args['after'] = '</div>';
+        }
         call_user_func($callback, $args);
         hocwp_field_widget_after();
     }

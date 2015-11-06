@@ -1,7 +1,4 @@
-window.wp = window.wp || {};
-window.hocwp = window.hocwp || {};
-
-(function($) {
+jQuery(document).ready(function($) {
     (function() {
         $('.sf-menu, .hocwp-superfish-menu > ul').each(function() {
             var $element = $(this),
@@ -91,20 +88,14 @@ window.hocwp = window.hocwp || {};
 
         $('.hocwp .comment-tools .comment-share').on('click', function(e) {
             e.preventDefault();
-            var $element = $(this),
-                $container = $element.closest('.comment'),
-                $list_share = $element.find('.list-share'),
-                comment_id = parseInt($container.attr('data-comment-id'));
+            var $element = $(this);
             $element.css({'text-decoration' : 'none'});
             $element.toggleClass('active');
         });
 
         $('.hocwp .comment-tools .comment-share .list-share .fa').on('click', function(e) {
             e.preventDefault();
-            var $element = $(this),
-                $container = $element.closest('.comment'),
-                $list_share = $element.find('.list-share'),
-                comment_id = parseInt($container.attr('data-comment-id'));
+            var $element = $(this);
             $element.css({'text-decoration' : 'none'});
             window.open($element.attr('data-url'), 'ShareWindow', 'height=450, width=550, toolbar=0, location=0, menubar=0, directories=0, scrollbars=0');
         });
@@ -130,7 +121,6 @@ window.hocwp = window.hocwp || {};
             e.preventDefault();
             var $element = $(this),
                 $container = $element.parent(),
-                $input = $container.find('input.hocwp-captcha-code'),
                 $image = $container.find('img.hocwp-captcha-image');
             $element.css({'opacity' : '0.25', 'pointer-events' : 'none'});
             $.ajax({
@@ -151,4 +141,4 @@ window.hocwp = window.hocwp || {};
             });
         });
     })();
-})(jQuery);
+});
