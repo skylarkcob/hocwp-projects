@@ -6,7 +6,8 @@ function hocwp_lib_load_chosen() {
 
 function hocwp_lib_admin_style_and_script() {
     global $pagenow;
-    if('widgets.php' == $pagenow) {
+    $use_chosen_select = apply_filters('hocwp_use_chosen_select', false);
+    if('widgets.php' == $pagenow || $use_chosen_select) {
         hocwp_lib_load_chosen();
     }
 }

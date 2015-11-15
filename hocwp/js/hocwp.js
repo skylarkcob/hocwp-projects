@@ -692,6 +692,7 @@ jQuery(document).ready(function($) {
         this.$element = $(element);
         this._defaults = ChosenSelect.DEFAULTS;
         this._name = ChosenSelect.NAME;
+        this.multiple = this.$element.attr('multiple');
         this.init();
         var $element = this.$element,
             loaded = parseInt(this.$element.attr('data-loaded')),
@@ -701,9 +702,13 @@ jQuery(document).ready(function($) {
         if(1 == loaded) {
             this.$element.parent().find('.chosen-container').remove();
         }
-        this.$element.chosen(chosen_params).on('change', function() {
-            hocwp.chosenSelectUpdated($element);
-        });
+        if('multiple' == this.multiple) {
+            this.$element.chosen(chosen_params).on('change', function() {
+                hocwp.chosenSelectUpdated($element);
+            });
+        } else {
+            this.$element.chosen(chosen_params);
+        }
         this.$element.parent().find('.chosen-container').show();
     }
 

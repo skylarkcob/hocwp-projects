@@ -612,18 +612,22 @@ function hocwp_field_select_chosen($args = array()) {
         $attributes['data-placeholder'] = $placeholder;
     }
     $args['attributes'] = $attributes;
-    $name = isset($args['name']) ? $args['name'] : '';
-    $id = isset($args['id']) ? $args['id'] : '';
-    $args['name'] = $name . '_chosen';
-    $args['id'] = $id . '_chosen';
-    $after = isset($args['after']) ? $args['after'] : '';
-    $value = isset($args['value']) ? $args['value'] : '';
-    if(is_array($value)) {
-        $value = json_encode($value);
+    if($multiple) {
+        $name = isset($args['name']) ? $args['name'] : '';
+        $id = isset($args['id']) ? $args['id'] : '';
+        $args['name'] = $name . '_chosen';
+        $args['id'] = $id . '_chosen';
+        $after = isset($args['after']) ? $args['after'] : '';
+        $value = isset($args['value']) ? $args['value'] : '';
+        if(is_array($value)) {
+            $value = json_encode($value);
+        }
+        $input_result = '<input type="hidden" id="' . esc_attr($id) . '" name="' . esc_attr($name) . '" class="chosen-result" value="' . esc_attr($value) . '" autocomplete="off">';
+        $args['after'] = $input_result . $after;
+        hocwp_field_select($args);
+    } else {
+        hocwp_field_select($args);
     }
-    $input_result = '<input type="hidden" id="' . esc_attr($id) . '" name="' . esc_attr($name) . '" class="chosen-result" value="' . esc_attr($value) . '" autocomplete="off">';
-    $args['after'] = $input_result . $after;
-    hocwp_field_select($args);
 }
 
 function hocwp_field_select($args = array()) {

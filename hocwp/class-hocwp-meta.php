@@ -139,7 +139,7 @@ class HOCWP_Meta {
     }
 
     public function add_field($args) {
-        $field_args = isset($args['field_args']) ? $args['field_args'] : array();
+        $field_args = isset($args['field_args']) ? $args['field_args'] : $args;
         $this->sanitize_field_args($field_args);
         if(isset($args['options'])) {
             $field_args['options'] = $args['options'];
@@ -299,8 +299,9 @@ class HOCWP_Meta {
     }
 
     public function add_meta_box() {
-        foreach($this->get_post_types() as $screen) {
-            add_meta_box($this->get_id(), $this->get_title(), array($this, 'post_meta_box_callback'), $screen, $this->get_context(), $this->get_priority(), $this->get_callback_args());
+        $post_type = hocwp_get_current_post_type();
+        if(in_array($post_type, $this->get_post_types())) {
+            add_meta_box($this->get_id(), $this->get_title(), array($this, 'post_meta_box_callback'), $post_type, $this->get_context(), $this->get_priority(), $this->get_callback_args());
         }
     }
 
@@ -331,6 +332,11 @@ class HOCWP_Meta {
                         echo '<p>' . sprintf(__('The callback function %s does not exists!', 'hocwp'), '<strong>' . $callback . '</strong>') . '</p>';
                     }
                 }
+            }
+            do_action('hocwp_post_meta_box_field', $this);
+            $current_post_type = hocwp_get_current_post_type();
+            if(!empty($current_post_type)) {
+                do_action('hocwp_' . $current_post_type . '_meta_box_field');
             }
             ?>
         </div>

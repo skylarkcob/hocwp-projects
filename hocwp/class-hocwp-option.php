@@ -257,6 +257,8 @@ class HOCWP_Option {
         $this->set_sanitize_callback(array($this, 'sanitize'));
         $this->set_capability('manage_options');
 
+        $this->set_parent_slug('options-general.php');
+
         $this->set_section_id('default');
         $this->set_section_title('');
 
