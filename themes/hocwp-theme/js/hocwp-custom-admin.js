@@ -1,6 +1,3 @@
-window.wp = window.wp || {};
-window.hocwp = window.hocwp || {};
+jQuery(document).ready(function($) {
 
-(function($) {
-
-})(jQuery);
+});
