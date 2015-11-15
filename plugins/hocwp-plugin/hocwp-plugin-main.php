@@ -4,12 +4,12 @@ Plugin Name: HocWP Plugin Default
 Plugin URI: http://hocwp.net/
 Description: This plugin is created by HocWP.
 Author: HocWP
-Version: 1.3.5
+Version: 1.3.7
 Author URI: http://hocwp.net/
 Text Domain: hocwp-plugin-default
 Domain Path: /languages/
 */
-define('HOCWP_PLUGIN_DEFAULT_VERSION', '1.3.5');
+define('HOCWP_PLUGIN_DEFAULT_VERSION', '1.3.7');
 
 define('HOCWP_PLUGIN_DEFAULT_FILE', __FILE__);
 

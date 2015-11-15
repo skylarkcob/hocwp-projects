@@ -41,6 +41,8 @@ require_once(HOCWP_PLUGIN_DEFAULT_INC_PATH . '/hocwp-plugin-setup.php');
 
 require_once(HOCWP_PLUGIN_DEFAULT_INC_PATH . '/hocwp-plugin-admin.php');
 
+require_once(HOCWP_PLUGIN_DEFAULT_INC_PATH . '/hocwp-plugin-meta.php');
+
 require_once(HOCWP_PLUGIN_DEFAULT_INC_PATH . '/hocwp-plugin-hook.php');
 
 require_once(HOCWP_PLUGIN_DEFAULT_INC_PATH . '/hocwp-plugin-ajax.php');
