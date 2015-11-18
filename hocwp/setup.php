@@ -7,6 +7,12 @@ if(!has_action('init', 'hocwp_session_start')) {
     add_action('init', 'hocwp_session_start');
 }
 
+function hocwp_init() {
+    do_action('hocwp_post_type_and_taxonomy');
+    do_action('hocwp_init');
+}
+add_action('init', 'hocwp_init');
+
 function hocwp_setup_widget_title($title) {
     $first_char = hocwp_get_first_char($title);
     $char = apply_filters('hocwp_hide_widget_title_special_char', '!');

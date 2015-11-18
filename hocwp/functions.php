@@ -133,7 +133,9 @@ function hocwp_get_value_by_key($arr, $key, $default = '') {
 }
 
 function hocwp_array_unique($arr) {
-    $arr = array_map('unserialize', array_unique(array_map('serialize', $arr)));
+    if(is_array($arr)) {
+        $arr = array_map('unserialize', array_unique(array_map('serialize', $arr)));
+    }
     return $arr;
 }
 
@@ -595,6 +597,24 @@ function hocwp_sanitize($data, $type) {
             return sanitize_text_field(trim($data));
         case 'email':
             return sanitize_email(trim($data));
+        case 'file_name':
+            return hocwp_sanitize_file_name($data);
+        case 'html_class':
+            return sanitize_html_class($data);
+        case 'key':
+            return sanitize_key($data);
+        case 'mime_type':
+            return sanitize_mime_type($data);
+        case 'sql_orderby':
+            return sanitize_sql_orderby($data);
+        case 'slug':
+            return sanitize_title($data);
+        case 'title_for_query':
+            return sanitize_title_for_query($data);
+        case 'html_id':
+            return hocwp_sanitize_id($data);
+        case 'array':
+            return hocwp_sanitize_array($data);
         default:
             return $data;
     }
@@ -1911,6 +1931,13 @@ function hocwp_the_footer_logo() {
         $a->set_text($img->build());
         $a->output();
     }
+}
+
+function hocwp_remove_array_item_by_value($value, $array) {
+    if(($key = array_search($value, $array)) !== false) {
+        unset($array[$key]);
+    }
+    return $array;
 }
 
 function hocwp_find_valid_value_in_array($arr, $key) {

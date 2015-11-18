@@ -81,7 +81,7 @@ function hocwp_get_post_thumbnail_url($post_id = '', $size = 'full') {
         }
     }
     if(empty($result)) {
-        $no_thumbnail = get_template_directory_uri() . '/hocwp/images/no-thumbnail.png';
+        $no_thumbnail = HOCWP_URL . '/images/no-thumbnail.png';
         $no_thumbnail = apply_filters('hocwp_no_thumbnail_url', $no_thumbnail);
         $result = $no_thumbnail;
     }
@@ -256,4 +256,26 @@ function hocwp_insert_post($args = array()) {
     $args['post_title'] = wp_strip_all_tags($args['post_title']);
     $post_id = wp_insert_post($args);
     return $post_id;
+}
+
+function hocwp_get_post_by_column($column_name, $column_value, $output = 'OBJECT') {
+    global $wpdb;
+    $output = strtoupper($output);
+    $sql = $wpdb->prepare("SELECT ID FROM $wpdb->posts WHERE $column_name = %s", $column_value);
+    $post_id = $wpdb->get_var($sql);
+    $result = '';
+    switch($output) {
+        case OBJECT:
+            if(hocwp_id_number_valid($post_id)) {
+                $result = get_post($post_id);
+            }
+            break;
+        default:
+            $result = $post_id;
+    }
+    return $result;
+}
+
+function hocwp_get_post_by_slug($slug) {
+    return hocwp_get_post_by_column('post_name', $slug);
 }
