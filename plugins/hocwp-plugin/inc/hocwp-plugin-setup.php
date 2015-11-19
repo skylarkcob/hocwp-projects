@@ -14,6 +14,7 @@ function hocwp_plugin_default_activation() {
     if(!current_user_can('activate_plugins')) {
         return;
     }
+    flush_rewrite_rules();
     do_action('hocwp_plugin_default_activation');
 }
 register_activation_hook(HOCWP_PLUGIN_DEFAULT_FILE, 'hocwp_plugin_default_activation');
@@ -22,6 +23,7 @@ function hocwp_plugin_default_deactivation() {
     if(!current_user_can('activate_plugins')) {
         return;
     }
+    flush_rewrite_rules();
     do_action('hocwp_plugin_default_deactivation');
 }
 register_deactivation_hook(HOCWP_PLUGIN_DEFAULT_FILE, 'hocwp_plugin_default_deactivation');
