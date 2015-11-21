@@ -274,6 +274,41 @@ function hocwp_field_recaptcha($args = array()) {
     <?php
 }
 
+function hocwp_field_headline($args = array()) {
+    $args = hocwp_field_sanitize_args($args);
+    $tag = isset($args['tag']) ? $args['tag'] : 'h2';
+    $text = isset($args['text']) ? $args['text'] : '';
+    $headline = new HOCWP_HTML($tag);
+    $headline->set_text($text);
+    $headline->output();
+}
+
+function hocwp_field_fieldset($args = array()) {
+    $args = hocwp_field_sanitize_args($args);
+    $label = isset($args['label']) ? $args['label'] : '';
+    $callback = hocwp_sanitize_callback($args);
+    $container_class = isset($args['container_class']) ? $args['container_class'] : '';
+    $func_args = hocwp_sanitize_callback_args($args);
+    if(!is_array($callback)) {
+        hocwp_add_string_with_space_before($container_class, hocwp_sanitize_file_name($callback));
+    } else {
+        $cb_class = isset($callback[1]) ? $callback[1] : '';
+        if(!empty($cb_class)) {
+            hocwp_add_string_with_space_before($container_class, hocwp_sanitize_file_name($cb_class));
+        }
+    }
+    hocwp_add_string_with_space_before($container_class, 'hocwp-fieldset');
+    unset($args['label']);
+    hocwp_field_before($args);
+    ?>
+    <fieldset class="<?php echo $container_class; ?>">
+        <legend><?php echo $label; ?></legend>
+        <?php call_user_func($callback, $func_args); ?>
+    </fieldset>
+    <?php
+    hocwp_field_after($args);
+}
+
 function hocwp_field_size($args = array()) {
     $args = hocwp_field_sanitize_args($args);
     $field_class = $args['class'];
@@ -281,7 +316,10 @@ function hocwp_field_size($args = array()) {
     $id_height = isset($args['id_height']) ? $args['id_height'] : '';
     $name_width = isset($args['name_width']) ? $args['name_width'] : '';
     $name_height = isset($args['name_height']) ? $args['name_height'] : '';
-    $value = (array)$args['value'];
+    $value = isset($args['value']) ? (array)$args['value'] : array(0, 0);
+    if(!hocwp_array_has_value($value)) {
+        $value = array(0, 0);
+    }
     hocwp_add_string_with_space_before($field_class, 'hocwp-number image-size');
     $sep = isset($args['sep']) ? $args['sep'] : '<span>x</span>';
     $id = explode('_', $id_width);
@@ -295,14 +333,14 @@ function hocwp_field_size($args = array()) {
         'field_class' => $field_class,
         'name' => $name_width,
         'autocomplete' => false,
-        'value' => $value[0],
+        'value' => isset($value[0]) ? $value[0] : 0,
         'only' => true
     );
     hocwp_field_input_number($input_args);
     echo $sep;
     $input_args['id'] = $id_height;
     $input_args['name'] = $name_height;
-    $input_args['value'] = $value[1];
+    $input_args['value'] = isset($value[1]) ? $value[1] : (isset($value[0]) ? $value[0] : 0);
     hocwp_field_input_number($input_args);
     hocwp_field_after($args);
 }
@@ -459,7 +497,7 @@ function hocwp_field_input_right_label($type, $args = array()) {
         $option['type'] = $type;
         $option['before'] = isset($args['before']) ? $args['before'] : '<p>';
         $option['after'] = isset($args['after']) ? $args['after'] : '</p>';
-        $option['name'] = $name;
+        $option['name'] = isset($option['name']) ? $option['name'] : $name;
         $option['value'] = $value;
         if(empty($value) && 0 == $count && 'radio' == $type) {
             $option['attributes']['checked'] = 'checked';
@@ -612,6 +650,10 @@ function hocwp_field_select_chosen($args = array()) {
         $attributes['data-placeholder'] = $placeholder;
     }
     $args['attributes'] = $attributes;
+    $before = hocwp_get_value_by_key($args, 'before', '<div class="hocwp-chosen-field hocwp-field-group">');
+    $after = hocwp_get_value_by_key($args, 'after', '</div>');
+    $args['before'] = $before;
+    $args['after'] = $after;
     if($multiple) {
         $name = isset($args['name']) ? $args['name'] : '';
         $id = isset($args['id']) ? $args['id'] : '';

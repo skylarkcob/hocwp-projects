@@ -40,6 +40,18 @@
     margin-top: 2px;
 }
 
+.hocwp-fieldset {
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+.hocwp-fieldset legend {
+    line-height: 11px;
+    margin-left: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
 /**
  * Meta box
  */
@@ -69,6 +81,10 @@
 .hocwp-meta-box div.meta-row input[type="checkbox"],
 .hocwp-meta-box div.meta-row input[type="radio"] {
     margin-top: 0;
+}
+
+.hocwp-meta-box .hocwp-field-group {
+    margin-bottom: 10px;
 }
 
 /**

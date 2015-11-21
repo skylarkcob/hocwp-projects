@@ -17,3 +17,16 @@ function hocwp_plugin_get_template($base_path, $slug, $name = '') {
 function hocwp_plugin_get_module($base_path, $name) {
     hocwp_plugin_get_template($base_path, 'module', $name);
 }
+
+function hocwp_plugin_load_custom_css() {
+    $option = get_option('hocwp_plugin_custom_css');
+    $css = hocwp_get_value_by_key($option, 'code');
+    if(!empty($css)) {
+        $css = hocwp_minify_css($css);
+        $style = new HOCWP_HTML('style');
+        $style->set_attribute('type', 'text/css');
+        $style->set_text($css);
+        $style->output();
+    }
+}
+add_action('wp_head', 'hocwp_plugin_load_custom_css', 99);

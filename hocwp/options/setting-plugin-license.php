@@ -17,6 +17,7 @@ function hocwp_option_plugin_license_sanitized($input) {
 		$customer_email = isset($input['customer_email']) ? $input['customer_email'] : '';
 		if(is_email($customer_email)) {
 			$code = isset($input['license_code']) ? $input['license_code'] : '';
+			$code = strtoupper($code);
 			$option = get_option('hocwp_plugin_licenses');
 			$use_for_key = md5($use_for);
 			$option[$use_for_key]['customer_email'] = $customer_email;
@@ -24,5 +25,7 @@ function hocwp_option_plugin_license_sanitized($input) {
 			update_option('hocwp_plugin_licenses', $option);
 		}
 	}
+	$transient_name = hocwp_build_license_transient_name('plugin', $use_for);
+	delete_transient($transient_name);
 }
 add_action('hocwp_sanitize_' . $option_plugin_license->get_option_name_no_prefix() . '_option', 'hocwp_option_plugin_license_sanitized');

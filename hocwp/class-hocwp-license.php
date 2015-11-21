@@ -324,39 +324,60 @@ class HOCWP_License {
         return false;
     }
 
+    public function get_transient_name() {
+        return hocwp_build_license_transient_name($this->get_type(), $this->get_use_for());
+    }
+
     public function check_valid($data = array()) {
-        $valid = false;
-        if(!hocwp_array_has_value($data)) {
-            $data = $this->get_saved_generated_data();
-        }
-        $hashed_license = hocwp_get_value_by_key($data, 'hashed');
-        if(!empty($hashed_license)) {
-            $key_map = maybe_unserialize(hocwp_get_value_by_key($data, 'key_map'));
-            $this->set_key_map($key_map);
-            $license_info = $this->get_saved_license_data();
-            if($this->for_theme()) {
-                $code = hocwp_get_value_by_key($license_info, 'license_code');
-                $this->set_code($code);
-                $email = hocwp_get_value_by_key($license_info, 'customer_email');
-                $this->set_customer_email($email);
+        $transient_name = $this->get_transient_name();
+        if(false === ($valid = get_transient($transient_name))) {
+            $valid = false;
+            $from_data_param = false;
+            if(hocwp_array_has_value($data)) {
+                $data_hashed = hocwp_get_value_by_key($data, 'hashed');
+                $data_key_map = hocwp_get_value_by_key($data, 'key_map');
+                if(!empty($data_hashed) && !empty($data_key_map)) {
+                    $from_data_param = true;
+                }
+            }
+            if(!$from_data_param) {
+                $data = $this->get_saved_generated_data();
+            }
+            $hashed_license = hocwp_get_value_by_key($data, 'hashed');
+            if(!empty($hashed_license)) {
+                $key_map = maybe_unserialize(hocwp_get_value_by_key($data, 'key_map'));
+                $this->set_key_map($key_map);
+                $license_info = $this->get_saved_license_data();
+                if($this->for_theme()) {
+                    $code = hocwp_get_value_by_key($license_info, 'license_code');
+                    $this->set_code($code);
+                    $email = hocwp_get_value_by_key($license_info, 'customer_email');
+                    $this->set_customer_email($email);
+                } else {
+                    $use_for = $this->get_use_for();
+                    $use_for_key = md5($use_for);
+                    $code = hocwp_get_value_by_key($license_info, array($use_for_key, 'license_code'));
+                    $this->set_code($code);
+                    $email = hocwp_get_value_by_key($license_info, array($use_for_key, 'customer_email'));
+                    $this->set_customer_email($email);
+                }
+                $this->create_key();
+                $key = $this->get_key();
+                if(!function_exists('wp_check_password')) {
+                    require_once(ABSPATH . WPINC . '/pluggable.php');
+                }
+                if(wp_check_password($key, $hashed_license)) {
+                    $valid = true;
+                }
+            }
+            $valid = (bool)$valid;
+            $this->set_valid($valid);
+            if(!$valid && $from_data_param) {
+                $valid = $this->check_valid();
             } else {
-                $use_for = $this->get_use_for();
-                $use_for_key = md5($use_for);
-                $code = hocwp_get_value_by_key($license_info, array($use_for_key, 'license_code'));
-                $this->set_code($code);
-                $email = hocwp_get_value_by_key($license_info, array($use_for_key, 'customer_email'));
-                $this->set_customer_email($email);
-            }
-            $this->create_key();
-            $key = $this->get_key();
-            if(!function_exists('wp_check_password')) {
-                require_once(ABSPATH . WPINC . '/pluggable.php');
-            }
-            if(wp_check_password($key, $hashed_license)) {
-                $valid = true;
+                set_transient($transient_name, $valid, WEEK_IN_SECONDS);
             }
         }
-        $this->set_valid($valid);
         return $valid;
     }
 }

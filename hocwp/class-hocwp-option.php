@@ -313,7 +313,7 @@ class HOCWP_Option {
                 if('options-general.php' != $this->get_parent_slug()) {
                     hocwp_admin_notice_setting_saved();
                 }
-                do_action($this->get_menu_slug() . '_option_saved');
+                do_action($this->get_menu_slug() . '_option_saved', $this);
             }
             $this->form();
             ?>
@@ -437,6 +437,27 @@ class HOCWP_Option {
             }
             $args['name'] = $this->get_field_name($name);
             $args['id'] = $this->get_field_id($name);
+            $options = isset($args['options']) ? $args['options'] : array();
+            if(hocwp_array_has_value($options)) {
+                $tmp_options = array();
+                foreach($options as $option) {
+                    $name = isset($option['name']) ? hocwp_sanitize_array($option['name']) : array();
+                    if(!hocwp_array_has_value($name)) {
+                        $name = isset($option['id']) ? hocwp_sanitize_array($option['id']) : array();
+                    }
+                    if(!hocwp_array_has_value($name)) {
+                        continue;
+                    }
+                    if(!isset($option['value'])) {
+                        $option['value'] = $this->get_by_key($name, hocwp_get_value_by_key($option, 'default'));
+                    }
+                    $option['name'] = $this->get_field_name($name);
+                    $option['id'] = $this->get_field_id($name);
+                    $tmp_options[] = $option;
+                }
+                $args['options'] = $tmp_options;
+                unset($tmp_options);
+            }
             call_user_func($callback, $args);
         } else {
             _e('Please set a valid callback for this field.', 'hocwp');
@@ -551,6 +572,10 @@ class HOCWP_Option {
     public function add_field($args = array()) {
         $id = isset($args['id']) ? $args['id'] : '';
         $name = isset($args['name']) ? $args['name'] : '';
+        $class = isset($args['class']) ? $args['class'] : '';
+        if(!isset($args['field_class'])) {
+            $args['field_class'] = $class;
+        }
         hocwp_transmit_id_and_name($id, $name);
         $args['id'] = $id;
         $args['name'] = $name;

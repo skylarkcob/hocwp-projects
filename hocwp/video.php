@@ -23,6 +23,11 @@ function hocwp_video_play($args = array()) {
     $cc = isset($args['cc_load_policy']) ? $args['cc_load_policy'] : false;
     $iv = isset($args['iv_load_policy']) ? $args['iv_load_policy'] : false;
     $showinfo = isset($args['showinfo']) ? $args['showinfo'] : false;
+    $player_id = hocwp_get_value_by_key($args, 'player_id', 'hocwp_player');
+    if(empty($player_id)) {
+        $player_id = 'hocwp_player';
+    }
+
     if(!empty($video_code)) {
         if($height > 0) {
             $video_code = preg_replace('/height="(.*?)"/i', 'height="' . $height . '"', $video_code);
@@ -30,6 +35,11 @@ function hocwp_video_play($args = array()) {
         if($width > 0) {
             $video_code = preg_replace('/width="(.*?)"/i', 'width="' . $width . '"', $video_code);
         }
+        $video_code = preg_replace('/id="(.*?)"/i', 'id="' . $player_id . '"', $video_code);
+        if(!hocwp_string_contain($video_code, 'id="')) {
+            $video_code = str_replace('<iframe', '<iframe id="' . $player_id . '"', $video_code);
+        }
+        $video_code = apply_filters('hocwp_video_code_result', $video_code, $args);
         echo $video_code;
     } else {
         if(!empty($video_url)) {
@@ -63,8 +73,20 @@ function hocwp_video_play($args = array()) {
             if($width > 0) {
                 $html = preg_replace('/width="(.*?)"/i', 'width="' . $width . '"', $html);
             }
+            $html = preg_replace('/id="(.*?)"/i', 'id="' . $player_id . '"', $html);
+            if(!hocwp_string_contain($html, 'id="')) {
+                $html = str_replace('<iframe', '<iframe id="' . $player_id . '"', $html);
+            }
             $html = apply_filters('hocwp_embed_video_result', $html, $video_args);
             echo $html;
+        }
+    }
+
+    $video_id = get_post_meta($post_id, 'video_id', true);
+    if(!empty($video_id)) {
+        $video_server = get_post_meta($post_id, 'video_server', true);
+        if('youtube' == $video_server) {
+
         }
     }
 }

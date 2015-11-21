@@ -1,7 +1,16 @@
 <?php
 global $hocwp_theme_license;
 
-function hocwp_theme_after_switch() {
+function hocwp_theme_switched($new_name, $new_theme) {
+    if(!current_user_can('switch_themes')) {
+        return;
+    }
+    flush_rewrite_rules();
+    do_action('hocwp_theme_deactivation');
+}
+add_action('switch_theme', 'hocwp_theme_switched', 10, 2);
+
+function hocwp_theme_after_switch($old_name, $old_theme) {
     if(!current_user_can('switch_themes')) {
         return;
     }
@@ -9,9 +18,10 @@ function hocwp_theme_after_switch() {
     if(hocwp_is_debugging() || hocwp_is_localhost()) {
         hocwp_update_permalink_struct('/%category%/%postname%.html');
     }
+    flush_rewrite_rules();
     do_action('hocwp_theme_activation');
 }
-add_action('after_switch_theme', 'hocwp_theme_after_switch');
+add_action('after_switch_theme', 'hocwp_theme_after_switch', 10, 2);
 
 function hocwp_setup_theme_data() {
     load_theme_textdomain('hocwp', get_template_directory() . '/languages');
@@ -240,6 +250,16 @@ function hocwp_setup_theme_admin_bar_menu($wp_admin_bar) {
         $wp_admin_bar->add_node($args);
     }
     $option = hocwp_option_get_object_from_list('theme_license');
+    if(hocwp_object_valid($option) && current_user_can($option->get_capability())) {
+        $args = array(
+            'id' => hocwp_sanitize_id($option->get_menu_slug()),
+            'title' => $option->get_menu_title(),
+            'href' => $option->get_page_url(),
+            'parent' => 'themes'
+        );
+        $wp_admin_bar->add_node($args);
+    }
+    $option = hocwp_option_get_object_from_list('theme_custom_css');
     if(hocwp_object_valid($option) && current_user_can($option->get_capability())) {
         $args = array(
             'id' => hocwp_sanitize_id($option->get_menu_slug()),

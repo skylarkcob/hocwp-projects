@@ -240,3 +240,101 @@ add_action('wp_head', 'hocwp_setup_theme_add_favicon');
 if('vi' == hocwp_get_language() && !is_admin()) {
     include HOCWP_PATH . '/theme/theme-translation.php';
 }
+
+function hocwp_setup_theme_custom_css() {
+    $option = get_option('hocwp_theme_custom_css');
+    $theme = wp_get_theme();
+    $template = hocwp_sanitize_id($theme->get_template());
+    $css = hocwp_get_value_by_key($option, $template);
+    if(!empty($css)) {
+        $css = hocwp_minify_css($css);
+        $style = new HOCWP_HTML('style');
+        $style->set_attribute('type', 'text/css');
+        $style->set_text($css);
+        $style->output();
+    }
+}
+add_action('wp_head', 'hocwp_setup_theme_custom_css', 99);
+
+function hocwp_setup_theme_the_excerpt($excerpt) {
+    $excerpt = str_replace('<p>', '<p class="post-excerpt">', $excerpt);
+    return $excerpt;
+}
+add_filter('the_excerpt', 'hocwp_setup_theme_the_excerpt');
+
+function hocwp_setup_theme_comment_form() {
+
+}
+add_action('comment_form', 'hocwp_setup_theme_comment_form');
+
+function hocwp_setup_theme_comment_form_submit_field($submit_field, $args) {
+    if(hocwp_use_comment_form_captcha() && !hocwp_use_comment_form_captcha_custom_position()) {
+        $disable_captcha_user = hocwp_user_not_use_comment_form_captcha();
+        if(!$disable_captcha_user || ($disable_captcha_user && !is_user_logged_in())) {
+            $submit_field = str_replace('form-submit', 'form-submit captcha-beside', $submit_field);
+            ob_start();
+            $args = array(
+                'before' => '<p class="captcha-group">',
+                'after' => '</p>',
+                'input_width' => 165
+            );
+            if('vi' == hocwp_get_language()) {
+                $args['placeholder'] = __('Nhập mã bảo mật', 'hocwp');
+            }
+            hocwp_field_captcha($args);
+            $captcha_field = ob_get_clean();
+            $submit_field .= $captcha_field;
+        }
+    }
+    return $submit_field;
+}
+add_filter('comment_form_submit_field', 'hocwp_setup_theme_comment_form_submit_field', 10, 2);
+
+function hocwp_setup_theme_preprocess_comment($commentdata) {
+    $disable_captcha_user = hocwp_user_not_use_comment_form_captcha();
+    if(hocwp_use_comment_form_captcha() && (!$disable_captcha_user || ($disable_captcha_user && !is_user_logged_in()))) {
+        $lang = hocwp_get_language();
+        if(isset($_POST['captcha'])) {
+            $captcha = $_POST['captcha'];
+            if(empty($captcha)) {
+                if('vi' == $lang) {
+                    wp_die(__('Để xác nhận bạn không phải là máy tính, xin vui lòng nhập mã bảo mật!', 'hocwp'), __('Chưa nhập mã bảo mật', 'hocwp'));
+                } else {
+                    wp_die(__('To confirm you are not a computer, please enter the security code!', 'hocwp'), __('Empty captcha code error', 'hocwp'));
+                }
+                exit;
+            } else {
+                $hw_captcha = new HOCWP_Captcha();
+                if(!$hw_captcha->check($captcha)) {
+                    if('vi' == $lang) {
+                        wp_die(__('Mã bảo mật bạn nhập không chính xác, xin vui lòng thử lại!', 'hocwp'), __('Sai mã bảo mật', 'hocwp'));
+                    } else {
+                        wp_die(__('The security code you entered is incorrect, please try again!', 'hocwp'), __('Invalid captcha code', 'hocwp'));
+                    }
+                    exit;
+                }
+            }
+        } else {
+            $commentdata = null;
+            if('vi' == $lang) {
+                wp_die(__('Hệ thống đã phát hiện bạn không phải là người!', 'hocwp'), __('Lỗi gửi bình luận', 'hocwp'));
+            } else {
+                wp_die(__('Our systems have detected that you are not a human!', 'hocwp'), __('Post comment error', 'hocwp'));
+            }
+            exit;
+        }
+    }
+    return $commentdata;
+}
+add_filter('preprocess_comment', 'hocwp_setup_theme_preprocess_comment', 1);
+
+function hocwp_setup_theme_enable_session($use) {
+    if(!is_admin()) {
+        $disable_captcha_user = hocwp_user_not_use_comment_form_captcha();
+        if(hocwp_use_comment_form_captcha() && (!$disable_captcha_user || ($disable_captcha_user && !is_user_logged_in()))) {
+            $use = true;
+        }
+    }
+    return $use;
+}
+add_filter('hocwp_use_session', 'hocwp_setup_theme_enable_session');

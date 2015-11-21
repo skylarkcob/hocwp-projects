@@ -20,7 +20,7 @@ class HOCWP_Widget_Post extends WP_Widget {
             'by' => 'recent',
             'number' => 5,
             'category' => array(),
-            'exerpt_length' => 75,
+            'excerpt_length' => 75,
             'thumbnail_size' => array(64, 64),
             'title_length' => 50,
             'show_author' => 0,
@@ -28,7 +28,7 @@ class HOCWP_Widget_Post extends WP_Widget {
             'show_comment_count' => 0,
             'only_thumbnail' => 0,
             'hide_thumbnail' => 0,
-            'post_full_widths' => array(
+            'full_width_posts' => array(
                 'none' => __('None', 'hocwp'),
                 'first' => __('First post', 'hocwp'),
                 'last' => __('Last post', 'hocwp'),
@@ -37,7 +37,7 @@ class HOCWP_Widget_Post extends WP_Widget {
                 'even' => __('Even posts', 'hocwp'),
                 'all' => __('All posts', 'hocwp')
             ),
-            'post_full_width' => 'none',
+            'full_width_post' => 'none',
             'times' => array(
                 'all' => __('All time', 'hocwp'),
                 'daily' => __('Daily', 'hocwp'),
@@ -103,6 +103,10 @@ class HOCWP_Widget_Post extends WP_Widget {
         $by = isset($instance['by']) ? $instance['by'] : $this->args['by'];
         $category = isset($instance['category']) ? $instance['category'] : json_encode($this->args['category']);
         $category = hocwp_json_string_to_array($category);
+        $excerpt_length = isset($instance['excerpt_length']) ? $instance['excerpt_length'] : $this->args['excerpt_length'];
+        $thumbnail_size = isset($instance['thumbnail_size']) ? $instance['thumbnail_size'] : $this->args['thumbnail_size'];
+        $thumbnail_size = hocwp_sanitize_size($thumbnail_size);
+        $full_width_post = hocwp_get_value_by_key($instance, 'full_width_post', $this->args['full_width_post']);
         $sidebar = isset($args['id']) ? $args['id'] : 'default';
         $widget_html = $args['before_widget'];
         if(!empty($title)) {
@@ -180,9 +184,37 @@ class HOCWP_Widget_Post extends WP_Widget {
             $widget_html .= '<ul class="' . $list_class . '">';
             $loop_html = apply_filters('hocwp_sidebar_' . $sidebar . '_widget_post_loop_html', '', $w_query, $data = $instance);
             if(empty($loop_html)) {
+                $count = 0;
                 ob_start();
                 while($w_query->have_posts()) {
                     $w_query->the_post();
+                    $class = 'a-widget-post';
+                    $full_width = false;
+                    if('all' == $full_width_post) {
+                        $full_width = true;
+                    } elseif('first' == $full_width_post && 0 == $count) {
+                        $full_width = true;
+                    } elseif('last' == $full_width_post && $count == $w_query->post_count) {
+                        $full_width = true;
+                    } elseif('first_last' == $full_width_post && (0 == $count || $count == $w_query->post_count)) {
+                        $full_width = true;
+                    } elseif('odd' == $full_width_post && ($count % 2) != 0) {
+                        $full_width = true;
+                    } elseif('even' == $full_width_post && ($count % 2) == 0) {
+                        $full_width = true;
+                    }
+                    if($full_width) {
+                        hocwp_add_string_with_space_before($class, 'full-width');
+                    }
+                    ?>
+                    <li <?php post_class($class); ?>>
+                        <?php
+                        hocwp_post_thumbnail(array('width' => $thumbnail_size[0], 'height' => $thumbnail_size[1]));
+                        hocwp_post_title_link();
+                        ?>
+                    </li>
+                    <?php
+                    $count++;
                 }
                 wp_reset_postdata();
                 $loop_html .= ob_get_clean();
@@ -207,8 +239,13 @@ class HOCWP_Widget_Post extends WP_Widget {
         $by = isset($instance['by']) ? $instance['by'] : $this->args['by'];
         $category = isset($instance['category']) ? $instance['category'] : json_encode($this->args['category']);
         $category = hocwp_json_string_to_array($category);
+        $thumbnail_size = hocwp_get_value_by_key($instance, 'thumbnail_size', $this->args['thumbnail_size']);
+        $full_width_post = hocwp_get_value_by_key($instance, 'full_width_post', $this->args['full_width_post']);
+
         hocwp_field_widget_before('hocwp-widget-post');
+
         hocwp_widget_field_title($this->get_field_id('title'), $this->get_field_name('title'), $title);
+
         $lists = get_post_types(array('_builtin' => false, 'public' => true), 'objects');
         if(!array_key_exists('post', $lists)) {
             $lists[] = get_post_type_object('post');
@@ -238,6 +275,7 @@ class HOCWP_Widget_Post extends WP_Widget {
             'multiple' => true
         );
         hocwp_widget_field('hocwp_field_select_chosen', $args);
+
         $args = array(
             'id' => $this->get_field_id('number'),
             'name' => $this->get_field_name('number'),
@@ -245,6 +283,7 @@ class HOCWP_Widget_Post extends WP_Widget {
             'label' => __('Number posts:', 'hocwp')
         );
         hocwp_widget_field('hocwp_field_input_number', $args);
+
         $lists = $this->args['bys'];
         $all_option = '';
         foreach($lists as $lkey => $lvalue) {
@@ -259,6 +298,7 @@ class HOCWP_Widget_Post extends WP_Widget {
             'class' => 'get-by'
         );
         hocwp_widget_field('hocwp_field_select', $args);
+
         $all_option = '';
         $taxonomies = hocwp_get_hierarchical_taxonomies();
         foreach($taxonomies as $tkey => $tax) {
@@ -295,6 +335,32 @@ class HOCWP_Widget_Post extends WP_Widget {
             $args['hidden'] = true;
         }
         hocwp_widget_field('hocwp_field_select_chosen', $args);
+
+        $args = array(
+            'id_width' => $this->get_field_id('thumbnail_size_width'),
+            'name_width' => $this->get_field_name('thumbnail_size_width'),
+            'id_height' => $this->get_field_id('thumbnail_size_height'),
+            'name_height' => $this->get_field_name('thumbnail_size_height'),
+            'value' => $thumbnail_size,
+            'label' => __('Thumbnail size:', 'hocwp')
+        );
+        hocwp_widget_field('hocwp_field_size', $args);
+
+        $lists = $this->args['full_width_posts'];
+        $all_option = '';
+        foreach($lists as $lkey => $lvalue) {
+            $all_option .= hocwp_field_get_option(array('value' => $lkey, 'text' => $lvalue, 'selected' => $full_width_post));
+        }
+        $args = array(
+            'id' => $this->get_field_id('full_width_post'),
+            'name' => $this->get_field_name('full_width_post'),
+            'value' => $by,
+            'all_option' => $all_option,
+            'label' => __('Full width posts:', 'hocwp'),
+            'class' => 'full-width-post'
+        );
+        hocwp_widget_field('hocwp_field_select', $args);
+
         hocwp_field_widget_after();
     }
 
@@ -305,6 +371,10 @@ class HOCWP_Widget_Post extends WP_Widget {
         $instance['number'] = isset($new_instance['number']) ? $new_instance['number'] : $this->args['number'];
         $instance['by'] = isset($new_instance['by']) ? $new_instance['by'] : $this->args['by'];
         $instance['category'] = isset($new_instance['category']) ? $new_instance['category'] : json_encode($this->args['category']);
+        $instance['full_width_post'] = hocwp_get_value_by_key($new_instance, 'full_width_post', $this->args['full_width_post']);
+        $width = hocwp_get_value_by_key($new_instance, 'thumbnail_size_width', $this->args['thumbnail_size'][0]);
+        $height = hocwp_get_value_by_key($new_instance, 'thumbnail_size_height', $this->args['thumbnail_size'][1]);
+        $instance['thumbnail_size'] = array($width, $height);
         return $instance;
     }
 }

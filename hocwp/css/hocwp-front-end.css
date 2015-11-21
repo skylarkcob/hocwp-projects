@@ -390,6 +390,11 @@
     margin-bottom: 15px;
 }
 
+.hocwp .comment-form .form-submit.captcha-beside {
+    float: left;
+    margin-right: 15px;
+}
+
 .hocwp .comment-form p label {
     font-weight: 400;
 }
@@ -615,6 +620,38 @@
 
 .one-widget .widget {
     margin: 0;
+}
+
+.hocwp-widget-post li {
+
+}
+
+.hocwp-widget-post li .entry-title {
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 18px;
+    margin-top: 0;
+}
+
+.hocwp-widget-post li .entry-title a {
+
+}
+
+.hocwp-widget-post li .wp-post-image {
+    float: left;
+    margin-right: 10px;
+    max-width: 100px;
+    width: auto;
+}
+
+.hocwp-widget-post .full-width .wp-post-image {
+    display: block;
+    float: none;
+    height: auto;
+    margin-bottom: 8px;
+    margin-right: 0;
+    max-width: 1200px;
+    width: 100%;
 }
 
 /**

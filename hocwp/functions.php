@@ -113,7 +113,7 @@ function hocwp_get_value_by_key($arr, $key, $default = '') {
     $value = $default;
     $tmp = $arr;
     if(!is_array($key)) {
-        $value = isset($arr[$key]) ? $arr[$key] : '';
+        $value = isset($arr[$key]) ? $arr[$key] : $default;
         return $value;
     }
     foreach($key as $child_key) {
@@ -713,6 +713,35 @@ function hocwp_sanitize_array($arr, $unique = true, $filter = true) {
     return $arr;
 }
 
+function hocwp_sanitize_size($size) {
+    $size = (array)$size;
+    $width = intval(isset($size[0]) ? $size['0'] : 0);
+    if(0 == $width && isset($size['width'])) {
+        $width = $size['width'];
+    }
+    $height = intval(isset($size[1]) ? $size[1] : $width);
+    if(0 != $width && (0 == $height || $height == $width) && isset($size['height'])) {
+        $height = $size['height'];
+    }
+    return array($width, $height);
+}
+
+function hocwp_sanitize_callback($args) {
+    $callback = isset($args['func']) ? $args['func'] : '';
+    if(empty($callback)) {
+        $callback = isset($args['callback']) ? $args['callback'] : '';
+    }
+    return $callback;
+}
+
+function hocwp_sanitize_callback_args($args) {
+    $func = isset($args['func_args']) ? $args['func_args'] : '';
+    if(empty($func)) {
+        $func = isset($args['callback_args']) ? $args['callback_args'] : '';
+    }
+    return $func;
+}
+
 function hocwp_get_browser() {
     global $is_lynx, $is_gecko, $is_IE, $is_opera, $is_NS4, $is_safari, $is_chrome, $is_iphone, $is_winIE, $is_macIE;
     $user_agent = strtolower($_SERVER['HTTP_USER_AGENT']);
@@ -1182,12 +1211,82 @@ function hocwp_string_contain($string, $needle) {
     return false;
 }
 
+function hocwp_build_css_rule($elements, $properties) {
+    $elements = hocwp_sanitize_array($elements);
+    $properties = hocwp_sanitize_array($properties);
+    $before = '';
+    foreach($elements as $element) {
+        $before .= $element . ',';
+    }
+    $before = trim($before, ',');
+    $after = '';
+    foreach($properties as $key => $property) {
+        $after .= $key . ':' . $property . ';';
+    }
+    $after = trim($after, ';');
+    return $before . '{' . $after . '}';
+}
+
+function hocwp_shorten_hex_css($content) {
+    $content = preg_replace('/(?<![\'"])#([0-9a-z])\\1([0-9a-z])\\2([0-9a-z])\\3(?![\'"])/i', '#$1$2$3', $content);
+    return $content;
+}
+
+function hocwp_shorten_zero_css($content) {
+    $before = '(?<=[:(, ])';
+    $after = '(?=[ ,);}])';
+    $units = '(em|ex|%|px|cm|mm|in|pt|pc|ch|rem|vh|vw|vmin|vmax|vm)';
+    $content = preg_replace('/'.$before.'(-?0*(\.0+)?)(?<=0)'.$units.$after.'/', '\\1', $content);
+    $content = preg_replace('/'.$before.'\.0+'.$after.'/', '0', $content);
+    $content = preg_replace('/'.$before.'(-?[0-9]+)\.0+'.$units.'?'.$after.'/', '\\1\\2', $content);
+    $content = preg_replace('/'.$before.'-?0+'.$after.'/', '0', $content);
+    return $content;
+}
+
+function hocwp_strip_white_space_css($content) {
+    $content = preg_replace('/^\s*/m', '', $content);
+    $content = preg_replace('/\s*$/m', '', $content);
+    $content = preg_replace('/\s+/', ' ', $content);
+    $content = preg_replace('/\s*([\*$~^|]?+=|[{};,>~]|!important\b)\s*/', '$1', $content);
+    $content = preg_replace('/([\[(:])\s+/', '$1', $content);
+    $content = preg_replace('/\s+([\]\)])/', '$1', $content);
+    $content = preg_replace('/\s+(:)(?![^\}]*\{)/', '$1', $content);
+    $content = preg_replace('/\s*([+-])\s*(?=[^}]*{)/', '$1', $content);
+    $content = preg_replace('/;}/', '}', $content);
+    return trim($content);
+}
+
+function hocwp_minify_css($css_content) {
+    $buffer = $css_content;
+    $buffer = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $buffer);
+    $buffer = str_replace(': ', ':', $buffer);
+    $buffer = str_replace(array("\r\n", "\r", "\n", "\t", '  ', '    ', '    '), '', $buffer);
+    $buffer = hocwp_shorten_hex_css($buffer);
+    $buffer = hocwp_shorten_zero_css($buffer);
+    $buffer = hocwp_strip_white_space_css($buffer);
+    return $buffer;
+}
+
 function hocwp_the_posts_navigation() {
     the_posts_pagination(array(
         'prev_text' => esc_html__('Previous page', 'hocwp'),
         'next_text' => esc_html__('Next page', 'hocwp'),
         'before_page_number' => '<span class="meta-nav screen-reader-text">' . esc_html__('Page', 'hocwp') . ' </span>'
     ));
+}
+
+function hocwp_wrap_class($classes = array()) {
+    $classes = hocwp_sanitize_array($classes);
+    $classes = apply_filters('hocwp_wrap_class', $classes);
+    $classes[] = 'wrap';
+    $classes[] = 'container';
+    $classes[] = 'wrapper';
+    $class = implode(' ', $classes);
+    echo $class;
+}
+
+function hocwp_div_clear() {
+    echo '<div class="clear"></div>';
 }
 
 function hocwp_change_image_source($img, $src) {
@@ -1907,7 +2006,7 @@ function hocwp_facebook_page_plugin($args = array()) {
 
 function hocwp_update_permalink_struct($struct) {
     global $wp_rewrite;
-    $wp_rewrite->set_permalink_structure( $struct );
+    $wp_rewrite->set_permalink_structure($struct);
     update_option('permalink_structure', $struct);
     flush_rewrite_rules();
 }

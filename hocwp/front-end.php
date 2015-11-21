@@ -1,7 +1,9 @@
 <?php
 function hocwp_breadcrumb($args = array()) {
+    $before = hocwp_get_value_by_key($args, 'before');
+    $after = hocwp_get_value_by_key($args, 'after');
     if(function_exists('yoast_breadcrumb') && hocwp_wpseo_breadcrumb_enabled()) {
-        yoast_breadcrumb('<div class="hocwp-breadcrumb breadcrumb yoast">', '</div>');
+        yoast_breadcrumb('<div class="hocwp-breadcrumb breadcrumb yoast">' . $before, $after . '</div>');
         return;
     }
     global $post, $wp_query;
