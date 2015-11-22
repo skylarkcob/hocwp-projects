@@ -8,8 +8,6 @@ $hocwp_plugin_default_license_data = array(
     'key_map' => ''
 );
 
-//$hocwp_plugin_default_license_data = array();
-
 function hocwp_plugin_default_activation() {
     if(!current_user_can('activate_plugins')) {
         return;
