@@ -27,3 +27,8 @@ function hocwp_build_license_transient_name($type, $use_for) {
     $name = 'hocwp_' . $type . '_' . $use_for . '_license_valid';
     return md5($name);
 }
+
+function hocwp_change_tag_attribute($tag, $attr, $value) {
+    $tag = preg_replace('/' . $attr . '="(.*?)"/i', $attr . '="' . $value . '"', $tag);
+    return $tag;
+}

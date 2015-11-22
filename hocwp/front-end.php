@@ -201,3 +201,19 @@ function hocwp_entry_meta() {
         echo '</span>';
     }
 }
+
+function hocwp_rel_canonical() {
+    if(!is_singular() || has_action('wp_head', 'rel_canonical')) {
+        return;
+    }
+    global $wp_the_query;
+    if(!$id = $wp_the_query->get_queried_object_id()) {
+        return;
+    }
+    $link = get_permalink($id);
+    if($page = get_query_var('cpage')) {
+        $link = get_comments_pagenum_link($page);
+    }
+    $link = apply_filters('hocwp_head_rel_canonical', $link, $id);
+    echo "<link rel='canonical' href='$link' />\n";
+}

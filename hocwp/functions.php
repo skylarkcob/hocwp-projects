@@ -1300,11 +1300,15 @@ function hocwp_change_image_source($img, $src) {
 }
 
 function hocwp_get_tag_source($tag_name, $html) {
+    return hocwp_get_tag_attr($tag_name, 'src', $html);
+}
+
+function hocwp_get_tag_attr($tag_name, $attr, $html) {
     $doc = new DOMDocument();
     $doc->loadHTML($html);
     $tags = $doc->getElementsByTagName($tag_name);
     foreach($tags as $tag) {
-        return $tag->getAttribute('src');
+        return $tag->getAttribute($attr);
     }
     return '';
 }
@@ -2058,6 +2062,24 @@ function hocwp_find_valid_value_in_array($arr, $key) {
 
 function hocwp_get_last_part_in_url($url) {
     return substr(parse_url($url, PHP_URL_PATH), 1);
+}
+
+function hocwp_substr($str, $len, $more = '...', $charset = 'UTF-8') {
+    $more = esc_html($more);
+    $str = html_entity_decode($str, ENT_QUOTES, $charset);
+    if(mb_strlen($str, $charset) > $len) {
+        $arr = explode(' ', $str);
+        $str = mb_substr($str, 0, $len, $charset);
+        $arr_words = explode(' ', $str);
+        $index = count($arr_words) - 1;
+        $last = $arr[$index];
+        unset($arr);
+        if(strcasecmp($arr_words[$index], $last)) {
+            unset($arr_words[$index]);
+        }
+        return implode(' ', $arr_words) . $more;
+    }
+    return $str;
 }
 
 function hocwp_icon_circle_ajax($post_id, $meta_key) {

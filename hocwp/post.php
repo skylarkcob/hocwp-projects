@@ -104,9 +104,9 @@ function hocwp_post_thumbnail($args = array()) {
     $bfi_thumb = isset($args['bfi_thumb']) ? $args['bfi_thumb'] : true;
     $bfi_thumb = apply_filters('hocwp_use_bfi_thumb', $bfi_thumb, $post_id);
     $size = hocwp_sanitize_size($args);
+    $width = $size[0];
+    $height = $size[1];
     if($bfi_thumb) {
-        $width = $size[0];
-        $height = $size[1];
         $params = isset($args['params']) ? $args['params'] : array();
         if(is_numeric($width) && $width > 0) {
             $params['width'] = $width;
@@ -120,8 +120,12 @@ function hocwp_post_thumbnail($args = array()) {
         }
     }
     $img = new HOCWP_HTML('img');
-    $img->set_attribute('width', $size[0]);
-    $img->set_attribute('height', $size[1]);
+    if(is_numeric($width) && $width > 0) {
+        $img->set_attribute('width', $size[0]);
+    }
+    if(is_numeric($height) && $height > 0) {
+        $img->set_attribute('height', $size[1]);
+    }
     $img->set_attribute('alt', get_the_title($post_id));
     $img->set_class('attachment-post-thumbnail wp-post-image');
     $img->set_attribute('src', $thumbnail_url);
