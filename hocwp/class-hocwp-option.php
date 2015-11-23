@@ -433,7 +433,7 @@ class HOCWP_Option {
             }
             unset($args['class']);
             if(!isset($args['value'])) {
-                $args['value'] = $this->get_by_key($name);
+                $args['value'] = $this->get_by_key($name, hocwp_get_value_by_key($args, 'default'));
             }
             $args['name'] = $this->get_field_name($name);
             $args['id'] = $this->get_field_id($name);

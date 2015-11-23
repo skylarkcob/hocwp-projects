@@ -488,7 +488,8 @@ function hocwp_field_input_right_label($type, $args = array()) {
     if(!hocwp_array_has_value($options)) {
         $options[] = array(
             'label' => $label,
-            'value' => $value
+            'value' => $value,
+            'default' => hocwp_get_value_by_key($args, 'default')
         );
     }
     $count = 0;
@@ -591,6 +592,10 @@ function hocwp_field_remove_button($args = array()) {
     $button->set_class($class);
     $button->set_text(__('Remove', 'hocwp'));
     $button->output();
+}
+
+function hocwp_field_rich_editor($args = array()) {
+    hocwp_field_editor($args);
 }
 
 function hocwp_field_editor($args = array()) {

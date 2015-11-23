@@ -87,8 +87,8 @@ add_action('phpmailer_init', 'hocwp_phpmailer_init_change_info');
 function hocwp_mail_test_smtp_setting($to_email) {
     global $phpmailer;
     if(!is_object($phpmailer) || !is_a($phpmailer, 'PHPMailer')) {
-        require_once ABSPATH . WPINC . '/class-phpmailer.php';
-        require_once ABSPATH . WPINC . '/class-smtp.php';
+        require(ABSPATH . WPINC . '/class-phpmailer.php');
+        require(ABSPATH . WPINC . '/class-smtp.php');
         $phpmailer = new PHPMailer(true);
     }
     $subject = __('SMTP Email', 'hocwp') . ': ' . sprintf(__('Test mail to %s', 'hocwp'), $to_email);

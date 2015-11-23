@@ -3,7 +3,7 @@ if(defined('HOCWP_PATH')) {
     return;
 }
 
-define('HOCWP_VERSION', '2.9.0');
+define('HOCWP_VERSION', '2.9.1');
 
 define('HOCWP_PATH', dirname(__FILE__));
 
@@ -54,7 +54,7 @@ function hocwp_autoload($class_name) {
     $file = $base_path . '/class-' . hocwp_sanitize_file_name($class_name);
     $file .= '.php';
     if(file_exists($file)) {
-        require_once($file);
+        require($file);
     }
 }
 
@@ -62,50 +62,52 @@ spl_autoload_register('hocwp_autoload');
 
 require(HOCWP_PATH . '/lib.php');
 
+require(HOCWP_PATH . '/tools.php');
+
 require(HOCWP_PATH . '/utils.php');
 
 require(HOCWP_PATH . '/query.php');
 
 require(HOCWP_PATH . '/users.php');
 
-require_once(HOCWP_PATH . '/mail.php');
+require(HOCWP_PATH . '/mail.php');
 
-require_once(HOCWP_PATH . '/html-field.php');
+require(HOCWP_PATH . '/html-field.php');
 
-require_once(HOCWP_PATH . '/wordpress-seo.php');
+require(HOCWP_PATH . '/wordpress-seo.php');
 
-require_once(HOCWP_PATH . '/woocommerce.php');
+require(HOCWP_PATH . '/woocommerce.php');
 
-require_once(HOCWP_PATH . '/option.php');
+require(HOCWP_PATH . '/option.php');
 
 if(hocwp_has_plugin_activated()) {
-    require_once(HOCWP_PATH . '/options/plugin-option.php');
+    require(HOCWP_PATH . '/options/plugin-option.php');
 }
 
-require_once(HOCWP_PATH . '/theme-switcher.php');
+require(HOCWP_PATH . '/theme-switcher.php');
 
-require_once(HOCWP_PATH . '/post.php');
+require(HOCWP_PATH . '/post.php');
 
-require_once(HOCWP_PATH . '/video.php');
+require(HOCWP_PATH . '/video.php');
 
-require_once(HOCWP_PATH . '/media.php');
+require(HOCWP_PATH . '/media.php');
 
-require_once(HOCWP_PATH . '/shop.php');
+require(HOCWP_PATH . '/shop.php');
 
-require_once(HOCWP_PATH . '/statistics.php');
+require(HOCWP_PATH . '/statistics.php');
 
-require_once(HOCWP_PATH . '/term.php');
+require(HOCWP_PATH . '/term.php');
 
-require_once(HOCWP_PATH . '/meta.php');
+require(HOCWP_PATH . '/meta.php');
 
-require_once(HOCWP_PATH . '/term-meta.php');
+require(HOCWP_PATH . '/term-meta.php');
 
-require_once(HOCWP_PATH . '/login.php');
+require(HOCWP_PATH . '/login.php');
 
-require_once(HOCWP_PATH . '/comment.php');
+require(HOCWP_PATH . '/comment.php');
 
-require_once(HOCWP_PATH . '/pagination.php');
+require(HOCWP_PATH . '/pagination.php');
 
-require_once(HOCWP_PATH . '/front-end.php');
+require(HOCWP_PATH . '/front-end.php');
 
-require_once(HOCWP_PATH . '/ajax.php');
+require(HOCWP_PATH . '/ajax.php');

@@ -59,7 +59,7 @@ function hocwp_add_option_page_smtp_email($parent_slug = null) {
     if(null != $parent_slug) {
         _deprecated_argument(__FUNCTION__, '2.7.4', __('Please do not use $parent_slug argument since core version 2.7.4 or later.', 'hocwp'));
     }
-    require_once(HOCWP_PATH . '/options/setting-smtp-email.php');
+    require(HOCWP_PATH . '/options/setting-smtp-email.php');
 }
 
 function hocwp_get_google_api_key() {

@@ -1,2 +1,2 @@
 <?php
-require_once(HOCWP_PATH . '/options/setting-login.php');
+require(HOCWP_PATH . '/options/setting-login.php');

@@ -331,7 +331,7 @@ class HOCWP_License {
     public function check_valid($data = array()) {
         $transient_name = $this->get_transient_name();
         if(false === ($valid = get_transient($transient_name))) {
-            $valid = false;
+            update_option('test', 'conheo');
             $from_data_param = false;
             if(hocwp_array_has_value($data)) {
                 $data_hashed = hocwp_get_value_by_key($data, 'hashed');
@@ -364,7 +364,7 @@ class HOCWP_License {
                 $this->create_key();
                 $key = $this->get_key();
                 if(!function_exists('wp_check_password')) {
-                    require_once(ABSPATH . WPINC . '/pluggable.php');
+                    require(ABSPATH . WPINC . '/pluggable.php');
                 }
                 if(wp_check_password($key, $hashed_license)) {
                     $valid = true;
@@ -374,10 +374,11 @@ class HOCWP_License {
             $this->set_valid($valid);
             if(!$valid && $from_data_param) {
                 $valid = $this->check_valid();
-            } else {
+            }
+            if($valid) {
                 set_transient($transient_name, $valid, WEEK_IN_SECONDS);
             }
         }
-        return $valid;
+        return (bool)$valid;
     }
 }

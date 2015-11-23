@@ -21,8 +21,7 @@ hocwp_option_add_object_to_list($option_theme_license);
 
 function hocwp_theme_license_option_saved($option) {
 	if(is_a($option, 'HOCWP_Option')) {
-		$transient_name = hocwp_build_license_transient_name($option->get_type(), $option->get_use_for());
-		delete_transient($transient_name);
+		hocwp_delete_transient_license_valid();
 	}
 }
 add_action($option_theme_license->get_menu_slug() . '_option_saved', 'hocwp_theme_license_option_saved');

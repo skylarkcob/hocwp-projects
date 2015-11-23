@@ -22,7 +22,7 @@ function hocwp_term_meta_table_init() {
 		KEY meta_key (meta_key($max_index_length))
 	) $charset_collate;\n";
 	if(!function_exists('dbDelta')) {
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+		require(ABSPATH . 'wp-admin/includes/upgrade.php');
 	}
 	dbDelta($sql);
 }

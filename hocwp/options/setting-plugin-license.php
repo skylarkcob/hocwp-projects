@@ -25,7 +25,6 @@ function hocwp_option_plugin_license_sanitized($input) {
 			update_option('hocwp_plugin_licenses', $option);
 		}
 	}
-	$transient_name = hocwp_build_license_transient_name('plugin', $use_for);
-	delete_transient($transient_name);
+	hocwp_delete_transient_license_valid();
 }
 add_action('hocwp_sanitize_' . $option_plugin_license->get_option_name_no_prefix() . '_option', 'hocwp_option_plugin_license_sanitized');

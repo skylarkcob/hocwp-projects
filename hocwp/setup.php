@@ -79,9 +79,20 @@ add_filter('login_redirect', 'hocwp_setup_login_redirect', 10, 3);
 function hocwp_setup_script_loader_tag($tag, $handle) {
     switch($handle) {
         case 'recaptcha':
-            $tag = str_replace(' src',' defer async src', $tag);
+            $tag = str_replace(' src', ' defer async src', $tag);
             break;
     }
     return $tag;
 }
 add_filter('script_loader_tag', 'hocwp_setup_script_loader_tag', 10, 2);
+
+function hocwp_setup_admin_init() {
+    $saved_domain = get_option('hocwp_domain');
+    $current_domain = hocwp_get_root_domain_name(get_bloginfo('url'));
+    if($saved_domain != $current_domain) {
+        update_option('hocwp_domain', $current_domain);
+        hocwp_delete_transient_license_valid();
+        do_action('hocwp_change_domain');
+    }
+}
+add_action('admin_init', 'hocwp_setup_admin_init');

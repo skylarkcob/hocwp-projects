@@ -103,6 +103,9 @@ function hocwp_setup_theme_support_enqueue_media($use) {
 add_filter('hocwp_wp_enqueue_media', 'hocwp_setup_theme_support_enqueue_media');
 
 function hocwp_setup_theme_scripts() {
+    if(hocwp_use_jquery_cdn()) {
+        hocwp_load_jquery_from_cdn();
+    }
     hocwp_theme_register_lib_superfish();
     hocwp_theme_register_lib_bootstrap();
     hocwp_theme_register_lib_font_awesome();

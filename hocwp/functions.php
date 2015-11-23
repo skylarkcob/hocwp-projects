@@ -206,6 +206,29 @@ function hocwp_get_first_char($string, $encoding = 'UTF-8') {
     return $result;
 }
 
+function hocwp_remove_first_char($string, $char) {
+    $string = ltrim($string, $char);
+    return $string;
+}
+
+function hocwp_get_last_char($string, $encoding = 'UTF-8') {
+    $result = '';
+    if(!empty($string)) {
+        $result = mb_substr($string, -1, 1, $encoding);
+    }
+    return $result;
+}
+
+function hocwp_remove_last_char($string, $char) {
+    $string = rtrim($string, $char);
+    return $string;
+}
+
+function hocwp_remove_first_char_and_last_char($string, $char) {
+    $string = trim($string, $char);
+    return $string;
+}
+
 function hocwp_uppercase($string, $encoding = 'utf-8') {
     return mb_strtoupper($string, $encoding);
 }
@@ -1216,11 +1239,17 @@ function hocwp_build_css_rule($elements, $properties) {
     $properties = hocwp_sanitize_array($properties);
     $before = '';
     foreach($elements as $element) {
+        if(empty($element)) {
+            continue;
+        }
         $before .= $element . ',';
     }
     $before = trim($before, ',');
     $after = '';
     foreach($properties as $key => $property) {
+        if(empty($key)) {
+            continue;
+        }
         $after .= $key . ':' . $property . ';';
     }
     $after = trim($after, ';');
@@ -1574,7 +1603,7 @@ function hocwp_get_current_admin_page() {
 
 function hocwp_get_plugins() {
     if(!function_exists('get_plugins')) {
-        require_once(ABSPATH . 'wp-admin/includes/plugin.php');
+        require(ABSPATH . 'wp-admin/includes/plugin.php');
     }
     return get_plugins();
 }
@@ -2102,4 +2131,26 @@ function hocwp_icon_circle_ajax($post_id, $meta_key) {
 
 function hocwp_get_posts_per_page() {
     return get_option('posts_per_page');
+}
+
+function hocwp_delete_transient_with_condition($transient_name, $condition = '', $blog_id = '') {
+    global $wpdb;
+    if(!empty($blog_id)) {
+        $wpdb->set_blog_id($blog_id);
+    }
+    $last_char = hocwp_get_last_char($transient_name);
+    if('_' == $last_char) {
+        $transient_name = hocwp_remove_last_char($transient_name, $last_char);
+    }
+    $wpdb->query($wpdb->prepare("DELETE FROM $wpdb->options WHERE option_name like %s" . $condition, '_transient_' . $transient_name . '_%'));
+    $wpdb->query($wpdb->prepare("DELETE FROM $wpdb->options WHERE option_name like %s" . $condition, '_transient_timeout_' . $transient_name . '_%'));
+}
+
+function hocwp_delete_transient($transient_name, $blog_id = '') {
+    hocwp_delete_transient_with_condition($transient_name, $blog_id);
+}
+
+function hocwp_delete_transient_license_valid($blog_id = '') {
+    $transient_name = 'hocwp_check_license';
+    hocwp_delete_transient($transient_name, $blog_id);
 }

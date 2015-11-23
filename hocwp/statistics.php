@@ -74,7 +74,7 @@ function hocwp_statistics_table_init() {
     ) $charset_collate;\n";
 
     if(!function_exists('dbDelta')) {
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        require(ABSPATH . 'wp-admin/includes/upgrade.php');
     }
     dbDelta($sql);
 }
