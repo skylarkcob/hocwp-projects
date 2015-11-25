@@ -38,7 +38,7 @@ function hocwp_in_maintenance_mode() {
     $result = hocwp_get_value_by_key($option, 'enabled');
     $result = (bool)$result;
     $result = apply_filters('hocwp_enable_maintenance_mode', $result);
-    if(hocwp_maintenance_mode_exclude_condition()) {
+    if(hocwp_maintenance_mode_exclude_condition() || hocwp_is_login_page()) {
         $result = false;
     }
     return $result;
@@ -118,6 +118,7 @@ function hocwp_load_jquery_from_cdn() {
             if(empty($version)) {
                 $version = HOCWP_JQUERY_LATEST_VERSION;
             }
+            wp_dequeue_script($handle);
             wp_deregister_script($handle);
             wp_register_script($handle, '//ajax.googleapis.com/ajax/libs/jquery/'. $version . '/jquery.min.js');
             if($enqueued) {

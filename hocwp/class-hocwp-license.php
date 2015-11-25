@@ -331,7 +331,6 @@ class HOCWP_License {
     public function check_valid($data = array()) {
         $transient_name = $this->get_transient_name();
         if(false === ($valid = get_transient($transient_name))) {
-            update_option('test', 'conheo');
             $from_data_param = false;
             if(hocwp_array_has_value($data)) {
                 $data_hashed = hocwp_get_value_by_key($data, 'hashed');

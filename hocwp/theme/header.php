@@ -15,7 +15,9 @@ $maintenance_mode = hocwp_in_maintenance_mode();
     do_action('hocwp_before_wp_head');
     wp_head();
     do_action('hocwp_after_wp_head');
-    do_action('hocwp_maintenance_head');
+    if($maintenance_mode) {
+        do_action('hocwp_maintenance_head');
+    }
     ?>
 </head>
 <body <?php body_class(); ?>>
