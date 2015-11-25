@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 if(!has_action('init', 'hocwp_session_start')) {
     add_action('init', 'hocwp_session_start');
 }

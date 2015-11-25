@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_plugin_default_get_option_defaults() {
     $defaults = array();
     $defaults = apply_filters(HOCWP_PLUGIN_DEFAULT_OPTION_NAME . '_option_defaults', $defaults);

@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 global $hocwp_plugin_default_type, $hocwp_plugin_default_time, $hocwp_plugin_default_license, $hocwp_plugin_default_license_valid, $hocwp_plugin_default_license_data;
 
 $hocwp_plugin_default_license_valid = true;

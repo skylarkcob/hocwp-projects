@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 $path = get_template_directory() . '/hocwp/load.php';
 
 if(!defined('HOCWP_URL')) {
