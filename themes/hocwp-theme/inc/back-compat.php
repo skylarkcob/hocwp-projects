@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_switch_theme() {
 	switch_theme(WP_DEFAULT_THEME, WP_DEFAULT_THEME);
 	unset($_GET['activated']);
