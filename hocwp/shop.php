@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_register_post_type_product() {
     $args = array(
         'name' => __('Products', 'hocwp'),

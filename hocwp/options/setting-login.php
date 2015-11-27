@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 $parent_slug = 'users.php';
 
 $option_user_login = new HOCWP_Option(__('Login settings', 'hocwp'), 'hocwp_user_login');

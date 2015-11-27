@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_get_request() {
     $request = remove_query_arg('paged');
     $home_root = parse_url(home_url());

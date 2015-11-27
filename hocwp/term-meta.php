@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 define('HOCWP_TERM_META_TABLE', 'termmeta');
 
 function hocwp_term_meta_table_init() {

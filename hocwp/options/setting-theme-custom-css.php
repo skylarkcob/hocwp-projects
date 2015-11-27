@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 $parent_slug = 'themes.php';
 
 $theme = wp_get_theme();

@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_theme_register_lib_bootstrap() {
     wp_register_style('bootstrap-style', get_template_directory_uri() . '/lib/bootstrap/css/bootstrap.min.css');
     wp_register_style('bootstrap-theme-style', get_template_directory_uri() . '/lib/bootstrap/css/bootstrap-theme.min.css', array('bootstrap-style'));

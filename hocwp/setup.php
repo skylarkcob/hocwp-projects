@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 if(!file_exists(HOCWP_CONTENT_PATH)) {
     mkdir(HOCWP_CONTENT_PATH);
 }

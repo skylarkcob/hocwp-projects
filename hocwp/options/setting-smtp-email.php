@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 $parent_slug = 'options-general.php';
 
 $option_smtp = new HOCWP_Option(__('SMTP Email', 'hocwp'), 'hocwp_option_smtp_email');

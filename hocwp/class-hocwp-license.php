@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 class HOCWP_License {
     private $hashed_password;
     private $key;

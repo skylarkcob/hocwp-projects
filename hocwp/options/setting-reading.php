@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 $reading_option = new HOCWP_Option('', 'reading');
 $reading_option->set_page('options-reading.php');
 $reading_option->add_field(array('id' => 'post_statistics', 'title' => __('Post Statistics', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox', 'label' => __('Track post views on your site.', 'hocwp')));

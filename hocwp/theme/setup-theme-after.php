@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_theme_check_load_facebook_javascript_sdk() {
     $data = apply_filters('hocwp_load_facebook_javascript_sdk_on_page_sidebar', array());
     foreach($data as $value) {

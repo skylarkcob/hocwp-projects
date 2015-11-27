@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_use_session() {
     $use_session = apply_filters('hocwp_use_session', false);
     return (bool)$use_session;

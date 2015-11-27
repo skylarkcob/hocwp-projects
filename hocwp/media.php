@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_media_sanitize_upload_file_name($file) {
     $file_name = isset($file['name']) ? $file['name'] : '';
     $file['name'] = hocwp_sanitize_file_name($file_name);

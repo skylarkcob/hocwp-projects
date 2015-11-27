@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 require(HOCWP_PATH . '/options/setting-theme-setting.php');
 require(HOCWP_PATH . '/options/setting-theme-license.php');
 require(HOCWP_PATH . '/options/setting-theme-custom-css.php');

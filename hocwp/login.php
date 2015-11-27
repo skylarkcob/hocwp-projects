@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_login_body_class($classes, $action) {
     $classes[] = 'hocwp';
     if(!empty($action)) {

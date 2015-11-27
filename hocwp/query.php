@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_query($args = array()) {
     if(!isset($args['post_type'])) {
         $args['post_type'] = 'post';

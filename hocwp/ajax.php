@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_comment_likes_ajax_callback() {
     $result = array();
     $likes = isset($_POST['likes']) ? absint($_POST['likes']) : 0;

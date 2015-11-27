@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_get_wpseo_social() {
     return get_option('wpseo_social');
 }

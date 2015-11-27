@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 $parent_slug = 'options-general.php';
 
 $option_social = new HOCWP_Option(__('Socials', 'hocwp'), 'hocwp_option_social');

@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_smtp_mail_defaults() {
     $defaults = array (
         'mail_from' => '',

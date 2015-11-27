@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 class HOCWP_Widget_Facebook_Box extends WP_Widget {
     public $args = array();
 

@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_get_wc_version() {
     if(defined('WOOCOMMERCE_VERSION')) {
         return WOOCOMMERCE_VERSION;

@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 $parent_slug = 'options-general.php';
 
 $option = new HOCWP_Option(__('Optimize', 'hocwp'), 'hocwp_optimize');

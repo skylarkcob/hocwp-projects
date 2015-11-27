@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 $parent_slug = 'themes.php';
 
 $option_theme_setting = new HOCWP_Option(__('Theme settings', 'hocwp'), 'hocwp_theme_setting');

@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_field_before(&$args = array()) {
     $container_class = isset($args['container_class']) ? $args['container_class'] : '';
     $before = isset($args['before']) ? $args['before'] : '';

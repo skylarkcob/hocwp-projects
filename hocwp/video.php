@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_video_source_meta_box($post_types = array()) {
     if(!hocwp_array_has_value($post_types)) {
         $post_types[] = 'post';

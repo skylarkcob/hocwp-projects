@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_maintenance_mode_default_settings() {
     $defaults = array(
         'title' => __('Maintenance mode', 'hocwp'),

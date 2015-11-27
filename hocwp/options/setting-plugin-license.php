@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 $parent_slug = 'plugins.php';
 $option_plugin_license = new HOCWP_Option(__('Plugin Licenses', 'hocwp'), 'hocwp_plugin_license');
 $option_plugin_license->set_parent_slug($parent_slug);

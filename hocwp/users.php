@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_get_administrators($args = array()) {
     $args['role'] = 'administrator';
     return get_users($args);

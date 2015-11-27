@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 $parent_slug = 'plugins.php';
 
 $option = new HOCWP_Option(__('Custom CSS', 'hocwp'), 'hocwp_plugin_custom_css');

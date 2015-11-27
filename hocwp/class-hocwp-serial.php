@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 if(defined('HOCWP_SERIAL_VERSION')) {
     return;
 }

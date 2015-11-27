@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_plugin_get_image_url($base_url, $name) {
     return trailingslashit($base_url) . 'images/' . $name;
 }

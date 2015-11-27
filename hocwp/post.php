@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_post_class($classes) {
     $classes[] = 'hocwp-post';
     return $classes;

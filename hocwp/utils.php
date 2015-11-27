@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_wrap_tag($text, $tag) {
     $html = new HOCWP_HTML($tag);
     $html->set_text($text);

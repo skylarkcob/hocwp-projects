@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_breadcrumb($args = array()) {
     $before = hocwp_get_value_by_key($args, 'before');
     $after = hocwp_get_value_by_key($args, 'after');

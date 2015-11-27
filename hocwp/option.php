@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_option_get_list_object() {
     global $hocwp_options;
     return $hocwp_options;

@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_comment_wp_insert_comment($comment_id, $comment_object) {
 
 }

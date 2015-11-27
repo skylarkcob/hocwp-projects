@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 $parent_slug = 'themes.php';
 
 $option_theme_license = new HOCWP_Option(__('Theme license', 'hocwp'), 'hocwp_theme_license');

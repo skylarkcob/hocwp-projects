@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 class HOCWP_Captcha {
     private $chars;
     private $length;

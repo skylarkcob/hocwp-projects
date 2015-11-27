@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_lib_load_chosen() {
     wp_enqueue_script('chosen', HOCWP_URL . '/lib/chosen/chosen.jquery.min.js', array('jquery'), false, true);
     wp_enqueue_style('chosen-style', HOCWP_URL . '/lib/chosen/chosen.min.css');

@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_theme_translation_comments_title_text() {
     return __('Gửi bình luận của bạn', 'hocwp');
 }

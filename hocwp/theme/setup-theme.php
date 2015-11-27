@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 global $hocwp_theme_license;
 
 function hocwp_theme_switched($new_name, $new_theme) {

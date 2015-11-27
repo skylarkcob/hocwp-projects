@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 $icon_url = get_template_directory_uri() . '/hocwp/images/icon-loading-circle-dark-full.gif';
 $icon_url = apply_filters('hocwp_ajax_loading_full_screen_icon', $icon_url);
 $color = apply_filters('hocwp_ajax_loading_full_screen_color', '#000');

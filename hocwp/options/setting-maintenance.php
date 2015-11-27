@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 $parent_slug = 'tools.php';
 
 $defaults = hocwp_maintenance_mode_default_settings();

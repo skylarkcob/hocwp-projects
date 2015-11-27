@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 function hocwp_theme_switcher_enabled() {
     return apply_filters('hocwp_theme_switcher_enabled', defined('HOCWP_THEME_SWITCHER_VERSION'));
 }

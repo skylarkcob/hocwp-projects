@@ -1,4 +1,5 @@
 <?php
+if(!function_exists('add_filter')) exit;
 $discussion_option = new HOCWP_Option('', 'discussion');
 $discussion_option->set_page('options-discussion.php');
 $discussion_option->add_section(array('id' => 'comment_form', 'title' => __('Comment Form', 'hocwp'), 'description' => __('These options can help you to customize comment form on your site.', 'hocwp')));
