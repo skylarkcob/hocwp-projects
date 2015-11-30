@@ -51,10 +51,10 @@ function hocwp_plugin_default_enqueue_scripts() {
         wp_register_script('hocwp-front-end', HOCWP_URL . '/js/hocwp-front-end' . HOCWP_JS_SUFFIX, array('hocwp'), false, true);
         wp_register_script('hocwp-plugin-default', HOCWP_PLUGIN_DEFAULT_URL . '/js/hocwp-plugin' . HOCWP_JS_SUFFIX, array('hocwp-front-end'), false, true);
     } else {
-        wp_register_script('hocwp-plugin-default', HOCWP_PLUGIN_DEFAULT_URL . '/js/hocwp-plugin' . HOCWP_JS_SUFFIX, array(), false, true);
+        wp_register_script('hocwp-plugin-default', HOCWP_PLUGIN_DEFAULT_URL . '/js/hocwp-plugin' . HOCWP_JS_SUFFIX, array(), HOCWP_PLUGIN_DEFAULT_VERSION, true);
         wp_localize_script('hocwp-plugin-default', 'hocwp', $localize_object);
     }
-    wp_register_style('hocwp-plugin-default-style', HOCWP_PLUGIN_DEFAULT_URL . '/css/hocwp-plugin' . HOCWP_CSS_SUFFIX);
+    wp_register_style('hocwp-plugin-default-style', HOCWP_PLUGIN_DEFAULT_URL . '/css/hocwp-plugin' . HOCWP_CSS_SUFFIX, array(), HOCWP_PLUGIN_DEFAULT_VERSION);
     wp_enqueue_style('hocwp-plugin-default-style');
     wp_enqueue_script('hocwp-plugin-default');
 }
@@ -62,10 +62,10 @@ add_action('wp_enqueue_scripts', 'hocwp_plugin_default_enqueue_scripts');
 
 function hocwp_plugin_default_admin_style_and_script() {
     hocwp_register_core_style_and_script();
-    wp_register_style('hocwp-admin-style', HOCWP_URL . '/css/hocwp-admin'. HOCWP_CSS_SUFFIX, array('hocwp-style'));
-    wp_register_script('hocwp-admin', HOCWP_URL . '/js/hocwp-admin' . HOCWP_JS_SUFFIX, array('jquery', 'hocwp'), false, true);
-    wp_register_style('hocwp-plugin-default-style', HOCWP_PLUGIN_DEFAULT_URL . '/css/hocwp-plugin-admin' . HOCWP_CSS_SUFFIX, array('hocwp-admin-style'));
-    wp_register_script('hocwp-plugin-default', HOCWP_PLUGIN_DEFAULT_URL . '/js/hocwp-plugin-admin' . HOCWP_JS_SUFFIX, array('hocwp-admin'), false, true);
+    wp_register_style('hocwp-admin-style', HOCWP_URL . '/css/hocwp-admin'. HOCWP_CSS_SUFFIX, array('hocwp-style'), HOCWP_PLUGIN_DEFAULT_VERSION);
+    wp_register_script('hocwp-admin', HOCWP_URL . '/js/hocwp-admin' . HOCWP_JS_SUFFIX, array('jquery', 'hocwp'), HOCWP_PLUGIN_DEFAULT_VERSION, true);
+    wp_register_style('hocwp-plugin-default-style', HOCWP_PLUGIN_DEFAULT_URL . '/css/hocwp-plugin-admin' . HOCWP_CSS_SUFFIX, array('hocwp-admin-style'), HOCWP_PLUGIN_DEFAULT_VERSION);
+    wp_register_script('hocwp-plugin-default', HOCWP_PLUGIN_DEFAULT_URL . '/js/hocwp-plugin-admin' . HOCWP_JS_SUFFIX, array('hocwp-admin'), HOCWP_PLUGIN_DEFAULT_VERSION, true);
     wp_localize_script('hocwp-plugin-default', 'hocwp', hocwp_default_script_localize_object());
     wp_enqueue_style('hocwp-plugin-default-style');
     wp_enqueue_script('hocwp-plugin-default');
