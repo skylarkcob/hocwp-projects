@@ -29,7 +29,7 @@ function hocwp_field_captcha($args = array()) {
     $id = isset($args['id']) ? $args['id'] : 'hocwp_captcha';
     $placeholder = isset($args['placeholder']) ? $args['placeholder'] : __('Enter captcha code', 'hocwp');
     $class = isset($args['class']) ? $args['class'] : '';
-    $input_width = isset($args['input_width']) ? absint($args['input_width']) : 115;
+    $input_width = isset($args['input_width']) ? absint($args['input_width']) : 125;
     hocwp_add_string_with_space_before($class, 'hocwp-captcha-code');
     hocwp_field_before($args);
     $image_url = $captcha->generate_image();

@@ -102,43 +102,6 @@ jQuery(document).ready(function($) {
     })();
 
     (function() {
-        var $icon_refresh_captcha = $('img.hocwp-captcha-reload'),
-            $captcha_image = $('img.hocwp-captcha-image');
-        if(!$captcha_image.length) {
-            return false;
-        }
-        $captcha_image.css({'cursor' : 'text'});
-        $icon_refresh_captcha.css({'opacity' : '0.75'});
-        $icon_refresh_captcha.on('mouseover', function(e) {
-            e.preventDefault();
-            $(this).css({'opacity' : '1'});
-        });
-        $icon_refresh_captcha.on('mouseleave', function(e) {
-            e.preventDefault();
-            $(this).$(this).css({'opacity' : '0.75'});
-        });
-        $icon_refresh_captcha.on('click', function(e) {
-            e.preventDefault();
-            var $element = $(this),
-                $container = $element.parent(),
-                $image = $container.find('img.hocwp-captcha-image');
-            $element.css({'opacity' : '0.25', 'pointer-events' : 'none'});
-            $.ajax({
-                type: 'POST',
-                dataType: 'json',
-                url: hocwp.ajax_url,
-                data: {
-                    action: 'hocwp_change_captcha_image'
-                },
-                success: function(response){
-                    if(response.success) {
-                        $image.attr('src', response.captcha_image_url);
-                    } else {
-                        alert(response.message);
-                    }
-                    $element.css({'opacity' : '0.75', 'pointer-events' : 'inherit'});
-                }
-            });
-        });
+        hocwp.iconChangeCaptchaExecute();
     })();
 });

@@ -14,4 +14,8 @@ jQuery(document).ready(function($) {
             that.addClass(action);
         });
     })();
+
+    (function() {
+        hocwp.iconChangeCaptchaExecute();
+    })();
 });

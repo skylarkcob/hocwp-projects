@@ -624,7 +624,7 @@ function hocwp_sanitize($data, $type) {
         case 'file_name':
             return hocwp_sanitize_file_name($data);
         case 'html_class':
-            return sanitize_html_class($data);
+            return hocwp_sanitize_file_name(sanitize_html_class($data));
         case 'key':
             return sanitize_key($data);
         case 'mime_type':

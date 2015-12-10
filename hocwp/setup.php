@@ -34,6 +34,11 @@ function hocwp_setup_body_class($classes) {
     if(is_multi_author()) {
         $classes[] = 'group-blog';
     }
+    if(is_user_logged_in()) {
+        $role = hocwp_get_user_role();
+        $role = hocwp_sanitize($role, 'html_class');
+        $classes[] = 'role-' . $role;
+    }
     return $classes;
 }
 add_filter('body_class', 'hocwp_setup_body_class');

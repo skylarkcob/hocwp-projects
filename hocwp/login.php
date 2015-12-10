@@ -38,3 +38,64 @@ function hocwp_get_login_logo_url() {
     }
     return $url;
 }
+
+function hocwp_use_captcha_for_login_page() {
+    $options = get_option('hocwp_user_login');
+    $use_captcha = hocwp_get_value_by_key($options, 'use_captcha');
+    $use_captcha = apply_filters('hocwp_use_captcha_for_login_page', $use_captcha);
+    return (bool)$use_captcha;
+}
+
+function hocwp_login_captcha_field() {
+    $args = array(
+        'before' => '<p>',
+        'after' => '</p>'
+    );
+    hocwp_field_captcha($args);
+}
+
+function hocwp_verify_login_captcha($user, $password) {
+    if(isset($_POST['captcha'])) {
+        $captcha_code = $_POST['captcha'];
+        $captcha = new HOCWP_Captcha();
+        if($captcha->check($captcha_code)) {
+            return $user;
+        }
+        return new WP_Error(__('Captcha Invalid', 'hocwp'), '<strong>' . __('ERROR:', 'hocwp') . '</strong> ' . __('Please enter a valid captcha.', 'hocwp'));
+    }
+    return new WP_Error(__('Captcha Invalid', 'hocwp'), '<strong>' . __('ERROR:', 'hocwp') . '</strong> ' . __('You are a robot, if not please check JavaScript enabled on your browser.', 'hocwp'));
+}
+
+function hocwp_verify_registration_captcha($errors, $sanitized_user_login, $user_email) {
+    if(isset($_POST['captcha'])) {
+        $captcha_code = $_POST['captcha'];
+        $captcha = new HOCWP_Captcha();
+        if(!$captcha->check($captcha_code)) {
+            $errors->add(__('Captcha Invalid', 'hocwp'), '<strong>' . __('ERROR:', 'hocwp') . '</strong> ' . __('Please enter a valid captcha.', 'hocwp'));
+        }
+    } else {
+        $errors->add(__('Captcha Invalid', 'hocwp'), '<strong>' . __('ERROR:', 'hocwp') . '</strong> ' . __('You are a robot, if not please check JavaScript enabled on your browser.', 'hocwp'));
+    }
+    return $errors;
+}
+
+function hocwp_verify_lostpassword_captcha() {
+    if(isset($_POST['captcha'])) {
+        $captcha_code = $_POST['captcha'];
+        $captcha = new HOCWP_Captcha();
+        if(!$captcha->check($captcha_code)) {
+            wp_die('<strong>' . __('ERROR:', 'hocwp') . '</strong> ' . __('Please enter a valid captcha.', 'hocwp'), __('Captcha Invalid', 'hocwp'));
+        }
+    } else {
+        wp_die('<strong>' . __('ERROR:', 'hocwp') . '</strong> ' . __('You are a robot, if not please check JavaScript enabled on your browser.', 'hocwp'), __('Captcha Invalid', 'hocwp'));
+    }
+}
+
+if(hocwp_use_captcha_for_login_page()) {
+    add_action('login_form', 'hocwp_login_captcha_field');
+    add_action('lostpassword_form', 'hocwp_login_captcha_field');
+    add_action('register_form', 'hocwp_login_captcha_field');
+    add_filter('wp_authenticate_user', 'hocwp_verify_login_captcha', 10, 2);
+    add_filter('registration_errors', 'hocwp_verify_registration_captcha', 10, 3);
+    add_action('lostpassword_post', 'hocwp_verify_lostpassword_captcha');
+}

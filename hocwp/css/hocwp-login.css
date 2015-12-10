@@ -98,3 +98,7 @@ body.hocwp.login #nav .register {
     background-position: left 1px;
     padding-left: 20px;
 }
+
+body.hocwp.login input.hocwp-captcha-code {
+    font-size: 13px;
+}

@@ -57,3 +57,22 @@ function hocwp_add_user_admin($args = array()) {
     $args['role'] = 'administrator';
     hocwp_add_user($args);
 }
+
+function hocwp_get_user_roles($user = null) {
+    $roles = array();
+    if(hocwp_id_number_valid($user)) {
+        $user = get_user_by('id', $user);
+    }
+    if(!is_a($user, 'WP_User')) {
+        $user = wp_get_current_user();
+    }
+    if(is_a($user, 'WP_User')) {
+        $roles = (array)$user->roles;
+    }
+    return $roles;
+}
+
+function hocwp_get_user_role($user = null) {
+    $roles = hocwp_get_user_roles($user);
+    return current($roles);
+}
