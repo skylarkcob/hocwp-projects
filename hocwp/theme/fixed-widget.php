@@ -40,7 +40,11 @@
                 $last_widget.addClass('fixed-bottom');
             } else {
                 $last_widget.removeClass('fixed-bottom');
-                $last_widget.css({'top' : '0', 'bottom' : 'auto'});
+                var p_top = 0;
+                if($('body').hasClass('admin-bar')) {
+                    p_top = $('#wpadminbar').height() + 'px';
+                }
+                $last_widget.css({'top' : p_top, 'bottom' : 'auto'});
             }
             if(window_top > widget_offset_top) {
                 $last_widget.addClass('fixed');

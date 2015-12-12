@@ -115,6 +115,20 @@ function hocwp_theme_the_menu($args = array()) {
     <?php
 }
 
+function hocwp_theme_site_main_before() {
+    ?>
+    <div id="primary" class="content-area">
+        <main id="main" class="site-main" role="main">
+    <?php
+}
+
+function hocwp_theme_site_main_after() {
+    ?>
+        </main>
+    </div>
+    <?php
+}
+
 function hocwp_theme_add_setting_field($args) {
     hocwp_option_add_setting_field('theme_setting', $args);
 }

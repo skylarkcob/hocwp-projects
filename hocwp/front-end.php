@@ -218,3 +218,27 @@ function hocwp_rel_canonical() {
     $link = apply_filters('hocwp_head_rel_canonical', $link, $id);
     echo "<link rel='canonical' href='$link' />\n";
 }
+
+function hocwp_posts_pagination($args = array()) {
+    $defaults = array(
+        'prev_text' => __('Trước', 'hocwp'),
+        'next_text' => __('Tiếp theo', 'hocwp'),
+        'screen_reader_text' => __('Phân trang', 'hocwp')
+    );
+    $args = wp_parse_args($args, $defaults);
+    the_posts_pagination($args);
+}
+
+function hocwp_entry_content() {
+    ?>
+    <div class="entry-content">
+        <?php the_content(); ?>
+    </div>
+    <?php
+}
+
+function hocwp_entry_tags() {
+    echo '<div class="entry-tags">';
+    the_tags('<span class="tag-label"><i class="fa fa-tag icon-left"></i><span class="text">Tags:</span></span>', '', '');
+    echo '</div>';
+}

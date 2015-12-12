@@ -1368,7 +1368,7 @@ function hocwp_comments_template() {
         if('facebook' == $comment_system) {
             hocwp_facebook_comment();
         } else {
-            if('default_and_facebook') {
+            if('default_and_facebook' == $comment_system) {
                 hocwp_facebook_comment();
             }
             comments_template();
@@ -1855,6 +1855,23 @@ function hocwp_search_form($args = array()) {
     return $form;
 }
 
+function hocwp_feedburner_form($args = array()) {
+    $name = isset($args['name']) ? $args['name'] : '';
+    $locale = isset($args['locale']) ? $args['locale'] : 'en_US';
+    $submit_button_text = isset($args['submit_button_text']) ? $args['submit_button_text'] : __('Đăng ký', 'hocwp');
+    $placeholder = isset($args['placeholder']) ? $args['placeholder'] : __('Nhập địa chỉ email của bạn...', 'hocwp');
+    ?>
+    <form class="feedburner-form" action="https://feedburner.google.com/fb/a/mailverify" method="post" target="popupwindow" onsubmit="window.open('https://feedburner.google.com/fb/a/mailverify?uri=<?php echo $name; ?>', 'popupwindow', 'scrollbars=yes,width=550,height=520');return true">
+        <?php do_action('hocwp_feedburner_before'); ?>
+        <input class="email-field" type="text" placeholder="<?php echo $placeholder; ?>" name="email" autocomplete="off">
+        <input type="hidden" value="<?php echo $name; ?>" name="uri">
+        <input type="hidden" name="loc" value="<?php echo $locale; ?>">
+        <input class="btn btn-submit" type="submit" value="<?php echo $submit_button_text; ?>">
+        <?php do_action('hocwp_feedburner_after'); ?>
+    </form>
+    <?php
+}
+
 function hocwp_get_sidebars() {
     return $GLOBALS['wp_registered_sidebars'];
 }
@@ -2165,4 +2182,9 @@ function hocwp_delete_transient($transient_name, $blog_id = '') {
 function hocwp_delete_transient_license_valid($blog_id = '') {
     $transient_name = 'hocwp_check_license';
     hocwp_delete_transient($transient_name, $blog_id);
+}
+
+function hocwp_get_wp_version() {
+    global $wp_version;
+    return $wp_version;
 }

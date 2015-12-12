@@ -12,4 +12,5 @@
             </section><!-- .error-404 -->
         </main><!-- .site-main -->
     </div><!-- .content-area -->
+    <?php get_sidebar(); ?>
 </div>

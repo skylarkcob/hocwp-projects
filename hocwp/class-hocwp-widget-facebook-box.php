@@ -31,6 +31,9 @@ class HOCWP_Widget_Facebook_Box extends WP_Widget {
                 'width' => $this->args['admin_width']
             )
         );
+        if(!is_admin()) {
+            add_filter('hocwp_use_facebook_javascript_sdk', '__return_true');
+        }
     }
 
     public function widget($args, $instance) {
