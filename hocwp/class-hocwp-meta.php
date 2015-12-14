@@ -111,6 +111,9 @@ class HOCWP_Meta {
     }
 
     public function set_post_types($post_types) {
+        if(!is_array($post_types)) {
+            $post_types = array($post_types);
+        }
         $this->post_types = $post_types;
     }
 
@@ -339,6 +342,7 @@ class HOCWP_Meta {
             if(!empty($current_post_type)) {
                 do_action('hocwp_' . $current_post_type . '_meta_box_field');
             }
+            do_action('hocwp_meta_box_' . $this->get_id() . '_field');
             ?>
         </div>
         <?php

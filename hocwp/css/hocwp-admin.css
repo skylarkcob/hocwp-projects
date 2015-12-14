@@ -62,6 +62,11 @@
     width: 20%;
 }
 
+.hocwp-meta-box label.full-width {
+    padding-right: 0;
+    width: auto;
+}
+
 .hocwp-meta-box label.vertical-align-top {
     vertical-align: top;
 }
@@ -152,11 +157,13 @@
  * Media upload
  */
 
+.hocwp-meta-box .media-preview,
 .hocwp .media-preview,
 .hocwp-widget .media-preview {
     display: block;
 }
 
+.hocwp-meta-box .media-preview img,
 .hocwp-widget .media-preview img,
 .hocwp .media-preview img {
     margin-bottom: 10px;
@@ -190,6 +197,7 @@
     height: 29px;
 }
 
+.hocwp-meta-box .media-preview img,
 .hocwp-widget .media-preview img {
     max-height: 315px;
 }

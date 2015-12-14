@@ -288,3 +288,19 @@ function hocwp_get_post_by_column($column_name, $column_value, $output = 'OBJECT
 function hocwp_get_post_by_slug($slug) {
     return hocwp_get_post_by_column('post_name', $slug);
 }
+
+function hocwp_get_author_posts_url() {
+    global $authordata;
+    if(!hocwp_object_valid($authordata)) {
+        return;
+    }
+    return get_author_posts_url($authordata->ID, $authordata->user_nicename);
+}
+
+function hocwp_get_post_comment_count($post_id = null, $status = 'approved') {
+    if(!hocwp_id_number_valid($post_id)) {
+        $post_id = get_the_ID();
+    }
+    $comments = get_comment_count($post_id);
+    return hocwp_get_value_by_key($comments, $status);
+}

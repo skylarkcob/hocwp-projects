@@ -457,6 +457,7 @@ function hocwp_field_input($args) {
     $input->set_attribute_array($atts);
     $input->output();
     if($right_label) {
+        $args['label_class'] = 'full-width';
         $args['label'] = $label;
     }
     hocwp_field_after($args);
@@ -483,15 +484,20 @@ function hocwp_field_input_url($args = array()) {
 
 function hocwp_field_input_right_label($type, $args = array()) {
     $options = isset($args['options']) ? $args['options'] : array();
-    $name = isset($args['name']) ? $args['name'] : '';
     $value = isset($args['value']) ? $args['value'] : '';
     $label = isset($args['label']) ? $args['label'] : '';
+    $id = hocwp_get_value_by_key($args, 'id');
+    $name = hocwp_get_value_by_key($args, 'name');
+    hocwp_transmit_id_and_name($id, $name);
     if(!hocwp_array_has_value($options)) {
-        $options[] = array(
+        $option_item = array(
             'label' => $label,
             'value' => $value,
-            'default' => hocwp_get_value_by_key($args, 'default')
+            'default' => hocwp_get_value_by_key($args, 'default'),
+            'id' => $id,
+            'name' => $name
         );
+        $options[] = $option_item;
     }
     $count = 0;
     foreach($options as $option) {
@@ -573,6 +579,36 @@ function hocwp_field_media_upload($args = array()) {
     );
     hocwp_field_input_hidden($id_args);
     hocwp_field_after($args);
+}
+
+function hocwp_field_media_upload_simple($args = array()) {
+    hocwp_field_sanitize_args($args);
+    $id = hocwp_get_value_by_key($args, 'id');
+    $name = hocwp_get_value_by_key($args, 'name');
+    if(empty($name)) {
+        _e('Please setup name for this field.', 'hocwp');
+        return;
+    }
+    $value = hocwp_get_value_by_key($args, 'value');
+    $value = hocwp_sanitize_media_value($value);
+    $btn_insert_class = 'btn-insert-media simple';
+    $btn_remove_class = 'btn-remove simple';
+    $img = '';
+    if(!empty($value['url'])) {
+        hocwp_add_string_with_space_before($btn_insert_class, 'hidden');
+        $img = '<img atl="" src="' . $value['url'] . '">';
+    } else {
+        hocwp_add_string_with_space_before($btn_remove_class, 'hidden');
+    }
+    ?>
+    <p class="hide-if-no-js">
+        <span class="media-preview"><?php echo $img; ?></span>
+        <a class="<?php echo $btn_insert_class; ?>" href="#" title="<?php _e('Set image', 'hocwp'); ?>"><?php _e('Set image', 'hocwp'); ?></a>
+        <a class="<?php echo $btn_remove_class; ?>" href="#" title="<?php _e('Remove image', 'hocwp'); ?>"><?php _e('Remove image', 'hocwp'); ?></a>
+        <input id="<?php echo $id; ?>_url" type="hidden" value="<?php echo $value['url']; ?>" name="<?php echo $name; ?>[url]" class="media-url">
+        <input id="<?php echo $id; ?>_id" type="hidden" value="<?php echo $value['id']; ?>" name="<?php echo $name; ?>[id]" class="media-id">
+    </p>
+    <?php
 }
 
 function hocwp_field_insert_media_button($args = array()) {

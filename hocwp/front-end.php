@@ -131,76 +131,24 @@ function hocwp_breadcrumb($args = array()) {
 }
 
 function hocwp_entry_meta() {
-    if ( is_sticky() && is_home() && ! is_paged() ) {
-        printf( '<span class="sticky-post">%s</span>', __( 'Featured', 'hocwp' ) );
-    }
-
-    $format = get_post_format();
-    if ( current_theme_supports( 'post-formats', $format ) ) {
-        printf( '<span class="entry-format">%1$s<a href="%2$s">%3$s</a></span>',
-            sprintf( '<span class="screen-reader-text">%s </span>', _x( 'Format', 'Used before post format.', 'hocwp' ) ),
-            esc_url( get_post_format_link( $format ) ),
-            get_post_format_string( $format )
-        );
-    }
-
-    if ( in_array( get_post_type(), array( 'post', 'attachment' ) ) ) {
-        $time_string = '<time class="entry-date published updated" datetime="%1$s">%2$s</time>';
-
-        if ( get_the_time( 'U' ) !== get_the_modified_time( 'U' ) ) {
-            $time_string = '<time class="entry-date published" datetime="%1$s">%2$s</time><time class="updated" datetime="%3$s">%4$s</time>';
-        }
-
-        $time_string = sprintf( $time_string,
-            esc_attr( get_the_date( 'c' ) ),
-            get_the_date(),
-            esc_attr( get_the_modified_date( 'c' ) ),
-            get_the_modified_date()
-        );
-
-        printf( '<span class="posted-on"><span class="screen-reader-text">%1$s </span><a href="%2$s" rel="bookmark">%3$s</a></span>',
-            _x( 'Posted on', 'Used before publish date.', 'hocwp' ),
-            esc_url( get_permalink() ),
-            $time_string
-        );
-    }
-
-    if ( 'post' == get_post_type() ) {
-        if ( is_singular() || is_multi_author() ) {
-            printf( '<span class="byline"><span class="author vcard"><span class="screen-reader-text">%1$s </span><a class="url fn n" href="%2$s">%3$s</a></span></span>',
-                _x( 'Author', 'Used before post author name.', 'hocwp' ),
-                esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ),
-                get_the_author()
-            );
-        }
-
-        $categories_list = get_the_category_list( _x( ', ', 'Used between list items, there is a space after the comma.', 'hocwp' ) );
-        if ( $categories_list ) {
-            printf( '<span class="cat-links"><span class="screen-reader-text">%1$s </span>%2$s</span>',
-                _x( 'Categories', 'Used before category names.', 'hocwp' ),
-                $categories_list
-            );
-        }
-    }
-
-    if ( is_attachment() && wp_attachment_is_image() ) {
-        // Retrieve attachment metadata.
-        $metadata = wp_get_attachment_metadata();
-
-        printf( '<span class="full-size-link"><span class="screen-reader-text">%1$s </span><a href="%2$s">%3$s &times; %4$s</a></span>',
-            _x( 'Full size', 'Used before full size attachment link.', 'hocwp' ),
-            esc_url( wp_get_attachment_url() ),
-            $metadata['width'],
-            $metadata['height']
-        );
-    }
-
-    if (!is_page() && ! post_password_required() && ( comments_open() || get_comments_number() ) ) {
-        echo '<span class="comments-link">';
-        /* translators: %s: post title */
-        comments_popup_link( sprintf( __( 'Leave a comment<span class="screen-reader-text"> on %s</span>', 'hocwp' ), get_the_title() ) );
-        echo '</span>';
-    }
+    $post_id = get_the_ID();
+    $author_url = hocwp_get_author_posts_url();
+    $comment_count = hocwp_get_post_comment_count($post_id);
+    $comment_text = $comment_count . ' Bình luận';
+    ?>
+    <p class="entry-meta">
+        <time datetime="<?php the_time('c'); ?>" itemprop="datePublished" class="entry-time"><?php the_date(); ?></time>
+        <time datetime="<?php the_modified_time('c'); ?>" itemprop="dateModified" class="entry-modified-time"><?php the_modified_date(); ?></time>
+        <span itemtype="http://schema.org/Person" itemscope="" itemprop="author" class="entry-author">
+            <a rel="author" itemprop="url" class="entry-author-link" href="<?php echo $author_url; ?>"><span itemprop="name" class="entry-author-name"><?php the_author(); ?></span></a>
+        </span>
+        <?php if(comments_open($post_id)) : ?>
+            <span class="entry-comments-link">
+                <a href="<?php the_permalink(); ?>#comments"><?php echo $comment_text; ?></a>
+            </span>
+        <?php endif; ?>
+    </p>
+    <?php
 }
 
 function hocwp_rel_canonical() {
@@ -229,10 +177,16 @@ function hocwp_posts_pagination($args = array()) {
     the_posts_pagination($args);
 }
 
-function hocwp_entry_content() {
+function hocwp_entry_content($content = '') {
     ?>
     <div class="entry-content">
-        <?php the_content(); ?>
+        <?php
+        if(!empty($content)) {
+            echo wpautop($content);
+        } else {
+            the_content();
+        }
+        ?>
     </div>
     <?php
 }

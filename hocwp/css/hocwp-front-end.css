@@ -3,6 +3,7 @@
  */
 
 .hocwp a {
+    outline: 0 none;
     transition: background-color 0s ease 0s, color 0.2s linear 0s;
 }
 
@@ -355,6 +356,10 @@
     margin-left: 8px;
 }
 
+.hocwp .comment-list .comment-body .comment-tools > a {
+    outline: 0 none;
+}
+
 .hocwp .comment-list li .comment-meta,
 .hocwp .comment-list li .comment-content {
     margin-left: 70px;
@@ -441,16 +446,16 @@
 
 .hocwp form input[type="file"],
 .hocwp form select,
+.hocwp form textarea,
 .hocwp form input[type="password"],
 .hocwp form input[type="url"],
 .hocwp form input[type="email"],
 .hocwp form input[type="text"] {
-    padding: 10px;
+    padding: 5px 10px;
     width: 45%;
 }
 
 .hocwp form textarea {
-    padding: 3%;
     width: 75%;
 }
 
@@ -522,6 +527,38 @@
 
 .entry-tags a:hover {
     background-color: #e2e2e2;
+}
+
+.entry-meta > * {
+    margin-right: 10px;
+}
+
+.entry-meta > *:last-child {
+    margin-right: 0;
+}
+
+.entry-meta > *::before {
+    color: #eb242b;
+    font-family: "FontAwesome";
+    margin-right: 5px;
+}
+
+.entry-meta .entry-time:before {
+    content: "\f017";
+}
+
+.entry-meta .entry-modified-time:before {
+    content: "\f021";
+}
+
+.entry-meta .entry-author:before {
+    content: "\f007";
+    margin-right: 0;
+}
+
+.entry-meta .entry-comments-link:before {
+    content: "\f086";
+    margin-right: 0;
 }
 
 /**
@@ -1251,8 +1288,8 @@
 }
 
 .fa-rss:hover, .fa-rss:focus, .fa-rss:active, .fa-rss.active, .open > .fa-rss.dropdown-toggle {
-    background-color: #feae1b;
-    border: 1px solid #e49c18;
+    background-color: #e49c18;
+    border: 1px solid #cd8c15;
     color: #fff;
 }
 

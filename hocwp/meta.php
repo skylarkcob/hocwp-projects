@@ -23,3 +23,22 @@ function hocwp_meta_box_post_attribute($post_types) {
 	$meta->set_priority('core');
 	$meta->init();
 }
+
+function hocwp_meta_box_side_image($args = array()) {
+	$id = hocwp_get_value_by_key($args, 'id', 'secondary_image_box');
+	$title = hocwp_get_value_by_key($args, 'title', __('Secondary Image', 'hocwp'));
+	$post_types = hocwp_get_value_by_key($args, 'post_type');
+	$post_types = hocwp_sanitize_array($post_types);
+	$field_id = hocwp_get_value_by_key($args, 'field_id', 'secondary_image');
+	if(!hocwp_array_has_value($post_types)) {
+		return;
+	}
+	$meta = new HOCWP_Meta('post');
+	$meta->set_post_types($post_types);
+	$meta->set_id($id);
+	$meta->set_title($title);
+	$meta->set_context('side');
+	$meta->set_priority('low');
+	$meta->add_field(array('id' => $field_id, 'field_callback' => 'hocwp_field_media_upload_simple'));
+	$meta->init();
+}

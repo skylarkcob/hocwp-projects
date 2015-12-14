@@ -63,6 +63,7 @@ jQuery(document).ready(function($) {
                     $count.html(response.likes);
                 }
             });
+            return false;
         });
 
         $('.hocwp .comment-tools .comment-report').on('click', function(e) {
@@ -84,6 +85,7 @@ jQuery(document).ready(function($) {
 
                 }
             });
+            return false;
         });
 
         $('.hocwp .comment-tools .comment-share').on('click', function(e) {
@@ -91,6 +93,7 @@ jQuery(document).ready(function($) {
             var $element = $(this);
             $element.css({'text-decoration' : 'none'});
             $element.toggleClass('active');
+            return false;
         });
 
         $('.hocwp .comment-tools .comment-share .list-share .fa').on('click', function(e) {

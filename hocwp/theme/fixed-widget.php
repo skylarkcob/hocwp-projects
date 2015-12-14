@@ -15,7 +15,7 @@
             site_footer_height = $site_footer.height(),
             site_footer_offset_top = $site_footer.offset().top,
             last_scroll_top = 0;
-        if(content_area_height < widget_height || 0 == widget_width) {
+        if(content_area_height < widget_height || 0 == widget_width || widget_width > 300 || $window.width() < 980) {
             return false;
         }
         if($admin_bar.length) {
@@ -27,6 +27,9 @@
             $last_widget.removeClass('fixed');
         }
         $window.scroll(function() {
+            if($window.width() < 980) {
+                return false;
+            }
             window_top = $(this).scrollTop();
             var scroll_down = true;
             if(window_top > last_scroll_top) {

@@ -2,6 +2,7 @@
 if(!function_exists('add_filter')) exit;
 $discussion_option = new HOCWP_Option('', 'discussion');
 $discussion_option->set_page('options-discussion.php');
+$discussion_option->add_field(array('id' => 'allow_shortcode', 'title' => __('Shortcode', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox', 'label' => __('Allow user to post shortcode in comment.', 'hocwp')));
 $discussion_option->add_section(array('id' => 'comment_form', 'title' => __('Comment Form', 'hocwp'), 'description' => __('These options can help you to customize comment form on your site.', 'hocwp')));
 $field_options = array(
 	array(

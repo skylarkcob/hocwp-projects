@@ -273,6 +273,16 @@ function hocwp_setup_theme_admin_bar_menu($wp_admin_bar) {
         );
         $wp_admin_bar->add_node($args);
     }
+    $option = hocwp_option_get_object_from_list('theme_add_to_head');
+    if(hocwp_object_valid($option) && current_user_can($option->get_capability())) {
+        $args = array(
+            'id' => hocwp_sanitize_id($option->get_menu_slug()),
+            'title' => $option->get_menu_title(),
+            'href' => $option->get_page_url(),
+            'parent' => 'themes'
+        );
+        $wp_admin_bar->add_node($args);
+    }
     $args = array(
         'id' => 'users',
         'title' => __('Users', 'hocwp'),
@@ -383,6 +393,15 @@ function hocwp_setup_theme_admin_bar_menu($wp_admin_bar) {
             'title' => $option->get_menu_title(),
             'href' => $option->get_page_url(),
             'parent' => 'tools'
+        );
+        $wp_admin_bar->add_node($args);
+    }
+    if(hocwp_plugin_wpsupercache_installed()) {
+        $args = array(
+            'id' => 'wpsupercache-content',
+            'title' => __('Delete cache', 'hocwp'),
+            'href' => admin_url('options-general.php?page=wpsupercache&tab=contents#listfiles'),
+            'parent' => 'site-name'
         );
         $wp_admin_bar->add_node($args);
     }

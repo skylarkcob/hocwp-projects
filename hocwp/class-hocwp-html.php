@@ -10,6 +10,7 @@ class HOCWP_HTML {
     public $attributes = array();
     public $break_line = true;
     public $close = true;
+    public $only_text = false;
 
     public function set_close($close) {
         $this->close = $close;
@@ -29,6 +30,10 @@ class HOCWP_HTML {
 
     public function set_name($name) {
         $this->name = strtolower($name);
+    }
+
+    public function use_only_text() {
+        $this->only_text = true;
     }
 
     public function get_self_closers() {
@@ -111,6 +116,9 @@ class HOCWP_HTML {
     }
 
     public function build() {
+        if($this->only_text) {
+            return $this->get_attribute('text');
+        }
         $this->check_html();
         $html_name = $this->get_name();
         $result = '<' . $html_name;

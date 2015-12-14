@@ -431,6 +431,7 @@ class HOCWP_Option {
                 _e('Please set name for this field.', 'hocwp');
                 return;
             }
+            $base_name = $name;
             unset($args['class']);
             if(!isset($args['value'])) {
                 $args['value'] = $this->get_by_key($name, hocwp_get_value_by_key($args, 'default'));
@@ -443,7 +444,11 @@ class HOCWP_Option {
                 foreach($options as $option) {
                     $name = isset($option['name']) ? hocwp_sanitize_array($option['name']) : array();
                     if(!hocwp_array_has_value($name)) {
-                        $name = isset($option['id']) ? hocwp_sanitize_array($option['id']) : array();
+                        if(!empty($base_name)) {
+                            $name = hocwp_sanitize_array($base_name);
+                        } else {
+                            $name = isset($option['id']) ? hocwp_sanitize_array($option['id']) : array();
+                        }
                     }
                     if(!hocwp_array_has_value($name)) {
                         continue;

@@ -133,3 +133,7 @@ function hocwp_load_jquery_from_cdn() {
 function hocwp_jquery_google_cdn_fallback() {
     echo '<script>window.jQuery || document.write(\'<script src="' . includes_url('js/jquery/jquery.js') . '"><\/script>\')</script>' . "\n";
 }
+
+function hocwp_plugin_wpsupercache_installed() {
+    return function_exists('wpsupercache_activate');
+}

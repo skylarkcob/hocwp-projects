@@ -4,7 +4,7 @@
 <?php do_action('hocwp_after_site_content'); ?>
 <?php if(!$maintenance_mode) : ?>
     <?php do_action('hocwp_before_site_footer'); ?>
-    <footer id="colophon" class="site-footer" role="contentinfo">
+    <footer id="colophon" class="site-footer clearfix" role="contentinfo">
         <?php hocwp_theme_get_template('footer'); ?>
     </footer><!-- .site-footer -->
     <?php do_action('hocwp_after_site_footer'); ?>

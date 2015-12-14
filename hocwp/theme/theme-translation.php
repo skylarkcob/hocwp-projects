@@ -49,15 +49,18 @@ function hocwp_theme_translation_comments_list_callback($comment, $args, $depth)
         $tag = 'li';
         $add_below = 'div-comment';
     }
+    $comment_date = get_comment_date('Y-m-d H:i:s', $comment_id);
     $comment_author = '<div class="comment-author vcard">' . get_avatar($comment, $avatar_size) . '<b class="fn">' . get_comment_author_link() . '</b> <span class="says">nói:</span></div>';
-    $comment_metadata = '<div class="comment-metadata"><a href="' . $comment_permalink . '"><time datetime="' . get_comment_time('c') . '">' . hocwp_human_time_diff_to_now(get_comment_date('Y-m-d H:i:s', true)) . ' ' . __('trước', 'hocwp') . '</time></a> <a class="comment-edit-link" href="' . get_edit_comment_link($comment_id) . '">(' . __('Sửa', 'hocwp') . ')</a></div>';
+    $comment_metadata = '<div class="comment-metadata"><a href="' . $comment_permalink . '"><time datetime="' . get_comment_time('c') . '">' . hocwp_human_time_diff_to_now($comment_date) . ' ' . __('trước', 'hocwp') . '</time></a> <a class="comment-edit-link" href="' . get_edit_comment_link($comment_id) . '">(' . __('Sửa', 'hocwp') . ')</a></div>';
     if($comment->comment_approved == '0') {
         $comment_metadata .= '<p class="comment-awaiting-moderation">' . __('Bình luận của bạn đang được chờ để xét duyệt.', 'hocwp') . '</p>';
     }
     $footer = new HOCWP_HTML('footer');
     $footer->set_class('comment-meta');
     $footer->set_text($comment_author . $comment_metadata);
-    $comment_content = '<div class="comment-content">' . wpautop(get_comment_text($comment_id)) . '</div>';
+    $comment_text = get_comment_text($comment_id);
+    $comment_text = apply_filters('comment_text', $comment_text, $comment);
+    $comment_content = '<div class="comment-content">' . $comment_text . '</div>';
     $reply = '<div class="reply comment-tools">';
     $reply .= get_comment_reply_link(array_merge($args, array('add_below' => $add_below, 'depth' => $depth, 'max_depth' => $max_depth)));
     $comment_tools_enabled = apply_filters('hocwp_comment_tools_enabled', true);

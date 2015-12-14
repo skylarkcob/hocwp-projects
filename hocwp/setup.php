@@ -4,6 +4,17 @@ if(!file_exists(HOCWP_CONTENT_PATH)) {
     mkdir(HOCWP_CONTENT_PATH);
 }
 
+function hocwp_setup_enable_session() {
+    $options = get_option('hocwp_user_login');
+    $use_captcha = hocwp_get_value_by_key($options, 'use_captcha');
+    $options = get_option('hocwp_discussion');
+    $comment_captcha = hocwp_get_value_by_key($options, 'captcha');
+    if((bool)$use_captcha || (bool)$comment_captcha) {
+        add_filter('hocwp_use_session', '__return_true');
+    }
+}
+add_action('init', 'hocwp_setup_enable_session');
+
 if(!has_action('init', 'hocwp_session_start')) {
     add_action('init', 'hocwp_session_start');
 }
@@ -11,6 +22,9 @@ if(!has_action('init', 'hocwp_session_start')) {
 function hocwp_init() {
     do_action('hocwp_post_type_and_taxonomy');
     do_action('hocwp_init');
+    if(!is_admin()) {
+        do_action('hocwp_front_end_init');
+    }
 }
 add_action('init', 'hocwp_init');
 

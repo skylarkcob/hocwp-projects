@@ -45,6 +45,26 @@ function hocwp_get_pc_ip() {
     return $result;
 }
 
+function hocwp_get_all_shortcodes() {
+    global $shortcode_tags;
+    return $shortcode_tags;
+}
+
+function hocwp_get_all_sb_shortcodes() {
+    $shortcodes = hocwp_get_all_shortcodes();
+    $result = array();
+    foreach($shortcodes as $key => $function) {
+        if(('sb' == substr($key, 0, 2) && 'sb' == substr($function, 0, 2)) || ('hocwp' == substr($key, 0, 2) && 'hocwp' == substr($function, 0, 2))) {
+            $result[$key] = $function;
+        }
+    }
+    return $result;
+}
+
+function hocwp_get_my_shortcodes() {
+    return hocwp_get_all_sb_shortcodes();
+}
+
 function hocwp_get_timezone_string() {
     $timezone_string = get_option('timezone_string');
     if(empty($timezone_string)) {
@@ -796,6 +816,11 @@ function hocwp_get_browser() {
         $browser = 'ie';
     } elseif($is_iphone) {
         $browser = 'iphone';
+    }
+    if('unknown' == $browser) {
+        if(false !== strpos($user_agent, 'edge/12')) {
+            $browser = 'edge';
+        }
     }
     return $browser;
 }
@@ -1777,6 +1802,9 @@ function hocwp_sanitize_media_value($value) {
     $id = absint($id);
     if(0 < $id && hocwp_media_file_exists($id)) {
         $url = hocwp_get_media_image_url($id);
+    }
+    if(0 >= $id && !is_array($value) && !empty($value)) {
+        $url = $value;
     }
     return array('id' => $id, 'url' => $url);
 }

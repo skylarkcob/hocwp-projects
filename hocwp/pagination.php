@@ -84,6 +84,9 @@ function hocwp_has_paged($args = array()) {
 
 function hocwp_build_pagination($args = array()) {
     $label_text = __('Pages', 'hocwp');
+    if('vi' == hocwp_get_language()) {
+        $label_text = 'Trang';
+    }
     $default_label = $label_text;
     $default_previous = '&laquo;';
     $default_next = '&raquo;';
@@ -161,7 +164,7 @@ function hocwp_loop_pagination_item($args = array()) {
     $anchor = $default_anchor;
     // The minimum number of page links before ellipsis shows.
     $default_gap = 3;
-    $gap =$default_gap;
+    $gap = $default_gap;
     $current_page = isset($args['current_page']) ? $args['current_page'] : 1;
     $total_page = isset($args['total_page']) ? $args['total_page'] : 1;
     $request = isset($args['request']) ? $args['request'] : hocwp_get_request();

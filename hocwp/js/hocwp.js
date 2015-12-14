@@ -288,7 +288,9 @@ jQuery(document).ready(function($) {
         options = options || {};
         options = $.extend({}, defaults, options);
         var $container = button.parent(),
-            $url = $container.find('input.media-url'),
+            container_tag = $container.get(0).tagName,
+            is_simple = button.hasClass('simple');
+        var $url = $container.find('input.media-url'),
             $id = $container.find('input.media-id'),
             $remove = $container.find('.btn-remove'),
             $preview = $container.find('.media-preview'),
