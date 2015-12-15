@@ -998,6 +998,13 @@ function hocwp_url_valid($url) {
     return false;
 }
 
+function hocwp_color_valid($color) {
+    if(preg_match('/^#[a-f0-9]{6}$/i', $color)) {
+        return true;
+    }
+    return false;
+}
+
 function hocwp_url_exists($url) {
     $file_headers = @get_headers($url);
     $result = true;
@@ -1829,6 +1836,11 @@ function hocwp_get_media_image_url($id) {
     return isset($detail[0]) ? $detail[0] : '';
 }
 
+function hocwp_get_media_option_url($value) {
+    $value = hocwp_sanitize_media_value($value);
+    return $value['url'];
+}
+
 function hocwp_bool_to_int($value) {
     if($value) {
         return 1;
@@ -2010,13 +2022,18 @@ function hocwp_admin_enqueue_scripts() {
     if($use) {
         wp_enqueue_script('jquery-ui-sortable');
     }
-    $wp_enqueue_media = apply_filters('hocwp_wp_enqueue_media', false);
-    if($wp_enqueue_media) {
+    $use = apply_filters('hocwp_use_color_picker', false);
+    if($use) {
+        wp_enqueue_script('wp-color-picker');
+        wp_enqueue_style('wp-color-picker');
+    }
+    $use = apply_filters('hocwp_wp_enqueue_media', false);
+    if($use) {
         wp_enqueue_media();
     }
     hocwp_register_core_style_and_script();
-    wp_register_style('hocwp-admin-style', get_template_directory_uri() . '/hocwp/css/hocwp-admin'. HOCWP_CSS_SUFFIX, array('hocwp-style'), HOCWP_VERSION);
-    wp_register_script('hocwp-admin', get_template_directory_uri() . '/hocwp/js/hocwp-admin' . HOCWP_JS_SUFFIX, array('jquery', 'hocwp'), HOCWP_VERSION, true);
+    wp_register_style('hocwp-admin-style', HOCWP_URL . '/css/hocwp-admin'. HOCWP_CSS_SUFFIX, array('hocwp-style'), HOCWP_VERSION);
+    wp_register_script('hocwp-admin', HOCWP_URL . '/js/hocwp-admin' . HOCWP_JS_SUFFIX, array('jquery', 'hocwp'), HOCWP_VERSION, true);
     wp_localize_script('hocwp', 'hocwp', hocwp_default_script_localize_object());
     $use = apply_filters('hocwp_use_admin_style_and_script', false);
     if($use) {

@@ -147,6 +147,7 @@ function hocwp_setup_theme_login_scripts() {
 add_action('login_enqueue_scripts', 'hocwp_setup_theme_login_scripts');
 
 function hocwp_setup_theme_admin_scripts() {
+    /*
     global $pagenow;
     $current_page = hocwp_get_current_admin_page();
     $use = apply_filters('hocwp_use_jquery_ui', false);
@@ -166,6 +167,8 @@ function hocwp_setup_theme_admin_scripts() {
         wp_enqueue_style('hocwp-admin-style');
         wp_enqueue_script('hocwp-admin');
     }
+    */
+    hocwp_admin_enqueue_scripts();
 }
 add_action('admin_enqueue_scripts', 'hocwp_setup_theme_admin_scripts');
 
@@ -274,6 +277,16 @@ function hocwp_setup_theme_admin_bar_menu($wp_admin_bar) {
         $wp_admin_bar->add_node($args);
     }
     $option = hocwp_option_get_object_from_list('theme_add_to_head');
+    if(hocwp_object_valid($option) && current_user_can($option->get_capability())) {
+        $args = array(
+            'id' => hocwp_sanitize_id($option->get_menu_slug()),
+            'title' => $option->get_menu_title(),
+            'href' => $option->get_page_url(),
+            'parent' => 'themes'
+        );
+        $wp_admin_bar->add_node($args);
+    }
+    $option = hocwp_option_get_object_from_list('theme_custom');
     if(hocwp_object_valid($option) && current_user_can($option->get_capability())) {
         $args = array(
             'id' => hocwp_sanitize_id($option->get_menu_slug()),

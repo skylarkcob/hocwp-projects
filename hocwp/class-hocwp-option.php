@@ -26,6 +26,7 @@ class HOCWP_Option {
     private $help_sidebar;
     private $use_style_and_script;
     private $use_media_upload;
+    private $use_color_picker;
     private $use_jquery_ui;
     private $use_jquery_ui_sortable;
 
@@ -78,6 +79,14 @@ class HOCWP_Option {
 
     public function get_use_media_upload() {
         return (bool)$this->use_media_upload;
+    }
+
+    public function set_use_color_picker($use) {
+        $this->use_color_picker = $use;
+    }
+
+    public function get_use_color_picker() {
+        return (bool)$this->use_color_picker;
     }
 
     public function set_help_sidebar($help_sidebar) {
@@ -338,6 +347,9 @@ class HOCWP_Option {
         if($this->get_use_style_and_script()) {
             add_filter('hocwp_use_admin_style_and_script', '__return_true');
         }
+        if($this->get_use_color_picker()) {
+            add_filter('hocwp_use_color_picker', '__return_true');
+        }
         if($this->get_use_media_upload()) {
             add_filter('hocwp_wp_enqueue_media', '__return_true');
         }
@@ -399,6 +411,7 @@ class HOCWP_Option {
     public function sanitize($input) {
         $input = apply_filters('hocwp_sanitize_option_' . $this->get_option_name_no_prefix(), $input);
         do_action('hocwp_sanitize_' . $this->get_option_name_no_prefix() . '_option', $input);
+        $input = apply_filters('validate_options', $input);
         return $input;
     }
 

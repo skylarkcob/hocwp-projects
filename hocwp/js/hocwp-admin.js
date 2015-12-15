@@ -143,4 +143,8 @@ jQuery(document).ready(function($) {
     (function() {
         $('.hocwp-widget .chooseable').hocwpChosenSelect();
     })();
+
+    (function() {
+        $('.hocwp-color-picker').wpColorPicker();
+    })();
 });

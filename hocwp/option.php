@@ -75,3 +75,22 @@ function hocwp_get_footer_logo_url() {
     $result = $result['url'];
     return $result;
 }
+
+function hocwp_option_defaults() {
+    $defaults = array(
+        'theme_custom' => array(
+            'background_music' => array(
+                'play_ons' => array(
+                    'home' => __('Homepage', 'hocwp'),
+                    'single' => __('Single', 'hocwp'),
+                    'page' => __('Page', 'hocwp'),
+                    'archive' => __('Archive', 'hocwp'),
+                    'search' => __('Search', 'hocwp'),
+                    'all' => __('Play on whole page', 'hocwp')
+                ),
+                'play_on' => 'home'
+            )
+        )
+    );
+    return apply_filters('hocwp_option_defaults', $defaults);
+}

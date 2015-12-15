@@ -404,3 +404,83 @@ function hocwp_setup_theme_allow_shortcode_in_comment() {
     }
 }
 add_action('hocwp_front_end_init', 'hocwp_setup_theme_allow_shortcode_in_comment');
+
+function hocwp_setup_theme_custom_head() {
+    $options = get_option('hocwp_theme_custom');
+    $background_image = hocwp_get_value_by_key($options, 'background_image');
+    $background_image = hocwp_get_media_option_url($background_image);
+    if(hocwp_url_valid($background_image)) {
+        $style = new HOCWP_HTML('style');
+        $style->set_attribute('type', 'text/css');
+        $elements = array('body.hocwp');
+        $properties = array(
+            'background-image' => 'url("' . $background_image . '")',
+            'background-repeat' => 'no-repeat',
+            'background-color' => 'rgba(0,0,0,0)'
+        );
+        $background_repeat = hocwp_get_value_by_key($options, 'background_repeat');
+        if((bool)$background_repeat) {
+            $properties['background-repeat'] = 'repeat';
+        }
+        $background_color = hocwp_get_value_by_key($options, 'background_color');
+        if(hocwp_color_valid($background_color)) {
+            $properties['background-color'] = $background_color;
+        }
+        $background_size = hocwp_get_value_by_key($options, 'background_size');
+        if(!empty($background_size)) {
+            $properties['background-size'] = $background_size;
+        }
+        $background_position = hocwp_get_value_by_key($options, 'background_position');
+        if(!empty($background_position)) {
+            $properties['background-position'] = $background_position;
+        }
+        $background_attachment = hocwp_get_value_by_key($options, 'background_attachment');
+        if(!empty($background_attachment)) {
+            $properties['background-attachment'] = $background_attachment;
+        }
+        $css = hocwp_build_css_rule($elements, $properties);
+        $css = hocwp_minify_css($css);
+        $style->set_text($css);
+        if(!empty($css)) {
+            $style->output();
+        }
+    }
+}
+add_action('wp_head', 'hocwp_setup_theme_custom_head');
+
+function hocwp_setup_theme_custom_footer() {
+    $options = get_option('hocwp_theme_custom');
+    $background_music = hocwp_get_value_by_key($options, 'background_music');
+    if(!empty($background_music)) {
+        $play_on = hocwp_get_value_by_key($options, 'play_on');
+        if(empty($play_on)) {
+            $defaults = hocwp_option_defaults();
+            $play_on = hocwp_get_value_by_key($defaults, array('theme_custom', 'background_music', 'play_on'));
+        }
+        $play = false;
+        if('home' == $play_on && is_home()) {
+            $play = true;
+        } elseif('single' == $play_on && is_single()) {
+            $play = true;
+        } elseif('page' == $play_on && is_page()) {
+            $play = true;
+        } elseif('archive' == $play_on && is_archive()) {
+            $play = true;
+        } elseif('search' == $play_on && is_search()) {
+            $play = true;
+        } elseif('all' == $play_on) {
+            $play = true;
+        }
+        $play = apply_filters('hocwp_play_background_music', $play);
+        if((bool)$play) {
+            $div = new HOCWP_HTML('div');
+            $div->set_class('hocwp-background-music hocwp-hidden');
+            if(hocwp_url_valid($background_music)) {
+
+            }
+            $div->set_text($background_music);
+            $div->output();
+        }
+    }
+}
+add_action('wp_footer', 'hocwp_setup_theme_custom_footer');

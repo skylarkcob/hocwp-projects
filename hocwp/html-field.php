@@ -100,6 +100,18 @@ function hocwp_field_sanitize_publish_box_args(&$args = array()) {
     return $args;
 }
 
+function hocwp_field_color_picker($args = array()) {
+    hocwp_sanitize_field_args($args);
+    $value = hocwp_get_value_by_key($args, 'value');
+    $class = hocwp_get_value_by_key($args, 'class');
+    hocwp_add_string_with_space_before($class, 'hocwp-color-picker');
+    $args['class'] = $class;
+    $atts = hocwp_get_value_by_key($args, 'attributes');
+    $atts['autocomplete'] = 'off';
+    $args['attributes'] = $atts;
+    hocwp_field_input($args);
+}
+
 function hocwp_field_sortable($args = array()) {
     hocwp_sanitize_field_args($args);
     $value = isset($args['value']) ? $args['value'] : '';

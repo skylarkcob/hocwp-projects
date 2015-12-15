@@ -1411,6 +1411,15 @@
     width: 100%;
 }
 
+.hocwp .hocwp-hidden *,
+.hocwp .hocwp-hidden {
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+    visibility: hidden;
+    width: 0;
+}
+
 @media screen and (max-width: 782px) {
     .hocwp.admin-bar .sidebar .widget.fixed,
     .hocwp.admin-bar .hocwp-mobile-menu {
