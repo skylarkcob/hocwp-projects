@@ -4,6 +4,9 @@ class HOCWP_Option {
     private $menu_title;
     private $page_title;
     private $menu_slug;
+    private $heading_text;
+    private $is_option_page;
+    private $page_title_action;
 
     private $capability;
     private $parent_slug;
@@ -200,6 +203,36 @@ class HOCWP_Option {
         return $this->menu_title;
     }
 
+    public function get_heading_text() {
+        return $this->heading_text;
+    }
+
+    public function set_heading_text($text) {
+        $this->heading_text = $text;
+    }
+
+    public function get_page_title_action() {
+        return $this->page_title_action;
+    }
+
+    public function set_page_title_action($action, $url, $text) {
+        $action = hocwp_sanitize($action, 'html_class');
+        hocwp_add_string_with_space_before($action, 'page-title-action');
+        $link = new HOCWP_HTML('a');
+        $link->set_class($action);
+        $link->set_attribute('href', $url);
+        $link->set_text($text);
+        $this->page_title_action = $link->build();
+    }
+
+    public function is_option_page() {
+        return (bool)$this->is_option_page;
+    }
+
+    public function set_is_option_page($value) {
+        $this->is_option_page = $value;
+    }
+
     public function set_menu_slug($menu_slug) {
         $this->menu_slug = $menu_slug;
     }
@@ -262,7 +295,9 @@ class HOCWP_Option {
     public function __construct($menu_title, $menu_slug) {
         $this->set_menu_title($menu_title);
         $this->set_page_title($menu_title);
+        $this->set_heading_text($menu_title);
         $this->set_menu_slug($menu_slug);
+        $this->set_is_option_page(true);
         $this->set_sanitize_callback(array($this, 'sanitize'));
         $this->set_capability('manage_options');
 
@@ -309,22 +344,29 @@ class HOCWP_Option {
     }
 
     public function default_setting_page_callback() {
-        $title = $this->get_menu_title();
-        if(!hocwp_string_contain(strtolower($title), 'settings')) {
+        $title = $this->get_heading_text();
+        if($this->is_option_page() && !hocwp_string_contain(strtolower($title), 'settings')) {
             hocwp_add_string_with_space_before($title, 'Settings');
         }
+        $wrap_class = $this->get_option_name_no_prefix();
+        hocwp_add_string_with_space_before($wrap_class, 'wrap hocwp');
+        $wrap_class = hocwp_sanitize($wrap_class, 'html_class');
         ?>
-        <div class="wrap hocwp">
-            <h1 class="page-title"><?php echo esc_html($title); ?></h1>
+        <div class="<?php echo $wrap_class; ?>">
+            <h1 class="page-title"><?php echo esc_html($title). $this->get_page_title_action(); ?></h1>
             <?php
-            if($this->is_this_page() && (isset($_REQUEST['submit']) || isset($_REQUEST['settings-updated']))) {
-                do_action('hocwp_option_saved');
-                if('options-general.php' != $this->get_parent_slug()) {
-                    hocwp_admin_notice_setting_saved();
+            if($this->is_option_page()) {
+                if($this->is_this_page() && (isset($_REQUEST['submit']) || isset($_REQUEST['settings-updated']))) {
+                    do_action('hocwp_option_saved');
+                    if('options-general.php' != $this->get_parent_slug()) {
+                        hocwp_admin_notice_setting_saved();
+                    }
+                    do_action($this->get_menu_slug() . '_option_saved', $this);
                 }
-                do_action($this->get_menu_slug() . '_option_saved', $this);
+                $this->form();
             }
-            $this->form();
+            do_action('hocwp_option_page_content');
+            do_action('hocwp_option_page_' . $this->get_option_name_no_prefix() . '_content');
             ?>
         </div>
         <?php

@@ -122,3 +122,68 @@ function hocwp_facebook_comment($args = array()) {
     $div->set_attribute_array($atts);
     $div->output();
 }
+
+function hocwp_get_top_commenters($number = 5, $time = 'all') {
+    $transient_name = 'hocwp_top_commenters_' . $time . '_' . $number;
+    $transient_name = hocwp_sanitize_id($transient_name);
+    if(false === ($results = get_transient($transient_name))) {
+        global $wpdb;
+        $sql = '';
+        $expires = HOUR_IN_SECONDS;
+        switch($time) {
+            case 'today':
+                $sql = 'SELECT COUNT(comment_author_email) AS comments_count, comment_author_email, comment_author, comment_author_url
+                    FROM ' . $wpdb->comments . '
+                    WHERE comment_author_email != "" AND comment_type = "" AND comment_approved = 1 AND DAY(comment_date) = DAY(CURDATE()) AND MONTH(comment_date) = MONTH(CURDATE()) AND YEAR(comment_date) = YEAR(CURDATE())
+                    GROUP BY comment_author_email
+                    ORDER BY comments_count DESC, comment_author ASC
+                    LIMIT ' . $number;
+                break;
+            case 'week':
+            case 'this_week':
+                $sql = 'SELECT COUNT(comment_author_email) AS comments_count, comment_author_email, comment_author, comment_author_url
+                    FROM ' . $wpdb->comments . '
+                    WHERE comment_author_email != "" AND comment_type = "" AND comment_approved = 1 AND YEARWEEK(comment_date) = YEARWEEK(NOW())
+                    GROUP BY comment_author_email
+                    ORDER BY comments_count DESC, comment_author ASC
+                    LIMIT ' . $number;
+                $expires = 12 * HOUR_IN_SECONDS;
+                break;
+            case 'month':
+            case 'this_month':
+                $sql = 'SELECT COUNT(comment_author_email) AS comments_count, comment_author_email, comment_author, comment_author_url
+                    FROM ' . $wpdb->comments . '
+                    WHERE comment_author_email != "" AND comment_type = "" AND comment_approved = 1 AND MONTH(comment_date) = MONTH(CURDATE()) AND YEAR(comment_date) = YEAR(CURDATE())
+                    GROUP BY comment_author_email
+                    ORDER BY comments_count DESC, comment_author ASC
+                    LIMIT ' . $number;
+                $expires = DAY_IN_SECONDS;
+                break;
+            case 'year':
+            case 'this_year':
+                $sql = 'SELECT COUNT(comment_author_email) AS comments_count, comment_author_email, comment_author, comment_author_url
+                    FROM ' . $wpdb->comments . '
+                    WHERE comment_author_email != "" AND comment_type = "" AND comment_approved = 1 AND YEAR(comment_date) = YEAR(CURDATE())
+                    GROUP BY comment_author_email
+                    ORDER BY comments_count DESC, comment_author ASC
+                    LIMIT ' . $number;
+                $expires = 2 * DAY_IN_SECONDS;
+                break;
+            default:
+                $sql = 'SELECT COUNT(comment_author_email) AS comments_count, comment_author_email, comment_author, comment_author_url
+                    FROM ' . $wpdb->comments . '
+                    WHERE comment_author_email != "" AND comment_type = "" AND comment_approved = 1
+                    GROUP BY comment_author_email
+                    ORDER BY comments_count DESC, comment_author ASC
+                    LIMIT ' . $number;
+        }
+        $results = $wpdb->get_results($sql);
+        set_transient($transient_name, $results, $expires);
+    }
+    return $results;
+}
+
+function hocwp_comment_inserted_hook($id, $comment) {
+    hocwp_delete_transient('hocwp_top_commenters');
+}
+add_action('wp_insert_comment', 'hocwp_comment_inserted_hook', 10, 2);

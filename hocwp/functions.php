@@ -122,6 +122,12 @@ function hocwp_array_has_value($arr) {
 }
 
 function hocwp_get_plugin_info($plugin_file) {
+    if(!file_exists($plugin_file)) {
+        $plugin_file = trailingslashit(WP_PLUGIN_DIR) . $plugin_file;
+    }
+    if(!file_exists($plugin_file)) {
+        return null;
+    }
     return get_plugin_data($plugin_file);
 }
 
@@ -644,7 +650,8 @@ function hocwp_sanitize($data, $type) {
         case 'file_name':
             return hocwp_sanitize_file_name($data);
         case 'html_class':
-            return hocwp_sanitize_file_name(sanitize_html_class($data));
+            $data = str_replace('_', '-', $data);
+            return $data;
         case 'key':
             return sanitize_key($data);
         case 'mime_type':
@@ -662,6 +669,10 @@ function hocwp_sanitize($data, $type) {
         default:
             return $data;
     }
+}
+
+function hocwp_sanitize_html_class($class) {
+    return hocwp_sanitize($class, 'html_class');
 }
 
 function hocwp_vietnamese_currency() {
@@ -1645,11 +1656,11 @@ function hocwp_get_current_admin_page() {
     return isset($_REQUEST['page']) ? $_REQUEST['page'] : '';
 }
 
-function hocwp_get_plugins() {
+function hocwp_get_plugins($folder = '') {
     if(!function_exists('get_plugins')) {
         require(ABSPATH . 'wp-admin/includes/plugin.php');
     }
-    return get_plugins();
+    return get_plugins($folder);
 }
 
 function hocwp_get_my_plugins() {

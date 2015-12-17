@@ -8,3 +8,4 @@ require(HOCWP_PATH . '/options/setting-theme-custom.php');
 require(HOCWP_PATH . '/options/setting-discussion.php');
 require(HOCWP_PATH . '/options/setting-optimize.php');
 require(HOCWP_PATH . '/options/setting-maintenance.php');
+require(HOCWP_PATH . '/options/setting-recommend-plugin.php');

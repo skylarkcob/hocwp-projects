@@ -4,7 +4,7 @@ if(defined('HOCWP_PATH')) {
     return;
 }
 
-define('HOCWP_VERSION', '3.0.2');
+define('HOCWP_VERSION', '3.0.3');
 
 define('HOCWP_PATH', dirname(__FILE__));
 
@@ -108,6 +108,8 @@ require(HOCWP_PATH . '/login.php');
 require(HOCWP_PATH . '/comment.php');
 
 require(HOCWP_PATH . '/pagination.php');
+
+require(HOCWP_PATH . '/back-end.php');
 
 require(HOCWP_PATH . '/front-end.php');
 

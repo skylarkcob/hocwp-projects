@@ -94,3 +94,22 @@ function hocwp_option_defaults() {
     );
     return apply_filters('hocwp_option_defaults', $defaults);
 }
+
+function hocwp_recommended_plugins() {
+    $required = array();
+    $required = apply_filters('hocwp_required_plugins', $required);
+    $defaults = array(
+        'required' => $required,
+        'recommended' => array(
+            'wordpress-seo',
+            'wp-super-cache',
+            'wp-optimize',
+            'wp-external-links',
+            'syntaxhighlighter',
+            'akismet',
+            'google-analytics-for-wordpress',
+            'updraftplus'
+        )
+    );
+    return apply_filters('hocwp_recommended_plugins', $defaults);
+}
