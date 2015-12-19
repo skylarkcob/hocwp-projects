@@ -387,6 +387,81 @@ function hocwp_setup_theme_maintenance_body_class($classes) {
     return $classes;
 }
 
+function hocwp_setup_theme_navigation_markup_template($template) {
+    $template = '<nav class="navigation %1$s">
+		<h2 class="screen-reader-text">%2$s</h2>
+		<div class="nav-links">%3$s</div>
+	</nav>';
+    return $template;
+}
+add_filter('navigation_markup_template', 'hocwp_setup_theme_navigation_markup_template');
+
+function hocwp_setup_theme_get_search_form($form) {
+    $format = current_theme_supports('html5', 'search-form') ? 'html5' : 'xhtml';
+    $format = apply_filters('search_form_format', $format);
+    if('html5' == $format) {
+        $form = '<form method="get" class="search-form" action="' . esc_url(home_url('/')) . '">
+				<label>
+					<span class="screen-reader-text">' . _x('Search for:', 'label') . '</span>
+					<input type="search" class="search-field" placeholder="' . esc_attr_x('Search &hellip;', 'placeholder') . '" value="' . get_search_query() . '" name="s" title="' . esc_attr_x('Search for:', 'label') . '" />
+				</label>
+				<input type="submit" class="search-submit" value="'. esc_attr_x('Search', 'submit button') .'" />
+			</form>';
+    } else {
+        $form = '<form method="get" id="searchform" class="searchform" action="' . esc_url(home_url('/')) . '">
+				<div>
+					<label class="screen-reader-text" for="s">' . _x('Search for:', 'label') . '</label>
+					<input type="text" value="' . get_search_query() . '" name="s" id="s" />
+					<input type="submit" id="searchsubmit" value="'. esc_attr_x('Search', 'submit button') .'" />
+				</div>
+			</form>';
+    }
+    return $form;
+}
+add_filter('get_search_form', 'hocwp_setup_theme_get_search_form');
+
+function hocwp_setup_theme_wpseo_breadcrumb_links($crumbs) {
+    $options = get_option('hocwp_reading');
+    $disable_post_title = hocwp_get_value_by_key($options, 'disable_post_title_breadcrumb');
+    $disable_post_title = apply_filters('hocwp_disable_post_title_breadcrumb', $disable_post_title);
+    if((bool)$disable_post_title) {
+        if(hocwp_array_has_value($crumbs)) {
+            array_pop($crumbs);
+        }
+    }
+    return $crumbs;
+}
+add_filter('wpseo_breadcrumb_links', 'hocwp_setup_theme_wpseo_breadcrumb_links');
+
+function hocwp_setup_theme_get_comment_author($author, $comment_id, $comment) {
+    $author = hocwp_uppercase_first_char($author);
+    return $author;
+}
+add_filter('get_comment_author', 'hocwp_setup_theme_get_comment_author', 10, 3);
+
+function hocwp_setup_theme_wpseo_breadcrumb_output($output) {
+    $output = str_replace(' xmlns:v="http://rdf.data-vocabulary.org/#"', '', $output);
+    return $output;
+}
+//add_filter('wpseo_breadcrumb_output', 'hocwp_setup_theme_wpseo_breadcrumb_output');
+
+function hocwp_setup_theme_wpseo_breadcrumb_single_link($output, $crumbs) {
+    $options = get_option('hocwp_reading');
+    $link_last_item = hocwp_get_value_by_key($options, 'link_last_item_breadcrumb');
+    $link_last_item = apply_filters('hocwp_link_last_item_breadcrumb', $link_last_item);
+    if((bool)$link_last_item) {
+        if(hocwp_array_has_value($crumbs)) {
+            if(strpos($output, '<span class="breadcrumb_last"') !== false || strpos($output, '<strong class="breadcrumb_last"') !== false) {
+                $output = '<a class="breadcrumb_last" property="v:title" rel="v:url" href="'. $crumbs['url']. '">';
+                $output .= $crumbs['text'];
+                $output .= '</a>';
+            }
+        }
+    }
+    return $output;
+}
+add_filter('wpseo_breadcrumb_single_link', 'hocwp_setup_theme_wpseo_breadcrumb_single_link' , 10, 2);
+
 if($maintenance_mode && !hocwp_maintenance_mode_exclude_condition()) {
     add_action('admin_notices', 'hocwp_setup_theme_in_maintenance_mode_notice');
     add_action('init', 'hocwp_maintenance_mode');

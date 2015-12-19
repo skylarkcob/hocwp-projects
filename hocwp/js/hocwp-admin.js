@@ -141,10 +141,17 @@ jQuery(document).ready(function($) {
     })();
 
     (function() {
-        $('.hocwp-widget .chooseable').hocwpChosenSelect();
+        var $choseables = $('.hocwp-widget .chooseable');
+        if($choseables.length) {
+            $choseables.hocwpChosenSelect();
+        }
     })();
 
     (function() {
-        $('.hocwp-color-picker').wpColorPicker();
+        var $color_picker = $('.hocwp-color-picker');
+        if($color_picker.length) {
+            $color_picker.wpColorPicker();
+        }
     })();
+
 });

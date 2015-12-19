@@ -132,7 +132,7 @@ class HOCWP_HTML {
             $text = $this->get_attribute('text');
             $result .= $text;
         }
-        if($this->get_close()) {
+        if($this->get_close() && !in_array($html_name, $this->get_self_closers())) {
             $result .= sprintf('</%s>', $html_name);
         }
         return $result;

@@ -44,3 +44,22 @@ function hocwp_wpseo_get_post_title($post_id) {
     }
     return $title;
 }
+
+function hocwp_wpseo_internallinks() {
+    return get_option('wpseo_internallinks');
+}
+
+function hocwp_update_wpseo_internallinks($wpseo_internallinks) {
+    update_option('wpseo_internallinks', $wpseo_internallinks);
+}
+
+function hocwp_update_wpseo_internallink($key, $value) {
+    $wpseo_internallinks = hocwp_wpseo_internallinks();
+    $wpseo_internallinks[$key] = $value;
+    hocwp_update_wpseo_internallinks($wpseo_internallinks);
+}
+
+function hocwp_wpseo_internallink_value($key) {
+    $wpseo_internallinks = hocwp_wpseo_internallinks();
+    return hocwp_get_value_by_key($wpseo_internallinks, $key);
+}

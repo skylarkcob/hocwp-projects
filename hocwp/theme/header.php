@@ -29,7 +29,7 @@ do_action('hocwp_before_site');
     <div class="site-inner">
         <?php if(!$maintenance_mode) : ?>
             <?php do_action('hocwp_before_site_header'); ?>
-            <header id="masthead" class="site-header clearfix" role="banner">
+            <header id="masthead" class="site-header clearfix">
                 <?php hocwp_theme_get_template('header'); ?>
             </header><!-- .site-header -->
             <?php do_action('hocwp_after_site_header'); ?>

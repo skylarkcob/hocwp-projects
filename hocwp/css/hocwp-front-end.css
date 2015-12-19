@@ -2,6 +2,10 @@
  * Global
  */
 
+body.hocwp {
+    min-width: 250px;
+}
+
 .hocwp a {
     outline: 0 none;
     transition: background-color 0s ease 0s, color 0.2s linear 0s;
@@ -676,6 +680,7 @@
 
 .hocwp .no-results .search-form,
 .hocwp .content-area .search-form {
+    min-width: 250px;
     width: 60%;
 }
 
@@ -1436,6 +1441,12 @@
     .hocwp .comment-respond p textarea {
         max-width: 100%;
         width: 100%;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    #wpadminbar {
+        position: fixed;
     }
 }
 

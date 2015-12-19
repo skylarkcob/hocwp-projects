@@ -98,7 +98,10 @@ function hocwp_post_thumbnail($args = array()) {
     if(post_password_required($post_id) || is_attachment()) {
         return;
     }
-    $thumbnail_url = hocwp_get_post_thumbnail_url($post_id);
+    $thumbnail_url = hocwp_get_value_by_key($args, 'thumbnail_url');
+    if(empty($thumbnail_url)) {
+        $thumbnail_url = hocwp_get_post_thumbnail_url($post_id);
+    }
     if(empty($thumbnail_url)) {
         return;
     }

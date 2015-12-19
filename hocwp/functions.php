@@ -355,7 +355,7 @@ function hocwp_carousel_bootstrap($args = array()) {
 
     ?>
     <div data-ride="carousel" class="<?php echo $container_class; ?>" id="<?php echo $id; ?>" data-interval="<?php echo $data_interval; ?>">
-        <div role="listbox" class="carousel-inner">
+        <div class="carousel-inner">
             <?php call_user_func($callback, $args); ?>
         </div>
         <?php echo $controls; ?>
@@ -1055,10 +1055,10 @@ function hocwp_get_current_post_type() {
     return $result;
 }
 
-function hocwp_register_sidebar($sidebar_id, $sidebar_name, $sidebar_description) {
-    $before_widget = apply_filters('hocwp_before_widget', '<section id="%1$s" class="widget %2$s">');
+function hocwp_register_sidebar($sidebar_id, $sidebar_name, $sidebar_description, $html_tag = 'aside') {
+    $before_widget = apply_filters('hocwp_before_widget', '<' . $html_tag . ' id="%1$s" class="widget %2$s">');
     $before_widget = apply_filters('hocwp_sidebar_' . $sidebar_id . '_before_widget', $before_widget);
-    $after_widget = apply_filters('hocwp_after_widget', '</section>');
+    $after_widget = apply_filters('hocwp_after_widget', '</' . $html_tag . '>');
     $after_widget = apply_filters('hocwp_sidebar_' . $sidebar_id . '_after_widget', $after_widget);
     $before_title = apply_filters('hocwp_widget_before_title', '<h4 class="widget-title">');
     $before_title = apply_filters('hocwp_sidebar_' . $sidebar_id . '_widget_before_title', $before_title);
@@ -1433,7 +1433,7 @@ function hocwp_wp_link_pages() {
 function hocwp_comment_nav() {
     if(get_comment_pages_count() > 1 && get_option('page_comments')) :
         ?>
-        <nav class="navigation comment-navigation" role="navigation">
+        <nav class="navigation comment-navigation">
             <h2 class="screen-reader-text"><?php echo apply_filters('hocwp_comment_navigation_text', __('Comment navigation', 'hocwp')); ?></h2>
             <div class="nav-links">
                 <?php
@@ -1893,7 +1893,7 @@ function hocwp_search_form($args = array()) {
         hocwp_add_string_with_space_before($class, 'use-icon-search');
         $submit_text = '&#xf002;';
     }
-    $form = '<form role="search" method="get" class="' . $class . '" action="' . esc_url(home_url('/')) . '">
+    $form = '<form method="get" class="' . $class . '" action="' . esc_url(home_url('/')) . '">
 				<label>
 					<span class="screen-reader-text">' . _x('Search for:', 'label') . '</span>
 					<input type="search" class="search-field" placeholder="' . esc_attr($placeholder) . '" value="' . get_search_query() . '" name="s" title="' . esc_attr_x('Search for:', 'label') . '" />
@@ -2060,10 +2060,17 @@ function hocwp_get_admin_email() {
 function hocwp_facebook_javascript_sdk($args = array()) {
     $language = isset($args['language']) ? $args['language'] : 'vi_VN';
     $language = apply_filters('hocwp_facebook_javascript_sdk_language', $language);
-    $app_id = isset($args['app_id']) ? $args['app_id'] : '1425884427679175';
+    $app_id = isset($args['app_id']) ? $args['app_id'] : '';
     $app_id = apply_filters('hocwp_facebook_javascript_sdk_app_id', $app_id);
+    if(empty($app_id)) {
+        return;
+    }
     $version = isset($args['version']) ? $args['version'] : '2.4';
     $version = apply_filters('hocwp_facebook_javascript_sdk_version', $version);
+    $use = hocwp_use_facebook_javascript_sdk();
+    if(!(bool)$use) {
+        return;
+    }
     ?>
     <div id="fb-root"></div>
     <script>(function(d, s, id) {

@@ -101,7 +101,7 @@ function hocwp_theme_the_menu($args = array()) {
     }
     $button_text = isset($args['button_text']) ? $args['button_text'] : __('Menu', 'hocwp');
     ?>
-    <nav id="site-navigation" class="main-navigation" role="navigation">
+    <nav id="site-navigation" class="main-navigation">
         <?php
         $menu_args = array(
             'theme_location' => $theme_location,
@@ -118,7 +118,7 @@ function hocwp_theme_the_menu($args = array()) {
 function hocwp_theme_site_main_before() {
     ?>
     <div id="primary" class="content-area">
-        <main id="main" class="site-main" role="main">
+        <main id="main" class="site-main">
     <?php
 }
 
