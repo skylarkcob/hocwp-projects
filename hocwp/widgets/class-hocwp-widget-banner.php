@@ -7,6 +7,7 @@ class HOCWP_Widget_Banner extends WP_Widget {
         $defaults = array(
             'admin_width' => 400
         );
+        $defaults = apply_filters('hocwp_widget_banner_defaults', $defaults);
         $args = apply_filters('hocwp_widget_banner_args', array());
         $args = wp_parse_args($args, $defaults);
         return $args;

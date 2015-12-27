@@ -4,7 +4,7 @@ do_action('hocwp_before_doctype');
 $maintenance_mode = hocwp_in_maintenance_mode();
 ?>
 <!doctype html>
-<html <?php language_attributes(); ?> class="no-js">
+<html <?php language_attributes(); ?> class="no-js"<?php hocwp_html_tag_attributes('html'); ?>>
 <head>
     <meta charset="<?php bloginfo('charset'); ?>">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -20,7 +20,7 @@ $maintenance_mode = hocwp_in_maintenance_mode();
     }
     ?>
 </head>
-<body <?php body_class(); ?>>
+<body <?php body_class(); ?><?php hocwp_html_tag_attributes('body'); ?>>
 <?php
 do_action('hocwp_open_body');
 do_action('hocwp_before_site');
@@ -29,7 +29,7 @@ do_action('hocwp_before_site');
     <div class="site-inner">
         <?php if(!$maintenance_mode) : ?>
             <?php do_action('hocwp_before_site_header'); ?>
-            <header id="masthead" class="site-header clearfix">
+            <header id="masthead" class="site-header clearfix"<?php hocwp_html_tag_attributes('header', 'masthead'); ?>>
                 <?php hocwp_theme_get_template('header'); ?>
             </header><!-- .site-header -->
             <?php do_action('hocwp_after_site_header'); ?>

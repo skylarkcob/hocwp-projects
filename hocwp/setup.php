@@ -4,6 +4,21 @@ if(!file_exists(HOCWP_CONTENT_PATH)) {
     mkdir(HOCWP_CONTENT_PATH);
 }
 
+function hocwp_setup_product_head_dscription() {
+    ?>
+<!--
+    This site is using a product of hocwp.net
+    Homepage: <?php echo HOCWP_HOMEPAGE . PHP_EOL; ?>
+    Email: <?php echo HOCWP_EMAIL . PHP_EOL; ?>
+    -->
+    <?php
+}
+if(defined('HOCWP_THEME_VERSION')) {
+    add_action('hocwp_before_wp_head', 'hocwp_setup_product_head_dscription', 0);
+} else {
+    add_action('wp_head', 'hocwp_setup_product_head_dscription', 0);
+}
+
 function hocwp_setup_enable_session() {
     $options = get_option('hocwp_user_login');
     $use_captcha = hocwp_get_value_by_key($options, 'use_captcha');
@@ -78,6 +93,7 @@ function hocwp_license_control() {
                 update_option('hocwp_license', $option);
             }
         }
+        hocwp_delete_transient_license_valid();
     } else {
         do_action('hocwp_check_license');
     }

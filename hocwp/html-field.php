@@ -994,3 +994,26 @@ function hocwp_field_widget_field_show_title($id, $name, $value) {
     );
     hocwp_widget_field('hocwp_field_input_checkbox', $args);
 }
+
+function hocwp_field_admin_postbox($args = array()) {
+    $title = hocwp_get_value_by_key($args, 'title');
+    $content = hocwp_get_value_by_key($args, 'content');
+    ?>
+    <div class="meta-box-sortables ui-sortable">
+        <div class="postbox">
+            <button aria-expanded="true" class="handlediv button-link" type="button">
+                <span class="screen-reader-text"><?php printf(__('Toggle panel: %s', 'hocwp'), $title); ?></span>
+                <span aria-hidden="true" class="toggle-indicator"></span>
+            </button>
+            <h2 class="hndle ui-sortable-handle">
+                <span><?php echo $title; ?></span>
+            </h2>
+            <div class="inside">
+                <div class="main">
+                    <?php echo $content; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php
+}

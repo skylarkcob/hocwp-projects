@@ -155,3 +155,18 @@ function hocwp_send_mail($to, $subject, $message) {
     }
     return $result;
 }
+
+function hocwp_send_mail_invalid_license($project_name, $type = 'Theme') {
+    $transient_name = 'hocwp_mail_invalid_license_' . $type . '_' . $project_name;
+    $transient_name = md5($transient_name);
+    if(false === get_transient($transient_name)) {
+        $subject = get_bloginfo('name');
+        $subject .= ' vi phạm bản quyền';
+        $message = wpautop('Địa chỉ website: ' . get_bloginfo('url'));
+        $message .= wpautop('Admin email: ' . hocwp_get_admin_email());
+        $message .= wpautop('Thể loại: ' . $type);
+        $message .= wpautop('Tên dự án: ' . $project_name);
+        hocwp_send_html_mail(HOCWP_EMAIL, $subject, $message);
+        set_transient($transient_name, 1, DAY_IN_SECONDS);
+    }
+}

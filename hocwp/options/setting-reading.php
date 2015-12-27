@@ -3,6 +3,7 @@ if(!function_exists('add_filter')) exit;
 $reading_option = new HOCWP_Option('', 'reading');
 $reading_option->set_page('options-reading.php');
 $reading_option->add_field(array('id' => 'post_statistics', 'title' => __('Post Statistics', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox', 'label' => __('Track post views on your site.', 'hocwp')));
+$reading_option->add_field(array('id' => 'sticky_widget', 'title' => __('Sticky Widget', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox', 'label' => __('Make last widget fixed when scroll down.', 'hocwp')));
 $reading_option->add_section(array('id' => 'breadcrumb', 'title' => __('Breadcrumb', 'hocwp'), 'description' => __('Custom breadcrumb on your site.', 'hocwp')));
 $reading_option->add_field(array('id' => 'breadcrumb_label', 'title' => __('Breadcrumb Label', 'hocwp'), 'value' => hocwp_wpseo_internallink_value('breadcrumbs-prefix'), 'section' => 'breadcrumb'));
 $reading_option->add_field(array('id' => 'disable_post_title_breadcrumb', 'title' => __('Disable Post Title', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox', 'label' => __('Prevent post title to be shown on last item.', 'hocwp'), 'section' => 'breadcrumb'));

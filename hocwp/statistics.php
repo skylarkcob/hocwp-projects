@@ -16,24 +16,6 @@ if(!file_exists(HOCWP_COUNTER_PATH)) {
     mkdir(HOCWP_COUNTER_PATH);
 }
 
-define('HOCWP_COUNTER_ONLINE_LOG', HOCWP_COUNTER_PATH . '/online.log');
-
-if(!file_exists(HOCWP_COUNTER_ONLINE_LOG)) {
-    hocwp_create_file(HOCWP_COUNTER_ONLINE_LOG);
-}
-
-define('HOCWP_COUNTER_IP_TXT', HOCWP_COUNTER_PATH . '/ip.txt');
-
-if(!file_exists(HOCWP_COUNTER_IP_TXT)) {
-    hocwp_create_file(HOCWP_COUNTER_IP_TXT);
-}
-
-define('HOCWP_COUNTER_COUNT_TXT', HOCWP_COUNTER_PATH . '/count.txt');
-
-if(!file_exists(HOCWP_COUNTER_COUNT_TXT)) {
-    hocwp_create_file(HOCWP_COUNTER_COUNT_TXT);
-}
-
 $use_statistics = apply_filters('hocwp_use_statistics', false);
 
 function hocwp_statistics_table_init() {

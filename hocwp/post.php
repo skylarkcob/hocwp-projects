@@ -1,11 +1,19 @@
 <?php
 if(!function_exists('add_filter')) exit;
+/**
+ * @param $classes
+ * @return array
+ */
 function hocwp_post_class($classes) {
     $classes[] = 'hocwp-post';
     return $classes;
 }
 add_filter('post_class', 'hocwp_post_class');
 
+/**
+ * @param $more
+ * @return mixed|void
+ */
 function hocwp_excerpt_more($more) {
     $read_more_text = apply_filters('hocwp_read_more_text', __('Continue reading', 'hocwp'));
     $read_more_text = apply_filters('hocwp_excerpt_more_text', $read_more_text);
@@ -13,15 +21,26 @@ function hocwp_excerpt_more($more) {
         esc_url(get_permalink(get_the_ID())),
         sprintf($read_more_text . '%s', '<span class="screen-reader-text">' . get_the_title(get_the_ID()) . '</span>')
     );
+    $link = apply_filters('hocwp_excerpt_continue_reading_link', $link);
     return apply_filters('hocwp_excerpt_more', '&hellip; ' . $link);
 }
 add_filter('excerpt_more', 'hocwp_excerpt_more');
 
+/**
+ * @param $old_url
+ * @param $new_url
+ * @return false|int
+ */
 function hocwp_post_change_content_url($old_url, $new_url) {
     global $wpdb;
-    return $wpdb->query("UPDATE $wpdb->posts SET post_content = (REPLACE (post_content, '$old_url', '$new_url'))");
+    $sql = "UPDATE $wpdb->posts SET post_content = (REPLACE (post_content, '$old_url', '$new_url'))";
+    return $wpdb->query($sql);
 }
 
+/**
+ * @param null $post_id
+ * @return int|mixed
+ */
 function hocwp_get_post_views($post_id = null) {
     if(!is_numeric($post_id)) {
         $post_id = get_the_ID();
@@ -35,6 +54,10 @@ function hocwp_get_post_views($post_id = null) {
     return $result;
 }
 
+/**
+ * @param null $post_id
+ * @return int|mixed
+ */
 function hocwp_get_post_likes($post_id = null) {
     if(!is_numeric($post_id)) {
         $post_id = get_the_ID();
@@ -53,6 +76,11 @@ function hocwp_get_post_dislikes($post_id = null) {
     return $result;
 }
 
+/**
+ * @param string $post_id
+ * @param string $size
+ * @return mixed|string|void
+ */
 function hocwp_get_post_thumbnail_url($post_id = '', $size = 'full') {
     $result = '';
     if(empty($post_id)) {
@@ -90,6 +118,9 @@ function hocwp_get_post_thumbnail_url($post_id = '', $size = 'full') {
     return $result;
 }
 
+/**
+ * @param array $args
+ */
 function hocwp_post_thumbnail($args = array()) {
     $post_id = isset($args['post_id']) ? $args['post_id'] : '';
     if(empty($post_id)) {
@@ -136,17 +167,31 @@ function hocwp_post_thumbnail($args = array()) {
     $loop = isset($args['loop']) ? $args['loop'] : true;
     $custom_html = isset($args['custom_html']) ? $args['custom_html'] : '';
     if(is_singular() && !$loop) : ?>
-        <div class="post-thumbnail">
+        <div class="post-thumbnail entry-thumb"<?php hocwp_html_tag_attributes('div', 'entry_thumb'); ?>>
             <?php
             $img->output();
             echo $custom_html;
+            if(current_theme_supports('hocwp-schema')) {
+                ?>
+                <meta itemprop="url" content="<?php echo $thumbnail_url; ?>">
+                <meta itemprop="width" content="<?php echo $width; ?>">
+                <meta itemprop="height" content="<?php echo $height; ?>">
+                <?php
+            }
             ?>
         </div>
     <?php else : ?>
-        <a class="post-thumbnail" href="<?php echo get_permalink($post_id); ?>" aria-hidden="true">
+        <a class="post-thumbnail entry-thumb" href="<?php echo get_permalink($post_id); ?>" aria-hidden="true"<?php hocwp_html_tag_attributes('a', 'entry_thumb'); ?>>
             <?php
             $img->output();
             echo $custom_html;
+            if(current_theme_supports('hocwp-schema')) {
+                ?>
+                <meta itemprop="url" content="<?php echo $thumbnail_url; ?>">
+                <meta itemprop="width" content="<?php echo $width; ?>">
+                <meta itemprop="height" content="<?php echo $height; ?>">
+                <?php
+            }
             ?>
         </a>
     <?php endif;
@@ -167,9 +212,15 @@ function hocwp_get_pages_by_template($template_name, $args = array()) {
 }
 
 function hocwp_article_before($post_class = '') {
-    ?>
-    <article id="post-<?php the_ID(); ?>" <?php post_class($post_class); ?> data-id="<?php the_ID(); ?>">
-    <?php
+    if(current_theme_supports('hocwp-schema')) {
+        ?>
+        <article <?php post_class($post_class); ?> data-id="<?php the_ID(); ?>"<?php hocwp_html_tag_attributes('article', 'post'); ?>>
+        <?php
+    } else {
+        ?>
+        <article id="post-<?php the_ID(); ?>" <?php post_class($post_class); ?> data-id="<?php the_ID(); ?>"<?php hocwp_html_tag_attributes('article', 'post'); ?>>
+        <?php
+    }
 }
 
 function hocwp_article_after() {
@@ -179,11 +230,11 @@ function hocwp_article_after() {
 }
 
 function hocwp_post_title_link() {
-    the_title(sprintf('<h2 class="entry-title"><a href="%s" rel="bookmark">', esc_url(get_permalink())), '</a></h2>');
+    the_title(sprintf('<h2 class="entry-title post-title" itemprop="headline"><a href="%s" rel="bookmark">', esc_url(get_permalink())), '</a></h2>');
 }
 
 function hocwp_post_title_single() {
-    the_title('<h1 class="entry-title">', '</h1>');
+    the_title('<h1 class="entry-title post-title" itemprop="headline">', '</h1>');
 }
 
 function hocwp_article_header($args = array()) {
@@ -295,7 +346,7 @@ function hocwp_get_post_by_slug($slug) {
 function hocwp_get_author_posts_url() {
     global $authordata;
     if(!hocwp_object_valid($authordata)) {
-        return;
+        return '';
     }
     return get_author_posts_url($authordata->ID, $authordata->user_nicename);
 }

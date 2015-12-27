@@ -25,8 +25,11 @@ function hocwp_theme_check_load_facebook_javascript_sdk() {
     }
     $comment_system = hocwp_theme_get_option('comment_system', 'discussion');
     if('facebook' == $comment_system || 'default_and_facebook' == $comment_system) {
-        if(comments_open() || get_comments_number()) {
-            return true;
+        if(is_singular()) {
+            $post_id = get_the_ID();
+            if(comments_open($post_id) || get_comments_number($post_id)) {
+                return true;
+            }
         }
     }
     return false;
@@ -181,7 +184,7 @@ function hocwp_theme_save_post_featured_meta($post_id) {
 add_action('save_post', 'hocwp_theme_save_post_featured_meta');
 
 function hocwp_theme_last_widget_fixed() {
-    $fixed = apply_filters('hocwp_theme_last_widget_fixed', true);
+    $fixed = hocwp_theme_sticky_last_widget();
     if($fixed) {
         get_template_part('hocwp/theme/fixed-widget');
     }
@@ -420,6 +423,14 @@ function hocwp_setup_theme_get_search_form($form) {
 }
 add_filter('get_search_form', 'hocwp_setup_theme_get_search_form');
 
+function hocwp_setup_theme_wpseo_breadcrumb_separator($separator) {
+    if(!hocwp_string_contain($separator, '</')) {
+        $separator = '<span class="sep separator">' . $separator . '</span>';
+    }
+    return $separator;
+}
+add_filter('wpseo_breadcrumb_separator', 'hocwp_setup_theme_wpseo_breadcrumb_separator');
+
 function hocwp_setup_theme_wpseo_breadcrumb_links($crumbs) {
     $options = get_option('hocwp_reading');
     $disable_post_title = hocwp_get_value_by_key($options, 'disable_post_title_breadcrumb');
@@ -433,18 +444,6 @@ function hocwp_setup_theme_wpseo_breadcrumb_links($crumbs) {
 }
 add_filter('wpseo_breadcrumb_links', 'hocwp_setup_theme_wpseo_breadcrumb_links');
 
-function hocwp_setup_theme_get_comment_author($author, $comment_id, $comment) {
-    $author = hocwp_uppercase_first_char($author);
-    return $author;
-}
-add_filter('get_comment_author', 'hocwp_setup_theme_get_comment_author', 10, 3);
-
-function hocwp_setup_theme_wpseo_breadcrumb_output($output) {
-    $output = str_replace(' xmlns:v="http://rdf.data-vocabulary.org/#"', '', $output);
-    return $output;
-}
-//add_filter('wpseo_breadcrumb_output', 'hocwp_setup_theme_wpseo_breadcrumb_output');
-
 function hocwp_setup_theme_wpseo_breadcrumb_single_link($output, $crumbs) {
     $options = get_option('hocwp_reading');
     $link_last_item = hocwp_get_value_by_key($options, 'link_last_item_breadcrumb');
@@ -454,13 +453,23 @@ function hocwp_setup_theme_wpseo_breadcrumb_single_link($output, $crumbs) {
             if(strpos($output, '<span class="breadcrumb_last"') !== false || strpos($output, '<strong class="breadcrumb_last"') !== false) {
                 $output = '<a class="breadcrumb_last" property="v:title" rel="v:url" href="'. $crumbs['url']. '">';
                 $output .= $crumbs['text'];
-                $output .= '</a>';
+                $output .= '</a></span>';
             }
         }
     }
     return $output;
 }
 add_filter('wpseo_breadcrumb_single_link', 'hocwp_setup_theme_wpseo_breadcrumb_single_link' , 10, 2);
+
+function hocwp_setup_theme_get_comment_author($author, $comment_id, $comment) {
+    if(!is_admin()) {
+        if(!is_email($author)) {
+            $author = hocwp_uppercase_first_char_words($author);
+        }
+    }
+    return $author;
+}
+add_filter('get_comment_author', 'hocwp_setup_theme_get_comment_author', 10, 3);
 
 if($maintenance_mode && !hocwp_maintenance_mode_exclude_condition()) {
     add_action('admin_notices', 'hocwp_setup_theme_in_maintenance_mode_notice');
@@ -524,37 +533,39 @@ function hocwp_setup_theme_custom_head() {
 add_action('wp_head', 'hocwp_setup_theme_custom_head');
 
 function hocwp_setup_theme_custom_footer() {
-    $options = get_option('hocwp_theme_custom');
-    $background_music = hocwp_get_value_by_key($options, 'background_music');
-    if(!empty($background_music)) {
-        $play_on = hocwp_get_value_by_key($options, 'play_on');
-        if(empty($play_on)) {
-            $defaults = hocwp_option_defaults();
-            $play_on = hocwp_get_value_by_key($defaults, array('theme_custom', 'background_music', 'play_on'));
-        }
-        $play = false;
-        if('home' == $play_on && is_home()) {
-            $play = true;
-        } elseif('single' == $play_on && is_single()) {
-            $play = true;
-        } elseif('page' == $play_on && is_page()) {
-            $play = true;
-        } elseif('archive' == $play_on && is_archive()) {
-            $play = true;
-        } elseif('search' == $play_on && is_search()) {
-            $play = true;
-        } elseif('all' == $play_on) {
-            $play = true;
-        }
-        $play = apply_filters('hocwp_play_background_music', $play);
-        if((bool)$play) {
-            $div = new HOCWP_HTML('div');
-            $div->set_class('hocwp-background-music hocwp-hidden');
-            if(hocwp_url_valid($background_music)) {
-
+    if(!wp_is_mobile()) {
+        $options = get_option('hocwp_theme_custom');
+        $background_music = hocwp_get_value_by_key($options, 'background_music');
+        if(!empty($background_music)) {
+            $play_on = hocwp_get_value_by_key($options, 'play_on');
+            if(empty($play_on)) {
+                $defaults = hocwp_option_defaults();
+                $play_on = hocwp_get_value_by_key($defaults, array('theme_custom', 'background_music', 'play_on'));
             }
-            $div->set_text($background_music);
-            $div->output();
+            $play = false;
+            if('home' == $play_on && is_home()) {
+                $play = true;
+            } elseif('single' == $play_on && is_single()) {
+                $play = true;
+            } elseif('page' == $play_on && is_page()) {
+                $play = true;
+            } elseif('archive' == $play_on && is_archive()) {
+                $play = true;
+            } elseif('search' == $play_on && is_search()) {
+                $play = true;
+            } elseif('all' == $play_on) {
+                $play = true;
+            }
+            $play = apply_filters('hocwp_play_background_music', $play);
+            if((bool)$play) {
+                $div = new HOCWP_HTML('div');
+                $div->set_class('hocwp-background-music hocwp-hidden');
+                if(hocwp_url_valid($background_music)) {
+
+                }
+                $div->set_text($background_music);
+                $div->output();
+            }
         }
     }
 }

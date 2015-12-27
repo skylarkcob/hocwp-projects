@@ -9,3 +9,4 @@ require(HOCWP_PATH . '/options/setting-discussion.php');
 require(HOCWP_PATH . '/options/setting-optimize.php');
 require(HOCWP_PATH . '/options/setting-maintenance.php');
 require(HOCWP_PATH . '/options/setting-recommend-plugin.php');
+require(HOCWP_PATH . '/options/setting-theme-about.php');

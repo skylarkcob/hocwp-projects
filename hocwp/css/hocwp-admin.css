@@ -96,6 +96,24 @@
     max-width: 100%;
 }
 
+.hocwp.server-information .postbox table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+.hocwp.server-information .postbox td {
+    padding: 5px 0;
+    width: 50%;
+}
+
+.hocwp.server-information .postbox td.label {
+    width: 25%;
+}
+
+.hocwp.server-information .postbox td.label:after {
+    content: ":";
+}
+
 /**
  * Sortable
  */

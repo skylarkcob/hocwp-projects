@@ -200,6 +200,54 @@ function hocwp_get_plugin_icon_url($plugin) {
     return $plugin_icon_url;
 }
 
+function hocwp_widget_title($args, $instance, $echo = true) {
+    $title = apply_filters('widget_title', $instance['title']);
+    $before_title = hocwp_get_value_by_key($args, 'before_title');
+    $after_title = hocwp_get_value_by_key($args, 'after_title');
+    if(!empty($title)) {
+        $title = $before_title . $title . $after_title;
+    }
+    $title = apply_filters('hocwp_widget_title_html', $title, $args, $instance);
+    if((bool)$echo) {
+        echo $title;
+    }
+    return $title;
+}
+
+function hocwp_checkbox_post_data_value($data, $key) {
+    return isset($data[$key]) ? 1 : 0;
+}
+
+function hocwp_change_nav_menu_css_class($terms, $classes, $item) {
+    if(hocwp_array_has_value($terms)) {
+        foreach($terms as $term) {
+            if($term->term_id == $item->object_id) {
+                $classes[] = 'current-menu-item';
+                break;
+            }
+        }
+    }
+    return $classes;
+}
+
+function hocwp_remove_wpseo_breadcrumb_xmlns($output) {
+    $output = str_replace(' xmlns:v="http://rdf.data-vocabulary.org/#"', '', $output);
+    return $output;
+}
+
+function hocwp_widget_before($args, $instance) {
+    if(isset($args['before_widget'])) {
+        echo $args['before_widget'];
+    }
+    hocwp_widget_title($args, $instance);
+}
+
+function hocwp_widget_after($args, $instance) {
+    if(isset($args['after_widget'])) {
+        echo $args['after_widget'];
+    }
+}
+
 function hocwp_get_installed_plugins($folder = '') {
     return hocwp_get_plugins($folder);
 }
@@ -211,6 +259,28 @@ function hocwp_get_plugin_slug_from_file_path($file) {
     $slug = explode('/', $file);
     $slug = current($slug);
     return $slug;
+}
+
+function hocwp_html_tag_attributes($tag, $context = '') {
+    if(!current_theme_supports('hocwp-schema')) {
+        return;
+    }
+    $base = 'http://schema.org/';
+    $item_type = apply_filters('hocwp_html_tag_attribute_item_type', '', $tag, $context);
+    if(!empty($item_type)) {
+        $schema = ' itemscope itemtype="' . $base . $item_type . '"';
+        echo $schema;
+    }
+    $item_prop = apply_filters('hocwp_html_tag_attribute_item_prop', '', $tag, $context);
+    if(!empty($item_prop)) {
+        $schema = ' itemprop="' . $item_prop . '"';
+        echo $schema;
+    }
+    $attributes = apply_filters('hocwp_html_tag_attributes', '', $tag, $context);
+    $attributes = trim($attributes);
+    if(!empty($attributes)) {
+        echo ' ' . $attributes;
+    }
 }
 
 function hocwp_loop_plugin_card($plugin, $allow_tags = array(), $base_name = '') {

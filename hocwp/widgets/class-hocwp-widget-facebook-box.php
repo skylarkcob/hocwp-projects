@@ -15,6 +15,7 @@ class HOCWP_Widget_Facebook_Box extends WP_Widget {
             'small_header' => false,
             'adapt_container_width' => true
         );
+        $defaults = apply_filters('hocwp_widget_facebook_box_defaults', $defaults);
         $args = apply_filters('hocwp_widget_facebook_box_args', array());
         $args = wp_parse_args($args, $defaults);
         return $args;

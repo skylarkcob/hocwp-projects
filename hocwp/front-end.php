@@ -1,10 +1,11 @@
 <?php
 if(!function_exists('add_filter')) exit;
+
 function hocwp_breadcrumb($args = array()) {
     $before = hocwp_get_value_by_key($args, 'before');
     $after = hocwp_get_value_by_key($args, 'after');
     if(function_exists('yoast_breadcrumb') && hocwp_wpseo_breadcrumb_enabled()) {
-        yoast_breadcrumb('<div class="hocwp-breadcrumb breadcrumb yoast">' . $before, $after . '</div>');
+        yoast_breadcrumb('<nav class="hocwp-breadcrumb breadcrumb yoast">' . $before, $after . '</nav>');
         return;
     }
     global $post, $wp_query;
@@ -130,21 +131,52 @@ function hocwp_breadcrumb($args = array()) {
     }
 }
 
-function hocwp_entry_meta() {
-    $post_id = get_the_ID();
+function hocwp_entry_meta($args = array()) {
+    $post_id = hocwp_get_value_by_key($args, 'post_id', get_the_ID());
+    $class = hocwp_get_value_by_key($args, 'class');
+    $cpost = get_post($post_id);
+    if(!is_a($cpost, 'WP_Post')) {
+        return;
+    }
     $author_url = hocwp_get_author_posts_url();
     $comment_count = hocwp_get_post_comment_count($post_id);
     $comment_text = $comment_count . ' Bình luận';
+    hocwp_add_string_with_space_before($class, 'entry-meta');
     ?>
-    <p class="entry-meta">
-        <time datetime="<?php the_time('c'); ?>" itemprop="datePublished" class="entry-time"><?php the_date(); ?></time>
-        <time datetime="<?php the_modified_time('c'); ?>" itemprop="dateModified" class="entry-modified-time"><?php the_modified_date(); ?></time>
-        <span itemtype="http://schema.org/Person" itemscope="" itemprop="author" class="entry-author">
-            <a rel="author" itemprop="url" class="entry-author-link" href="<?php echo $author_url; ?>"><span itemprop="name" class="entry-author-name"><?php the_author(); ?></span></a>
+    <p class="<?php echo $class; ?>">
+        <time datetime="<?php the_time('c'); ?>" itemprop="datePublished" class="entry-time published date post-date"><?php echo get_the_date(); ?></time>
+        <time datetime="<?php the_modified_time('c'); ?>" itemprop="dateModified" class="entry-modified-time date modified post-date"><?php the_modified_date(); ?></time>
+        <span itemtype="http://schema.org/Person" itemscope itemprop="author" class="entry-author vcard author post-author">
+            <span class="fn">
+                <a rel="author" itemprop="url" class="entry-author-link" href="<?php echo $author_url; ?>"><span itemprop="name" class="entry-author-name"><?php the_author(); ?></span></a>
+            </span>
         </span>
         <?php if(comments_open($post_id)) : ?>
             <span class="entry-comments-link">
                 <a href="<?php the_permalink(); ?>#comments"><?php echo $comment_text; ?></a>
+            </span>
+        <?php endif; ?>
+        <?php if(current_theme_supports('hocwp-schema')) : ?>
+            <?php
+            global $authordata;
+            $author_id = 0;
+            $author_name = '';
+            $author_avatar = '';
+            if(hocwp_object_valid($authordata)) {
+                $author_id = $authordata->ID;
+                $author_name = $authordata->display_name;
+                $author_avatar = get_avatar_url($author_id, array('size' => 128));
+            }
+            $logo_url = apply_filters('hocwp_publisher_logo_url', '');
+            ?>
+            <span itemprop="publisher" itemscope itemtype="https://schema.org/Organization" class="small hidden">
+                <span itemprop="logo" itemscope itemtype="https://schema.org/ImageObject">
+                    <img alt="" src="<?php echo $logo_url; ?>">
+                    <meta itemprop="url" content="<?php echo $logo_url; ?>">
+                    <meta itemprop="width" content="600">
+                    <meta itemprop="height" content="60">
+                </span>
+                <meta itemprop="name" content="<?php echo $author_name; ?>">
             </span>
         <?php endif; ?>
     </p>
@@ -179,7 +211,7 @@ function hocwp_posts_pagination($args = array()) {
 
 function hocwp_entry_content($content = '') {
     ?>
-    <div class="entry-content">
+    <div class="entry-content" itemprop="text">
         <?php
         if(!empty($content)) {
             echo wpautop($content);
@@ -191,8 +223,14 @@ function hocwp_entry_content($content = '') {
     <?php
 }
 
+function hocwp_entry_summary() {
+    echo '<div class="entry-summary" itemprop="text">';
+    the_excerpt();
+    echo '</div>';
+}
+
 function hocwp_entry_tags() {
     echo '<div class="entry-tags">';
-    the_tags('<span class="tag-label"><i class="fa fa-tag icon-left"></i><span class="text">Tags:</span></span>', '', '');
+    the_tags('<span class="tag-label"><i class="fa fa-tag icon-left"></i><span class="text">Tags:</span></span>&nbsp;', ' ', '');
     echo '</div>';
 }

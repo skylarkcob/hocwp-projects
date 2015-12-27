@@ -83,7 +83,7 @@ jQuery(document).ready(function($) {
                 if(settings.data.search('hocwp') != -1) {
                     var id_base = hocwp.getParamByName(settings.data, 'id_base'),
                         $widget = $(this);
-                    if('hocwp_widget_post' == id_base) {
+                    if('hocwp_widget_post' == id_base || 'hocwp_widget_top_commenter' == id_base) {
                         $widget.find('.hocwp-widget .chosen-container').hide();
                         $widget.find('.hocwp-widget .chooseable').hocwpChosenSelect();
                         $widget.find('.hocwp-widget .chosen-container').show();
@@ -154,4 +154,17 @@ jQuery(document).ready(function($) {
         }
     })();
 
+    (function() {
+        $('.hocwp.server-information .postbox > .handlediv').on('click', function(e) {
+            e.preventDefault();
+            var $element = $(this),
+                $postbox = $element.parent();
+            $postbox.toggleClass('closed');
+            if($postbox.hasClass('closed')) {
+                $element.attr('aria-expanded', 'false');
+            } else {
+                $element.attr('aria-expanded', 'true');
+            }
+        });
+    })();
 });

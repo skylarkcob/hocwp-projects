@@ -3,6 +3,11 @@ if(!function_exists('add_filter')) exit;
 if(post_password_required()) {
     return;
 }
+$post_id = get_the_ID();
+$cpost = get_post($post_id);
+if(!is_a($cpost, 'WP_Post')) {
+    return;
+}
 $comments_title = apply_filters('hocwp_comments_title_text', __('Leave your comment', 'hocwp'));
 ?>
 <div id="comments" class="comments-area">
@@ -30,7 +35,7 @@ $comments_title = apply_filters('hocwp_comments_title_text', __('Leave your comm
         echo '</ol>';
         hocwp_comment_nav();
     }
-    if(!comments_open() && get_comments_number() && post_type_supports(get_post_type(), 'comments')) {
+    if(!comments_open($post_id) && get_comments_number($post_id) && post_type_supports(get_post_type($cpost), 'comments')) {
         $no_comment_text = apply_filters('hocwp_comments_closed_text', __('Comments are closed.', 'hocwp'));
         ?>
         <p class="no-comments"><?php echo $no_comment_text; ?></p>

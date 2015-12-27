@@ -268,6 +268,12 @@ function hocwp_uppercase_first_char($string, $encoding = 'utf-8') {
     return $first_char . $then;
 }
 
+function hocwp_uppercase_first_char_words($string, $encoding = 'utf-8') {
+    $words = explode(' ', $string);
+    $words = array_map('hocwp_uppercase_first_char', $words);
+    return implode(' ', $words);
+}
+
 function hocwp_uppercase_first_char_only($string, $encoding = 'utf-8') {
     $string = hocwp_lowercase($string, $encoding);
     $string = hocwp_uppercase_first_char($string, $encoding);
@@ -1406,7 +1412,12 @@ function hocwp_get_first_image_source($content) {
 }
 
 function hocwp_comments_template() {
-    if(comments_open() || get_comments_number()) {
+    $post_id = get_the_ID();
+    $cpost = get_post($post_id);
+    if(!is_a($cpost, 'WP_Post')) {
+        return;
+    }
+    if(comments_open($post_id) || get_comments_number($post_id)) {
         $comment_system = hocwp_theme_get_option('comment_system', 'discussion');
         if('facebook' == $comment_system) {
             hocwp_facebook_comment();
@@ -1709,9 +1720,11 @@ function hocwp_has_plugin() {
 
 function hocwp_has_plugin_activated() {
     $plugins = get_option('active_plugins');
-    foreach($plugins as $base_name) {
-        if(hocwp_string_contain($base_name, 'hocwp')) {
-            return true;
+    if(hocwp_array_has_value($plugins)) {
+        foreach($plugins as $base_name) {
+            if(hocwp_string_contain($base_name, 'hocwp')) {
+                return true;
+            }
         }
     }
     return false;
@@ -2250,4 +2263,8 @@ function hocwp_delete_transient_license_valid($blog_id = '') {
 function hocwp_get_wp_version() {
     global $wp_version;
     return $wp_version;
+}
+
+function hocwp_get_ip_address() {
+    return isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
 }

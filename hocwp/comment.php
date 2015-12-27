@@ -14,6 +14,8 @@ function hocwp_comment_transition_comment_status($new_status, $old_status, $comm
 
             }
         }
+        hocwp_delete_transient('hocwp_top_commenters');
+        do_action('hocwp_comment_status_changed', $comment);
     }
 }
 add_action('transition_comment_status', 'hocwp_comment_transition_comment_status', 10, 3);
@@ -123,60 +125,39 @@ function hocwp_facebook_comment($args = array()) {
     $div->output();
 }
 
-function hocwp_get_top_commenters($number = 5, $time = 'all') {
+function hocwp_get_top_commenters($number = 5, $time = 'all', $condition = '') {
     $transient_name = 'hocwp_top_commenters_' . $time . '_' . $number;
     $transient_name = hocwp_sanitize_id($transient_name);
     if(false === ($results = get_transient($transient_name))) {
         global $wpdb;
-        $sql = '';
+        $sql = 'SELECT COUNT(comment_author_email) AS comments_count, comment_author_email, comment_author, comment_author_url, user_id FROM ' . $wpdb->comments . '
+                    WHERE comment_author_email != "" AND comment_type = "" AND comment_approved = 1';
         $expires = HOUR_IN_SECONDS;
         switch($time) {
             case 'today':
-                $sql = 'SELECT COUNT(comment_author_email) AS comments_count, comment_author_email, comment_author, comment_author_url
-                    FROM ' . $wpdb->comments . '
-                    WHERE comment_author_email != "" AND comment_type = "" AND comment_approved = 1 AND DAY(comment_date) = DAY(CURDATE()) AND MONTH(comment_date) = MONTH(CURDATE()) AND YEAR(comment_date) = YEAR(CURDATE())
-                    GROUP BY comment_author_email
-                    ORDER BY comments_count DESC, comment_author ASC
-                    LIMIT ' . $number;
+                $sql .= ' AND DAY(comment_date) = DAY(CURDATE()) AND MONTH(comment_date) = MONTH(CURDATE()) AND YEAR(comment_date) = YEAR(CURDATE())';
                 break;
             case 'week':
             case 'this_week':
-                $sql = 'SELECT COUNT(comment_author_email) AS comments_count, comment_author_email, comment_author, comment_author_url
-                    FROM ' . $wpdb->comments . '
-                    WHERE comment_author_email != "" AND comment_type = "" AND comment_approved = 1 AND YEARWEEK(comment_date) = YEARWEEK(NOW())
-                    GROUP BY comment_author_email
-                    ORDER BY comments_count DESC, comment_author ASC
-                    LIMIT ' . $number;
+                $sql .= ' AND YEARWEEK(comment_date) = YEARWEEK(NOW())';
                 $expires = 12 * HOUR_IN_SECONDS;
                 break;
             case 'month':
             case 'this_month':
-                $sql = 'SELECT COUNT(comment_author_email) AS comments_count, comment_author_email, comment_author, comment_author_url
-                    FROM ' . $wpdb->comments . '
-                    WHERE comment_author_email != "" AND comment_type = "" AND comment_approved = 1 AND MONTH(comment_date) = MONTH(CURDATE()) AND YEAR(comment_date) = YEAR(CURDATE())
-                    GROUP BY comment_author_email
-                    ORDER BY comments_count DESC, comment_author ASC
-                    LIMIT ' . $number;
+                $sql .= ' AND MONTH(comment_date) = MONTH(CURDATE()) AND YEAR(comment_date) = YEAR(CURDATE())';
                 $expires = DAY_IN_SECONDS;
                 break;
             case 'year':
             case 'this_year':
-                $sql = 'SELECT COUNT(comment_author_email) AS comments_count, comment_author_email, comment_author, comment_author_url
-                    FROM ' . $wpdb->comments . '
-                    WHERE comment_author_email != "" AND comment_type = "" AND comment_approved = 1 AND YEAR(comment_date) = YEAR(CURDATE())
-                    GROUP BY comment_author_email
-                    ORDER BY comments_count DESC, comment_author ASC
-                    LIMIT ' . $number;
+                $sql .= ' AND YEAR(comment_date) = YEAR(CURDATE())';
                 $expires = 2 * DAY_IN_SECONDS;
                 break;
-            default:
-                $sql = 'SELECT COUNT(comment_author_email) AS comments_count, comment_author_email, comment_author, comment_author_url
-                    FROM ' . $wpdb->comments . '
-                    WHERE comment_author_email != "" AND comment_type = "" AND comment_approved = 1
-                    GROUP BY comment_author_email
-                    ORDER BY comments_count DESC, comment_author ASC
-                    LIMIT ' . $number;
         }
+        $condition = trim($condition);
+        if(!empty($condition)) {
+            $sql .= ' ' . $condition;
+        }
+        $sql .= ' GROUP BY comment_author_email ORDER BY comments_count DESC, comment_author ASC LIMIT ' . $number;
         $results = $wpdb->get_results($sql);
         set_transient($transient_name, $results, $expires);
     }

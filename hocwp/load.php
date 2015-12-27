@@ -1,10 +1,11 @@
 <?php
 if(!function_exists('add_filter')) exit;
+
 if(defined('HOCWP_PATH')) {
     return;
 }
 
-define('HOCWP_VERSION', '3.0.7');
+define('HOCWP_VERSION', '3.1.5');
 
 define('HOCWP_PATH', dirname(__FILE__));
 
@@ -51,6 +52,9 @@ function hocwp_autoload($class_name) {
     $first_piece = current($pieces);
     if('HOCWP' !== $class_name && 'HOCWP' !== $first_piece) {
         return;
+    }
+    if(false !== strrpos($class_name, 'HOCWP_Widget')) {
+        $base_path .= '/widgets';
     }
     $file = $base_path . '/class-' . hocwp_sanitize_file_name($class_name);
     $file .= '.php';

@@ -1,5 +1,25 @@
 <?php
 if(!function_exists('add_filter')) exit;
+
+function hocwp_pagination_defaults() {
+    $defaults = array(
+        'label' => __('Trang', 'hocwp'),
+        'last' => __('Trang cuối', 'hocwp'),
+        'first' => __('Trang đầu', 'hocwp'),
+        'next' => '&raquo;',
+        'prev' => '&laquo;',
+        'style' => 'default',
+        'border_radius' => 'none',
+        'range' => 3,
+        'anchor' => 1,
+        'gap' => 3,
+        'hellip' => true,
+        'show_max_page' => true,
+        'min_page' => 5
+    );
+    return apply_filters('hocwp_pagination_defaults', $defaults);
+}
+
 function hocwp_get_request() {
     $request = remove_query_arg('paged');
     $home_root = parse_url(home_url());
@@ -83,16 +103,12 @@ function hocwp_has_paged($args = array()) {
 }
 
 function hocwp_build_pagination($args = array()) {
-    $label_text = __('Pages', 'hocwp');
-    if('vi' == hocwp_get_language()) {
-        $label_text = 'Trang';
-    }
-    $default_label = $label_text;
-    $default_previous = '&laquo;';
-    $default_next = '&raquo;';
-    $label = $default_label;
-    $previous = $default_previous;
-    $next = $default_next;
+    $defaults = hocwp_pagination_defaults();
+    $label = trim(hocwp_get_value_by_key($args, 'label', hocwp_get_value_by_key($defaults, 'label')));
+    $previous = hocwp_get_value_by_key($args, 'prev', hocwp_get_value_by_key($defaults, 'prev'));
+    $next = hocwp_get_value_by_key($args, 'next', hocwp_get_value_by_key($defaults, 'next'));
+    $first = hocwp_get_value_by_key($args, 'first', hocwp_get_value_by_key($defaults, 'first'));
+    $last = hocwp_get_value_by_key($args, 'last', hocwp_get_value_by_key($defaults, 'last'));
     $request = isset($args['request']) ? $args['request'] : '';
     if(empty($request)) {
         $request = hocwp_get_request();
@@ -109,11 +125,12 @@ function hocwp_build_pagination($args = array()) {
     }
     $args['total_page'] = $total_page;
     $result = '';
-    $label = trim($label);
     if(!empty($label)) {
         $result .= '<span class="item label-item">' . $label . '</span>';
     }
     if($current_page > 1) {
+        $link_href = hocwp_get_pagenum_link(array('pagenum' => 1, 'request' => $request));
+        $result .= '<a class="item link-item first-item" href="' . $link_href . '" data-paged="' . 1 . '">' . $first . '</a>';
         $link_href = hocwp_get_pagenum_link(array('pagenum' => ($current_page - 1), 'request' => $request));
         $result .= '<a class="item link-item previous-item" href="' . $link_href . '" data-paged="' . ($current_page - 1) . '">' . $previous . '</a>';
     }
@@ -121,6 +138,8 @@ function hocwp_build_pagination($args = array()) {
     if($current_page < $total_page) {
         $link_href = hocwp_get_pagenum_link(array('pagenum' => ($current_page + 1), 'request' => $request));
         $result .= '<a href="' . $link_href . '" class="item next-item link-item" data-paged="' . ($current_page + 1) . '">' . $next . '</a>';
+        $link_href = hocwp_get_pagenum_link(array('pagenum' => $total_page, 'request' => $request));
+        $result .= '<a href="' . $link_href . '" class="item last-item link-item" data-paged="' . $total_page . '">' . $last . '</a>';
     }
     return $result;
 }
@@ -156,26 +175,37 @@ function hocwp_show_pagination($args = array()) {
 }
 
 function hocwp_loop_pagination_item($args = array()) {
+    $defaults = hocwp_pagination_defaults();
     // The number of page links to show before and after the current page.
-    $default_range = 3;
-    $range = $default_range;
+    $range = hocwp_get_value_by_key($args, 'range', hocwp_get_value_by_key($defaults, 'range'));
     // The number of page links to show at beginning and end of pagination.
-    $default_anchor = 1;
-    $anchor = $default_anchor;
+    $anchor = hocwp_get_value_by_key($args, 'anchor', hocwp_get_value_by_key($defaults, 'anchor'));
     // The minimum number of page links before ellipsis shows.
-    $default_gap = 3;
-    $gap = $default_gap;
+    $gap = hocwp_get_value_by_key($args, 'gap', hocwp_get_value_by_key($defaults, 'gap'));
+    $hellip = hocwp_get_value_by_key($args, 'hellip', hocwp_get_value_by_key($defaults, 'hellip'));
+    $show_max_page = hocwp_get_value_by_key($args, 'show_max_page', hocwp_get_value_by_key($defaults, 'show_max_page'));
+    $min_page = hocwp_get_value_by_key($args, 'min_page', hocwp_get_value_by_key($defaults, 'min_page'));
     $current_page = isset($args['current_page']) ? $args['current_page'] : 1;
     $total_page = isset($args['total_page']) ? $args['total_page'] : 1;
+
     $request = isset($args['request']) ? $args['request'] : hocwp_get_request();
 
     $hidden_button = '<span class="item hidden-item">&hellip;</span>';
+    if(!(bool)$hellip) {
+        $hidden_button = '';
+    }
     $result = '';
+
     $hidden_before = false;
     $hidden_after = false;
     $before_current = $current_page - $range;
     $after_current = $current_page + $range;
     for($i = 1; $i <= $total_page; $i++) {
+        if(!(bool)$show_max_page) {
+            if($i == $total_page && $current_page < ($total_page - 2)) {
+                continue;
+            }
+        }
         if($current_page == $i) {
             $result .= '<span class="item current-item">' . $i .'</span>';
         } else {
@@ -183,11 +213,11 @@ function hocwp_loop_pagination_item($args = array()) {
             $count_hidden_button_after = $total_page - ($after_current + 1);
             $show_hidden_button_before = ($i < $before_current && !$hidden_before && $count_hidden_button_before >= $gap) ? true : false;
             $show_hidden_button_after = ($i > $after_current && !$hidden_after && $count_hidden_button_after >= $gap) ? true : false;
-            if(1 == $i || $total_page == $i || ($i <= $after_current && $i >= $before_current)) {
+            if(1 == $i || $total_page == $i || ($i <= $after_current && $i >= $before_current) || ($i <= $min_page && $current_page < 2)) {
                 $link_href = hocwp_get_pagenum_link(array('pagenum' => $i, 'request' => $request));
                 $result .= '<a class="item link-item" href="' . $link_href . '" data-paged="' . $i . '">' . $i . '</a>';
             } else {
-                if($show_hidden_button_before) {
+                if($show_hidden_button_before && ($current_page > 1)) {
                     $result .= $hidden_button;
                     $hidden_before = true;
                     $i = $before_current - 1;
