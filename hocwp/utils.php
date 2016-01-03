@@ -66,23 +66,6 @@ function hocwp_maintenance_mode_exclude_condition() {
     return apply_filters('hocwp_maintenance_mode_exclude_condition', $condition);
 }
 
-function hocwp_maintenance_mode() {
-    if(!is_admin() && hocwp_in_maintenance_mode()) {
-        if(!hocwp_maintenance_mode_exclude_condition()) {
-            $charset = get_bloginfo('charset') ? get_bloginfo('charset') : 'UTF-8';
-            $protocol = !empty($_SERVER['SERVER_PROTOCOL']) && in_array($_SERVER['SERVER_PROTOCOL'], array('HTTP/1.1', 'HTTP/1.0')) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0';
-            $status_code = (int)apply_filters('hocwp_maintenance_mode_status_code', 503);
-            nocache_headers();
-            ob_start();
-            header("Content-type: text/html; charset=$charset");
-            header("$protocol $status_code Service Unavailable", TRUE, $status_code);
-            hocwp_get_views_template('maintenance');
-            ob_flush();
-            exit;
-        }
-    }
-}
-
 function hocwp_get_views_template($slug, $name = '') {
     $template = $slug;
     $template = str_replace('.php', '', $template);
@@ -207,7 +190,7 @@ function hocwp_get_plugin_icon_url($plugin) {
     } elseif(!empty($plugin['icons']['1x'])) {
         $plugin_icon_url = $plugin['icons']['1x'];
     } else {
-        $plugin_icon_url = $plugin['icons']['default'];
+        $plugin_icon_url = hocwp_get_value_by_key($plugin, array('icons', 'default'));
     }
     if(empty($plugin_icon_url)) {
         $plugin_icon_url = hocwp_plugin_random_icon();
@@ -307,14 +290,14 @@ function hocwp_loop_plugin_card($plugin, $allow_tags = array(), $base_name = '')
     if(is_object($plugin)) {
         $plugin = (array)$plugin;
     }
-    $title = wp_kses($plugin['name'], $allow_tags);
+    $title = wp_kses(hocwp_get_value_by_key($plugin, 'name'), $allow_tags);
     if(empty($title)) {
         $is_local = true;
     }
-    $description = strip_tags($plugin['short_description']);
-    $version = wp_kses($plugin['version'], $allow_tags);
+    $description = strip_tags(hocwp_get_value_by_key($plugin, 'short_description'));
+    $version = wp_kses(hocwp_get_value_by_key($plugin, 'version'), $allow_tags);
     $name = strip_tags($title . ' ' . $version);
-    $author = wp_kses($plugin['author'], $allow_tags);
+    $author = wp_kses(hocwp_get_value_by_key($plugin, 'author'), $allow_tags);
     if(!empty($author)) {
         $author = ' <cite>' . sprintf(__('By %s'), $author) . '</cite>';
     }
@@ -338,12 +321,12 @@ function hocwp_loop_plugin_card($plugin, $allow_tags = array(), $base_name = '')
                 break;
         }
     }
-    $details_link = self_admin_url('plugin-install.php?tab=plugin-information&amp;plugin=' . $plugin['slug'] . '&amp;TB_iframe=true&amp;width=600&amp;height=550');
+    $details_link = self_admin_url('plugin-install.php?tab=plugin-information&amp;plugin=' . hocwp_get_value_by_key($plugin, 'slug') . '&amp;TB_iframe=true&amp;width=600&amp;height=550');
     $action_links[] = '<a target="_blank" href="' . esc_url($details_link) . '" class="thickbox" aria-label="' . esc_attr(sprintf(__('More information about %s'), $name)) . '" data-title="' . esc_attr($name) . '">' . __('More Details') . '</a>';
     $plugin_icon_url = hocwp_get_plugin_icon_url($plugin);
     $action_links = apply_filters('plugin_install_action_links', $action_links, $plugin);
     $date_format = __('M j, Y @ H:i');
-    $last_updated_timestamp = strtotime($plugin['last_updated']);
+    $last_updated_timestamp = strtotime(hocwp_get_value_by_key($plugin, 'last_updated'));
     if(empty($title) && !empty($base_name)) {
         $local_plugin = hocwp_get_plugin_info($base_name);
         $title = wp_kses($local_plugin['Name'], $allow_tags);
@@ -361,7 +344,7 @@ function hocwp_loop_plugin_card($plugin, $allow_tags = array(), $base_name = '')
         return;
     }
     ?>
-    <div class="plugin-card plugin-card-<?php echo sanitize_html_class($plugin['slug']); ?>">
+    <div class="plugin-card plugin-card-<?php echo sanitize_html_class(hocwp_get_value_by_key($plugin, 'slug')); ?>">
         <div class="plugin-card-top">
             <div class="name column-name">
                 <h3>

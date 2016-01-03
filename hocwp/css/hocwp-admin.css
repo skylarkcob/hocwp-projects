@@ -248,6 +248,12 @@
     outline: 0 none;
 }
 
+.hocwp .plugin-card {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+}
+
 /**
  * Sortable
  */
