@@ -5,7 +5,7 @@ if(defined('HOCWP_PATH')) {
     return;
 }
 
-define('HOCWP_VERSION', '3.1.7');
+define('HOCWP_VERSION', '3.1.8');
 
 define('HOCWP_PATH', dirname(__FILE__));
 

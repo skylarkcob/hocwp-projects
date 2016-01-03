@@ -594,7 +594,7 @@ class HOCWP_Option {
 
     public function get_page_url() {
         $url = '';
-        if($this->is_submenu()) {
+        if($this->is_submenu() && strrpos($this->get_parent_slug(), '.php') !== false) {
             $url .= $this->get_parent_slug();
         } else {
             $url .= 'admin.php';

@@ -119,7 +119,7 @@
  */
 
 .hocwp.option-page {
-
+    padding-top: 25px;
 }
 
 .hocwp.option-page > .page-title {
@@ -134,7 +134,7 @@
     color: #fff;
     height: 50px;
     line-height: 50px;
-    margin-top: 40px;
+    margin-top: 5px;
     padding: 15px;
 }
 

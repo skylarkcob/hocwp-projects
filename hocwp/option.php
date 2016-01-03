@@ -1,5 +1,8 @@
 <?php
 if(!function_exists('add_filter')) exit;
+
+global $hocwp_pos_tabs;
+
 function hocwp_option_get_list_object() {
     global $hocwp_options;
     return $hocwp_options;
@@ -112,4 +115,102 @@ function hocwp_recommended_plugins() {
         )
     );
     return apply_filters('hocwp_recommended_plugins', $defaults);
+}
+
+function hocwp_plugin_option_page_header() {
+    ?>
+    <div class="page-header">
+        <h2 class="theme-name"><?php _e('Plugin Options', 'hocwp'); ?></h2>
+        <span class="theme-version"><?php printf(__('Core Version: %s', 'hocwp'), HOCWP_VERSION); ?></span>
+    </div>
+    <?php
+}
+
+function hocwp_plugin_option_page_footer() {
+    hocwp_theme_option_form_after();
+}
+
+function hocwp_plugin_option_page_sidebar() {
+    global $hocwp_pos_tabs;
+    if(hocwp_array_has_value($hocwp_pos_tabs)) {
+        $current_page = hocwp_get_current_admin_page();
+        ?>
+        <ul class="list-tabs">
+            <?php foreach($hocwp_pos_tabs as $key => $value) : ?>
+                <?php
+                $admin_url = admin_url('plugins.php');
+                $admin_url = add_query_arg(array('page' => $key), $admin_url);
+                $item_class = hocwp_sanitize_html_class($key);
+                if($key == $current_page) {
+                    hocwp_add_string_with_space_before($item_class, 'active');
+                    $admin_url = 'javascript:;';
+                }
+                $text = hocwp_get_value_by_key($value, 'text');
+                if(empty($text)) {
+                    continue;
+                }
+                ?>
+                <li class="<?php echo $item_class; ?>"><a href="<?php echo $admin_url; ?>"><span><?php echo $text; ?></span></a></li>
+            <?php endforeach; ?>
+        </ul>
+        <?php
+    }
+}
+
+function hocwp_theme_option_form_before() {
+    global $hocwp_theme_option;
+    $theme = wp_get_theme();
+    $name = $theme->get('Name');
+    if(empty($name)) {
+        $name = __('Unknown', 'hocwp');
+    }
+    $version = $theme->get('Version');
+    if(empty($version)) {
+        $version = '1.0.0';
+    }
+    ?>
+    <div class="page-header">
+        <h2 class="theme-name"><?php echo $name; ?></h2>
+        <span class="theme-version"><?php printf(__('Version: %s', 'hocwp'), $version); ?></span>
+    </div>
+    <?php
+}
+
+function hocwp_theme_option_form_after() {
+    $hocwp_root_domain = hocwp_get_root_domain_name(HOCWP_HOMEPAGE);
+    ?>
+    <div class="page-footer">
+        <p>Created by <?php echo $hocwp_root_domain; ?>. If you have any questions, please send us an email via address: <em><?php echo HOCWP_EMAIL; ?></em></p>
+    </div>
+    <div class="copyright">
+        <p>&copy; 2008 - <?php echo date('Y'); ?> <a target="_blank" href="<?php echo HOCWP_HOMEPAGE; ?>"><?php echo $hocwp_root_domain; ?></a>. All Rights Reserved.</p>
+    </div>
+    <?php
+}
+
+function hocwp_theme_option_sidebar_tab() {
+    global $hocwp_tos_tabs;
+    if(hocwp_array_has_value($hocwp_tos_tabs)) {
+        $current_page = hocwp_get_current_admin_page();
+        ?>
+        <ul class="list-tabs">
+            <?php foreach($hocwp_tos_tabs as $key => $value) : ?>
+                <?php
+                $admin_url = admin_url('admin.php');
+                $admin_url = add_query_arg(array('page' => $key), $admin_url);
+                $item_class = hocwp_sanitize_html_class($key);
+                if($key == $current_page) {
+                    hocwp_add_string_with_space_before($item_class, 'active');
+                    $admin_url = 'javascript:;';
+                }
+                $text = hocwp_get_value_by_key($value, 'text');
+                if(empty($text)) {
+                    continue;
+                }
+                ?>
+                <li class="<?php echo $item_class; ?>"><a href="<?php echo $admin_url; ?>"><span><?php echo $text; ?></span></a></li>
+            <?php endforeach; ?>
+        </ul>
+        <?php
+    }
 }
