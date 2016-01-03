@@ -1,6 +1,8 @@
 <?php
 if(!function_exists('add_filter')) exit;
-$parent_slug = 'users.php';
+
+global $hocwp_tos_tabs;
+$parent_slug = 'hocwp_theme_option';
 
 $option_user_login = new HOCWP_Option(__('Login settings', 'hocwp'), 'hocwp_user_login');
 $option_user_login->set_parent_slug($parent_slug);
@@ -9,6 +11,11 @@ $option_user_login->set_use_media_upload(true);
 $option_user_login->add_field(array('id' => 'logo', 'title' => __('Logo', 'hocwp'), 'field_callback' => 'hocwp_field_media_upload'));
 $option_user_login->add_field(array('id' => 'users_can_register', 'title' => __('Membership', 'hocwp'), 'label' => __('Anyone can register', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox', 'value' => hocwp_users_can_register()));
 $option_user_login->add_field(array('id' => 'use_captcha', 'title' => __('Captcha', 'hocwp'), 'label' => __('Protect your site against bots by using captcha', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox'));
+
+$option_user_login->add_option_tab($hocwp_tos_tabs);
+$option_user_login->set_page_header_callback('hocwp_theme_option_form_before');
+$option_user_login->set_page_footer_callback('hocwp_theme_option_form_after');
+$option_user_login->set_page_sidebar_callback('hocwp_theme_option_sidebar_tab');
 $option_user_login->init();
 hocwp_option_add_object_to_list($option_user_login);
 

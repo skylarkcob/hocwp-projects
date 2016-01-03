@@ -154,8 +154,14 @@ body.hocwp {
 }
 
 .hocwp .mobile-menu-button {
+    background: transparent none repeat scroll 0 0;
+    border: medium none;
+    color: #fff;
     cursor: pointer;
+    font-size: 17px;
+    line-height: 40px;
     padding: 0 10px;
+    vertical-align: middle;
 }
 
 .hocwp .hocwp-mobile-menu.left + .mobile-menu-button {
@@ -230,6 +236,19 @@ body.hocwp {
 .hocwp .hocwp-mobile-menu .sub-menu {
     list-style: none outside none;
     padding-left: 0;
+}
+
+.hocwp .menu-item .search-form {
+    padding: 5px;
+    overflow: hidden;
+}
+
+.hocwp .menu-item .search-form label {
+    margin: 0;
+}
+
+.hocwp .hocwp-mobile-menu .sub-menu li:first-child {
+    border-top: medium none;
 }
 
 /**
@@ -579,6 +598,16 @@ body.hocwp {
     margin-right: 0;
 }
 
+.hocwp .entry-content figure {
+    margin-bottom: 20px;
+}
+
+.hocwp .entry-content figure figcaption {
+    font-style: italic;
+    margin-top: 5px;
+    text-align: center;
+}
+
 /**
  * Widgets
  */
@@ -835,6 +864,7 @@ body.hocwp {
 
 .hocwp .hocwp-widget-post .post-slider .post-excerpt {
     color: #444;
+    margin-bottom: 0;
     max-height: 40px;
     overflow: hidden;
 }
@@ -1521,6 +1551,12 @@ body.hocwp {
     overflow: hidden;
     visibility: hidden;
     width: 0;
+}
+
+@media screen and (max-width: 1024px) {
+    .hocwp .site {
+        overflow: hidden;
+    }
 }
 
 @media screen and (max-width: 782px) {

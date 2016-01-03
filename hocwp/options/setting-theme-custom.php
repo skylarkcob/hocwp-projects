@@ -1,6 +1,8 @@
 <?php
 if(!function_exists('add_filter')) exit;
-$parent_slug = 'themes.php';
+
+global $hocwp_tos_tabs;
+$parent_slug = 'hocwp_theme_option';
 $defaults = hocwp_option_defaults();
 
 $option = new HOCWP_Option(__('Theme Custom', 'hocwp'), 'hocwp_theme_custom');
@@ -30,5 +32,9 @@ $option->add_field(array('id' => 'background_attachment', 'title' => __('Attachm
 $option->set_use_color_picker(true);
 $option->set_use_media_upload(true);
 $option->set_use_style_and_script(true);
+$option->add_option_tab($hocwp_tos_tabs);
+$option->set_page_header_callback('hocwp_theme_option_form_before');
+$option->set_page_footer_callback('hocwp_theme_option_form_after');
+$option->set_page_sidebar_callback('hocwp_theme_option_sidebar_tab');
 $option->init();
 hocwp_option_add_object_to_list($option);

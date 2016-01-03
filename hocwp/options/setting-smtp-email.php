@@ -1,6 +1,8 @@
 <?php
 if(!function_exists('add_filter')) exit;
-$parent_slug = 'options-general.php';
+
+global $hocwp_tos_tabs;
+$parent_slug = 'hocwp_theme_option';
 
 $option_smtp = new HOCWP_Option(__('SMTP Email', 'hocwp'), 'hocwp_option_smtp_email');
 $option_smtp->set_parent_slug($parent_slug);
@@ -64,6 +66,11 @@ $option_smtp->add_field(array('id' => 'smtp_auth', 'title' => __('Authentication
 $option_smtp->add_field(array('id' => 'smtp_user', 'title' => __('Username', 'hocwp'), 'section' => 'smtp_option'));
 $option_smtp->add_field(array('id' => 'smtp_pass', 'title' => __('Password', 'hocwp'), 'section' => 'smtp_option', 'type' => 'password'));
 $option_smtp->add_field(array('id' => 'to_email', 'title' => __('To', 'hocwp'), 'section' => 'testing', 'description' => __('Type an email address here and then click Send Test to generate a test email.', 'hocwp'), 'type' => 'email'));
+
+$option_smtp->add_option_tab($hocwp_tos_tabs);
+$option_smtp->set_page_header_callback('hocwp_theme_option_form_before');
+$option_smtp->set_page_footer_callback('hocwp_theme_option_form_after');
+$option_smtp->set_page_sidebar_callback('hocwp_theme_option_sidebar_tab');
 $option_smtp->init();
 hocwp_option_add_object_to_list($option_smtp);
 

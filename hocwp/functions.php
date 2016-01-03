@@ -219,7 +219,7 @@ function hocwp_is_login_page() {
 
 function hocwp_can_save_post($post_id) {
     global $pagenow;
-    if(!HOCWP_DOING_AUTO_SAVE && current_user_can('edit_post', $post_id) && 'edit.php' != $pagenow) {
+    if(hocwp_id_number_valid($post_id) && !HOCWP_DOING_AUTO_SAVE && current_user_can('edit_post', $post_id) && 'edit.php' != $pagenow) {
         return true;
     }
     return false;
@@ -656,6 +656,8 @@ function hocwp_sanitize($data, $type) {
         case 'file_name':
             return hocwp_sanitize_file_name($data);
         case 'html_class':
+            $data = hocwp_remove_vietnamese($data);
+            $data = hocwp_sanitize_id($data);
             $data = str_replace('_', '-', $data);
             return $data;
         case 'key':

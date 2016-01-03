@@ -1,17 +1,23 @@
 <?php
 if(!function_exists('add_filter')) exit;
-$parent_slug = 'plugins.php';
+
+global $hocwp_tos_tabs;
+$parent_slug = 'hocwp_theme_option';
 
 $option = new HOCWP_Option(__('Recommended Plugins', 'hocwp'), 'hocwp_recommended_plugin');
 $option->set_parent_slug($parent_slug);
 $option->set_is_option_page(false);
-$option->set_menu_title(__('Recommended', 'hocwp'));
+$option->set_menu_title(__('Plugins', 'hocwp'));
 $option->set_use_style_and_script(true);
+$option->add_option_tab($hocwp_tos_tabs);
+$option->set_page_header_callback('hocwp_theme_option_form_before');
+$option->set_page_footer_callback('hocwp_theme_option_form_after');
+$option->set_page_sidebar_callback('hocwp_theme_option_sidebar_tab');
 $option->init();
 hocwp_option_add_object_to_list($option);
 
 function hocwp_option_page_recommended_plugin_content() {
-    $base_url = 'plugins.php?page=hocwp_recommended_plugin';
+    $base_url = 'admin.php?page=hocwp_recommended_plugin';
     $current_tab = isset($_REQUEST['tab']) ? $_REQUEST['tab'] : 'installed';
     $tabs = array(
         'installed' => __('Installed', 'hocwp'),

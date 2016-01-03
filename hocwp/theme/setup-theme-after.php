@@ -489,6 +489,12 @@ function hocwp_setup_theme_allow_shortcode_in_comment() {
 }
 add_action('hocwp_front_end_init', 'hocwp_setup_theme_allow_shortcode_in_comment');
 
+function hocwp_setup_theme_widget_title($title) {
+    $title = hocwp_wrap_tag($title, 'span', hocwp_sanitize_html_class($title));
+    return $title;
+}
+add_filter('widget_title', 'hocwp_setup_theme_widget_title');
+
 function hocwp_setup_theme_custom_head() {
     $options = get_option('hocwp_theme_custom');
     $background_image = hocwp_get_value_by_key($options, 'background_image');

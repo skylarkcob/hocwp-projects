@@ -50,6 +50,13 @@ jQuery(document).ready(function($) {
         return result;
     };
 
+    hocwp.getTagName = function($tag) {
+        if($tag.length) {
+            return $tag.get(0).tagName;
+        }
+        return '';
+    };
+
     hocwp.isUrl = function(text) {
         var url_regex = new RegExp('^(http:\/\/www.|https:\/\/www.|ftp:\/\/www.|www.){1}([0-9A-Za-z]+\.)');
         return url_regex.test(text);
@@ -287,9 +294,7 @@ jQuery(document).ready(function($) {
         };
         options = options || {};
         options = $.extend({}, defaults, options);
-        var $container = button.parent(),
-            container_tag = $container.get(0).tagName,
-            is_simple = button.hasClass('simple');
+        var $container = button.parent();
         var $url = $container.find('input.media-url'),
             $id = $container.find('input.media-id'),
             $remove = $container.find('.btn-remove'),
@@ -634,7 +639,10 @@ jQuery(document).ready(function($) {
         this.init();
         var $element = this.$element,
             $menu_parent = $element.parent(),
+            $mobile_menu_button = $menu_parent.find('.mobile-menu-button'),
+            $search_form = $menu_parent.find('.search-form'),
             display_width = parseFloat(this.options.displayWidth),
+            height = parseInt(this.options.height),
             body_height = $body.height();
         this.element_class = $element.attr('class');
         this.html = $element.html();
@@ -649,10 +657,18 @@ jQuery(document).ready(function($) {
             $element.show();
             $element.addClass(position);
             $element.addClass('hocwp-mobile-menu');
-            if(!$menu_parent.find('.mobile-menu-button').length) {
+            if(!$mobile_menu_button.length) {
                 $menu_parent.append(hocwp.mobile_menu_icon);
-                $menu_parent.find('.mobile-menu-button').attr('aria-controls', $element.attr('id'))
+                $mobile_menu_button = $menu_parent.find('.mobile-menu-button');
+                $mobile_menu_button.attr('aria-controls', $element.attr('id'))
             }
+            if(!$search_form.length) {
+                if(!$element.find('li.search-item').length) {
+                    $element.prepend('<li class="search-item menu-item" style="overflow: hidden">' + hocwp.search_form + '</li>');
+                }
+            }
+            $mobile_menu_button.css({'line-height' : height + 'px'});
+            $mobile_menu_button.show();
             $menu_parent.find('.mobile-menu-button').on('click', function() {
                 $element.toggleClass('active');
             });
@@ -661,6 +677,7 @@ jQuery(document).ready(function($) {
                     $element.toggleClass('active');
                 }
             });
+
             $element.find('li.menu-item-has-children .fa').on('click', function(e) {
                 e.preventDefault();
                 var $this = $(this),
@@ -703,7 +720,8 @@ jQuery(document).ready(function($) {
 
     MobileMenu.DEFAULTS = {
         displayWidth: 980,
-        position: 'left'
+        position: 'left',
+        height: 30
     };
 
     MobileMenu.prototype.init = function() {
@@ -728,7 +746,6 @@ jQuery(document).ready(function($) {
 
 jQuery(document).ready(function($) {
     function ChosenSelect(element, options) {
-        var $window = $(window);
         this.self = this;
         this.element = element;
         this.options = $.extend({}, ChosenSelect.DEFAULTS, options);

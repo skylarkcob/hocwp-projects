@@ -183,6 +183,58 @@ function hocwp_entry_meta($args = array()) {
     <?php
 }
 
+function hocwp_entry_meta_author_first($args = array()) {
+    $post_id = hocwp_get_value_by_key($args, 'post_id', get_the_ID());
+    $class = hocwp_get_value_by_key($args, 'class');
+    $cpost = get_post($post_id);
+    if(!is_a($cpost, 'WP_Post')) {
+        return;
+    }
+    $author_url = hocwp_get_author_posts_url();
+    $comment_count = hocwp_get_post_comment_count($post_id);
+    $comment_text = $comment_count . ' Bình luận';
+    hocwp_add_string_with_space_before($class, 'entry-meta');
+    ?>
+    <p class="<?php echo $class; ?>">
+        <span itemtype="http://schema.org/Person" itemscope itemprop="author" class="entry-author vcard author post-author">
+            <span class="fn">
+                <a rel="author" itemprop="url" class="entry-author-link" href="<?php echo $author_url; ?>"><span itemprop="name" class="entry-author-name"><?php the_author(); ?></span></a>
+            </span>
+        </span>
+        <time datetime="<?php the_time('c'); ?>" itemprop="datePublished" class="entry-time published date post-date"><?php echo get_the_date(); ?></time>
+        <time datetime="<?php the_modified_time('c'); ?>" itemprop="dateModified" class="entry-modified-time date modified post-date"><?php the_modified_date(); ?></time>
+        <?php if(comments_open($post_id)) : ?>
+            <span class="entry-comments-link">
+                <a href="<?php the_permalink(); ?>#comments"><?php echo $comment_text; ?></a>
+            </span>
+        <?php endif; ?>
+        <?php if(current_theme_supports('hocwp-schema')) : ?>
+            <?php
+            global $authordata;
+            $author_id = 0;
+            $author_name = '';
+            $author_avatar = '';
+            if(hocwp_object_valid($authordata)) {
+                $author_id = $authordata->ID;
+                $author_name = $authordata->display_name;
+                $author_avatar = get_avatar_url($author_id, array('size' => 128));
+            }
+            $logo_url = apply_filters('hocwp_publisher_logo_url', '');
+            ?>
+            <span itemprop="publisher" itemscope itemtype="https://schema.org/Organization" class="small hidden">
+                <span itemprop="logo" itemscope itemtype="https://schema.org/ImageObject">
+                    <img alt="" src="<?php echo $logo_url; ?>">
+                    <meta itemprop="url" content="<?php echo $logo_url; ?>">
+                    <meta itemprop="width" content="600">
+                    <meta itemprop="height" content="60">
+                </span>
+                <meta itemprop="name" content="<?php echo $author_name; ?>">
+            </span>
+        <?php endif; ?>
+    </p>
+    <?php
+}
+
 function hocwp_rel_canonical() {
     if(!is_singular() || has_action('wp_head', 'rel_canonical')) {
         return;

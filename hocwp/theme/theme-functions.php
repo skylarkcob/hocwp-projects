@@ -24,7 +24,8 @@ function hocwp_theme_default_script_localize_object() {
     $defaults = hocwp_default_script_localize_object();
     $args = array(
         'login_logo_url' => hocwp_get_login_logo_url(),
-        'mobile_menu_icon' => '<button class="menu-toggle mobile-menu-button" aria-expanded="false" aria-controls=""><i class="fa fa fa-bars"></i><span class="text">' . __('Menu', 'hocwp') . '</span></button>'
+        'mobile_menu_icon' => '<button class="menu-toggle mobile-menu-button" aria-expanded="false" aria-controls=""><i class="fa fa fa-bars"></i><span class="text">' . __('Menu', 'hocwp') . '</span></button>',
+        'search_form' => get_search_form(false)
     );
     $args = wp_parse_args($args, $defaults);
     return apply_filters('hocwp_theme_default_script_object', $args);
@@ -99,6 +100,11 @@ function hocwp_theme_the_menu($args = array()) {
     $menu_class = isset($args['menu_class']) ? $args['menu_class'] : '';
     hocwp_add_string_with_space_before($menu_class , 'hocwp-menu');
     hocwp_add_string_with_space_before($menu_class , $theme_location);
+    $nav_class = '';
+    if('primary' == $theme_location) {
+        hocwp_add_string_with_space_before($nav_class, 'main-navigation');
+    }
+    hocwp_add_string_with_space_before($nav_class, hocwp_sanitize_html_class($theme_location . '-navigation'));
     $superfish = isset($args['superfish']) ? $args['superfish'] : true;
     if($superfish) {
         hocwp_add_string_with_space_before($menu_class, 'hocwp-superfish-menu');
@@ -106,7 +112,7 @@ function hocwp_theme_the_menu($args = array()) {
     }
     $button_text = isset($args['button_text']) ? $args['button_text'] : __('Menu', 'hocwp');
     ?>
-    <nav id="site-navigation" class="main-navigation"<?php hocwp_html_tag_attributes('nav', 'site_navigation'); ?>>
+    <nav id="<?php echo hocwp_sanitize_id($theme_location . '_navigation'); ?>" class="<?php echo $nav_class; ?>"<?php hocwp_html_tag_attributes('nav', 'site_navigation'); ?>>
         <?php
         $menu_args = array(
             'theme_location' => $theme_location,

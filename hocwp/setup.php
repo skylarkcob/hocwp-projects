@@ -1,5 +1,6 @@
 <?php
 if(!function_exists('add_filter')) exit;
+
 if(!file_exists(HOCWP_CONTENT_PATH)) {
     mkdir(HOCWP_CONTENT_PATH);
 }
@@ -16,7 +17,9 @@ function hocwp_setup_product_head_dscription() {
 if(defined('HOCWP_THEME_VERSION')) {
     add_action('hocwp_before_wp_head', 'hocwp_setup_product_head_dscription', 0);
 } else {
-    add_action('wp_head', 'hocwp_setup_product_head_dscription', 0);
+    if(!has_action('wp_head', 'hocwp_setup_product_head_dscription')) {
+        add_action('wp_head', 'hocwp_setup_product_head_dscription', 0);
+    }
 }
 
 function hocwp_setup_enable_session() {

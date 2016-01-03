@@ -8,6 +8,10 @@ class HOCWP_Option {
     private $is_option_page;
     private $page_title_action;
 
+    private $page_header_callback;
+    private $page_footer_callback;
+    private $page_sidebar_callback;
+
     private $capability;
     private $parent_slug;
     private $function;
@@ -52,8 +56,8 @@ class HOCWP_Option {
         return $this->exists;
     }
 
-    public function set_use_style_and_script($use_style_and_script) {
-        $this->use_style_and_script = $use_style_and_script;
+    public function set_use_style_and_script($use) {
+        $this->use_style_and_script = $use;
     }
 
     public function get_use_style_and_script() {
@@ -76,8 +80,8 @@ class HOCWP_Option {
         return (bool)$this->use_jquery_ui;
     }
 
-    public function set_use_media_upload($use_media_upload) {
-        $this->use_media_upload = $use_media_upload;
+    public function set_use_media_upload($use) {
+        $this->use_media_upload = $use;
     }
 
     public function get_use_media_upload() {
@@ -225,6 +229,30 @@ class HOCWP_Option {
         $this->page_title_action = $link->build();
     }
 
+    public function set_page_sidebar_callback($func) {
+        $this->page_sidebar_callback = $func;
+    }
+
+    public function get_page_sidebar_callback() {
+        return $this->page_sidebar_callback;
+    }
+
+    public function set_page_header_callback($func) {
+        $this->page_header_callback = $func;
+    }
+
+    public function get_page_header_callback() {
+        return $this->page_header_callback;
+    }
+
+    public function set_page_footer_callback($func) {
+        $this->page_footer_callback = $func;
+    }
+
+    public function get_page_footer_callback() {
+        return $this->page_footer_callback;
+    }
+
     public function is_option_page() {
         return (bool)$this->is_option_page;
     }
@@ -300,6 +328,7 @@ class HOCWP_Option {
         $this->set_is_option_page(true);
         $this->set_sanitize_callback(array($this, 'sanitize'));
         $this->set_capability('manage_options');
+        $this->set_use_style_and_script(true);
 
         $this->set_parent_slug('options-general.php');
 
@@ -344,32 +373,67 @@ class HOCWP_Option {
     }
 
     public function default_setting_page_callback() {
+        $parent_slug = $this->get_parent_slug();
+        if(empty($parent_slug)) {
+            return;
+        }
         $title = $this->get_heading_text();
-        if($this->is_option_page() && !hocwp_string_contain(strtolower($title), 'settings')) {
+        if($this->is_option_page() && !hocwp_string_contain(strtolower($title), 'settings') && !hocwp_string_contain(strtolower($title), 'options')) {
             hocwp_add_string_with_space_before($title, 'Settings');
         }
         $wrap_class = $this->get_option_name_no_prefix();
-        hocwp_add_string_with_space_before($wrap_class, 'wrap hocwp');
         $wrap_class = hocwp_sanitize($wrap_class, 'html_class');
+        hocwp_add_string_with_space_before($wrap_class, 'wrap hocwp option-page');
         ?>
         <div class="<?php echo $wrap_class; ?>">
             <h1 class="page-title"><?php echo esc_html($title). $this->get_page_title_action(); ?></h1>
             <?php
-            if($this->is_option_page()) {
-                if($this->is_this_page() && (isset($_REQUEST['submit']) || isset($_REQUEST['settings-updated']))) {
-                    do_action('hocwp_option_saved');
-                    if('options-general.php' != $this->get_parent_slug()) {
-                        hocwp_admin_notice_setting_saved();
-                    }
-                    do_action($this->get_menu_slug() . '_option_saved', $this);
-                }
-                $this->form();
+            $header_callback = $this->get_page_header_callback();
+            if(hocwp_callback_exists($header_callback)) {
+                call_user_func($header_callback);
             }
-            do_action('hocwp_option_page_content');
-            do_action('hocwp_option_page_' . $this->get_option_name_no_prefix() . '_content');
+            ?>
+            <div class="page-content">
+                <div class="sidebar">
+                    <?php
+                    $sidebar_callback = $this->get_page_sidebar_callback();
+                    if(hocwp_callback_exists($sidebar_callback)) {
+                        call_user_func($sidebar_callback);
+                    }
+                    ?>
+                </div>
+                <div class="main main-content">
+                    <?php
+                    if($this->is_option_page()) {
+                        if($this->is_this_page() && (isset($_REQUEST['submit']) || isset($_REQUEST['settings-updated']))) {
+                            do_action('hocwp_option_saved');
+                            if('options-general.php' != $this->get_parent_slug()) {
+                                hocwp_admin_notice_setting_saved();
+                            }
+                            do_action($this->get_menu_slug() . '_option_saved', $this);
+                        }
+                        $this->form();
+                    }
+                    do_action('hocwp_option_page_content');
+                    do_action('hocwp_option_page_' . $this->get_option_name_no_prefix() . '_content');
+                    ?>
+                </div>
+            </div>
+            <?php
+            $footer_callback = $this->get_page_footer_callback();
+            if(hocwp_callback_exists($footer_callback)) {
+                call_user_func($footer_callback);
+            }
             ?>
         </div>
         <?php
+    }
+
+    public function add_option_tab(&$option_tabs) {
+        $option_tabs = hocwp_sanitize_array($option_tabs);
+        $option_tabs[$this->get_option_name()] = array(
+            'text' => $this->get_menu_title(),
+        );
     }
 
     public function init() {

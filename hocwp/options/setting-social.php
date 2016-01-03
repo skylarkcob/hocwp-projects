@@ -1,9 +1,12 @@
 <?php
 if(!function_exists('add_filter')) exit;
-$parent_slug = 'options-general.php';
+
+global $hocwp_tos_tabs;
+$parent_slug = 'hocwp_theme_option';
 
 $option_social = new HOCWP_Option(__('Socials', 'hocwp'), 'hocwp_option_social');
 $option_social->set_parent_slug($parent_slug);
+$option_social->set_use_style_and_script(true);
 $option_social->add_section(array('id' => 'account', 'title' => __('Account', 'hocwp'), 'description' => __('Your social accounts to config API on website.', 'hocwp')));
 $option_social->add_section(array('id' => 'facebook', 'title' => __('Facebook', 'hocwp'), 'description' => __('All information about Facebook account and Facebook Insights Admins.', 'hocwp')));
 $option_social->add_section(array('id' => 'google', 'title' => __('Google', 'hocwp'), 'description' => __('All information about Google account and Google console.', 'hocwp')));
@@ -23,6 +26,11 @@ $option_social->add_field(array('id' => 'rss_url', 'title' => __('RSS URL', 'hoc
 $option_social->add_field(array('id' => 'addthis_id', 'title' => __('AddThis ID', 'hocwp'), 'section' => 'account'));
 $option_social->add_field(array('id' => 'fbadminapp', 'title' => __('Facebook App ID', 'hocwp'), 'section' => 'facebook', 'value' => hocwp_get_wpseo_social_value('fbadminapp')));
 $option_social->add_field(array('id' => 'google_api_key', 'title' => __('Google API Key', 'hocwp'), 'section' => 'google'));
+
+$option_social->add_option_tab($hocwp_tos_tabs);
+$option_social->set_page_header_callback('hocwp_theme_option_form_before');
+$option_social->set_page_footer_callback('hocwp_theme_option_form_after');
+$option_social->set_page_sidebar_callback('hocwp_theme_option_sidebar_tab');
 $option_social->init();
 hocwp_option_add_object_to_list($option_social);
 
@@ -91,6 +99,7 @@ function hocwp_addthis_toolbox($args = array()) {
 	$post_id = isset($args['post_id']) ? $args['post_id'] : get_the_ID();
 	$class = isset($args['class']) ? $args['class'] : 'addthis_native_toolbox';
 	$class = apply_filters('hocwp_addthis_toolbox_class', $class);
+	hocwp_add_string_with_space_before($class, 'addthis-tools');
 	$url = isset($args['url']) ? $args['url'] : get_the_permalink();
 	$title = isset($args['title']) ? $args['title'] : get_the_title();
 	?>

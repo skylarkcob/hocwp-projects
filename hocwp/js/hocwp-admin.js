@@ -167,4 +167,15 @@ jQuery(document).ready(function($) {
             }
         });
     })();
+
+    (function() {
+        var $hocwp_option_page = $('.hocwp.option-page');
+        if($hocwp_option_page.length) {
+            var $sidebar = $hocwp_option_page.find('.sidebar'),
+                $main = $hocwp_option_page.find('.main-content');
+            if($sidebar.height() >= $main.height()) {
+                $main.css({'min-height' : $sidebar.height() + 50 + 'px'});
+            }
+        }
+    })();
 });

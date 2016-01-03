@@ -109,6 +109,7 @@ function hocwp_get_post_thumbnail_url($post_id = '', $size = 'full') {
             $result = $thumbnail['url'];
         }
     }
+    $result = apply_filters('hocwp_post_pre_post_thumbnail', $result, $post_id);
     if(empty($result)) {
         $no_thumbnail = HOCWP_URL . '/images/no-thumbnail.png';
         $no_thumbnail = apply_filters('hocwp_no_thumbnail_url', $no_thumbnail);

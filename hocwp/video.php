@@ -17,6 +17,11 @@ function hocwp_video_play($args = array()) {
     $post_id = isset($args['post_id']) ? $args['post_id'] : get_the_ID();
     $video_url = get_post_meta($post_id, 'video_url', true);
     $video_code = get_post_meta($post_id, 'video_code', true);
+    if(empty($video_url) && empty($video_code)) {
+        if(hocwp_automatic_video_posts_installed()) {
+            $video_url = get_post_meta($post_id, '_ayvpp_video_url', true);
+        }
+    }
     $autoplay = isset($args['autoplay']) ? $args['autoplay'] : false;
     $width = isset($args['width']) ? $args['width'] : '';
     $height = isset($args['height']) ? $args['height'] : '';
@@ -28,7 +33,6 @@ function hocwp_video_play($args = array()) {
     if(empty($player_id)) {
         $player_id = 'hocwp_player';
     }
-
     if(!empty($video_code)) {
         if($height > 0) {
             $video_code = preg_replace('/height="(.*?)"/i', 'height="' . $height . '"', $video_code);
@@ -134,7 +138,7 @@ function hocwp_detect_video_id($url) {
 }
 
 function hocwp_save_video_default_meta($post_id) {
-    if(!is_numeric($post_id) || $post_id < 1) {
+    if(!hocwp_can_save_post($post_id)) {
         return;
     }
     $video_url = get_post_meta($post_id, 'video_url');
@@ -163,6 +167,22 @@ function hocwp_save_video_default_meta($post_id) {
         }
         update_post_meta($post_id, 'thumbnail_url', $thumbnail_url);
         update_post_meta($post_id, 'thumbnails', $thumbnails);
+    }
+}
+
+function hocwp_convert_automatic_video_posts_data($post_id) {
+    if(hocwp_automatic_video_posts_installed()) {
+        $video_id = get_post_meta($post_id, 'video_id', true);
+        if(empty($video_id)) {
+            $video_code = get_post_meta($post_id, 'video_code', true);
+            if(empty($video_code)) {
+                $video_url = get_post_meta($post_id, '_ayvpp_video_url', true);
+                if(!empty($video_url)) {
+                    update_post_meta($post_id, 'video_url', $video_url);
+                    hocwp_save_video_default_meta($post_id);
+                }
+            }
+        }
     }
 }
 
@@ -329,4 +349,18 @@ function hocwp_get_dailymotion_thumbnail($id, $type = 'medium', $thumbnails = nu
         $thumbnails = hocwp_get_dailymotion_thumbnails($id);
     }
     return hocwp_get_valid_video_thumbnail_data($thumbnails, $type);
+}
+
+function hocwp_automatic_video_posts_installed() {
+    $result = false;
+    if(function_exists('WP_ayvpp_activate_plugin')) {
+        $result = true;
+    }
+    return $result;
+}
+
+function hocwp_youtube_default_video_thumbnail_url($video_id) {
+    $url = 'https://i.ytimg.com/vi/' . $video_id . '/default.jpg';
+    $url = apply_filters('hocwp_youtube_default_video_thumbnail_url', $url, $video_id);
+    return $url;
 }

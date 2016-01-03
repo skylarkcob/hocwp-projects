@@ -122,7 +122,23 @@ function hocwp_facebook_comment($args = array()) {
     );
     $atts = apply_filters('hocwp_facebook_comment_attributes', $atts, $args);
     $div->set_attribute_array($atts);
+    $div->set_text(__('Loading...', 'hocwp'));
     $div->output();
+}
+
+function hocwp_google_comment() {
+    ?>
+    <script src="https://apis.google.com/js/plusone.js"></script>
+    <div id="google_comments"><?php _e('Loading...', 'hocwp'); ?></div>
+    <script>
+        gapi.comments.render('google_comments', {
+            href: window.location,
+            width: '624',
+            first_party_property: 'BLOGGER',
+            view_type: 'FILTERED_POSTMOD'
+        });
+    </script>
+    <?php
 }
 
 function hocwp_get_top_commenters($number = 5, $time = 'all', $condition = '') {

@@ -1,7 +1,9 @@
 <?php
 if(!function_exists('add_filter')) exit;
-$reading_option = new HOCWP_Option('', 'reading');
-$reading_option->set_page('options-reading.php');
+
+global $hocwp_tos_tabs;
+$reading_option = new HOCWP_Option(__('Reading', 'hocwp'), 'hocwp_reading');
+$reading_option->set_parent_slug('hocwp_theme_option');
 $reading_option->add_field(array('id' => 'post_statistics', 'title' => __('Post Statistics', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox', 'label' => __('Track post views on your site.', 'hocwp')));
 $reading_option->add_field(array('id' => 'sticky_widget', 'title' => __('Sticky Widget', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox', 'label' => __('Make last widget fixed when scroll down.', 'hocwp')));
 $reading_option->add_section(array('id' => 'breadcrumb', 'title' => __('Breadcrumb', 'hocwp'), 'description' => __('Custom breadcrumb on your site.', 'hocwp')));
@@ -11,6 +13,11 @@ $reading_option->add_field(array('id' => 'link_last_item_breadcrumb', 'title' =>
 $reading_option->add_section(array('id' => 'scroll_top_section', 'title' => __('Scroll To Top', 'hocwp'), 'description' => __('This option can help you to display scroll to top button on your site.', 'hocwp')));
 $reading_option->add_field(array('id' => 'go_to_top', 'title' => __('Scroll Top Button', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox', 'label' => __('Display scroll top to top button on bottom right of site.', 'hocwp'), 'section' => 'scroll_top_section'));
 $reading_option->add_field(array('id' => 'scroll_top_icon', 'title' => __('Button Icon', 'hocwp'), 'field_callback' => 'hocwp_field_media_upload', 'section' => 'scroll_top_section'));
+
+$reading_option->add_option_tab($hocwp_tos_tabs);
+$reading_option->set_page_header_callback('hocwp_theme_option_form_before');
+$reading_option->set_page_footer_callback('hocwp_theme_option_form_after');
+$reading_option->set_page_sidebar_callback('hocwp_theme_option_sidebar_tab');
 $reading_option->init();
 hocwp_option_add_object_to_list($reading_option);
 

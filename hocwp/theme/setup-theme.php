@@ -200,6 +200,13 @@ function hocwp_setup_theme_remove_editor_menu() {
         }
         remove_submenu_page('themes.php', 'theme-editor.php');
     }
+    $current_admin_page = hocwp_get_current_admin_page();
+    if('hocwp_theme_option' == $current_admin_page) {
+        $admin_url = admin_url('admin.php');
+        $admin_url = add_query_arg(array('page' => $current_admin_page), $admin_url);
+        wp_redirect($admin_url);
+        exit;
+    }
 }
 add_action('admin_init', 'hocwp_setup_theme_remove_editor_menu');
 
@@ -503,3 +510,10 @@ function hocwp_setup_theme_esc_comment_author_url($commentdata) {
     return $commentdata;
 }
 add_filter('preprocess_comment', 'hocwp_setup_theme_esc_comment_author_url');
+
+function hocwp_setup_theme_admin_menu() {
+    global $submenu;
+    unset($submenu['themes.php'][6]);
+    remove_submenu_page('hocwp_theme_option', 'hocwp_theme_option');
+}
+add_action('admin_menu', 'hocwp_setup_theme_admin_menu', 99);

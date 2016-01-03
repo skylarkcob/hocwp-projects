@@ -1,8 +1,12 @@
 <?php
 if(!function_exists('add_filter')) exit;
-function hocwp_wrap_tag($text, $tag) {
+function hocwp_wrap_tag($text, $tag, $class = '') {
+    if(empty($text)) {
+        return $text;
+    }
     $html = new HOCWP_HTML($tag);
     $html->set_text($text);
+    $html->set_class($class);
     return $html->build();
 }
 
@@ -181,6 +185,17 @@ function hocwp_plugin_install_status($plugin) {
     return install_plugin_install_status($plugin);
 }
 
+function hocwp_setup_loop_data($args) {
+    global $hocwp_loop_data;
+    $hocwp_loop_data = $args;
+    return $hocwp_loop_data;
+}
+
+function hocwp_get_loop_data() {
+    global $hocwp_loop_data;
+    return $hocwp_loop_data;
+}
+
 function hocwp_get_plugin_icon_url($plugin) {
     if(is_object($plugin)) {
         $plugin = (array)$plugin;
@@ -198,6 +213,10 @@ function hocwp_get_plugin_icon_url($plugin) {
         $plugin_icon_url = hocwp_plugin_random_icon();
     }
     return $plugin_icon_url;
+}
+
+function hocwp_get_image_url($name) {
+    return HOCWP_URL . '/images/' . $name;
 }
 
 function hocwp_widget_title($args, $instance, $echo = true) {
