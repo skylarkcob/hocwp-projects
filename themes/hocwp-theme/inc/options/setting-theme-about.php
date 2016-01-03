@@ -108,7 +108,7 @@ function hocwp_option_page_about_content() {
                     </tbody>
                 </table>
                 <hr>
-                <a onclick="window.open('<?php echo HOCWP_URL; ?>/views/phpinfo.php', 'PHPInfo', 'width=800, height=600, scrollbars=1'); return false;" href="#" class="button-primary">PHP Info</a>
+                <a onclick="window.open('<?php echo HOCWP_THEME_INC_URL; ?>/views/phpinfo.php', 'PHPInfo', 'width=800, height=600, scrollbars=1'); return false;" href="#" class="button-primary">PHP Info</a>
                 <?php
                 $content = ob_get_clean();
                 $args = array(

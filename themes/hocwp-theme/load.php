@@ -16,6 +16,10 @@ define('HOCWP_THEME_PATH', get_template_directory());
 
 define('HOCWP_THEME_INC_PATH', HOCWP_THEME_PATH . '/inc');
 
+define('HOCWP_THEME_URL', get_template_directory_uri());
+
+define('HOCWP_THEME_INC_URL', HOCWP_THEME_URL . '/inc');
+
 if(!defined('HOCWP_URL')) {
     define('HOCWP_URL', untrailingslashit(get_template_directory_uri()) . '/hocwp');
 }

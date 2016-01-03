@@ -242,3 +242,20 @@ function hocwp_theme_sticky_last_widget() {
     $sticky_widget = apply_filters('hocwp_sticky_widget', $sticky_widget);
     return (bool)$sticky_widget;
 }
+
+function hocwp_theme_maintenance_mode() {
+    if(!is_admin() && hocwp_in_maintenance_mode()) {
+        if(!hocwp_maintenance_mode_exclude_condition()) {
+            $charset = get_bloginfo('charset') ? get_bloginfo('charset') : 'UTF-8';
+            $protocol = !empty($_SERVER['SERVER_PROTOCOL']) && in_array($_SERVER['SERVER_PROTOCOL'], array('HTTP/1.1', 'HTTP/1.0')) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0';
+            $status_code = (int)apply_filters('hocwp_maintenance_mode_status_code', 503);
+            nocache_headers();
+            ob_start();
+            header("Content-type: text/html; charset=$charset");
+            header("$protocol $status_code Service Unavailable", TRUE, $status_code);
+            get_template_part('inc/views/maintenance');
+            ob_flush();
+            exit;
+        }
+    }
+}

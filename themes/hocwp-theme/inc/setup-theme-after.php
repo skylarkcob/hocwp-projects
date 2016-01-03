@@ -473,7 +473,7 @@ add_filter('get_comment_author', 'hocwp_setup_theme_get_comment_author', 10, 3);
 
 if($maintenance_mode && !hocwp_maintenance_mode_exclude_condition()) {
     add_action('admin_notices', 'hocwp_setup_theme_in_maintenance_mode_notice');
-    add_action('init', 'hocwp_maintenance_mode');
+    add_action('init', 'hocwp_theme_maintenance_mode');
     add_action('hocwp_maintenance_head', 'hocwp_setup_theme_maintenance_head');
     add_action('hocwp_maintenance', 'hocwp_setup_theme_maintenance');
     add_action('wp_enqueue_scripts', 'hocwp_setup_theme_maintenance_scripts');
