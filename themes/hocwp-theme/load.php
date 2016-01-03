@@ -10,7 +10,11 @@ if(version_compare($GLOBALS['wp_version'], HOCWP_REQUIRE_WP_VERSION, '<')) {
     return;
 }
 
-define('HOCWP_THEME_VERSION', '5.0.4');
+define('HOCWP_THEME_VERSION', '5.0.5');
+
+define('HOCWP_THEME_PATH', get_template_directory());
+
+define('HOCWP_THEME_INC_PATH', HOCWP_THEME_PATH . '/inc');
 
 if(!defined('HOCWP_URL')) {
     define('HOCWP_URL', untrailingslashit(get_template_directory_uri()) . '/hocwp');
@@ -25,40 +29,36 @@ function hocwp_theme_missing_core_notice() {
 }
 
 if(!defined('HOCWP_PATH')) {
-    if(!file_exists(get_template_directory() . '/hocwp/load.php')) {
+    if(!file_exists(HOCWP_THEME_PATH . '/hocwp/load.php')) {
         if(is_admin()) {
             add_action('admin_notices', 'hocwp_theme_missing_core_notice');
         } else {
-            wp_die(__('Theme cannot be displayed because of missing core.', 'hocwp'), __('Missing Core', 'hocwp'));
+            wp_die('<strong>' . __('Error:', 'hocwp') . '</strong> ' . __('Theme cannot be displayed because of missing core. Please contact administrator for assistance.', 'hocwp'), __('Missing Core', 'hocwp'));
             exit;
         }
         return;
     }
-    require_once(get_template_directory() . '/hocwp/load.php');
+    require_once(HOCWP_THEME_PATH . '/hocwp/load.php');
 }
 
-require_once(get_template_directory() . '/inc/hocwp-custom-pre-hook.php');
+require_once(HOCWP_THEME_INC_PATH . '/hocwp-custom-pre-hook.php');
 
-require_once(HOCWP_PATH . '/options/theme-option.php');
+require_once(HOCWP_THEME_INC_PATH . '/options/theme-option.php');
 
-require_once(HOCWP_PATH . '/options/user-option.php');
+require_once(HOCWP_THEME_INC_PATH . '/theme-functions.php');
 
-require_once(HOCWP_PATH . '/options/general-option.php');
+require_once(HOCWP_THEME_INC_PATH . '/setup-theme.php');
 
-require_once(HOCWP_PATH . '/theme/theme-functions.php');
+require HOCWP_THEME_INC_PATH . '/hocwp-custom-functions.php';
 
-require_once(HOCWP_PATH . '/theme/setup-theme.php');
+require HOCWP_THEME_INC_PATH . '/hocwp-custom-admin.php';
 
-require get_template_directory() . '/inc/hocwp-custom-functions.php';
+require HOCWP_THEME_INC_PATH . '/hocwp-custom-post-type-and-taxonomy.php';
 
-require get_template_directory() . '/inc/hocwp-custom-admin.php';
+require HOCWP_THEME_INC_PATH . '/hocwp-custom-meta.php';
 
-require get_template_directory() . '/inc/hocwp-custom-post-type-and-taxonomy.php';
+require HOCWP_THEME_INC_PATH . '/hocwp-custom-hook.php';
 
-require get_template_directory() . '/inc/hocwp-custom-meta.php';
+require HOCWP_THEME_INC_PATH . '/hocwp-custom-ajax.php';
 
-require get_template_directory() . '/inc/hocwp-custom-hook.php';
-
-require get_template_directory() . '/inc/hocwp-custom-ajax.php';
-
-require_once(HOCWP_PATH . '/theme/setup-theme-after.php');
+require_once(HOCWP_THEME_INC_PATH . '/setup-theme-after.php');
