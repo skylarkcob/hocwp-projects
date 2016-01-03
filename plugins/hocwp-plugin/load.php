@@ -2,6 +2,15 @@
 if(!function_exists('add_filter')) exit;
 $path = get_template_directory() . '/hocwp/load.php';
 
+function hocwp_plugin_default_missing_core_notice() {
+    $plugin_data = get_plugin_data(HOCWP_PLUGIN_DEFAULT_FILE);
+    ?>
+    <div class="updated notice settings-error error">
+        <p><strong><?php _e('Error:', 'hocwp-plugin-default'); ?></strong> <?php printf(__('Plugin %s cannot be run properly because of missing core.', 'hocwp-plugin-default'), '<strong>' . $plugin_data['Name'] . '</strong>'); ?></p>
+    </div>
+    <?php
+}
+
 if(!defined('HOCWP_URL')) {
     if(file_exists($path)) {
         define('HOCWP_URL', untrailingslashit(get_template_directory_uri()) . '/hocwp');
@@ -11,15 +20,6 @@ if(!defined('HOCWP_URL')) {
 }
 
 require_once(HOCWP_PLUGIN_DEFAULT_INC_PATH . '/hocwp-plugin-pre-hook.php');
-
-function hocwp_plugin_default_missing_core_notice() {
-    $plugin_data = get_plugin_data(HOCWP_PLUGIN_DEFAULT_FILE);
-    ?>
-    <div class="updated notice settings-error error">
-        <p><strong><?php _e('Error:', 'hocwp-plugin-default'); ?></strong> <?php printf(__('Plugin %s cannot be run properly because of missing core.', 'hocwp-plugin-default'), '<strong>' . $plugin_data['Name'] . '</strong>'); ?></p>
-    </div>
-    <?php
-}
 
 if(!defined('HOCWP_PATH')) {
     if(!file_exists($path)) {
