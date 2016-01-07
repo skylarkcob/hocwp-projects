@@ -553,7 +553,20 @@ class HOCWP_Option {
             $base_name = $name;
             unset($args['class']);
             if(!isset($args['value'])) {
-                $args['value'] = $this->get_by_key($name, hocwp_get_value_by_key($args, 'default'));
+                $value = $this->get_by_key($name, hocwp_get_value_by_key($args, 'default'));
+                $args['value'] = $value;
+            }
+            if('hocwp_field_size' == $callback || 'hocwp_field_input_size' == $callback) {
+                $tmp_name = $name;
+                $tmp_name[] = 'width';
+                $args['name_width'] = $this->get_field_name($tmp_name);
+                $args['id_width'] = $this->get_field_id($tmp_name);
+                $tmp_name = $name;
+                $tmp_name[] = 'height';
+                $args['name_height'] = $this->get_field_name($tmp_name);
+                $args['id_height'] = $this->get_field_id($tmp_name);
+                $tmp_sizes = $this->get_by_key($name, hocwp_get_value_by_key($args, 'default'));
+                $sizes = array();
             }
             $args['name'] = $this->get_field_name($name);
             $args['id'] = $this->get_field_id($name);
@@ -573,7 +586,8 @@ class HOCWP_Option {
                         continue;
                     }
                     if(!isset($option['value'])) {
-                        $option['value'] = $this->get_by_key($name, hocwp_get_value_by_key($option, 'default'));
+                        $value = $this->get_by_key($name, hocwp_get_value_by_key($option, 'default'));
+                        $option['value'] = $value;
                     }
                     $option['name'] = $this->get_field_name($name);
                     $option['id'] = $this->get_field_id($name);

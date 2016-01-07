@@ -80,12 +80,14 @@ function hocwp_get_views_template($slug, $name = '') {
     }
 }
 
-function hocwp_use_jquery_cdn() {
-    $option = get_option('hocwp_optimize');
-    $use = hocwp_get_value_by_key($option, 'use_jquery_cdn', 1);
-    $use = (bool)$use;
-    $use = apply_filters('hocwp_use_jquery_google_cdn', $use);
-    return $use;
+function hocwp_use_jquery_cdn($value = null) {
+    if(null == $value) {
+        $option = hocwp_get_optimize_option();
+        $use = hocwp_get_value_by_key($option, 'use_jquery_cdn', 1);
+        $value = (bool)$use;
+    }
+    $value = apply_filters('hocwp_use_jquery_google_cdn', $value);
+    return $value;
 }
 
 function hocwp_load_jquery_from_cdn() {

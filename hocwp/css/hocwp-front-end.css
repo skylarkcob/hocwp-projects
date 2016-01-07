@@ -1,4 +1,8 @@
 /**
+ * Last update: 07/01/2016
+ */
+
+/**
  * Global
  */
 
@@ -174,6 +178,7 @@ body.hocwp {
 
 .hocwp .hocwp-mobile-menu {
     height: 100%;
+    max-width: 250px;
     padding: 0;
     top: 0;
     width: 250px;
@@ -249,6 +254,14 @@ body.hocwp {
 
 .hocwp .hocwp-mobile-menu .sub-menu li:first-child {
     border-top: medium none;
+}
+
+.hocwp .hocwp-mobile-menu li a:hover {
+    text-decoration: none;
+}
+
+.hocwp .hocwp-mobile-menu .sub-menu li:last-child {
+    border-bottom: medium none;
 }
 
 /**
@@ -606,6 +619,20 @@ body.hocwp {
     font-style: italic;
     margin-top: 5px;
     text-align: center;
+}
+
+.hocwp .entry-content h1,
+.hocwp .entry-content h2 {
+    font-size: 23px;
+}
+
+.hocwp .entry-content h3 {
+    font-size: 19px;
+}
+
+.hocwp .entry-content h4 {
+    font-size: 15px;
+    font-weight: 700;
 }
 
 /**

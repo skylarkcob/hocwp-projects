@@ -1,3 +1,7 @@
+/**
+ * Last update: 07/01/2016
+ */
+
 jQuery(document).ready(function($) {
     (function() {
         var logo_url = hocwp.login_logo_url;

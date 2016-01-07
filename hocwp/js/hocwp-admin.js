@@ -1,3 +1,7 @@
+/**
+ * Last update: 07/01/2016
+ */
+
 jQuery(document).ready(function($) {
     hocwp.addBulkAction = function(actions) {
         actions = actions || [];
@@ -133,6 +137,22 @@ jQuery(document).ready(function($) {
                     $license_code.val(response.license_code);
                 }
             });
+        });
+    })();
+
+    (function() {
+        $('.hocwp input[type="checkbox"]').on('click', function(e) {
+            var $element = $(this),
+                value = $element.val();
+            if($element.is(':checked')) {
+                if(1 != value) {
+                    $element.val(1);
+                }
+            } else {
+                if(1 == value || '' == value) {
+                    $element.val(0);
+                }
+            }
         });
     })();
 

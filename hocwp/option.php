@@ -25,6 +25,7 @@ function hocwp_option_get_data($base_slug) {
     if(hocwp_object_valid($option)) {
         $data = $option->get();
     } else {
+        $base_slug = str_replace('hocwp_', '', $base_slug);
         $data = get_option('hocwp_' . $base_slug);
     }
     return $data;
@@ -32,8 +33,52 @@ function hocwp_option_get_data($base_slug) {
 
 function hocwp_option_get_value($base, $key) {
     $data = hocwp_option_get_data($base);
-    $result = hocwp_get_value_by_key($data, $key);
+    $base_slug = str_replace('hocwp_', '', $base);
+    $defaults = hocwp_option_defaults();
+    $defaults = hocwp_get_value_by_key($defaults, $base_slug);
+    if(hocwp_array_has_value($defaults)) {
+        $data = (array)$data;
+        $data = wp_parse_args($data, $defaults);
+    }
+    if(!empty($key)) {
+        $result = hocwp_get_value_by_key($data, $key);
+    } else {
+        $result = $data;
+    }
     return $result;
+}
+
+function hocwp_get_option_by_name($base, $name = '') {
+    return hocwp_option_get_value($base, $name);
+}
+
+function hocwp_get_reading_option($name = '') {
+    return hocwp_get_option_by_name('reading', $name);
+}
+
+function hocwp_get_optimize_option($name = '') {
+    return hocwp_get_option_by_name('optimize', $name);
+}
+
+function hocwp_get_thumbnail_size($name = 'thumbnail_small') {
+    $width = 0;
+    $height = 0;
+    switch($name) {
+        case 'thumbnail_small':
+            $width = absint(get_option('thumbnail_size_w'));
+            $height = absint(get_option('thumbnail_size_h'));
+            break;
+        case 'thumbnail_medium':
+            $width = absint(get_option('medium_size_w'));
+            $height = absint(get_option('medium_size_h'));
+            break;
+        case 'thumbnail_large':
+            $width = absint(get_option('large_size_w'));
+            $height = absint(get_option('large_size_h'));
+            break;
+    }
+    $value = array($width, $height);
+    return $value;
 }
 
 function hocwp_option_add_setting_field($base, $args) {
@@ -93,14 +138,28 @@ function hocwp_option_defaults() {
                 ),
                 'play_on' => 'home'
             )
+        ),
+        'optimize' => array(
+            'use_jquery_cdn' => 1,
+            'use_bootstrap' => 1,
+            'use_bootstrap_cdn' => 1,
+            'use_fontawesome' => 1,
+            'use_fontawesome_cdn' => 1,
+            'use_superfish' => 1,
+            'use_superfish_cdn' => 1
         )
     );
     return apply_filters('hocwp_option_defaults', $defaults);
 }
 
-function hocwp_recommended_plugins() {
+function hocwp_get_theme_required_plugins() {
     $required = array();
     $required = apply_filters('hocwp_required_plugins', $required);
+    return $required;
+}
+
+function hocwp_recommended_plugins() {
+    $required = hocwp_get_theme_required_plugins();
     $defaults = array(
         'required' => $required,
         'recommended' => array(

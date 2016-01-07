@@ -1,3 +1,7 @@
+/**
+ * Last update: 07/01/2016
+ */
+
 jQuery(document).ready(function($) {
     (function() {
         $('.sf-menu, .hocwp-superfish-menu > ul').each(function() {

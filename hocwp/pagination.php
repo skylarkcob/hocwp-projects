@@ -151,8 +151,9 @@ function hocwp_show_pagination($args = array()) {
     $border_radius = isset($args['border_radius']) ? $args['border_radius'] : $default_border_radius;
 
     $style .= '-style';
-    $class = 'pagination loop-paginations hocwp-pagination';
-    $class .= ' '.$style;
+    $class = hocwp_get_value_by_key($args, 'class');
+    hocwp_add_string_with_space_before($class, 'pagination loop-paginations hocwp-pagination');
+    $class .= ' ' . $style;
     switch($border_radius) {
         case 'circle':
             $class .= ' border-radius-circle';

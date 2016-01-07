@@ -322,6 +322,10 @@ function hocwp_field_fieldset($args = array()) {
     hocwp_field_after($args);
 }
 
+function hocwp_field_input_size($args = array()) {
+    hocwp_field_size($args);
+}
+
 function hocwp_field_size($args = array()) {
     $args = hocwp_field_sanitize_args($args);
     $field_class = $args['class'];

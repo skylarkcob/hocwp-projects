@@ -1,3 +1,7 @@
+/**
+ * Last update: 07/01/2016
+ */
+
 window.wp = window.wp || {};
 window.hocwp = window.hocwp || {};
 

@@ -7,6 +7,6 @@ function hocwp_get_wc_version() {
     return '';
 }
 
-function hcowp_wc_installed() {
+function hocwp_wc_installed() {
     return defined('WOOCOMMERCE_VERSION');
 }

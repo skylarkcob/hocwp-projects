@@ -144,12 +144,19 @@ function hocwp_get_value_by_key($arr, $key, $default = '') {
         return $value;
     }
     foreach($key as $child_key) {
+        $has_value = false;
         $tmp = (array)$tmp;
         if(is_array($child_key)) {
             continue;
         }
-        $tmp = isset($tmp[$child_key]) ? $tmp[$child_key] : '';
+        if(isset($tmp[$child_key])) {
+            $has_value = true;
+            $tmp = $tmp[$child_key];
+        }
         if(empty($tmp) || !is_array($tmp)) {
+            if($has_value) {
+                $value = $tmp;
+            }
             break;
         }
     }
@@ -778,6 +785,32 @@ function hocwp_sanitize_array($arr, $unique = true, $filter = true) {
 
 function hocwp_sanitize_size($size) {
     $size = (array)$size;
+    if(isset($size['size'])) {
+        $type = $size['size'];
+        switch($type) {
+            case 'small':
+                $width = absint(get_option('thumbnail_size_w'));
+                $height = absint(get_option('thumbnail_size_h'));
+                if(0 != $width && 0 != $height) {
+                    return array($width, $height);
+                }
+                break;
+            case 'medium':
+                $width = absint(get_option('medium_size_w'));
+                $height = absint(get_option('medium_size_h'));
+                if(0 != $width && 0 != $height) {
+                    return array($width, $height);
+                }
+                break;
+            case 'large':
+                $width = absint(get_option('large_size_w'));
+                $height = absint(get_option('large_size_h'));
+                if(0 != $width && 0 != $height) {
+                    return array($width, $height);
+                }
+                break;
+        }
+    }
     $width = intval(isset($size[0]) ? $size['0'] : 0);
     if(0 == $width && isset($size['width'])) {
         $width = $size['width'];
@@ -824,7 +857,7 @@ function hocwp_get_browser() {
         $browser = 'safari';
     } elseif($is_chrome) {
         $browser = 'chrome';
-        if(false !== strpos($user_agent, 'edge')) {
+        if(false !== strpos($user_agent, 'edge/')) {
             $browser = 'edge';
         }
     } elseif($is_winIE) {
@@ -837,7 +870,7 @@ function hocwp_get_browser() {
         $browser = 'iphone';
     }
     if('unknown' == $browser) {
-        if(false !== strpos($user_agent, 'edge/12')) {
+        if(false !== strpos($user_agent, 'edge/')) {
             $browser = 'edge';
         }
     }
@@ -1753,6 +1786,9 @@ function hocwp_admin_notice($args = array()) {
         return;
     }
     $title = isset($args['title']) ? $args['title'] : '';
+    if($error && empty($title)) {
+        $title = __('Error', 'hocwp');
+    }
     if(!empty($title)) {
         $text = '<strong>' . $title . ':</strong> ' . $text;
     }

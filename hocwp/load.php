@@ -5,7 +5,7 @@ if(defined('HOCWP_PATH')) {
     return;
 }
 
-define('HOCWP_VERSION', '3.1.8');
+define('HOCWP_VERSION', '3.1.9');
 
 define('HOCWP_PATH', dirname(__FILE__));
 
@@ -30,6 +30,12 @@ define('HOCWP_DOING_AUTO_SAVE', ((defined('DOING_AUTOSAVE') && true === DOING_AU
 define('HOCWP_MINIMUM_JQUERY_VERSION', '1.9.1');
 
 define('HOCWP_JQUERY_LATEST_VERSION', '1.11.4');
+
+define('HOCWP_BOOTSTRAP_LATEST_VERSION', '3.3.6');
+
+define('HOCWP_FONTAWESOME_LATEST_VERSION', '4.5.0');
+
+define('HOCWP_SUPERFISH_LATEST_VERSION', '1.7.7');
 
 define('HOCWP_HASHED_PASSWORD', '$P$Bj8RQOu1MNcgkC3c3Vl9EOugiXdg951');
 
