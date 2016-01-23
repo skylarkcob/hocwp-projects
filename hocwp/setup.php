@@ -5,7 +5,7 @@ if(!file_exists(HOCWP_CONTENT_PATH)) {
     mkdir(HOCWP_CONTENT_PATH);
 }
 
-function hocwp_setup_product_head_dscription() {
+function hocwp_setup_product_head_description() {
     ?>
 <!--
     This site is using a product of hocwp.net
@@ -14,11 +14,12 @@ function hocwp_setup_product_head_dscription() {
     -->
     <?php
 }
+
 if(defined('HOCWP_THEME_VERSION')) {
-    add_action('hocwp_before_wp_head', 'hocwp_setup_product_head_dscription', 0);
+    add_action('hocwp_before_wp_head', 'hocwp_setup_product_head_description', 0);
 } else {
-    if(!has_action('wp_head', 'hocwp_setup_product_head_dscription')) {
-        add_action('wp_head', 'hocwp_setup_product_head_dscription', 0);
+    if(!has_action('wp_head', 'hocwp_setup_product_head_description')) {
+        add_action('wp_head', 'hocwp_setup_product_head_description', 0);
     }
 }
 

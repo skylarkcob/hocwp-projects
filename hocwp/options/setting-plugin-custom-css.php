@@ -2,7 +2,7 @@
 if(!function_exists('add_filter')) exit;
 
 global $hocwp_pos_tabs;
-$parent_slug = 'plugins.php';
+$parent_slug = 'hocwp_plugin_option';
 
 $option = new HOCWP_Option(__('Custom CSS', 'hocwp'), 'hocwp_plugin_custom_css');
 $option->set_parent_slug($parent_slug);

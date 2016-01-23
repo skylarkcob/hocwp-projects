@@ -276,6 +276,9 @@ class HOCWP_License {
                 if(!empty($piece)) {
                     $value = $this->get_map_key_value($piece);
                     if(!empty($value)) {
+                        if(is_array($value)) {
+                            $value = implode('_', $value);
+                        }
                         $result .= $value . '_';
                     }
                 }

@@ -2,7 +2,7 @@
 if(!function_exists('add_filter')) exit;
 
 global $hocwp_pos_tabs;
-$parent_slug = 'plugins.php';
+$parent_slug = 'hocwp_plugin_option';
 $option = new HOCWP_Option(__('Plugin Licenses', 'hocwp'), 'hocwp_plugin_license');
 $option->set_parent_slug($parent_slug);
 $option->set_use_style_and_script(true);

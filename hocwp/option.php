@@ -180,7 +180,7 @@ function hocwp_plugin_option_page_header() {
     ?>
     <div class="page-header">
         <h2 class="theme-name"><?php _e('Plugin Options', 'hocwp'); ?></h2>
-        <span class="theme-version"><?php printf(__('Core Version: %s', 'hocwp'), HOCWP_VERSION); ?></span>
+        <span class="theme-version"><?php printf(__('Core Version: %s', 'hocwp'), HOCWP_PLUGIN_CORE_VERSION); ?></span>
     </div>
     <?php
 }
