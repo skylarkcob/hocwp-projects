@@ -45,19 +45,39 @@ function hocwp_get_theme_template($name) {
 }
 
 function hocwp_theme_get_content_none() {
-    hocwp_theme_get_template('content', 'none');
+    hocwp_theme_get_content('none');
+}
+
+function hocwp_theme_get_content($name) {
+    hocwp_theme_get_template('content/content', $name);
 }
 
 function hocwp_theme_get_template_page($name) {
-    hocwp_theme_get_template('page', $name);
+    hocwp_theme_get_template('page/page', $name);
 }
 
 function hocwp_theme_get_module($name) {
-    hocwp_theme_get_template('module', $name);
+    hocwp_theme_get_template('module/module', $name);
+}
+
+function hocwp_theme_get_ajax($name) {
+    hocwp_theme_get_template('ajax/ajax', $name);
+}
+
+function hocwp_theme_get_carousel($name) {
+    hocwp_theme_get_template('carousel/carousel', $name);
+}
+
+function hocwp_theme_get_meta($name) {
+    hocwp_theme_get_template('meta/meta', $name);
+}
+
+function hocwp_theme_get_modal($name) {
+    hocwp_theme_get_template('modal/modal', $name);
 }
 
 function hocwp_theme_get_loop($name) {
-    hocwp_theme_get_template('loop', $name);
+    hocwp_theme_get_template('loop/loop', $name);
 }
 
 function hocwp_theme_get_image_url($name) {

@@ -184,7 +184,7 @@ add_filter('admin_footer_text', 'hocwp_setup_theme_admin_footer_text', 99);
 function hocwp_setup_theme_update_footer($text) {
     $tmp = strtolower($text);
     if(hocwp_string_contain($tmp, 'version')) {
-        $text = sprintf(__('Theme core version %s', 'hocwp'), HOCWP_THEME_VERSION);
+        $text = sprintf(__('Theme core version %s', 'hocwp'), HOCWP_THEME_CORE_VERSION);
     }
     return $text;
 }

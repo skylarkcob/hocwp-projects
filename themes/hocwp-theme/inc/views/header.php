@@ -30,7 +30,7 @@ do_action('hocwp_before_site');
         <?php if(!$maintenance_mode) : ?>
             <?php do_action('hocwp_before_site_header'); ?>
             <header id="masthead" class="site-header clearfix"<?php hocwp_html_tag_attributes('header', 'masthead'); ?>>
-                <?php hocwp_theme_get_template('header'); ?>
+                <?php hocwp_theme_get_module('header'); ?>
             </header><!-- .site-header -->
             <?php do_action('hocwp_after_site_header'); ?>
         <?php endif; ?>

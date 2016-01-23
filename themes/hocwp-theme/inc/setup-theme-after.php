@@ -495,6 +495,51 @@ function hocwp_setup_theme_widget_title($title) {
 }
 add_filter('widget_title', 'hocwp_setup_theme_widget_title');
 
+function hocwp_setup_theme_add_required_plugins($plugins) {
+    if(current_theme_supports('woocommerce') || hocwp_wc_installed()) {
+        $plugins[] = 'woocommerce';
+    }
+    return $plugins;
+}
+add_filter('hocwp_required_plugins', 'hocwp_setup_theme_add_required_plugins', 99);
+
+function hocwp_setup_theme_admin_notice_required_plugins() {
+    $required_plugins = hocwp_get_theme_required_plugins();
+    if(hocwp_array_has_value($required_plugins)) {
+        $active_plugins = get_option('active_plugins');
+        $missing_required = false;
+        if(!hocwp_array_has_value($active_plugins)) {
+            $missing_required = true;
+        } else {
+            $not_active = array();
+            foreach($required_plugins as $slug) {
+                if('woocommerce' == $slug && hocwp_wc_installed()) {
+                    continue;
+                }
+                $install = false;
+                foreach($active_plugins as $basename) {
+                    $tmp = basename(dirname($basename));
+                    if($tmp == $slug) {
+                        $install = true;
+                    }
+                }
+                if(!$install) {
+                    $not_active[] = $slug;
+                }
+            }
+            if(hocwp_array_has_value($not_active)) {
+                $missing_required = true;
+            }
+        }
+        if($missing_required) {
+            $admin_url = admin_url('admin.php');
+            $admin_url = add_query_arg(array('page' => 'hocwp_recommended_plugin', 'tab' => 'required'), $admin_url);
+            hocwp_admin_notice(array('text' => sprintf(__('Please install the required plugins for your theme. You can <a href="%s">click here</a> to see the list of required plugins for this theme.', 'hocwp'), $admin_url), 'error' => true));
+        }
+    }
+}
+add_action('admin_notices', 'hocwp_setup_theme_admin_notice_required_plugins');
+
 function hocwp_setup_theme_custom_head() {
     $options = get_option('hocwp_theme_custom');
     $background_image = hocwp_get_value_by_key($options, 'background_image');
