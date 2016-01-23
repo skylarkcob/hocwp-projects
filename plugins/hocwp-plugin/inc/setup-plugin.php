@@ -1,8 +1,77 @@
 <?php
 if(!function_exists('add_filter')) exit;
+
 if(!has_action('init', 'hocwp_session_start')) {
     add_action('init', 'hocwp_session_start');
 }
+
+function hocwp_plugin_default_get_option_defaults() {
+    $defaults = array();
+    $defaults = apply_filters(HOCWP_PLUGIN_DEFAULT_OPTION_NAME . '_option_defaults', $defaults);
+    return $defaults;
+}
+
+function hocwp_plugin_default_get_option() {
+    $defaults = hocwp_plugin_default_get_option_defaults();
+    $option = get_option(HOCWP_PLUGIN_DEFAULT_OPTION_NAME);
+    if(!hocwp_array_has_value($option)) {
+        $option = array();
+    }
+    $option = wp_parse_args($option, $defaults);
+    return apply_filters(HOCWP_PLUGIN_DEFAULT_OPTION_NAME . '_options', $option);
+}
+
+function hocwp_plugin_default_get_license_defined_data() {
+    global $hocwp_plugin_default_license_data;
+    $hocwp_plugin_default_license_data = hocwp_sanitize_array($hocwp_plugin_default_license_data);
+    return apply_filters('hocwp_plugin_default_license_defined_data', $hocwp_plugin_default_license_data);
+}
+
+function hocwp_plugin_default_license_valid() {
+    global $hocwp_plugin_default_license, $hocwp_plugin_default_license_valid;
+
+    if(!hocwp_object_valid($hocwp_plugin_default_license)) {
+        $hocwp_plugin_default_license = new HOCWP_License();
+        $hocwp_plugin_default_license->set_type('plugin');
+        $hocwp_plugin_default_license->set_use_for(HOCWP_PLUGIN_DEFAULT_BASENAME);
+        $hocwp_plugin_default_license->set_option_name(HOCWP_PLUGIN_LICENSE_OPTION_NAME);
+    }
+
+    $hocwp_plugin_default_license_valid = $hocwp_plugin_default_license->check_valid(hocwp_plugin_default_get_license_defined_data());
+    return $hocwp_plugin_default_license_valid;
+}
+
+$GLOBALS['hocwp_plugin_default_license_valid'] = true;
+
+function hocwp_plugin_default_activation() {
+    if(!current_user_can('activate_plugins')) {
+        return;
+    }
+    flush_rewrite_rules();
+    do_action('hocwp_plugin_default_activation');
+}
+register_activation_hook(HOCWP_PLUGIN_DEFAULT_FILE, 'hocwp_plugin_default_activation');
+
+function hocwp_plugin_default_deactivation() {
+    if(!current_user_can('activate_plugins')) {
+        return;
+    }
+    flush_rewrite_rules();
+    do_action('hocwp_plugin_default_deactivation');
+}
+register_deactivation_hook(HOCWP_PLUGIN_DEFAULT_FILE, 'hocwp_plugin_default_deactivation');
+
+function hocwp_plugin_default_settings_link($links) {
+    $settings_link = sprintf('<a href="' . HOCWP_PLUGIN_DEFAULT_SETTINGS_URL . '">%s</a>', __('Settings', 'hocwp-plugin-default'));
+    array_unshift($links, $settings_link);
+    return $links;
+}
+add_filter('plugin_action_links_' . HOCWP_PLUGIN_DEFAULT_BASENAME, 'hocwp_plugin_default_settings_link');
+
+function hocwp_plugin_default_textdomain() {
+    load_plugin_textdomain('hocwp-plugin-default', false, HOCWP_PLUGIN_DEFAULT_DIRNAME . '/languages/');
+}
+add_action('plugins_loaded', 'hocwp_plugin_default_textdomain');
 
 function hocwp_plugin_default_admin_bar_menu($wp_admin_bar) {
     $args = array(
@@ -37,10 +106,6 @@ function hocwp_plugin_default_invalid_license_notice() {
         'text' => sprintf(__('Plugin %1$s is using an invalid license key! If you does not have one, please contact %2$s via email address %3$s for more information.', 'hocwp-plugin-default'), $plugin_name, '<strong>' . HOCWP_NAME . '</strong>', '<a href="mailto:' . esc_attr(HOCWP_EMAIL) . '">' . HOCWP_EMAIL . '</a>')
     );
     hocwp_admin_notice($args);
-}
-
-if(!hocwp_plugin_default_license_valid()) {
-    return;
 }
 
 function hocwp_plugin_default_enqueue_scripts() {

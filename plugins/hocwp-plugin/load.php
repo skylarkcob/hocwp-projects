@@ -1,5 +1,10 @@
 <?php
 if(!function_exists('add_filter')) exit;
+
+if(!defined('HOCWP_PLUGIN_CORE_VERSION')) {
+    define('HOCWP_PLUGIN_CORE_VERSION', '1.0.0');
+}
+
 $path = get_template_directory() . '/hocwp/load.php';
 
 function hocwp_plugin_default_missing_core_notice() {
@@ -19,7 +24,7 @@ if(!defined('HOCWP_URL')) {
     }
 }
 
-require_once(HOCWP_PLUGIN_DEFAULT_INC_PATH . '/hocwp-plugin-pre-hook.php');
+require_once(HOCWP_PLUGIN_DEFAULT_CUSTOM_PATH . '/hocwp-plugin-pre-hook.php');
 
 if(!defined('HOCWP_PATH')) {
     if(!file_exists($path)) {
@@ -36,14 +41,16 @@ if(!defined('HOCWP_PATH')) {
 
 require_once(HOCWP_PATH . '/plugin-functions.php');
 
-require_once(HOCWP_PLUGIN_DEFAULT_INC_PATH . '/hocwp-plugin-functions.php');
+require_once(HOCWP_PLUGIN_DEFAULT_INC_PATH . '/setup-plugin.php');
 
-require_once(HOCWP_PLUGIN_DEFAULT_INC_PATH . '/hocwp-plugin-setup.php');
+require_once(HOCWP_PLUGIN_DEFAULT_CUSTOM_PATH . '/hocwp-plugin-functions.php');
 
-require_once(HOCWP_PLUGIN_DEFAULT_INC_PATH . '/hocwp-plugin-admin.php');
+require_once(HOCWP_PLUGIN_DEFAULT_CUSTOM_PATH . '/hocwp-plugin-setup.php');
 
-require_once(HOCWP_PLUGIN_DEFAULT_INC_PATH . '/hocwp-plugin-meta.php');
+require_once(HOCWP_PLUGIN_DEFAULT_CUSTOM_PATH . '/hocwp-plugin-admin.php');
 
-require_once(HOCWP_PLUGIN_DEFAULT_INC_PATH . '/hocwp-plugin-hook.php');
+require_once(HOCWP_PLUGIN_DEFAULT_CUSTOM_PATH . '/hocwp-plugin-meta.php');
 
-require_once(HOCWP_PLUGIN_DEFAULT_INC_PATH . '/hocwp-plugin-ajax.php');
+require_once(HOCWP_PLUGIN_DEFAULT_CUSTOM_PATH . '/hocwp-plugin-hook.php');
+
+require_once(HOCWP_PLUGIN_DEFAULT_CUSTOM_PATH . '/hocwp-plugin-ajax.php');
