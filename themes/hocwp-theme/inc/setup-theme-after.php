@@ -503,6 +503,12 @@ function hocwp_setup_theme_add_required_plugins($plugins) {
 }
 add_filter('hocwp_required_plugins', 'hocwp_setup_theme_add_required_plugins', 99);
 
+function hocwp_setup_theme_remove_vietnamese_permalink($title, $raw_title, $context) {
+    $title = hocwp_sanitize_html_class($title);
+    return $title;
+}
+//add_filter('sanitize_title', 'hocwp_setup_theme_remove_vietnamese_permalink', 10, 3);
+
 function hocwp_setup_theme_admin_notice_required_plugins() {
     $required_plugins = hocwp_get_theme_required_plugins();
     if(hocwp_array_has_value($required_plugins)) {

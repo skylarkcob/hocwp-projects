@@ -78,6 +78,7 @@ function hocwp_setup_theme_widgets_init() {
     register_widget('HOCWP_Widget_Facebook_Box');
     register_widget('HOCWP_Widget_Post');
     register_widget('HOCWP_Widget_Top_Commenter');
+    register_widget('HOCWP_Widget_Icon');
     $default_sidebars = array(
         'primary',
         'secondary',

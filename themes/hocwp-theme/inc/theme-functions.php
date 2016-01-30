@@ -180,6 +180,16 @@ function hocwp_theme_add_setting_field_footer_text() {
     hocwp_theme_add_setting_field(array('title' => __('Footer Text', 'hocwp'), 'id' => 'footer_text', 'field_callback' => 'hocwp_field_editor'));
 }
 
+function hocwp_theme_the_footer_text($the_content = true) {
+    $text = hocwp_theme_get_option('footer_text');
+    if($the_content) {
+        $text = apply_filters('the_content', $text);
+    } else {
+        $text = wpautop($text);
+    }
+    echo $text;
+}
+
 function hocwp_theme_add_setting_field_select_page($option_name, $title) {
     hocwp_theme_add_setting_field(array('title' => $title, 'id' => $option_name, 'field_callback' => 'hocwp_field_select_page'));
 }

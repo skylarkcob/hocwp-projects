@@ -10,7 +10,7 @@ if(version_compare($GLOBALS['wp_version'], HOCWP_REQUIRE_WP_VERSION, '<')) {
     return;
 }
 
-define('HOCWP_THEME_CORE_VERSION', '5.0.6');
+define('HOCWP_THEME_CORE_VERSION', '5.0.7');
 
 define('HOCWP_THEME_PATH', get_template_directory());
 
