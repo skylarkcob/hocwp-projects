@@ -11,6 +11,11 @@ function hocwp_theme_register_lib_sticky() {
     wp_enqueue_script('sticky');
 }
 
+function hocwp_theme_register_lib_fancybox() {
+    wp_enqueue_style('fancybox-style', HOCWP_THEME_URL . '/lib/fancybox/jquery.fancybox.css');
+    wp_enqueue_script('fancybox', HOCWP_THEME_URL . '/lib/fancybox/jquery.fancybox.pack.js', array('jquery'), false, true);
+}
+
 function hocwp_theme_register_lib_superfish() {
     wp_register_style('superfish-style', get_template_directory_uri() . '/lib/superfish/css/superfish.min.css');
     wp_register_script('superfish', get_template_directory_uri() . '/lib/superfish/js/superfish.min.js', array('jquery'), false, true);
@@ -176,6 +181,10 @@ function hocwp_theme_add_setting_field_footer_logo() {
     hocwp_theme_add_setting_field(array('title' => __('Footer Logo', 'hocwp'), 'id' => 'footer_logo', 'field_callback' => 'hocwp_field_media_upload'));
 }
 
+function hocwp_theme_add_setting_field_hotline() {
+    hocwp_theme_add_setting_field(array('id' => 'hotline', 'title' => __('Hotline', 'hocwp')));
+}
+
 function hocwp_theme_add_setting_field_footer_text() {
     hocwp_theme_add_setting_field(array('title' => __('Footer Text', 'hocwp'), 'id' => 'footer_text', 'field_callback' => 'hocwp_field_editor'));
 }
@@ -209,6 +218,10 @@ function hocwp_theme_add_setting_field_term_sortable($name, $title, $taxonomies 
         'term_args' => $term_args
     );
     hocwp_theme_add_setting_field($args);
+}
+
+function hocwp_theme_term_meta_field_thumbnail($taxonomies = array('category')) {
+    hocwp_term_meta_thumbnail_field($taxonomies);
 }
 
 function hocwp_theme_generate_license($password, $site_url = '', $domain = '') {
