@@ -32,16 +32,12 @@ class HOCWP_Widget_Banner extends WP_Widget {
         if('!' === $first_char) {
             $title_text = ltrim($title_text, '!');
         }
-        $title  = apply_filters('widget_title', $instance['title']);
         $banner_image = isset($instance['banner_image']) ? $instance['banner_image'] : '';
         $banner_url = isset($instance['banner_url']) ? $instance['banner_url'] : '';
         $banner_image = hocwp_sanitize_media_value($banner_image);
         $banner_image = $banner_image['url'];
         if(!empty($banner_image)) {
-            echo $args['before_widget'];
-            if(!empty($title)) {
-                echo $args['before_title'] . $title . $args['after_title'];
-            }
+            hocwp_widget_before($args, $instance);
             if(!empty($banner_url)) {
                 echo '<a class="hocwp-banner-link" title="' . $title_text . '" href="' . $banner_url . '">';
             }
@@ -49,7 +45,7 @@ class HOCWP_Widget_Banner extends WP_Widget {
             if(!empty($banner_url)) {
                 echo '</a>';
             }
-            echo $args['after_widget'];
+            hocwp_widget_after($args, $instance);
         }
     }
 
@@ -81,12 +77,9 @@ class HOCWP_Widget_Banner extends WP_Widget {
 
     public function update($new_instance, $old_instance) {
         $instance = $old_instance;
-        $title = isset($new_instance['title']) ? strip_tags($new_instance['title']) : '';
-        $banner_image = isset($new_instance['banner_image']) ? $new_instance['banner_image'] : '';
-        $banner_url = isset($new_instance['banner_url']) ? $new_instance['banner_url'] : '';
-        $instance['title'] = $title;
-        $instance['banner_image'] = $banner_image;
-        $instance['banner_url'] = $banner_url;
+        $instance['title'] = strip_tags(hocwp_get_value_by_key($new_instance, 'title'));
+        $instance['banner_image'] = hocwp_get_value_by_key($new_instance, 'banner_image');
+        $instance['banner_url'] = hocwp_get_value_by_key($new_instance, 'banner_url');
         return $instance;
     }
 }

@@ -1960,7 +1960,13 @@ function hocwp_search_form($args = array()) {
 function hocwp_feedburner_form($args = array()) {
     $name = isset($args['name']) ? $args['name'] : '';
     $locale = isset($args['locale']) ? $args['locale'] : 'en_US';
-    $submit_button_text = isset($args['submit_button_text']) ? $args['submit_button_text'] : __('Đăng ký', 'hocwp');
+    $submit_button_text = isset($args['submit_button_text']) ? $args['submit_button_text'] : '';
+    if(!isset($args['submit_button_text']) && isset($args['button_text'])) {
+        $submit_button_text = $args['button_text'];
+    }
+    if(empty($submit_button_text)) {
+        $submit_button_text = __('Đăng ký', 'hocwp');
+    }
     $placeholder = isset($args['placeholder']) ? $args['placeholder'] : __('Nhập địa chỉ email của bạn...', 'hocwp');
     ?>
     <form class="feedburner-form" action="https://feedburner.google.com/fb/a/mailverify" method="post" target="popupwindow" onsubmit="window.open('https://feedburner.google.com/fb/a/mailverify?uri=<?php echo $name; ?>', 'popupwindow', 'scrollbars=yes,width=550,height=520');return true">

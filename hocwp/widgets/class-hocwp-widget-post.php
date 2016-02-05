@@ -116,10 +116,7 @@ class HOCWP_Widget_Post extends WP_Widget {
         $thumbnail_size = hocwp_sanitize_size($thumbnail_size);
         $full_width_post = hocwp_get_value_by_key($instance, 'full_width_post', $this->args['full_width_post']);
         $sidebar = isset($args['id']) ? $args['id'] : 'default';
-        $widget_html = $args['before_widget'];
-        if(!empty($title)) {
-            $widget_html .= $title;
-        }
+        $widget_html = hocwp_get_value_by_key($args, 'before_widget') . $title;
         $content_class = 'widget-content';
         $slider = hocwp_get_value_by_key($instance, 'slider', hocwp_get_value_by_key($this->args, 'slider'));
         if((bool)$slider) {
@@ -362,7 +359,7 @@ class HOCWP_Widget_Post extends WP_Widget {
             $widget_html .= '<p class="nothing-found">' . __('Nothing found!', 'hocwp') . '</p>';
         }
         $widget_html .= '</div>';
-        $widget_html .= $args['after_widget'];
+        $widget_html .= hocwp_get_value_by_key($args, 'after_widget');
         $widget_html = apply_filters('hocwp_widget_html', $widget_html, $instance, $query = $w_query, $widget_args = $args, $option_name = $this->option_name, $widget_number = $this->number, $sidebar_id = $sidebar);
         $widget_html = apply_filters($this->option_name . '_html', $widget_html, $instance, $query = $w_query, $widget_args = $args, $widget_number = $this->number, $sidebar_id = $sidebar);
         $widget_html = apply_filters($this->option_name . '_' . $sidebar . '_html', $widget_html, $instance, $query = $w_query, $widget_args = $args, $widget_number = $this->number);
@@ -512,11 +509,11 @@ class HOCWP_Widget_Post extends WP_Widget {
 
     public function update($new_instance, $old_instance) {
         $instance = $old_instance;
-        $instance['title'] = isset($new_instance['title']) ? strip_tags($new_instance['title']) : '';
-        $instance['post_type'] = isset($new_instance['post_type']) ? $new_instance['post_type'] : json_encode($this->args['post_type']);
-        $instance['number'] = isset($new_instance['number']) ? $new_instance['number'] : $this->args['number'];
-        $instance['by'] = isset($new_instance['by']) ? $new_instance['by'] : $this->args['by'];
-        $instance['category'] = isset($new_instance['category']) ? $new_instance['category'] : json_encode($this->args['category']);
+        $instance['title'] = strip_tags(hocwp_get_value_by_key($new_instance, 'title'));
+        $instance['post_type'] = hocwp_get_value_by_key($new_instance, 'post_type', json_encode($this->args['post_type']));
+        $instance['number'] = hocwp_get_value_by_key($new_instance, 'number', $this->args['number']);
+        $instance['by'] = hocwp_get_value_by_key($new_instance, 'by', $this->args['by']);
+        $instance['category'] = hocwp_get_value_by_key($new_instance, 'category', json_encode($this->args['category']));
         $instance['full_width_post'] = hocwp_get_value_by_key($new_instance, 'full_width_post', $this->args['full_width_post']);
         $width = hocwp_get_value_by_key($new_instance, 'thumbnail_size_width', $this->args['thumbnail_size'][0]);
         $height = hocwp_get_value_by_key($new_instance, 'thumbnail_size_height', $this->args['thumbnail_size'][1]);

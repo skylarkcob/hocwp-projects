@@ -20,7 +20,7 @@ function hocwp_breadcrumb($args = array()) {
         echo '<ul id="' . $breadcrums_id . '" class="' . $class . '">';
         echo '<li class="item-home"><a class="bread-link bread-home" href="' . get_home_url() . '" title="' . $home_title . '">' . $home_title . '</a></li>';
         echo '<li class="separator separator-home"> ' . $separator . ' </li>';
-        if(is_archive() && !is_tax() && !is_category()) {
+        if(is_post_type_archive()) {
             echo '<li class="item-current item-archive"><strong class="bread-current bread-archive">' . post_type_archive_title('', false) . '</strong></li>';
 
         } elseif(is_archive() && is_tax() && !is_category()) {

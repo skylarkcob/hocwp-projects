@@ -38,8 +38,6 @@ class HOCWP_Widget_Facebook_Box extends WP_Widget {
     }
 
     public function widget($args, $instance) {
-        $title = isset($instance['title']) ? $instance['title'] : '';
-        $title  = apply_filters('widget_title', $instance['title']);
         $page_name = isset($instance['page_name']) ? $instance['page_name'] : '';
         $href = isset($instance['href']) ? $instance['href'] : '';
         $width = isset($instance['width']) ? $instance['width'] : $this->args['width'];
@@ -50,10 +48,7 @@ class HOCWP_Widget_Facebook_Box extends WP_Widget {
         $hide_cta = (bool)(isset($instance['hide_cta']) ? $instance['hide_cta'] : $this->args['hide_cta']);
         $small_header = (bool)(isset($instance['small_header']) ? $instance['small_header'] : $this->args['small_header']);
         $adapt_container_width = (bool)(isset($instance['adapt_container_width']) ? $instance['adapt_container_width'] : $this->args['adapt_container_width']);
-        echo $args['before_widget'];
-        if(!empty($title)) {
-            echo $args['before_title'] . $title . $args['after_title'];
-        }
+        hocwp_widget_before($args, $instance);
         $fanpage_args = array(
             'page_name' => $page_name,
             'href' => $href,
@@ -67,7 +62,7 @@ class HOCWP_Widget_Facebook_Box extends WP_Widget {
             'adapt_container_width' => $adapt_container_width
         );
         hocwp_facebook_page_plugin($fanpage_args);
-        echo $args['after_widget'];
+        hocwp_widget_after($args, $instance);
     }
 
     public function form($instance) {
@@ -164,17 +159,17 @@ class HOCWP_Widget_Facebook_Box extends WP_Widget {
 
     public function update($new_instance, $old_instance) {
         $instance = $old_instance;
-        $instance['title'] = isset($new_instance['title']) ? strip_tags($new_instance['title']) : '';
-        $instance['page_name'] = isset($new_instance['page_name']) ? $new_instance['page_name'] : '';
-        $instance['href'] = isset($new_instance['href']) ? $new_instance['href'] : '';
-        $instance['width'] = isset($new_instance['width']) ? $new_instance['width'] : $this->args['width'];
-        $instance['height'] = isset($new_instance['height']) ? $new_instance['height'] : $this->args['height'];
-        $instance['hide_cover'] = isset($new_instance['hide_cover']) ? 1 : hocwp_bool_to_int($this->args['hide_cover']);
-        $instance['show_facepile'] = isset($new_instance['show_facepile']) ? 1 : hocwp_bool_to_int($this->args['show_facepile']);
-        $instance['show_posts'] = isset($new_instance['show_posts']) ? 1 : hocwp_bool_to_int($this->args['show_posts']);
-        $instance['hide_cta'] = isset($new_instance['hide_cta']) ? 1 : hocwp_bool_to_int($this->args['hide_cta']);
-        $instance['small_header'] = isset($new_instance['small_header']) ? 1 : hocwp_bool_to_int($this->args['small_header']);
-        $instance['adapt_container_width'] = isset($new_instance['adapt_container_width']) ? 1 : hocwp_bool_to_int($this->args['adapt_container_width']);
+        $instance['title'] = strip_tags(hocwp_get_value_by_key($new_instance, 'title'));
+        $instance['page_name'] = hocwp_get_value_by_key($new_instance, 'page_name');
+        $instance['href'] = hocwp_get_value_by_key($new_instance, 'href');
+        $instance['width'] = hocwp_get_value_by_key($new_instance, 'width', $this->args['width']);
+        $instance['height'] = hocwp_get_value_by_key($new_instance, 'height', $this->args['height']);
+        $instance['hide_cover'] = hocwp_checkbox_post_data_value($new_instance, 'hide_cover', hocwp_bool_to_int($this->args['hide_cover']));
+        $instance['show_facepile'] = hocwp_checkbox_post_data_value($new_instance, 'show_facepile', hocwp_bool_to_int($this->args['show_facepile']));
+        $instance['show_posts'] = hocwp_checkbox_post_data_value($new_instance, 'show_posts', hocwp_bool_to_int($this->args['show_posts']));
+        $instance['hide_cta'] = hocwp_checkbox_post_data_value($new_instance, 'hide_cta', hocwp_bool_to_int($this->args['hide_cta']));
+        $instance['small_header'] = hocwp_checkbox_post_data_value($new_instance, 'small_header', hocwp_bool_to_int($this->args['small_header']));
+        $instance['adapt_container_width'] = hocwp_checkbox_post_data_value($new_instance, 'adapt_container_width', hocwp_bool_to_int($this->args['adapt_container_width']));
         return $instance;
     }
 }

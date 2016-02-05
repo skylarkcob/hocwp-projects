@@ -218,8 +218,8 @@ function hocwp_widget_title($args, $instance, $echo = true) {
     return $title;
 }
 
-function hocwp_checkbox_post_data_value($data, $key) {
-    return isset($data[$key]) ? 1 : 0;
+function hocwp_checkbox_post_data_value($data, $key, $default = 0) {
+    return isset($data[$key]) ? 1 : $default;
 }
 
 function hocwp_change_nav_menu_css_class($terms, $classes, $item) {
@@ -239,14 +239,18 @@ function hocwp_remove_wpseo_breadcrumb_xmlns($output) {
     return $output;
 }
 
-function hocwp_widget_before($args, $instance) {
+function hocwp_widget_before($args, $instance, $show_title = true) {
     if(isset($args['before_widget'])) {
         echo $args['before_widget'];
     }
-    hocwp_widget_title($args, $instance);
+    if($show_title) {
+        hocwp_widget_title($args, $instance);
+    }
+    echo '<div class="widget-content">';
 }
 
 function hocwp_widget_after($args, $instance) {
+    echo '</div>';
     if(isset($args['after_widget'])) {
         echo $args['after_widget'];
     }

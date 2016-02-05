@@ -289,6 +289,25 @@ function hocwp_post_author_box() {
     }
 }
 
+function hocwp_post_get_taxonomies($object, $output = 'names') {
+    return get_object_taxonomies($object, $output);
+}
+
+function hocwp_post_get_top_parent_terms($post) {
+    $result = array();
+    $taxonomies = hocwp_post_get_taxonomies($post);
+    foreach($taxonomies as $tax) {
+        $terms = wp_get_post_terms($post->ID, $tax);
+        foreach($terms as $term) {
+            if($term->parent != 0) {
+                $term = hocwp_term_get_top_most_parent($term);
+            }
+            $result[] = $term;
+        }
+    }
+    return $result;
+}
+
 function hocwp_insert_post($args = array()) {
     $post_title = '';
     $post_content = '';

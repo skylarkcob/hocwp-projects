@@ -66,43 +66,37 @@ class HOCWP_Widget_Top_Commenter extends WP_Widget {
             }
         }
         $commenters = hocwp_get_top_commenters($number, $time, $condition);
-        ?>
-        <div class="widget-content">
-            <?php
-            if(!hocwp_array_has_value($commenters)) {
-                echo wpautop($none_text);
-            } else {
-                ?>
-                <ol class="list-commenters">
-                    <?php
-                    foreach($commenters as $commenter) {
-                        $url = $commenter->comment_author_url;
-                        $author = $commenter->comment_author;
-                        $count = absint($commenter->comments_count);
-                        $email = $commenter->comment_author_email;
-                        $user_id = 0;
-                        if(!empty($commenter->user_id)) {
-                            $user_id = $commenter->user_id;
-                        }
-                        if((bool)$show_count) {
-                            $author .= " ($count)";
-                        }
-                        if(empty($url) || 'http://' == $url || !(bool)$link_author_name) {
-                            $url = $author;
-                        } else {
-                            $url = "<a href='$url' rel='external nofollow' class='url'>$author</a>";
-                        }
-                        ?>
-                        <li class="commenter"><?php echo $url; ?></li>
-                        <?php
+        if(!hocwp_array_has_value($commenters)) {
+            echo wpautop($none_text);
+        } else {
+            ?>
+            <ol class="list-commenters">
+                <?php
+                foreach($commenters as $commenter) {
+                    $url = $commenter->comment_author_url;
+                    $author = $commenter->comment_author;
+                    $count = absint($commenter->comments_count);
+                    $email = $commenter->comment_author_email;
+                    $user_id = 0;
+                    if(!empty($commenter->user_id)) {
+                        $user_id = $commenter->user_id;
+                    }
+                    if((bool)$show_count) {
+                        $author .= " ($count)";
+                    }
+                    if(empty($url) || 'http://' == $url || !(bool)$link_author_name) {
+                        $url = $author;
+                    } else {
+                        $url = "<a href='$url' rel='external nofollow' class='url'>$author</a>";
                     }
                     ?>
-                </ol>
-                <?php
-            }
-            ?>
-        </div>
-        <?php
+                    <li class="commenter"><?php echo $url; ?></li>
+                    <?php
+                }
+                ?>
+            </ol>
+            <?php
+        }
         hocwp_widget_after($args, $instance);
     }
 

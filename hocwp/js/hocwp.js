@@ -1,5 +1,5 @@
 /**
- * Last update: 07/01/2016
+ * Last update: 05/02/2016
  */
 
 window.wp = window.wp || {};
@@ -701,6 +701,26 @@ jQuery(document).ready(function($) {
                     $sub_menu.slideDown();
                 }
                 $this.toggleClass('active');
+                return false;
+            });
+
+            $window.scroll(function() {
+                var pos = $(this).scrollTop(),
+                    $last_item = $element.children('li:last-child'),
+                    last_item_pos = $element.offset().top,
+                    $admin_bar = $('#wpadminbar'),
+                    admin_bar_height = 0;
+                if($admin_bar.length) {
+                    admin_bar_height = $admin_bar.height();
+                }
+                if(pos < 100) {
+                    pos = admin_bar_height;
+                }
+                if(pos == admin_bar_height) {
+                    $element.css({'top' : pos + 'px'});
+                } else {
+                    $element.css({'top' : '-' + pos + 'px'});
+                }
             });
         }
 
