@@ -96,6 +96,17 @@ function hocwp_option_add_setting_field($base, $args) {
     }
 }
 
+function hocwp_option_add_setting_section($base, $args) {
+    $option = hocwp_option_get_object_from_list($base);
+    if(hocwp_object_valid($option)) {
+        $id = isset($args['id']) ? $args['id'] : '';
+        $title = isset($args['title']) ? $args['title'] : '';
+        if(!empty($id) && !empty($title)) {
+            $option->add_section($args);
+        }
+    }
+}
+
 function hocwp_get_option($base_name) {
     $option = hocwp_option_get_object_from_list($base_name);
     if(hocwp_object_valid($option)) {

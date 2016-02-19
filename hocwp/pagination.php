@@ -1,4 +1,9 @@
 <?php
+/*
+ * Name: HocWP Pagination
+ * Version: 1.0.1
+ * Last updated: 18/02/2016
+ */
 if(!function_exists('add_filter')) exit;
 
 function hocwp_pagination_defaults() {
@@ -15,7 +20,8 @@ function hocwp_pagination_defaults() {
         'gap' => 3,
         'hellip' => true,
         'show_max_page' => true,
-        'min_page' => 5
+        'min_page' => 5,
+        'current_item_link' => false
     );
     return apply_filters('hocwp_pagination_defaults', $defaults);
 }
@@ -177,17 +183,20 @@ function hocwp_show_pagination($args = array()) {
 
 function hocwp_loop_pagination_item($args = array()) {
     $defaults = hocwp_pagination_defaults();
+
     // The number of page links to show before and after the current page.
     $range = hocwp_get_value_by_key($args, 'range', hocwp_get_value_by_key($defaults, 'range'));
     // The number of page links to show at beginning and end of pagination.
     $anchor = hocwp_get_value_by_key($args, 'anchor', hocwp_get_value_by_key($defaults, 'anchor'));
     // The minimum number of page links before ellipsis shows.
     $gap = hocwp_get_value_by_key($args, 'gap', hocwp_get_value_by_key($defaults, 'gap'));
+
     $hellip = hocwp_get_value_by_key($args, 'hellip', hocwp_get_value_by_key($defaults, 'hellip'));
     $show_max_page = hocwp_get_value_by_key($args, 'show_max_page', hocwp_get_value_by_key($defaults, 'show_max_page'));
     $min_page = hocwp_get_value_by_key($args, 'min_page', hocwp_get_value_by_key($defaults, 'min_page'));
     $current_page = isset($args['current_page']) ? $args['current_page'] : 1;
     $total_page = isset($args['total_page']) ? $args['total_page'] : 1;
+    $current_item_link = hocwp_get_value_by_key($args, 'current_item_link', hocwp_get_value_by_key($defaults, 'current_item_link'));
 
     $request = isset($args['request']) ? $args['request'] : hocwp_get_request();
 
@@ -208,7 +217,12 @@ function hocwp_loop_pagination_item($args = array()) {
             }
         }
         if($current_page == $i) {
-            $result .= '<span class="item current-item">' . $i .'</span>';
+            if($current_item_link) {
+                $link_href = hocwp_get_pagenum_link(array('pagenum' => $i, 'request' => $request));
+                $result .= '<a class="item link-item current-item" href="' . $link_href . '" data-paged="' . $i . '">' . $i . '</a>';
+            } else {
+                $result .= '<span class="item current-item">' . $i .'</span>';
+            }
         } else {
             $count_hidden_button_before = $before_current - ($anchor + 1);
             $count_hidden_button_after = $total_page - ($after_current + 1);

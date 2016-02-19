@@ -338,12 +338,16 @@ class HOCWP_Widget_Post extends WP_Widget {
                         ?>
                         <li <?php post_class($class); ?>>
                             <?php
+                            do_action('hocwp_post_widget_before_post', $sidebar_id = $sidebar);
                             if($full_width) {
                                 hocwp_post_thumbnail(array('bfi_thumb' => false));
                             } else {
                                 hocwp_post_thumbnail(array('width' => $thumbnail_size[0], 'height' => $thumbnail_size[1]));
                             }
+                            do_action('hocwp_post_widget_before_post_title', $sidebar_id = $sidebar);
                             hocwp_post_title_link();
+                            do_action('hocwp_post_widget_after_post_title', $sidebar_id = $sidebar);
+                            do_action('hocwp_post_widget_after_post', $sidebar_id = $sidebar);
                             ?>
                         </li>
                         <?php

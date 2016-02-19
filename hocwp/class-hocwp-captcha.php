@@ -1,4 +1,9 @@
 <?php
+/*
+ * Name: HocWP Captcha
+ * Version: 1.0.1
+ * Last updated: 16/02/2016
+ */
 if(!function_exists('add_filter')) exit;
 class HOCWP_Captcha {
     private $chars;
@@ -19,6 +24,10 @@ class HOCWP_Captcha {
     private $save_url;
     private $session_name;
     private $expired_minutes;
+    private $pixel;
+    private $pixel_color;
+    private $line;
+    private $line_color;
 
     public function set_expired_minutes($minutes) {
         $this->expired_minutes = $minutes;
@@ -176,6 +185,38 @@ class HOCWP_Captcha {
         return $this->chars;
     }
 
+    public function set_pixel($bool) {
+        $this->pixel = $bool;
+    }
+
+    public function get_pixel() {
+        return (bool)$this->pixel;
+    }
+
+    public function set_pixel_color($color) {
+        $this->pixel_color = $color;
+    }
+
+    public function get_pixel_color() {
+        return $this->pixel_color;
+    }
+
+    public function set_line($bool) {
+        $this->line = $bool;
+    }
+
+    public function get_line() {
+        return (bool)$this->line;
+    }
+
+    public function set_line_color($color) {
+        $this->line_color = $color;
+    }
+
+    public function get_line_color() {
+        return $this->line_color;
+    }
+
     public function __construct() {
         $defaults = array(
             'chars' => hocwp_get_safe_captcha_characters(),
@@ -185,6 +226,10 @@ class HOCWP_Captcha {
             'size' => array(87, 25),
             'background' => array(255, 255, 255),
             'foreground' => array(138, 200, 67),
+            'pixel' => true,
+            'pixel_color' => array(205, 255, 205),
+            'line' => true,
+            'line_color' => array(205, 215, 205),
             'font_char_width' => 14,
             'file_mode' => 0444,
             'image_type' => 'png',
@@ -205,6 +250,10 @@ class HOCWP_Captcha {
         $this->set_size($args['size']);
         $this->set_background($args['background']);
         $this->set_foreground($args['foreground']);
+        $this->set_line($args['line']);
+        $this->set_line_color($args['line_color']);
+        $this->set_pixel($args['pixel']);
+        $this->set_pixel_color($args['pixel_color']);
         $this->set_font_char_width($args['font_char_width']);
         $this->set_file_mode($args['file_mode']);
         $this->set_image_type($args['image_type']);
@@ -241,6 +290,16 @@ class HOCWP_Captcha {
             $bg = @imagecolorallocate($im, $background[0], $background[1], $background[2]);
             $fg = @imagecolorallocate($im, $foreground[0], $foreground[1], $foreground[2]);
             @imagefill($im, 0, 0, $bg);
+
+            if($this->get_pixel()) {
+                $pixel_colors = $this->get_pixel_color();
+                $pixel_color = @imagecolorallocate($im, $pixel_colors[0], $pixel_colors[1], $pixel_colors[2]);
+                $pixels = rand(300, 600);
+                for($i = 0; $i < $pixels; $i++) {
+                    @imagesetpixel($im, rand(1, 100), rand(1, 100), $pixel_color);
+                }
+            }
+
             $base = $this->get_base();
             $x = $base[0] + mt_rand(-2, 2);
             for($i = 0; $i < strlen($code); $i++) {
@@ -251,6 +310,16 @@ class HOCWP_Captcha {
                 @imagettftext($im, $this->get_font_size(), $angle, $x, $y, $fg, $font, $code[$i]);
                 $x += $this->get_font_char_width();
             }
+
+            if($this->get_line()) {
+                $lines = rand(5, 10);
+                $line_colors = $this->get_line_color();
+                $line_color = @imagecolorallocate($im, $line_colors[0], $line_colors[1], $line_colors[2]);
+                for($i = 0; $i < $lines; $i++) {
+                    @imageline($im, rand(1, 100), rand(1, 100), rand(1, 100), rand(1, 100), $line_color);
+                }
+            }
+
             switch($this->get_image_type()) {
                 case 'jpeg':
                     $filename = sanitize_file_name($filename. '.jpeg');
