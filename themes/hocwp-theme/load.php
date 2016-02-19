@@ -67,4 +67,6 @@ require HOCWP_THEME_CUSTOM_PATH . '/hocwp-custom-hook.php';
 
 require HOCWP_THEME_CUSTOM_PATH . '/hocwp-custom-ajax.php';
 
+require HOCWP_THEME_CUSTOM_PATH . '/hocwp-custom-translation.php';
+
 require_once(HOCWP_THEME_INC_PATH . '/setup-theme-after.php');

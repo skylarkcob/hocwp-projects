@@ -28,6 +28,7 @@ function hocwp_theme_register_lib_font_awesome() {
 function hocwp_theme_default_script_localize_object() {
     $defaults = hocwp_default_script_localize_object();
     $args = array(
+        'home_url' => esc_url(home_url('/')),
         'login_logo_url' => hocwp_get_login_logo_url(),
         'mobile_menu_icon' => '<button class="menu-toggle mobile-menu-button" aria-expanded="false" aria-controls=""><i class="fa fa fa-bars"></i><span class="text">' . __('Menu', 'hocwp') . '</span></button>',
         'search_form' => get_search_form(false)
@@ -108,6 +109,7 @@ function hocwp_theme_the_logo() {
         $logo_url = '<img alt="' . get_bloginfo('description') . '" src="' . $logo_url . '">';
         $logo_class = 'img-hyperlink';
     }
+    hocwp_add_string_with_space_before($logo_class, 'site-logo');
     ?>
     <div class="site-branding">
         <?php if(is_front_page() && is_home()) : ?>
@@ -169,6 +171,10 @@ function hocwp_theme_site_main_after() {
     <?php
 }
 
+function hocwp_theme_add_setting_section($args) {
+    hocwp_option_add_setting_section('theme_setting', $args);
+}
+
 function hocwp_theme_add_setting_field($args) {
     hocwp_option_add_setting_field('theme_setting', $args);
 }
@@ -191,6 +197,9 @@ function hocwp_theme_add_setting_field_footer_text() {
 
 function hocwp_theme_the_footer_text($the_content = true) {
     $text = hocwp_theme_get_option('footer_text');
+    if(function_exists('pll__')) {
+        $text = pll__($text);
+    }
     if($the_content) {
         $text = apply_filters('the_content', $text);
     } else {
@@ -300,5 +309,18 @@ function hocwp_theme_maintenance_mode() {
             ob_flush();
             exit;
         }
+    }
+}
+
+function hocwp_theme_translate_text($text) {
+    if(function_exists('pll__')) {
+        $text = pll__($text);
+    }
+    return $text;
+}
+
+function hocwp_theme_register_translation_text($name, $text, $multiline = false) {
+    if(function_exists('pll_register_string')) {
+        pll_register_string($name, $text, 'hocwp', $multiline);
     }
 }

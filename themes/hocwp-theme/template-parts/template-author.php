@@ -1,2 +1,2 @@
 <?php
-hocwp_theme_get_template('archive');
+hocwp_get_theme_template('archive');
