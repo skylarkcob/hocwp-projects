@@ -80,6 +80,7 @@ function hocwp_setup_theme_widgets_init() {
     register_widget('HOCWP_Widget_Top_Commenter');
     register_widget('HOCWP_Widget_Icon');
     register_widget('HOCWP_Widget_FeedBurner');
+    register_widget('HOCWP_Widget_Social');
     $default_sidebars = array(
         'primary',
         'secondary',

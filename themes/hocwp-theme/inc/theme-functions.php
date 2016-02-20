@@ -25,6 +25,10 @@ function hocwp_theme_register_lib_font_awesome() {
     wp_register_style('font-awesome-style', get_template_directory_uri() . '/lib/font-awesome/css/font-awesome.min.css');
 }
 
+function hocwp_theme_register_lib_raty() {
+    wp_enqueue_script('jquery-raty', get_template_directory_uri() . '/lib/raty/jquery.raty.js', array('jquery'), false, true);
+}
+
 function hocwp_theme_default_script_localize_object() {
     $defaults = hocwp_default_script_localize_object();
     $args = array(

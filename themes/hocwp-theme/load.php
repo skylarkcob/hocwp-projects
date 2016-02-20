@@ -10,7 +10,9 @@ if(version_compare($GLOBALS['wp_version'], HOCWP_REQUIRE_WP_VERSION, '<')) {
     return;
 }
 
-define('HOCWP_THEME_CORE_VERSION', '5.0.9');
+define('HOCWP_THEME_CORE_VERSION', '5.1.0');
+
+define('HOCWP_THEME_REQUIRE_CORE_VERSION', '3.2.4');
 
 define('HOCWP_THEME_PATH', get_template_directory());
 
@@ -45,6 +47,27 @@ if(!defined('HOCWP_PATH')) {
         return;
     }
     require_once(HOCWP_THEME_PATH . '/hocwp/load.php');
+}
+
+function hocwp_theme_invalid_core_version_notice() {
+    ?>
+    <div class="updated notice settings-error error">
+        <p><strong><?php _e('Error:', 'hocwp'); ?></strong> <?php _e('Current theme cannot be run properly because of using invalid core version. Please update core to latest version or contact administrator for assistance.', 'hocwp'); ?></p>
+    </div>
+    <?php
+}
+
+if(version_compare(HOCWP_VERSION, HOCWP_THEME_REQUIRE_CORE_VERSION, '<')) {
+    global $pagenow;
+    if(is_admin()) {
+        add_action('admin_notices', 'hocwp_theme_invalid_core_version_notice');
+    } else {
+        if('wp-login.php' != $pagenow) {
+            wp_die('<strong>' . __('Error:', 'hocwp') . '</strong> ' . __('Theme cannot be displayed because of using invalid core version. Please contact administrator for assistance.', 'hocwp'), __('Invalid Core Version', 'hocwp'));
+            exit;
+        }
+    }
+    return;
 }
 
 require_once(HOCWP_THEME_CUSTOM_PATH . '/hocwp-custom-pre-hook.php');
