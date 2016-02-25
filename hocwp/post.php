@@ -1,19 +1,12 @@
 <?php
-if(!function_exists('add_filter')) exit;
-/**
- * @param $classes
- * @return array
- */
+if(!function_exists('add_filter')) {exit;}
+
 function hocwp_post_class($classes) {
     $classes[] = 'hocwp-post';
     return $classes;
 }
 add_filter('post_class', 'hocwp_post_class');
 
-/**
- * @param $more
- * @return mixed|void
- */
 function hocwp_excerpt_more($more) {
     $read_more_text = apply_filters('hocwp_read_more_text', __('Continue reading', 'hocwp'));
     $read_more_text = apply_filters('hocwp_excerpt_more_text', $read_more_text);
@@ -26,21 +19,12 @@ function hocwp_excerpt_more($more) {
 }
 add_filter('excerpt_more', 'hocwp_excerpt_more');
 
-/**
- * @param $old_url
- * @param $new_url
- * @return false|int
- */
 function hocwp_post_change_content_url($old_url, $new_url) {
     global $wpdb;
     $sql = "UPDATE $wpdb->posts SET post_content = (REPLACE (post_content, '$old_url', '$new_url'))";
     return $wpdb->query($sql);
 }
 
-/**
- * @param null $post_id
- * @return int|mixed
- */
 function hocwp_get_post_views($post_id = null) {
     if(!is_numeric($post_id)) {
         $post_id = get_the_ID();
@@ -54,10 +38,6 @@ function hocwp_get_post_views($post_id = null) {
     return $result;
 }
 
-/**
- * @param null $post_id
- * @return int|mixed
- */
 function hocwp_get_post_likes($post_id = null) {
     if(!is_numeric($post_id)) {
         $post_id = get_the_ID();
@@ -76,11 +56,6 @@ function hocwp_get_post_dislikes($post_id = null) {
     return $result;
 }
 
-/**
- * @param string $post_id
- * @param string $size
- * @return mixed|string|void
- */
 function hocwp_get_post_thumbnail_url($post_id = '', $size = 'full') {
     $result = '';
     if(empty($post_id)) {
@@ -119,9 +94,6 @@ function hocwp_get_post_thumbnail_url($post_id = '', $size = 'full') {
     return $result;
 }
 
-/**
- * @param array $args
- */
 function hocwp_post_thumbnail($args = array()) {
     $post_id = isset($args['post_id']) ? $args['post_id'] : '';
     if(empty($post_id)) {
@@ -162,15 +134,36 @@ function hocwp_post_thumbnail($args = array()) {
     if(is_numeric($height) && $height > 0) {
         $img->set_attribute('height', $size[1]);
     }
+    $permalink = hocwp_get_value_by_key($args, 'permalink', get_permalink($post_id));
+    $lazyload = hocwp_get_value_by_key($args, 'lazyload', false);
+    $before = hocwp_get_value_by_key($args, 'before');
+    $after = hocwp_get_value_by_key($args, 'after');
     $img->set_attribute('alt', get_the_title($post_id));
     $img->set_class('attachment-post-thumbnail wp-post-image');
     $img->set_attribute('src', $thumbnail_url);
+    $bk_img = '';
+    if((bool)$lazyload) {
+        $img->set_wrap_tag('noscript');
+        $bk_img = $img->build();
+        $img->set_wrap_tag('');
+        $loading_icon = hocwp_get_value_by_key($args, 'loading_icon');
+        if(!hocwp_is_image($loading_icon)) {
+            $loading_icon = hocwp_get_image_url('transparent.gif');
+        }
+        $img->set_image_src($loading_icon);
+        $img->set_attribute('data-original', $thumbnail_url);
+        $img->add_class('lazyload');
+    }
     $loop = isset($args['loop']) ? $args['loop'] : true;
     $custom_html = isset($args['custom_html']) ? $args['custom_html'] : '';
+    echo $before;
     if(is_singular() && !$loop) : ?>
         <div class="post-thumbnail entry-thumb"<?php hocwp_html_tag_attributes('div', 'entry_thumb'); ?>>
             <?php
             $img->output();
+            if((bool)$lazyload) {
+                echo $bk_img;
+            }
             echo $custom_html;
             if(current_theme_supports('hocwp-schema')) {
                 ?>
@@ -182,9 +175,12 @@ function hocwp_post_thumbnail($args = array()) {
             ?>
         </div>
     <?php else : ?>
-        <a class="post-thumbnail entry-thumb" href="<?php echo get_permalink($post_id); ?>" aria-hidden="true"<?php hocwp_html_tag_attributes('a', 'entry_thumb'); ?>>
+        <a class="post-thumbnail entry-thumb" href="<?php echo $permalink; ?>" aria-hidden="true"<?php hocwp_html_tag_attributes('a', 'entry_thumb'); ?>>
             <?php
             $img->output();
+            if((bool)$lazyload) {
+                echo $bk_img;
+            }
             echo $custom_html;
             if(current_theme_supports('hocwp-schema')) {
                 ?>
@@ -196,6 +192,7 @@ function hocwp_post_thumbnail($args = array()) {
             ?>
         </a>
     <?php endif;
+    echo $after;
 }
 
 function hocwp_post_type_no_featured_field() {
@@ -230,8 +227,15 @@ function hocwp_article_after() {
     <?php
 }
 
-function hocwp_post_title_link() {
-    the_title(sprintf('<h2 class="entry-title post-title" itemprop="headline"><a href="%s" rel="bookmark">', esc_url(get_permalink())), '</a></h2>');
+function hocwp_post_title_link($args = array()) {
+    $title = hocwp_get_value_by_key($args, 'title');
+    $permalink = hocwp_get_value_by_key($args, 'permalink', get_permalink());
+    if(empty($title)) {
+        the_title(sprintf('<h2 class="entry-title post-title" itemprop="headline"><a href="%s" rel="bookmark">', esc_url($permalink)), '</a></h2>');
+    } else {
+        $title = sprintf('<h2 class="entry-title post-title" itemprop="headline"><a href="%s" rel="bookmark">', esc_url($permalink)) . $title . '</a></h2>';
+        echo $title;
+    }
 }
 
 function hocwp_post_title_single() {
@@ -341,10 +345,21 @@ function hocwp_insert_post($args = array()) {
     return $post_id;
 }
 
-function hocwp_get_post_by_column($column_name, $column_value, $output = 'OBJECT') {
+function hocwp_get_post_by_column($column_name, $column_value, $output = 'OBJECT', $args = array()) {
     global $wpdb;
+    $post_type = hocwp_get_value_by_key($args, 'post_type');
+    $post_types = hocwp_sanitize_array($post_type);
     $output = strtoupper($output);
     $sql = $wpdb->prepare("SELECT ID FROM $wpdb->posts WHERE $column_name = %s", $column_value);
+    $count_type = 0;
+    foreach($post_types as $post_type) {
+        if(0 == $count_type) {
+            $sql .= " AND post_type = '$post_type'";
+        } else {
+            $sql .= " OR post_type = '$post_type'";
+        }
+        $count_type++;
+    }
     $post_id = $wpdb->get_var($sql);
     $result = '';
     switch($output) {

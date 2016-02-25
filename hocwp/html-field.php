@@ -558,6 +558,12 @@ function hocwp_field_media_upload($args = array()) {
     if(!empty($media_url)) {
         $image = new HOCWP_HTML('img');
         $image->set_attribute('src', $media_url);
+        if(isset($value['is_image']) && !(bool)$value['is_image']) {
+            $type_icon = hocwp_get_value_by_key($value, 'type_icon');
+            if(!empty($type_icon)) {
+                $image->set_attribute('src', $type_icon);
+            }
+        }
         $media_preview->set_text($image->build());
     }
     $media_preview->output();
@@ -607,12 +613,21 @@ function hocwp_field_media_upload_simple($args = array()) {
     }
     $value = hocwp_get_value_by_key($args, 'value');
     $value = hocwp_sanitize_media_value($value);
+    $media_url = $value['url'];
     $btn_insert_class = 'btn-insert-media simple';
     $btn_remove_class = 'btn-remove simple';
     $img = '';
     if(!empty($value['url'])) {
         hocwp_add_string_with_space_before($btn_insert_class, 'hidden');
-        $img = '<img atl="" src="' . $value['url'] . '">';
+        $image = new HOCWP_HTML('img');
+        $image->set_attribute('src', $media_url);
+        if(isset($value['is_image']) && !(bool)$value['is_image']) {
+            $type_icon = hocwp_get_value_by_key($value, 'type_icon');
+            if(!empty($type_icon)) {
+                $image->set_attribute('src', $type_icon);
+            }
+        }
+        $img = $image->build();
     } else {
         hocwp_add_string_with_space_before($btn_remove_class, 'hidden');
     }
@@ -859,8 +874,12 @@ function hocwp_field_select_plugin($args = array()) {
 
 function hocwp_field_select_term($args = array()) {
     hocwp_field_sanitize_args($args);
-    $taxonomy = isset($args['taxonomy']) ? $args['taxonomy'] : 'category';
-    $taxonomies = isset($args['taxonomies']) ? $args['taxonomies'] : array('category');
+    $taxonomy = hocwp_get_value_by_key($args, 'taxonomy');
+    $taxonomies = hocwp_get_value_by_key($args, 'taxonomies');
+    $taxonomies = hocwp_sanitize_array($taxonomies);
+    if(!hocwp_array_has_value($taxonomies) && empty($taxonomy)) {
+        $taxonomy = 'category';
+    }
     $taxonomies[] = $taxonomy;
     $taxonomies = hocwp_sanitize_array($taxonomies);
     $options = isset($args['options']) ? $args['options'] : array();

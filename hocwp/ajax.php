@@ -97,3 +97,14 @@ function hocwp_vote_post_ajax_callback() {
 }
 add_action('wp_ajax_hocwp_vote_post', 'hocwp_vote_post_ajax_callback');
 add_action('wp_ajax_nopriv_hocwp_vote_post', 'hocwp_vote_post_ajax_callback');
+
+function hocwp_sanitize_media_value_ajax_callback() {
+    $id = isset($_POST['id']) ? $_POST['id'] : 0;
+    $url = isset($_POST['url']) ? $_POST['url'] : '';
+    $result = array('id' => $id, 'url' => $url);
+    $result = hocwp_sanitize_media_value($result);
+    echo json_encode($result);
+    exit;
+}
+add_action('wp_ajax_hocwp_sanitize_media_value', 'hocwp_sanitize_media_value_ajax_callback');
+add_action('wp_ajax_nopriv_hocwp_sanitize_media_value', 'hocwp_sanitize_media_value_ajax_callback');

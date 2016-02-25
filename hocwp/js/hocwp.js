@@ -1,5 +1,5 @@
 /**
- * Last update: 05/02/2016
+ * Last updated: 24/02/2016
  */
 
 window.wp = window.wp || {};
@@ -77,9 +77,32 @@ jQuery(document).ready(function($) {
     hocwp.createImageHTML = function(args) {
         args = args || {};
         var alt = args.alt || '',
-            src = args.src || '';
-        if($.trim(src)) {
-            return '<img src="' + src + '" alt="' + alt + '">';
+            id = args.id || 0,
+            src = args.src || '',
+            $element = args.element || null;
+        if($.isNumeric(id) && id > 0) {
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: hocwp.ajax_url,
+                data: {
+                    action: 'hocwp_sanitize_media_value',
+                    url: src,
+                    id: id
+                },
+                success: function(response){
+                    if(!response.is_image) {
+                        src = response.type_icon;
+                    }
+                    if($element.length) {
+                        $element.html('<img src="' + src + '" alt="' + alt + '">');
+                    }
+                }
+            });
+        } else {
+            if($.trim(src)) {
+                return '<img src="' + src + '" alt="' + alt + '">';
+            }
         }
     };
 
@@ -148,6 +171,13 @@ jQuery(document).ready(function($) {
                 }
             });
         });
+    };
+
+    hocwp.addDefaultQuicktagButton = function() {
+        QTags.addButton('hr', 'hr', '\n<hr>\n', '', 'h', 'Horizontal rule line', 30);
+        QTags.addButton('dl', 'dl', '<dl>\n', '</dl>\n\n', 'd', 'HTML Description List Element', 100);
+        QTags.addButton('dt', 'dt', '\t<dt>', '</dt>\n', '', 'HTML Definition Term Element', 101);
+        QTags.addButton('dd', 'dd', '\t<dd>', '</dd>\n', '', 'HTML Description Element', 102);
     };
 
     hocwp.formatNumber = function(number, separator, currency) {
@@ -281,7 +311,7 @@ jQuery(document).ready(function($) {
 
     hocwp.mediaChange = function(upload, remove, preview, url, id) {
         if(hocwp.isImageUrl(url.val())) {
-            preview.html(hocwp.createImageHTML({src: url.val()}));
+            preview.html(hocwp.createImageHTML({src: url.val(), id: id.val(), element: preview}));
         } else {
             preview.html('');
         }
@@ -336,7 +366,7 @@ jQuery(document).ready(function($) {
                     }
                     if(media_item.url) {
                         $url.val(media_item.url);
-                        $preview.html(hocwp.createImageHTML({src: media_item.url}));
+                        $preview.html(hocwp.createImageHTML({src: media_item.url, id: media_item.id, element: $preview}));
                         button.addClass('hidden');
                         $remove.removeClass('hidden');
                     }
@@ -405,10 +435,13 @@ jQuery(document).ready(function($) {
 jQuery(document).ready(function($) {
     function MediaUpload(element, options) {
         this.self = this;
+        this.$element = $(element);
+        if(!this.$element.length) {
+            return false;
+        }
         this.element = element;
         this.options = $.extend({}, MediaUpload.DEFAULTS, options);
         this.items = null;
-        this.$element = $(element);
         this.$container = this.$element.parent();
         this.$id = this.$container.find('input.media-id');
         this.$url = this.$container.find('input.media-url');
@@ -453,7 +486,7 @@ jQuery(document).ready(function($) {
             }
             if(media_item.url) {
                 this.$url.val(media_item.url);
-                this.$preview.html(hocwp.createImageHTML({src: media_item.url}));
+                this.$preview.html(hocwp.createImageHTML({src: media_item.url, id: media_item.id, element: this.$preview}));
                 this.$element.addClass('hidden');
                 this.$remove.removeClass('hidden');
             }
@@ -498,7 +531,7 @@ jQuery(document).ready(function($) {
     MediaUpload.prototype.change = function(e) {
         e.preventDefault();
         if(hocwp.isImageUrl(this.$url.val())) {
-            this.$preview.html(hocwp.createImageHTML({src: this.$url.val()}));
+            this.$preview.html(hocwp.createImageHTML({src: this.$url.val(), id: this.$id.val(), element: this.$preview}));
         } else {
             this.$preview.html('');
         }
@@ -519,9 +552,12 @@ jQuery(document).ready(function($) {
         var $window = $(window),
             current_pos = $window.scrollTop();
         this.self = this;
+        this.$element = $(element);
+        if(!this.$element.length) {
+            return false;
+        }
         this.element = element;
         this.options = $.extend({}, ScrollTop.DEFAULTS, options);
-        this.$element = $(element);
         this._defaults = ScrollTop.DEFAULTS;
         this._name = ScrollTop.NAME;
 
@@ -572,9 +608,12 @@ jQuery(document).ready(function($) {
 jQuery(document).ready(function($) {
     function SortableList(element, options) {
         this.self = this;
+        this.$element = $(element);
+        if(!this.$element.length) {
+            return false;
+        }
         this.element = element;
         this.options = $.extend({}, SortableList.DEFAULTS, options);
-        this.$element = $(element);
         this._defaults = SortableList.DEFAULTS;
         this._name = SortableList.NAME;
         if(this.$element.hasClass('manage-column')) {
@@ -635,9 +674,12 @@ jQuery(document).ready(function($) {
             $body = $('body'),
             current_width = $window.width();
         this.self = this;
+        this.$element = $(element);
+        if(!this.$element.length) {
+            return false;
+        }
         this.element = element;
         this.options = $.extend({}, MobileMenu.DEFAULTS, options);
-        this.$element = $(element);
         this._defaults = MobileMenu.DEFAULTS;
         this._name = MobileMenu.NAME;
         this.init();
@@ -771,9 +813,12 @@ jQuery(document).ready(function($) {
 jQuery(document).ready(function($) {
     function ChosenSelect(element, options) {
         this.self = this;
+        this.$element = $(element);
+        if(!this.$element.length) {
+            return false;
+        }
         this.element = element;
         this.options = $.extend({}, ChosenSelect.DEFAULTS, options);
-        this.$element = $(element);
         this._defaults = ChosenSelect.DEFAULTS;
         this._name = ChosenSelect.NAME;
         this.multiple = this.$element.attr('multiple');
@@ -817,6 +862,81 @@ jQuery(document).ready(function($) {
         return this.each(function() {
             if(!$.data(this, ChosenSelect.NAME)) {
                 $.data(this, ChosenSelect.NAME, new ChosenSelect(this, options));
+            }
+        });
+    };
+});
+
+jQuery(document).ready(function($) {
+    function PostRating(element, options) {
+        this.self = this;
+        this.$element = $(element);
+        if(!this.$element.length) {
+            return false;
+        }
+        this.element = element;
+        this.options = $.extend({}, PostRating.DEFAULTS, options);
+        this._defaults = PostRating.DEFAULTS;
+        this._name = PostRating.NAME;
+        this.multiple = this.$element.attr('multiple');
+        this.init();
+        var $element = this.$element;
+        $element.raty(this.options);
+    }
+
+    PostRating.NAME = 'hocwp.postRating';
+
+    PostRating.DEFAULTS = {
+        score: function() {
+            return $(this).attr('data-score');
+        },
+        path: function() {
+            return this.getAttribute('data-path');
+        },
+        number: parseInt($(this).attr('data-number')),
+        numberMax: parseInt($(this).attr('data-number-max')),
+        readOnly: function() {
+            var readonly = parseInt($(this).attr('data-readonly'));
+            return readonly == 1;
+        },
+        click: function(score, e) {
+            var $element = $(this),
+                post_id = parseInt(this.getAttribute('data-id'));
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: hocwp.ajax_url,
+                data: {
+                    action: 'hocwp_rate_post',
+                    post_id: post_id,
+                    score: score,
+                    number: $element.attr('data-number'),
+                    number_max: $element.attr('data-number-max')
+                },
+                success: function(response){
+                    if(response.success) {
+                        var refresh = parseInt($element.attr('data-refresh'));
+                        if(1 == refresh) {
+                            $element.attr('data-score', response.score);
+                        } else {
+                            $element.attr('data-score', score);
+                        }
+                        $element.attr('data-readonly', 1);
+                        $element.raty(options);
+                    }
+                }
+            });
+        }
+    };
+
+    PostRating.prototype.init = function() {
+
+    };
+
+    $.fn.hocwpPostRating = function(options) {
+        return this.each(function() {
+            if(!$.data(this, PostRating.NAME)) {
+                $.data(this, PostRating.NAME, new PostRating(this, options));
             }
         });
     };

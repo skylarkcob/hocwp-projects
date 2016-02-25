@@ -17,12 +17,22 @@ class HOCWP_Meta {
     private $column;
     private $edit_callback;
 
+    private $use_media_upload = false;
+
     public function set_edit_callback($edit_callback) {
         $this->edit_callback = $edit_callback;
     }
 
     public function get_edit_callback() {
         return $this->edit_callback;
+    }
+
+    public function set_use_media_upload($use) {
+        $this->use_media_upload = $use;
+    }
+
+    public function get_use_media_upload() {
+        return (bool)$this->use_media_upload;
     }
 
     public function set_column($column) {
@@ -181,7 +191,7 @@ class HOCWP_Meta {
 
     public function term_meta_init() {
         global $pagenow;
-        if('edit-tags.php' == $pagenow) {
+        if('edit-tags.php' == $pagenow || $this->get_use_media_upload()) {
             add_filter('hocwp_wp_enqueue_media', '__return_true');
             add_filter('hocwp_use_admin_style_and_script', '__return_true');
         }
@@ -294,7 +304,7 @@ class HOCWP_Meta {
 
     public function post_meta_box_init() {
         global $pagenow;
-        if('post-new.php' == $pagenow) {
+        if('post-new.php' == $pagenow || $this->get_use_media_upload()) {
             add_filter('hocwp_wp_enqueue_media', '__return_true');
             add_filter('hocwp_use_admin_style_and_script', '__return_true');
         }

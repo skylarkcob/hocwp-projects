@@ -46,15 +46,14 @@ function hocwp_get_pc_ip() {
 }
 
 function hocwp_get_all_shortcodes() {
-    global $shortcode_tags;
-    return $shortcode_tags;
+    return $GLOBALS['shortcode_tags'];
 }
 
 function hocwp_get_all_sb_shortcodes() {
     $shortcodes = hocwp_get_all_shortcodes();
     $result = array();
     foreach($shortcodes as $key => $function) {
-        if(('sb' == substr($key, 0, 2) && 'sb' == substr($function, 0, 2)) || ('hocwp' == substr($key, 0, 2) && 'hocwp' == substr($function, 0, 2))) {
+        if(('sb' == substr($key, 0, 2) && 'sb' == substr($function, 0, 2)) || ('hocwp' == substr($key, 0, 5) && 'hocwp' == substr($function, 0, 5))) {
             $result[$key] = $function;
         }
     }
@@ -1591,6 +1590,7 @@ function hocwp_get_social_share_url($args = array()) {
             }
             $result = $url;
             break;
+        case 'gplus':
         case 'googleplus':
             $url = 'http://plusone.google.com/_/+1/confirm';
             $url = add_query_arg('hl', $language, $url);
@@ -1865,8 +1865,27 @@ function hocwp_sanitize_field_args(&$args) {
     return $args;
 }
 
+function hocwp_is_image($url, $id = 0) {
+    $result = false;
+    if(hocwp_id_number_valid($id)) {
+        $result = wp_attachment_is_image($id);
+    } else {
+        $img_formats = array('png', 'jpg', 'jpeg', 'gif', 'tiff', 'bmp');
+        $path_info = pathinfo($url);
+        $extension = isset($path_info['extension']) ? $path_info['extension'] : '';
+        if(in_array(strtolower($extension), $img_formats)) {
+            $result = true;
+        }
+    }
+    return $result;
+}
+
 function hocwp_sanitize_media_value($value) {
     $url = isset($value['url']) ? $value['url'] : '';
+    $has_url = false;
+    if(!empty($url)) {
+        $has_url = true;
+    }
     $id = isset($value['id']) ? $value['id'] : '';
     $id = absint($id);
     if(0 < $id && hocwp_media_file_exists($id)) {
@@ -1875,7 +1894,21 @@ function hocwp_sanitize_media_value($value) {
     if(0 >= $id && !is_array($value) && !empty($value)) {
         $url = $value;
     }
-    return array('id' => $id, 'url' => $url);
+    if($has_url && empty($url)) {
+        $url = wp_get_attachment_url($id);
+    }
+    $icon = wp_mime_type_icon($id);
+    $size = hocwp_get_media_size($id);
+    $result = array(
+        'id' => $id,
+        'url' => $url,
+        'type_icon' => $icon,
+        'is_image' => hocwp_is_image($url, $id),
+        'size' => $size,
+        'size_format' => hocwp_size_converter($size),
+        'mime_type' => get_post_mime_type($id)
+    );
+    return $result;
 }
 
 function hocwp_get_media_path($id) {
@@ -1896,6 +1929,16 @@ function hocwp_get_media_image_detail($id) {
 function hocwp_get_media_image_url($id) {
     $detail = hocwp_get_media_image_detail($id);
     return isset($detail[0]) ? $detail[0] : '';
+}
+
+function hocwp_size_converter($bytes, $decimals = 2) {
+    $result = size_format($bytes, $decimals);
+    $result = strtoupper($result);
+    return $result;
+}
+
+function hocwp_get_media_size($id) {
+    return filesize(get_attached_file($id));
 }
 
 function hocwp_get_media_option_url($value) {
@@ -1944,10 +1987,13 @@ function hocwp_search_form($args = array()) {
         hocwp_add_string_with_space_before($class, 'use-icon-search');
         $submit_text = '&#xf002;';
     }
-    $form = '<form method="get" class="' . $class . '" action="' . esc_url(home_url('/')) . '">
+    $action = hocwp_get_value_by_key($args, 'action', home_url('/'));
+    $action = trailingslashit($action);
+    $name = hocwp_get_value_by_key($args, 'name', 's');
+    $form = '<form method="get" class="' . $class . '" action="' . esc_url($action) . '">
 				<label>
 					<span class="screen-reader-text">' . _x('Search for:', 'label') . '</span>
-					<input type="search" class="search-field" placeholder="' . esc_attr($placeholder) . '" value="' . get_search_query() . '" name="s" title="' . esc_attr_x('Search for:', 'label') . '" />
+					<input type="search" class="search-field" placeholder="' . esc_attr($placeholder) . '" value="' . get_search_query() . '" name="' . $name . '" title="' . esc_attr_x('Search for:', 'label') . '" />
 				</label>
 				<input type="submit" class="search-submit" value="'. esc_attr($submit_text) .'" />
 			</form>';
@@ -2028,9 +2074,11 @@ function hocwp_register_core_style_and_script() {
 
 function hocwp_default_script_localize_object() {
     $datepicker_icon = apply_filters('hocwp_datepicker_icon', HOCWP_URL . '/images/icon-datepicker-calendar.gif');
+    $shortcodes = hocwp_get_all_shortcodes();
     $args = array(
         'ajax_url' => admin_url('admin-ajax.php'),
         'datepicker_icon' => $datepicker_icon,
+        'shortcodes' => $shortcodes,
         'i18n' => array(
             'jquery_undefined_error' => __('HocWP\'s JavaScript requires jQuery', 'hocwp'),
             'jquery_version_error' => sprintf(__('HocWP\'s JavaScript requires jQuery version %s or higher', 'hocwp'), HOCWP_MINIMUM_JQUERY_VERSION),

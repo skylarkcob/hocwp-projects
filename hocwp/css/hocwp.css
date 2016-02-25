@@ -1,5 +1,5 @@
 /**
- * Last update: 05/02/2016
+ * Last updated: 25/02/2016
  */
 
 /**
@@ -368,6 +368,16 @@ label.label-input-size {
 
 .icon-circle-success {
     background-color: #7ad03a;
+}
+
+.button img.hocwp-icon,
+button img.hocwp-icon {
+    display: inline-block;
+    height: 18px;
+    margin-right: 5px;
+    padding: 0;
+    vertical-align: -4px;
+    width: 18px;
 }
 
 /**

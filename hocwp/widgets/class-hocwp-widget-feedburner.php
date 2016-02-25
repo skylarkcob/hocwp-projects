@@ -17,7 +17,7 @@ class HOCWP_Widget_FeedBurner extends WP_Widget {
 
 	public function __construct() {
 		$this->args = $this->get_defaults();
-		parent::__construct('hocwp_widget_feedburner', 'HOCWP FeedBurner ',
+		parent::__construct('hocwp_widget_feedburner', 'HOCWP FeedBurner',
 			array(
 				'classname' => 'hocwp-feedburner-widget',
 				'description' => __('Display FeedBurner subscription box on sidebar.', 'hocwp'),
@@ -32,7 +32,7 @@ class HOCWP_Widget_FeedBurner extends WP_Widget {
 		$feedburner_name = hocwp_get_value_by_key($instance, 'feedburner_name');
 		if(!empty($feedburner_name)) {
 			$button_text = hocwp_get_value_by_key($instance, 'button_text', hocwp_get_value_by_key($this->args, 'button_text'));
-			$placeholder = hocwp_get_value_by_key($instance, '$placeholder', hocwp_get_value_by_key($this->args, '$placeholder'));
+			$placeholder = hocwp_get_value_by_key($instance, 'placeholder', hocwp_get_value_by_key($this->args, 'placeholder'));
 			hocwp_widget_before($args, $instance);
 			$fb_args = array(
 				'button_text' => $button_text,

@@ -158,6 +158,31 @@ function hocwp_option_defaults() {
             'use_fontawesome_cdn' => 1,
             'use_superfish' => 1,
             'use_superfish_cdn' => 1
+        ),
+        'social' => array(
+            'order' => 'facebook,twitter,instagram,linkedin,myspace,pinterest,youtube,gplus,rss',
+            'option_names' => array(
+                'facebook' => 'facebook_site',
+                'twitter' => 'twitter_site',
+                'instagram' => 'instagram_url',
+                'linkedin' => 'linkedin_url',
+                'myspace' => 'myspace_url',
+                'pinterest' => 'pinterest_url',
+                'youtube' => 'youtube_url',
+                'gplus' => 'google_plus_url',
+                'rss' => 'rss_url'
+            ),
+            'icons' => array(
+                'facebook' => 'fa-facebook',
+                'twitter' => 'fa-twitter',
+                'instagram' => 'fa-instagram',
+                'linkedin' => 'fa-linkedin',
+                'myspace' => 'fa-users',
+                'pinterest' => 'fa-pinterest',
+                'youtube' => 'fa-youtube',
+                'gplus' => 'fa-google-plus',
+                'rss' => 'fa-rss'
+            )
         )
     );
     return apply_filters('hocwp_option_defaults', $defaults);
@@ -208,7 +233,7 @@ function hocwp_plugin_option_page_sidebar() {
         <ul class="list-tabs">
             <?php foreach($hocwp_pos_tabs as $key => $value) : ?>
                 <?php
-                $admin_url = admin_url('plugins.php');
+                $admin_url = admin_url('admin.php');
                 $admin_url = add_query_arg(array('page' => $key), $admin_url);
                 $item_class = hocwp_sanitize_html_class($key);
                 if($key == $current_page) {

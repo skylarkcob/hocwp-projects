@@ -11,6 +11,7 @@ class HOCWP_HTML {
     public $break_line = true;
     public $close = true;
     public $only_text = false;
+    public $wrap_tag = '';
 
     public function set_close($close) {
         $this->close = $close;
@@ -22,6 +23,9 @@ class HOCWP_HTML {
 
     public function __construct($name) {
         $this->set_name($name);
+        if('img' == $name) {
+            $this->set_image_alt("");
+        }
     }
 
     public function get_name() {
@@ -54,13 +58,30 @@ class HOCWP_HTML {
     }
 
     public function set_attribute($attribute_name, $value) {
-        if(!empty($value) || is_numeric($value)) {
-            $this->attributes[$attribute_name] = $value;
-        }
+        $this->attributes[$attribute_name] = $value;
+    }
+
+    public function set_image_src($src) {
+        $this->set_attribute('src', $src);
+    }
+
+    public function set_image_alt($alt) {
+        $this->set_attribute('alt', $alt);
     }
 
     public function set_class($class) {
         $this->set_attribute('class', $class);
+    }
+
+    public function set_id($id) {
+        $id = hocwp_sanitize_id($id);
+        $this->set_attribute('id', $id);
+    }
+
+    public function add_class($class) {
+        $old_class = $this->get_attribute('class');
+        hocwp_add_string_with_space_before($old_class, $class);
+        $this->set_class($old_class);
     }
 
     public function set_href($href) {
@@ -116,12 +137,16 @@ class HOCWP_HTML {
     }
 
     public function build() {
+        $wrap_tag = $this->get_wrap_tag();
         if($this->only_text) {
             return $this->get_attribute('text');
         }
         $this->check_html();
         $html_name = $this->get_name();
         $result = '<' . $html_name;
+        if(!empty($wrap_tag)) {
+            $result = '<' . $wrap_tag . '>' . $result;
+        }
         foreach($this->attributes as $key => $value) {
             if($key != 'text') {
                 $result .= sprintf(' %1$s="%2$s"', $key, trim(esc_attr($value)));
@@ -134,6 +159,9 @@ class HOCWP_HTML {
         }
         if($this->get_close() && !in_array($html_name, $this->get_self_closers())) {
             $result .= sprintf('</%s>', $html_name);
+        }
+        if(!empty($wrap_tag)) {
+            $result .= '</' . $wrap_tag . '>';
         }
         return $result;
     }
@@ -156,5 +184,13 @@ class HOCWP_HTML {
 
     public function is_attribute_exists($attribute_name) {
         return array_key_exists($attribute_name, $this->attributes);
+    }
+
+    public function set_wrap_tag($tag) {
+        $this->wrap_tag = $tag;
+    }
+
+    public function get_wrap_tag() {
+        return $this->wrap_tag;
     }
 }

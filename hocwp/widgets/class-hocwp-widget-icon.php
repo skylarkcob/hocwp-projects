@@ -5,7 +5,10 @@ class HOCWP_Widget_Icon extends WP_Widget {
 
     private function get_defaults() {
         $defaults = array(
-            'admin_width' => 400
+            'id' => 'hocwp_widget_icon',
+            'name' => 'HOCWP Icon',
+            'admin_width' => 400,
+            'title_link' => 0
         );
         $defaults = apply_filters('hocwp_widget_icon_defaults', $defaults);
         $args = apply_filters('hocwp_widget_icon_args', array());
@@ -15,7 +18,7 @@ class HOCWP_Widget_Icon extends WP_Widget {
 
     public function __construct() {
         $this->args = $this->get_defaults();
-        parent::__construct('hocwp_widget_icon', 'HOCWP Icon',
+        parent::__construct($this->args['id'], $this->args['name'],
             array(
                 'classname' => 'hocwp-icon-widget',
                 'description' => __('Display widget with icon.', 'hocwp'),
@@ -29,6 +32,7 @@ class HOCWP_Widget_Icon extends WP_Widget {
     public function widget($args, $instance) {
         $sidebar = hocwp_get_value_by_key($args, 'id', 'default');
         $title = hocwp_widget_title($args, $instance, false);
+        $title_link = hocwp_get_value_by_key($instance, 'title_link', hocwp_get_value_by_key($this->args, 'title_link'));
         hocwp_widget_before($args, $instance, false);
         $icon = hocwp_get_value_by_key($instance, 'icon');
         $icon = hocwp_sanitize_media_value($icon);
@@ -41,6 +45,10 @@ class HOCWP_Widget_Icon extends WP_Widget {
         $widget_html = '';
         if(!empty($icon_url)) {
             $widget_html .= '<a href="' . $link . '"><img class="icon" src="' . $icon_url . '" alt="" data-hover="' . $icon_hover_url . '"></a>';
+        }
+        if((bool)$title_link) {
+            $title = '<a href="' . $link . '">' . $title . '</a>';
+            $title = apply_filters('hocwp_widget_icon_title_html', $title, $instance, $args, $sidebar);
         }
         $widget_html .= $title;
         $widget_html .= '<div class="text">' . apply_filters('the_content', $text) . '</div>';
@@ -58,6 +66,7 @@ class HOCWP_Widget_Icon extends WP_Widget {
         $icon_hover = hocwp_sanitize_media_value($icon_hover);
         $link = hocwp_get_value_by_key($instance, 'link');
         $text = hocwp_get_value_by_key($instance, 'text');
+        $title_link = hocwp_get_value_by_key($instance, 'title_link', hocwp_get_value_by_key($this->args, 'title_link'));
         hocwp_field_widget_before();
         hocwp_widget_field_title($this->get_field_id('title'), $this->get_field_name('title'), $title);
 
@@ -93,6 +102,14 @@ class HOCWP_Widget_Icon extends WP_Widget {
         );
         hocwp_widget_field('hocwp_field_textarea', $args);
 
+        $args = array(
+            'id' => $this->get_field_id('title_link'),
+            'name' => $this->get_field_name('title_link'),
+            'value' => $title_link,
+            'label' => __('Display title as link?', 'hocwp')
+        );
+        hocwp_widget_field('hocwp_field_input_checkbox', $args);
+
         hocwp_field_widget_after();
     }
 
@@ -102,6 +119,7 @@ class HOCWP_Widget_Icon extends WP_Widget {
         $instance['icon'] = hocwp_get_value_by_key($new_instance, 'icon');
         $instance['icon_hover'] = hocwp_get_value_by_key($new_instance, 'icon_hover');
         $instance['link'] = esc_url(hocwp_get_value_by_key($new_instance, 'link'));
+        $instance['title_link'] = hocwp_checkbox_post_data_value($new_instance, 'title_link');
         $instance['text'] = hocwp_get_value_by_key($new_instance, 'text');
         return $instance;
     }

@@ -76,3 +76,10 @@ function hocwp_get_user_role($user = null) {
     $roles = hocwp_get_user_roles($user);
     return current($roles);
 }
+
+function hocwp_current_user_can_use_rich_editor() {
+    if(!current_user_can('edit_posts') && !current_user_can('edit_pages') && get_user_option('rich_editing') == 'true') {
+        return false;
+    }
+    return true;
+}

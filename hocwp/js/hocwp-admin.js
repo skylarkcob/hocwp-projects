@@ -1,5 +1,5 @@
 /**
- * Last update: 07/01/2016
+ * Last updated: 24/02/2016
  */
 
 jQuery(document).ready(function($) {
@@ -158,6 +158,10 @@ jQuery(document).ready(function($) {
 
     (function() {
         hocwp.switcherAjax();
+    })();
+
+    (function() {
+        hocwp.addDefaultQuicktagButton();
     })();
 
     (function() {

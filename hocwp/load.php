@@ -5,7 +5,7 @@ if(defined('HOCWP_PATH')) {
     return;
 }
 
-define('HOCWP_VERSION', '3.2.4');
+define('HOCWP_VERSION', '3.2.6');
 
 define('HOCWP_PATH', dirname(__FILE__));
 
@@ -43,7 +43,7 @@ define('HOCWP_REQUIRED_HTML', '<span style="color:#FF0000">*</span>');
 
 define('HOCWP_PLUGIN_LICENSE_OPTION_NAME', 'hocwp_plugin_licenses');
 
-define('HOCWP_PLUGIN_LICENSE_ADMIN_URL', admin_url('plugins.php?page=hocwp_plugin_license'));
+define('HOCWP_PLUGIN_LICENSE_ADMIN_URL', admin_url('admin.php?page=hocwp_plugin_license'));
 
 require(HOCWP_PATH . '/lib/bfi-thumb/BFI_Thumb.php');
 
@@ -76,6 +76,8 @@ require(HOCWP_PATH . '/lib.php');
 require(HOCWP_PATH . '/tools.php');
 
 require(HOCWP_PATH . '/utils.php');
+
+require(HOCWP_PATH . '/shortcode.php');
 
 require(HOCWP_PATH . '/query.php');
 

@@ -1,8 +1,8 @@
 <?php
 /*
  * Name: HocWP Pagination
- * Version: 1.0.1
- * Last updated: 18/02/2016
+ * Version: 1.0.2
+ * Last updated: 25/02/2016
  */
 if(!function_exists('add_filter')) exit;
 
@@ -11,6 +11,7 @@ function hocwp_pagination_defaults() {
         'label' => __('Trang', 'hocwp'),
         'last' => __('Trang cuối', 'hocwp'),
         'first' => __('Trang đầu', 'hocwp'),
+        'show_first_item' => false,
         'next' => '&raquo;',
         'prev' => '&laquo;',
         'style' => 'default',
@@ -115,6 +116,7 @@ function hocwp_build_pagination($args = array()) {
     $next = hocwp_get_value_by_key($args, 'next', hocwp_get_value_by_key($defaults, 'next'));
     $first = hocwp_get_value_by_key($args, 'first', hocwp_get_value_by_key($defaults, 'first'));
     $last = hocwp_get_value_by_key($args, 'last', hocwp_get_value_by_key($defaults, 'last'));
+    $show_first_item = hocwp_get_value_by_key($args, 'show_first_item', hocwp_get_value_by_key($defaults, 'show_first_item'));
     $request = isset($args['request']) ? $args['request'] : '';
     if(empty($request)) {
         $request = hocwp_get_request();
@@ -134,7 +136,7 @@ function hocwp_build_pagination($args = array()) {
     if(!empty($label)) {
         $result .= '<span class="item label-item">' . $label . '</span>';
     }
-    if($current_page > 1) {
+    if($current_page > 1 || $show_first_item) {
         $link_href = hocwp_get_pagenum_link(array('pagenum' => 1, 'request' => $request));
         $result .= '<a class="item link-item first-item" href="' . $link_href . '" data-paged="' . 1 . '">' . $first . '</a>';
         $link_href = hocwp_get_pagenum_link(array('pagenum' => ($current_page - 1), 'request' => $request));
@@ -176,7 +178,14 @@ function hocwp_show_pagination($args = array()) {
     } else {
         hocwp_add_string_with_space_before($class, 'no-paged');
     }
-    echo '<nav class="' . $class . '">';
+    $query = hocwp_get_value_by_key($args, 'query', $GLOBALS['wp_query']);
+    $ajax = hocwp_get_value_by_key($args, 'ajax');
+    $query_vars = array();
+    if((bool)$ajax) {
+        $query_vars = $query->query_vars;
+        hocwp_add_string_with_space_before($class, 'ajax');
+    }
+    echo '<nav class="' . $class . '" data-query-vars="' . esc_attr(json_encode($query_vars)) . '">';
     echo hocwp_build_pagination($args);
     echo '</nav>';
 }
