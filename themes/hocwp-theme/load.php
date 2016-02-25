@@ -2,7 +2,7 @@
 if(!function_exists('add_filter')) exit;
 
 if(!defined('HOCWP_REQUIRE_WP_VERSION')) {
-    define('HOCWP_REQUIRE_WP_VERSION', '4.1');
+    define('HOCWP_REQUIRE_WP_VERSION', '4.2');
 }
 
 if(version_compare($GLOBALS['wp_version'], HOCWP_REQUIRE_WP_VERSION, '<')) {
@@ -10,7 +10,7 @@ if(version_compare($GLOBALS['wp_version'], HOCWP_REQUIRE_WP_VERSION, '<')) {
     return;
 }
 
-define('HOCWP_THEME_CORE_VERSION', '5.1.0');
+define('HOCWP_THEME_CORE_VERSION', '5.1.1');
 
 define('HOCWP_THEME_REQUIRE_CORE_VERSION', '3.2.4');
 

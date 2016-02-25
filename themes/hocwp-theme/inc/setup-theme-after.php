@@ -389,7 +389,7 @@ function hocwp_setup_theme_maintenance() {
 }
 
 function hocwp_setup_theme_maintenance_scripts() {
-    wp_enqueue_style('hocwp-maintenance-style', HOCWP_URL . '/css/hocwp-maintenance.css', array());
+    wp_enqueue_style('hocwp-maintenance-style', HOCWP_URL . '/css/hocwp-maintenance' . HOCWP_CSS_SUFFIX, array());
 }
 
 function hocwp_setup_theme_maintenance_body_class($classes) {
