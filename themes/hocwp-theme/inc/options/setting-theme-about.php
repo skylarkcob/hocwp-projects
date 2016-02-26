@@ -27,7 +27,7 @@ function hocwp_option_page_about_content() {
                 <table>
                     <tbody>
                     <tr>
-                        <td class="label">WordPress Version</td>
+                        <td class="label">WordPress version</td>
                         <td><?php echo hocwp_get_wp_version(); ?></td>
                     </tr>
                     <tr>
@@ -39,8 +39,32 @@ function hocwp_option_page_about_content() {
                         <td><?php bloginfo('url'); ?></td>
                     </tr>
                     <tr>
-                        <td class="label">Admin Email</td>
+                        <td class="label">Admin email</td>
                         <td><?php bloginfo('admin_email'); ?></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Home dir</td>
+                        <td><?php echo htmlspecialchars(ABSPATH); ?></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Content dir</td>
+                        <td><?php echo htmlspecialchars(WP_CONTENT_DIR); ?></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Plugin dir</td>
+                        <td><?php echo htmlspecialchars(WP_PLUGIN_DIR); ?></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Table prefix</td>
+                        <td><?php echo hocwp_get_table_prefix(); ?></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Active plugins</td>
+                        <td><?php echo count((array)get_option('active_plugins')); ?></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Total users</td>
+                        <td><?php echo hocwp_count_user(); ?></td>
                     </tr>
                     </tbody>
                 </table>
@@ -56,15 +80,15 @@ function hocwp_option_page_about_content() {
                 <table>
                     <tbody>
                     <tr>
-                        <td class="label">Current Theme</td>
+                        <td class="label">Current theme</td>
                         <td><?php echo $current_theme->get('Name'); ?></td>
                     </tr>
                     <tr>
-                        <td class="label">Current Theme Author</td>
+                        <td class="label">Current theme author</td>
                         <td><?php echo $current_theme->get('Author'); ?></td>
                     </tr>
                     <tr>
-                        <td class="label">Current Theme URL</td>
+                        <td class="label">Current theme URL</td>
                         <td><?php echo $current_theme->get('AuthorURI'); ?></td>
                     </tr>
                     <tr>
@@ -87,24 +111,37 @@ function hocwp_option_page_about_content() {
                 <table>
                     <tbody>
                     <tr>
-                        <td class="label">PHP Version</td>
+                        <td class="label">PHP version</td>
                         <td><?php echo phpversion(); ?></td>
                     </tr>
                     <tr>
-                        <td class="label">MySQL Version</td>
+                        <td class="label">MySQL version</td>
                         <td><?php echo $wpdb->db_version(); ?></td>
                     </tr>
-                    <?php if(function_exists('apache_get_version')) : ?>
-                        <tr>
-                            <td class="label">Apache</td>
-                            <td><?php echo apache_get_version(); ?></td>
-                        </tr>
-                    <?php else : ?>
-                        <tr>
-                            <td class="label">Software</td>
-                            <td><?php print_r($_SERVER['SERVER_SOFTWARE']); ?></td>
-                        </tr>
-                    <?php endif; ?>
+                    <tr>
+                        <td class="label">Server software</td>
+                        <td><?php echo hocwp_get_web_server(); ?></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Server OS</td>
+                        <td><?php echo implode(' ', hocwp_get_computer_info()); ?></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Peak memory usage</td>
+                        <td><?php echo hocwp_size_converter(hocwp_get_peak_memory_usage()); ?></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Current memory usage</td>
+                        <td><?php echo hocwp_size_converter(hocwp_get_memory_usage()); ?></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Memory linit</td>
+                        <td><?php echo hocwp_get_memory_limit(); ?></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Curl version</td>
+                        <td><?php echo hocwp_get_curl_version(); ?></td>
+                    </tr>
                     </tbody>
                 </table>
                 <hr>
