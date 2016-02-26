@@ -1,5 +1,5 @@
 /**
- * Last updated: 07/01/2016
+ * Last updated: 26/02/2016
  */
 
 /**
@@ -29,6 +29,10 @@
     margin-bottom: 9px;
     padding: 15px 10px;
     vertical-align: middle;
+}
+
+.hocwp.option-page .form-table {
+    table-layout: fixed;
 }
 
 /**
@@ -256,6 +260,12 @@
     margin-left: 0;
     margin-right: 0;
     width: 100%;
+}
+
+#nav > h2::after {
+    clear: both;
+    content: "";
+    display: table;
 }
 
 /**

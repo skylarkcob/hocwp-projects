@@ -61,6 +61,52 @@ function hocwp_in_maintenance_mode_notice() {
     }
 }
 
+function hocwp_get_computer_info() {
+    $result = array(
+        'operating_system_name' => php_uname('s'),
+        'computer_name' => php_uname('n'),
+        'release_name' => php_uname('r'),
+        'version_information' => php_uname('v'),
+        'machine_type' => php_uname('m')
+    );
+    return $result;
+}
+
+function hocwp_get_web_server() {
+    return htmlspecialchars($_SERVER['SERVER_SOFTWARE']);
+}
+
+function hocwp_get_table_prefix() {
+    global $wpdb;
+    if(is_multisite()) {
+        return $wpdb->base_prefix;
+    } else {
+        return $wpdb->get_blog_prefix(0);
+    }
+}
+
+function hocwp_get_peak_memory_usage() {
+    return memory_get_peak_usage(true);
+}
+
+function hocwp_get_memory_usage() {
+    return memory_get_usage(true);
+}
+
+function hocwp_get_memory_limit() {
+    return ini_get('memory_limit');
+}
+
+function hocwp_get_curl_version() {
+    if(function_exists('curl_version') && function_exists('curl_exec')) {
+        $cv = curl_version();
+        $cvs = $cv['version'] . ' / SSL: ' . $cv['ssl_version'] . ' / libz: ' . $cv['libz_version'];
+    } else {
+        $cvs = __('Not installed', 'hocwp') . ' (' . __('required for some remote storage providers', 'hocwp') . ')';
+    }
+    return htmlspecialchars($cvs);
+}
+
 function hocwp_maintenance_mode_exclude_condition() {
     $condition = hocwp_is_admin();
     return apply_filters('hocwp_maintenance_mode_exclude_condition', $condition);

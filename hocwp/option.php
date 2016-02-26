@@ -213,10 +213,11 @@ function hocwp_recommended_plugins() {
 }
 
 function hocwp_plugin_option_page_header() {
+    $core_version = defined('HOCWP_PLUGIN_CORE_VERSION') ? HOCWP_PLUGIN_CORE_VERSION : HOCWP_VERSION;
     ?>
     <div class="page-header">
         <h2 class="theme-name"><?php _e('Plugin Options', 'hocwp'); ?></h2>
-        <span class="theme-version"><?php printf(__('Core Version: %s', 'hocwp'), HOCWP_PLUGIN_CORE_VERSION); ?></span>
+        <span class="theme-version hocwp-version"><?php printf(__('Core Version: %s', 'hocwp'), $core_version); ?></span>
     </div>
     <?php
 }

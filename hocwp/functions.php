@@ -1870,7 +1870,7 @@ function hocwp_is_image($url, $id = 0) {
     if(hocwp_id_number_valid($id)) {
         $result = wp_attachment_is_image($id);
     } else {
-        $img_formats = array('png', 'jpg', 'jpeg', 'gif', 'tiff', 'bmp');
+        $img_formats = array('png', 'jpg', 'jpeg', 'gif', 'tiff', 'bmp', 'ico');
         $path_info = pathinfo($url);
         $extension = isset($path_info['extension']) ? $path_info['extension'] : '';
         if(in_array(strtolower($extension), $img_formats)) {
@@ -2155,6 +2155,8 @@ function hocwp_admin_enqueue_scripts() {
     if($use) {
         wp_enqueue_style('hocwp-admin-style');
         wp_enqueue_script('hocwp-admin');
+    } elseif('wpsupercache' == $current_page) {
+        wp_enqueue_style('hocwp-admin-style');
     }
 }
 

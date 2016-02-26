@@ -25,6 +25,12 @@ function hocwp_is_admin($user = null) {
     return false;
 }
 
+function hocwp_count_user($role = 'total_users') {
+    $count = count_users();
+    $result = hocwp_get_value_by_key($count, $role, $count['total_users']);
+    return $result;
+}
+
 function hocwp_remove_all_user_role($user) {
     foreach($user->roles as $role) {
         $user->remove_role($role);
