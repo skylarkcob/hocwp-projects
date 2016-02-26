@@ -14,6 +14,7 @@ require(HOCWP_THEME_INC_PATH . '/options/setting-theme-setting.php');
 require(HOCWP_THEME_INC_PATH . '/options/setting-theme-custom.php');
 require(HOCWP_THEME_INC_PATH . '/options/setting-theme-custom-css.php');
 require(HOCWP_THEME_INC_PATH . '/options/setting-theme-add-to-head.php');
+require(HOCWP_THEME_INC_PATH . '/options/setting-theme-add-to-footer.php');
 require(HOCWP_THEME_INC_PATH . '/options/setting-optimize.php');
 require(HOCWP_THEME_INC_PATH . '/options/setting-social.php');
 require(HOCWP_THEME_INC_PATH . '/options/setting-login.php');

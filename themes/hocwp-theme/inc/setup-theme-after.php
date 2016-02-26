@@ -641,3 +641,12 @@ function hocwp_setup_theme_custom_footer() {
     }
 }
 add_action('wp_footer', 'hocwp_setup_theme_custom_footer');
+
+function hocwp_setup_theme_custom_footer_data() {
+    $option = get_option('hocwp_theme_add_to_footer');
+    $code = hocwp_get_value_by_key($option, 'code');
+    if(!empty($code)) {
+        echo $code;
+    }
+}
+add_action('wp_footer', 'hocwp_setup_theme_custom_footer_data', 99);
