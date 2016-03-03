@@ -165,6 +165,10 @@ jQuery(document).ready(function($) {
     })();
 
     (function() {
+        $('.chooseable').hocwpChosenSelect();
+    })();
+
+    (function() {
         var $choseables = $('.hocwp-widget .chooseable');
         if($choseables.length) {
             $choseables.hocwpChosenSelect();
@@ -172,9 +176,22 @@ jQuery(document).ready(function($) {
     })();
 
     (function() {
-        var $color_picker = $('.hocwp-color-picker');
+        var $color_picker = $('.hocwp-color-picker'),
+            $datetime_picker = $('.hocwp-datetime-picker');
         if($color_picker.length) {
             $color_picker.wpColorPicker();
+        }
+        if($datetime_picker.length) {
+            var options = {},
+                min_date = $datetime_picker.attr('data-min-date'),
+                date_format = $datetime_picker.attr('data-date-format');
+            if($.isNumeric(min_date)) {
+                options.minDate = 0;
+            }
+            if($.trim(date_format)) {
+                options.dateFormat = date_format;
+            }
+            $datetime_picker.datepicker(options);
         }
     })();
 

@@ -102,7 +102,9 @@ function hocwp_breadcrumb($args = array()) {
             $taxonomy = 'post_tag';
             $args ='include=' . $term_id;
             $terms = get_terms($taxonomy, $args);
-            echo '<li class="item-current item-tag-' . $terms[0]->term_id . ' item-tag-' . $terms[0]->slug . '"><strong class="bread-current bread-tag-' . $terms[0]->term_id . ' bread-tag-' . $terms[0]->slug . '">' . $terms[0]->name . '</strong></li>';
+            if(hocwp_array_has_value($terms)) {
+                echo '<li class="item-current item-tag-' . $terms[0]->term_id . ' item-tag-' . $terms[0]->slug . '"><strong class="bread-current bread-tag-' . $terms[0]->term_id . ' bread-tag-' . $terms[0]->slug . '">' . $terms[0]->name . '</strong></li>';
+            }
         } elseif(is_day()) {
             echo '<li class="item-year item-year-' . get_the_time('Y') . '"><a class="bread-year bread-year-' . get_the_time('Y') . '" href="' . get_year_link(get_the_time('Y')) . '" title="' . get_the_time('Y') . '">' . get_the_time('Y') . ' Archives</a></li>';
             echo '<li class="separator separator-' . get_the_time('Y') . '"> ' . $separator . ' </li>';
@@ -285,4 +287,17 @@ function hocwp_entry_tags() {
     echo '<div class="entry-tags">';
     the_tags('<span class="tag-label"><i class="fa fa-tag icon-left"></i><span class="text">Tags:</span></span>&nbsp;', ' ', '');
     echo '</div>';
+}
+
+function hocwp_button_vote_group() {
+    ?>
+    <p class="vote btn-group" data-post-id="<?php the_ID(); ?>">
+        <a class="btn btn-default">
+            <i class="fa fa-thumbs-o-up"></i>
+        </a>
+        <a class="btn btn-default">
+            <i class="fa fa-thumbs-o-down"></i>
+        </a>
+    </p>
+    <?php
 }

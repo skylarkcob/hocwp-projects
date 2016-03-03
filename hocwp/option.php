@@ -48,6 +48,10 @@ function hocwp_option_get_value($base, $key) {
     return $result;
 }
 
+function hocwp_get_date_format() {
+    return get_option('date_format');
+}
+
 function hocwp_get_option_by_name($base, $name = '') {
     return hocwp_option_get_value($base, $name);
 }

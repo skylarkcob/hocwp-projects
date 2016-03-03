@@ -42,3 +42,13 @@ function hocwp_meta_box_side_image($args = array()) {
 	$meta->add_field(array('id' => $field_id, 'field_callback' => 'hocwp_field_media_upload_simple'));
 	$meta->init();
 }
+
+function hocwp_meta_box_page_additional_information() {
+	$meta = new HOCWP_Meta('post');
+	$meta->set_title(__('Additional Information', 'hocwp'));
+	$meta->set_id('page_additionalinformation');
+	$meta->set_post_types(array('page'));
+	$meta->add_field(array('id' => 'different_title', 'label' => __('Different title:', 'hocwp')));
+	$meta->add_field(array('id' => 'sidebar', 'label' => __('Sidebar', 'hocwp'), 'field_callback' => 'hocwp_field_select_sidebar'));
+	$meta->init();
+}

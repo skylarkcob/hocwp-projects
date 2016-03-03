@@ -49,6 +49,12 @@ function hocwp_get_all_shortcodes() {
     return $GLOBALS['shortcode_tags'];
 }
 
+function hocwp_get_alphabetical_chars() {
+    $result = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $result = str_split($result);
+    return $result;
+}
+
 function hocwp_get_all_sb_shortcodes() {
     $shortcodes = hocwp_get_all_shortcodes();
     $result = array();
@@ -763,7 +769,9 @@ function hocwp_sanitize_form_post($key, $type) {
         case 'datetime':
             return isset($_POST[$key]) ? hocwp_string_to_datetime($_POST[$key]) : '';
         case 'timestamp':
-            return isset($_POST[$key]) ? strtotime(hocwp_string_to_datetime($_POST[$key])) : '';
+            $value = isset($_POST[$key]) ? $_POST[$key] : '';
+            $value = strtotime($value);
+            return $value;
         default:
             return isset($_POST[$key]) ? hocwp_sanitize($_POST[$key], $type) : '';
     }
@@ -1095,7 +1103,7 @@ function hocwp_get_current_post_type() {
     return $result;
 }
 
-function hocwp_register_sidebar($sidebar_id, $sidebar_name, $sidebar_description, $html_tag = 'aside') {
+function hocwp_register_sidebar($sidebar_id, $sidebar_name, $sidebar_description = '', $html_tag = 'aside') {
     $before_widget = apply_filters('hocwp_before_widget', '<' . $html_tag . ' id="%1$s" class="widget %2$s">');
     $before_widget = apply_filters('hocwp_sidebar_' . $sidebar_id . '_before_widget', $before_widget);
     $after_widget = apply_filters('hocwp_after_widget', '</' . $html_tag . '>');
@@ -2099,6 +2107,7 @@ function hocwp_enqueue_jquery_ui_style() {
 
 function hocwp_enqueue_jquery_ui_datepicker() {
     wp_enqueue_script('jquery-ui-datepicker');
+    hocwp_enqueue_jquery_ui_style();
 }
 
 function hocwp_get_recaptcha_language() {
@@ -2152,7 +2161,7 @@ function hocwp_admin_enqueue_scripts() {
     wp_register_script('hocwp-admin', HOCWP_URL . '/js/hocwp-admin' . HOCWP_JS_SUFFIX, array('jquery', 'hocwp'), HOCWP_VERSION, true);
     wp_localize_script('hocwp', 'hocwp', hocwp_default_script_localize_object());
     $use = apply_filters('hocwp_use_admin_style_and_script', false);
-    if($use) {
+    if($use || 'post-new.php' == $pagenow || 'post.php' == $pagenow) {
         wp_enqueue_style('hocwp-admin-style');
         wp_enqueue_script('hocwp-admin');
     } elseif('wpsupercache' == $current_page) {

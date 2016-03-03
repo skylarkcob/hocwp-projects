@@ -38,6 +38,46 @@ function hocwp_change_tag_attribute($tag, $attr, $value) {
     return $tag;
 }
 
+function hocwp_replace_text_placeholder($text) {
+    remove_filter('hocwp_replace_text_placeholder', 'hocwp_replace_text_placeholder');
+    $text = apply_filters('hocwp_replace_text_placeholder', $text);
+    $text_placeholders = array(
+        '%DOMAIN%',
+        '%CURRENT_YEAR%',
+        '%PAGED%'
+    );
+    $text_placeholders = apply_filters('hocwp_text_placeholders', $text_placeholders);
+    $placeholder_replace = array(
+        hocwp_get_domain_name(home_url()),
+        date('Y'),
+        hocwp_get_paged()
+    );
+    $placeholder_replace = apply_filters('hocwp_text_placeholders_replace', $placeholder_replace);
+    $text = str_replace($text_placeholders, $placeholder_replace, $text);
+    return $text;
+}
+
+function hocwp_the_social_list($args = array()) {
+    $option_socials = hocwp_option_defaults()['social'];
+    $order = hocwp_get_value_by_key($args, 'order', hocwp_get_value_by_key($option_socials, 'order'));
+    $orders = explode(',', $order);
+    $orders = array_map('trim', $orders);
+    $orders = hocwp_sanitize_array($orders);
+    $option_names = $option_socials['option_names'];
+    $options = hocwp_get_option('option_social');
+    $icons = $option_socials['icons'];
+    if(hocwp_array_has_value($orders)) {
+        foreach($orders as $social) {
+            $option_name = hocwp_get_value_by_key($option_names, $social);
+            $item = hocwp_get_value_by_key($options, $option_name);
+            if(!empty($item)) {
+                $icon = '<i class="fa ' . $icons[$social] . '"></i>';
+                echo '<a href="' . $item . '" class="link-' . $social . '">' . $icon . '</a>';
+            }
+        }
+    }
+}
+
 function hocwp_in_maintenance_mode() {
     $option = get_option('hocwp_maintenance');
     $result = hocwp_get_value_by_key($option, 'enabled');
@@ -124,6 +164,58 @@ function hocwp_get_views_template($slug, $name = '') {
     if(file_exists($template)) {
         include($template);
     }
+}
+
+function hocwp_convert_datetime_format_to_jquery($php_format) {
+    $matched_symbols = array(
+        // Day
+        'd' => 'dd',
+        'D' => 'D',
+        'j' => 'd',
+        'l' => 'DD',
+        'N' => '',
+        'S' => '',
+        'w' => '',
+        'z' => 'o',
+        // Week
+        'W' => '',
+        // Month
+        'F' => 'MM',
+        'm' => 'mm',
+        'M' => 'M',
+        'n' => 'm',
+        't' => '',
+        // Year
+        'L' => '',
+        'o' => '',
+        'Y' => 'yy',
+        'y' => 'y',
+        // Time
+        'a' => '',
+        'A' => '',
+        'B' => '',
+        'g' => '',
+        'G' => '',
+        'h' => '',
+        'H' => '',
+        'i' => '',
+        's' => '',
+        'u' => ''
+    );
+    $result = '';
+    $escaping = false;
+    for($i = 0; $i < strlen($php_format); $i++) {
+        $char = $php_format[$i];
+        if(isset($matched_symbols[$char])) {
+            $result .= $matched_symbols[$char];
+        } else {
+            $result .= $char;
+        }
+    }
+    if($escaping) {
+        $result = esc_attr($result);
+    }
+    return $result;
 }
 
 function hocwp_use_jquery_cdn($value = null) {

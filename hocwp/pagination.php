@@ -102,7 +102,7 @@ function hocwp_get_total_page($args = array()) {
 }
 
 function hocwp_has_paged($args = array()) {
-    $total = hocwp_get_total_page($args);
+    $total = hocwp_get_value_by_key($args, 'total_page', hocwp_get_total_page($args));
     if($total > 1) {
         return true;
     }
@@ -112,6 +112,7 @@ function hocwp_has_paged($args = array()) {
 function hocwp_build_pagination($args = array()) {
     $defaults = hocwp_pagination_defaults();
     $label = trim(hocwp_get_value_by_key($args, 'label', hocwp_get_value_by_key($defaults, 'label')));
+    $label = apply_filters('hocwp_replace_text_placeholder', $label);
     $previous = hocwp_get_value_by_key($args, 'prev', hocwp_get_value_by_key($defaults, 'prev'));
     $next = hocwp_get_value_by_key($args, 'next', hocwp_get_value_by_key($defaults, 'next'));
     $first = hocwp_get_value_by_key($args, 'first', hocwp_get_value_by_key($defaults, 'first'));
@@ -121,9 +122,12 @@ function hocwp_build_pagination($args = array()) {
     if(empty($request)) {
         $request = hocwp_get_request();
     }
-    $query = hocwp_get_query($args);
-    $total_page = hocwp_get_total_page($args);
-    $current_page = isset($query->query_vars['paged']) ? $query->query_vars['paged'] : '0';
+    $current_page = hocwp_get_value_by_key($args, 'current_page');
+    if(!isset($args['current_page'])) {
+        $query = hocwp_get_query($args);
+        $current_page = isset($query->query_vars['paged']) ? $query->query_vars['paged'] : '0';
+    }
+    $total_page = hocwp_get_value_by_key($args, 'total_page', hocwp_get_total_page($args));
     if(1 > $current_page || $current_page > $total_page) {
         $current_page = hocwp_get_paged();
     }
@@ -134,11 +138,14 @@ function hocwp_build_pagination($args = array()) {
     $args['total_page'] = $total_page;
     $result = '';
     if(!empty($label)) {
+        $label = str_replace('%TOTAL_PAGES%', $total_page, $label);
         $result .= '<span class="item label-item">' . $label . '</span>';
     }
     if($current_page > 1 || $show_first_item) {
         $link_href = hocwp_get_pagenum_link(array('pagenum' => 1, 'request' => $request));
-        $result .= '<a class="item link-item first-item" href="' . $link_href . '" data-paged="' . 1 . '">' . $first . '</a>';
+        if(!empty($first)) {
+            $result .= '<a class="item link-item first-item" href="' . $link_href . '" data-paged="' . 1 . '">' . $first . '</a>';
+        }
         $link_href = hocwp_get_pagenum_link(array('pagenum' => ($current_page - 1), 'request' => $request));
         $result .= '<a class="item link-item previous-item" href="' . $link_href . '" data-paged="' . ($current_page - 1) . '">' . $previous . '</a>';
     }
@@ -147,12 +154,14 @@ function hocwp_build_pagination($args = array()) {
         $link_href = hocwp_get_pagenum_link(array('pagenum' => ($current_page + 1), 'request' => $request));
         $result .= '<a href="' . $link_href . '" class="item next-item link-item" data-paged="' . ($current_page + 1) . '">' . $next . '</a>';
         $link_href = hocwp_get_pagenum_link(array('pagenum' => $total_page, 'request' => $request));
-        $result .= '<a href="' . $link_href . '" class="item last-item link-item" data-paged="' . $total_page . '">' . $last . '</a>';
+        if(!empty($last)) {
+            $result .= '<a href="' . $link_href . '" class="item last-item link-item" data-paged="' . $total_page . '">' . $last . '</a>';
+        }
     }
     return $result;
 }
 
-function hocwp_show_pagination($args = array()) {
+function hocwp_pagination_before($args = array()) {
     $default_style = 'default';
     $default_border_radius = 'default';
     $style = $default_style;
@@ -160,7 +169,7 @@ function hocwp_show_pagination($args = array()) {
 
     $style .= '-style';
     $class = hocwp_get_value_by_key($args, 'class');
-    hocwp_add_string_with_space_before($class, 'pagination loop-paginations hocwp-pagination');
+    hocwp_add_string_with_space_before($class, 'pagination loop-paginations hocwp-pagination clearfix');
     $class .= ' ' . $style;
     switch($border_radius) {
         case 'circle':
@@ -182,12 +191,20 @@ function hocwp_show_pagination($args = array()) {
     $ajax = hocwp_get_value_by_key($args, 'ajax');
     $query_vars = array();
     if((bool)$ajax) {
-        $query_vars = $query->query_vars;
+        $query_vars = hocwp_get_value_by_key($args, 'query_vars', $query->query_vars);
         hocwp_add_string_with_space_before($class, 'ajax');
     }
     echo '<nav class="' . $class . '" data-query-vars="' . esc_attr(json_encode($query_vars)) . '">';
-    echo hocwp_build_pagination($args);
+}
+
+function hocwp_pagination_after() {
     echo '</nav>';
+}
+
+function hocwp_show_pagination($args = array()) {
+    hocwp_pagination_before($args);
+    echo hocwp_build_pagination($args);
+    hocwp_pagination_after();
 }
 
 function hocwp_loop_pagination_item($args = array()) {
@@ -268,4 +285,33 @@ function hocwp_get_paged() {
 
 function hocwp_pagination($args = array()) {
     hocwp_show_pagination($args);
+}
+
+function hocwp_term_pagination($args = array()) {
+    $query_vars = hocwp_get_value_by_key($args, 'query_vars', array());
+    $posts_per_page = hocwp_get_value_by_key($query_vars, 'number', hocwp_get_posts_per_page());
+    $offset = absint(hocwp_get_value_by_key($query_vars, 'offset'));
+    $paged = hocwp_get_paged();
+    $taxonomy = hocwp_get_value_by_key($args, 'taxonomy', 'category');
+    if($paged > 1) {
+        $offset = ($paged - 1) * $posts_per_page;
+    }
+    $term_args = array(
+        'number' => 0,
+        'hide_empty' => false
+    );
+    $terms = get_terms($taxonomy, $term_args);
+    $total_page = 1;
+    if(0 < $posts_per_page) {
+        $total_page = ceil(count($terms) / $posts_per_page);
+    }
+    $args['current_page'] = $paged;
+    $args['total_page'] = $total_page;
+    $class = hocwp_get_value_by_key($args, 'class');
+    hocwp_add_string_with_space_before($class, 'term-pagination');
+    $args['class'] = $class;
+    $result = hocwp_build_pagination($args);
+    hocwp_pagination_before($args);
+    echo $result;
+    hocwp_pagination_after();
 }

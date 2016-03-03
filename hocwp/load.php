@@ -101,11 +101,7 @@ require(HOCWP_PATH . '/theme-switcher.php');
 
 require(HOCWP_PATH . '/post.php');
 
-require(HOCWP_PATH . '/video.php');
-
 require(HOCWP_PATH . '/media.php');
-
-require(HOCWP_PATH . '/shop.php');
 
 require(HOCWP_PATH . '/statistics.php');
 
@@ -124,5 +120,11 @@ require(HOCWP_PATH . '/pagination.php');
 require(HOCWP_PATH . '/back-end.php');
 
 require(HOCWP_PATH . '/front-end.php');
+
+require(HOCWP_PATH . '/video.php');
+
+require(HOCWP_PATH . '/shop.php');
+
+require(HOCWP_PATH . '/coupon.php');
 
 require(HOCWP_PATH . '/ajax.php');

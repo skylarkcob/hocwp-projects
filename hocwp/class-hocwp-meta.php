@@ -194,6 +194,7 @@ class HOCWP_Meta {
         if('edit-tags.php' == $pagenow || $this->get_use_media_upload()) {
             add_filter('hocwp_wp_enqueue_media', '__return_true');
             add_filter('hocwp_use_admin_style_and_script', '__return_true');
+            add_filter('hocwp_admin_jquery_datetime_picker', '__return_true');
         }
         foreach($this->get_taxonomies() as $taxonomy) {
             add_action($taxonomy . '_add_form_fields', array($this, 'term_field_add_page'));
@@ -304,9 +305,10 @@ class HOCWP_Meta {
 
     public function post_meta_box_init() {
         global $pagenow;
-        if('post-new.php' == $pagenow || $this->get_use_media_upload()) {
+        if('post-new.php' == $pagenow || 'post.php' == $pagenow || $this->get_use_media_upload()) {
             add_filter('hocwp_wp_enqueue_media', '__return_true');
             add_filter('hocwp_use_admin_style_and_script', '__return_true');
+            add_filter('hocwp_admin_jquery_datetime_picker', '__return_true');
         }
         add_action('add_meta_boxes', array($this, 'add_meta_box'));
         add_action('save_post', array($this, 'save_post'));
@@ -363,7 +365,7 @@ class HOCWP_Meta {
             return $post_id;
         }
         foreach($this->get_fields() as $field) {
-            $type = isset($field['type']) ? $field['type'] : 'default';
+            $type = isset($field['type']) ? $field['type'] : hocwp_get_value_by_key($field, 'data_type', 'default');
             $name = isset($field['field_args']['name']) ? $field['field_args']['name'] : '';
             if(empty($name)) {
                 continue;

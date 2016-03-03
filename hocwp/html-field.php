@@ -1,7 +1,7 @@
 <?php
 if(!function_exists('add_filter')) exit;
 function hocwp_field_before(&$args = array()) {
-    $container_class = isset($args['container_class']) ? $args['container_class'] : '';
+    //$container_class = isset($args['container_class']) ? $args['container_class'] : '';
     $before = isset($args['before']) ? $args['before'] : '';
     echo $before;
     $label = isset($args['label']) ? $args['label'] : '';
@@ -102,13 +102,35 @@ function hocwp_field_sanitize_publish_box_args(&$args = array()) {
 
 function hocwp_field_color_picker($args = array()) {
     hocwp_sanitize_field_args($args);
-    $value = hocwp_get_value_by_key($args, 'value');
+    //$value = hocwp_get_value_by_key($args, 'value');
     $class = hocwp_get_value_by_key($args, 'class');
     hocwp_add_string_with_space_before($class, 'hocwp-color-picker');
     $args['class'] = $class;
     $atts = hocwp_get_value_by_key($args, 'attributes');
     $atts['autocomplete'] = 'off';
     $args['attributes'] = $atts;
+    hocwp_field_input($args);
+}
+
+function hocwp_field_datetime_picker($args = array()) {
+    hocwp_sanitize_field_args($args);
+    $class = hocwp_get_value_by_key($args, 'class');
+    hocwp_add_string_with_space_before($class, 'hocwp-datetime-picker');
+    $min_date = hocwp_get_value_by_key($args, 'min_date');
+    $max_date = hocwp_get_value_by_key($args, 'max_date');
+    $date_format = hocwp_get_value_by_key($args, 'date_format');
+    $value = hocwp_get_value_by_key($args, 'value');
+    $args['class'] = $class;
+    $atts = hocwp_get_value_by_key($args, 'attributes');
+    $atts['autocomplete'] = 'off';
+    $atts['data-min-date'] = $min_date;
+    $atts['data-max-date'] = $max_date;
+    $atts['data-date-format'] = hocwp_convert_datetime_format_to_jquery($date_format);
+    $args['attributes'] = $atts;
+    $args['type'] = 'text';
+    if(is_numeric($value) && $value > 0) {
+        $args['value'] = date($date_format, $value);
+    }
     hocwp_field_input($args);
 }
 
@@ -341,7 +363,7 @@ function hocwp_field_size($args = array()) {
     $sep = isset($args['sep']) ? $args['sep'] : '<span>x</span>';
     $id = explode('_', $id_width);
     $id = hocwp_sanitize_array($id);
-    $last = array_pop($id);
+    //$last = array_pop($id);
     $args['id'] = implode('_', $id);
     $args['label_class'] = 'label-input-size';
     hocwp_field_before($args);
@@ -363,14 +385,19 @@ function hocwp_field_size($args = array()) {
 }
 
 function hocwp_field_textarea($args = array()) {
+    $tmp_class = isset($args['class']) ? $args['class'] : 'widefat';
     hocwp_sanitize_field_args($args);
     $id = isset($args['id']) ? $args['id'] : '';
     $name = isset($args['name']) ? $args['name'] : '';
     $value = isset($args['value']) ? $args['value'] : '';
-    $description = isset($args['description']) ? $args['description'] : '';
+    //$description = isset($args['description']) ? $args['description'] : '';
     $class = isset($args['class']) ? $args['class'] : '';
-    $container_class = isset($args['container_class']) ? $args['container_class'] : '';
+    hocwp_add_string_with_space_before($class, $tmp_class);
+    //$container_class = isset($args['container_class']) ? $args['container_class'] : '';
     $value = trim($value);
+    if(empty($value)) {
+        $value = hocwp_get_value_by_key($args, 'default');
+    }
     $autocomplete = isset($args['autocomplete']) ? $args['autocomplete'] : false;
     $row = isset($args['row']) ? $args['row'] : 5;
     if(isset($args['textarea_rows'])) {
@@ -485,6 +512,16 @@ function hocwp_field_input_text($args = array()) {
 
 function hocwp_field_input_number($args = array()) {
     $args['type'] = 'number';
+    $atts = array();
+    if(isset($args['min'])) {
+        $atts['min'] = $args['min'];
+    }
+    if(isset($args['max'])) {
+        $atts['max'] = $args['max'];
+    }
+    if(hocwp_array_has_value($atts)) {
+        $args['attributes'] = $atts;
+    }
     hocwp_field_input($args);
 }
 
@@ -643,8 +680,8 @@ function hocwp_field_media_upload_simple($args = array()) {
 }
 
 function hocwp_field_insert_media_button($args = array()) {
-    $data_editor = isset($args['data_editor']) ? $args['data_editor'] : 'content';
-    $id = isset($args['id']) ? $args['id'] : $data_editor . '_insert_media_button';
+    //$data_editor = isset($args['data_editor']) ? $args['data_editor'] : 'content';
+    //$id = isset($args['id']) ? $args['id'] : $data_editor . '_insert_media_button';
     $class = isset($args['class']) ? $args['class'] : '';
     hocwp_add_string_with_space_before($class, 'button btn-add-media btn btn-insert-media');
     $button = new HOCWP_HTML('button');
@@ -842,6 +879,20 @@ function hocwp_field_select_page($args = array()) {
     hocwp_field_select($args);
 }
 
+function hocwp_field_select_sidebar($args = array()) {
+    $sidebars = hocwp_get_sidebars();
+    $choose_text = __('Choose sidebar', 'hocwp');
+    $choose_text = apply_filters('hocwp_theme_select_sidebar_text', $choose_text);
+    $all_option = '<option value="0">-- ' . $choose_text . ' --</option>';
+    $value = isset($args['value']) ? $args['value'] : '';
+    foreach($sidebars as $key => $sidebar) {
+        $sidebar_name = hocwp_get_value_by_key($sidebar, 'name', $key);
+        $all_option .= '<option value="' . esc_attr($key) . '" ' . selected($value, $key, false) . '>' . $sidebar_name . '</option>';
+    }
+    $args['all_option'] = $all_option;
+    hocwp_field_select($args);
+}
+
 function hocwp_field_select_theme($args = array()) {
     $themes = wp_get_themes();
     $choose_text = __('Choose theme', 'hocwp');
@@ -940,6 +991,7 @@ function hocwp_field_select_term($args = array()) {
                     );
                     $select = hocwp_get_term_drop_down($select_args);
                     $select = hocwp_remove_select_tag_keep_content($select);
+                    $tmp = '';
                     if(!empty($select)) {
                         if($option_group) {
                             $tmp = '<optgroup label="' . $tax->labels->singular_name . '" data-taxonomy="' . $tax->name . '">';

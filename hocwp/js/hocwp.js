@@ -736,7 +736,7 @@ jQuery(document).ready(function($) {
                     $current_li.find('.fa-minus').each(function() {
                         $(this).removeClass('fa-minus active').addClass('fa-plus');
                     });
-                    $current_li.find('.sub-menu').hide();
+                    $current_li.find('.sub-menu').not($sub_menu).hide();
                 } else {
                     $this.removeClass('fa-plus');
                     $this.addClass('fa-minus');
