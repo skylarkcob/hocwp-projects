@@ -300,20 +300,7 @@ class HOCWP_Widget_Post extends WP_Widget {
                                 foreach($next_posts as $post) {
                                     setup_postdata($post);
                                     $class = 'a-widget-post';
-                                    $full_width = false;
-                                    if('all' == $full_width_post) {
-                                        $full_width = true;
-                                    } elseif('first' == $full_width_post && 0 == $count) {
-                                        $full_width = true;
-                                    } elseif('last' == $full_width_post && $count == $w_query->post_count) {
-                                        $full_width = true;
-                                    } elseif('first_last' == $full_width_post && (0 == $count || $count == $w_query->post_count)) {
-                                        $full_width = true;
-                                    } elseif('odd' == $full_width_post && ($count % 2) != 0) {
-                                        $full_width = true;
-                                    } elseif('even' == $full_width_post && ($count % 2) == 0) {
-                                        $full_width = true;
-                                    }
+                                    $full_width = hocwp_widget_item_full_width_result($full_width_post, $w_query->post_count, $count);
                                     if($full_width) {
                                         hocwp_add_string_with_space_before($class, 'full-width');
                                     }
@@ -535,7 +522,7 @@ class HOCWP_Widget_Post extends WP_Widget {
         $args = array(
             'id' => $this->get_field_id('full_width_post'),
             'name' => $this->get_field_name('full_width_post'),
-            'value' => $by,
+            'value' => $full_width_post,
             'all_option' => $all_option,
             'label' => __('Full width posts:', 'hocwp'),
             'class' => 'full-width-post'
@@ -576,10 +563,10 @@ class HOCWP_Widget_Post extends WP_Widget {
         hocwp_widget_field('hocwp_field_input_checkbox', $args);
 
         $args = array(
-                'id' => $this->get_field_id('category_as_widget_title'),
-                'name' => $this->get_field_name('category_as_widget_title'),
-                'value' => $category_as_widget_title,
-                'label' => __('Display category name as widget title?', 'hocwp')
+            'id' => $this->get_field_id('category_as_widget_title'),
+            'name' => $this->get_field_name('category_as_widget_title'),
+            'value' => $category_as_widget_title,
+            'label' => __('Display category name as widget title?', 'hocwp')
         );
         hocwp_widget_field('hocwp_field_input_checkbox', $args);
 

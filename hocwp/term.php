@@ -65,15 +65,18 @@ function hocwp_term_get_thumbnail_url($args = array()) {
         if(hocwp_id_number_valid($height)) {
             $params['height'] = $height;
         }
+        $crop = hocwp_get_value_by_key($args, 'crop', true);
+        $params['crop'] = $crop;
         $value = bfi_thumb($value, $params);
     }
     return apply_filters('hocwp_term_thumbnail', $value, $term_id);
 }
 
-function hocwp_term_the_thumbnail($args = array()) {
+function hocwp_term_get_thumbnail_html($args = array()) {
     $thumb_url = hocwp_term_get_thumbnail_url($args);
+    $result = '';
+    $term = hocwp_get_value_by_key($args, 'term');
     if(!empty($thumb_url)) {
-        $term = hocwp_get_value_by_key($args, 'term');
         $taxonomy = hocwp_get_value_by_key($args, 'taxonomy');
         if(!is_a($term, 'WP_Term')) {
             $term_id = hocwp_get_value_by_key($args, 'term_id');
@@ -82,9 +85,13 @@ function hocwp_term_the_thumbnail($args = array()) {
             }
         }
         if(is_a($term, 'WP_Term')) {
+            $size = hocwp_sanitize_size($args);
+            $link = hocwp_get_value_by_key($args, 'link', true);
             $show_name = hocwp_get_value_by_key($args, 'show_name');
             $img = new HOCWP_HTML('img');
             $img->set_image_src($thumb_url);
+            $img->set_attribute('width', $size[0]);
+            $img->set_attribute('height', $size[1]);
             $class = 'img-responsive wp-term-image';
             $slug = $term->taxonomy;
             hocwp_add_string_with_space_before($class, hocwp_sanitize_html_class($slug) . '-thumb');
@@ -97,9 +104,18 @@ function hocwp_term_the_thumbnail($args = array()) {
             $a->set_text($link_text);
             $a->set_attribute('title', $term->name);
             $a->set_href(get_term_link($term));
-            $a->output();
+            if(!(bool)$link) {
+                $result = $img->build();
+            } else {
+                $result = $a->build();
+            }
         }
     }
+    return apply_filters('hocwp_term_thumbnail_html', $result, $term);
+}
+
+function hocwp_term_the_thumbnail($args = array()) {
+    echo hocwp_term_get_thumbnail_html($args);
 }
 
 function hocwp_term_get_current() {

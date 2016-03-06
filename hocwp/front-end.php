@@ -290,14 +290,19 @@ function hocwp_entry_tags() {
 }
 
 function hocwp_button_vote_group() {
+    $post_id = get_the_ID();
+    $vote_up = absint(get_post_meta($post_id, 'likes', true));
+    $vote_down = absint(hocwp_get_post_meta('dislikes', $post_id));
     ?>
-    <p class="vote btn-group" data-post-id="<?php the_ID(); ?>">
-        <a class="btn btn-default">
-            <i class="fa fa-thumbs-o-up"></i>
-        </a>
-        <a class="btn btn-default">
-            <i class="fa fa-thumbs-o-down"></i>
-        </a>
-    </p>
+    <div class="text-center vote-buttons">
+        <p class="vote btn-group" data-post-id="<?php the_ID(); ?>">
+            <a class="btn btn-default vote-up vote-post" data-vote-type="up" data-vote="<?php echo $vote_up; ?>">
+                <i class="fa fa-thumbs-o-up"></i>
+            </a>
+            <a class="btn btn-default vote-down vote-post" data-vote-type="down" data-vote="<?php echo $vote_down; ?>">
+                <i class="fa fa-thumbs-o-down"></i>
+            </a>
+        </p>
+    </div>
     <?php
 }

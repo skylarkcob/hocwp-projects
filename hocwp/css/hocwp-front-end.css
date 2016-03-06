@@ -1,5 +1,5 @@
 /**
- * Last updated: 05/02/2016
+ * Last updated: 04/03/2016
  */
 
 /**
@@ -101,7 +101,7 @@ body.hocwp {
     overflow: hidden;
 }
 
-.hocwp .site-content * {
+.hocwp .site-content *:not(.row) {
     max-width: 100%;
 }
 
@@ -929,6 +929,22 @@ body.hocwp {
     margin-bottom: 0;
     max-height: 40px;
     overflow: hidden;
+}
+
+.hocwp .hocwp-widget-term .list-terms .term-item .wp-term-image {
+    float: left;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+.hocwp .hocwp-widget-term .list-terms .term-item:not(.only-thumbnail, .full-width) .wp-term-image {
+    width: 40%;
+}
+
+.hocwp .hocwp-widget-term .list-terms .term-item.full-width .wp-term-image,
+.hocwp .hocwp-widget-term .list-terms .term-item.only-thumbnail .wp-term-image {
+    margin: 0 0 5px;
+    width: 100%;
 }
 
 /**

@@ -303,6 +303,26 @@ function hocwp_coupon_label_html($percent, $text, $type) {
 	<?php
 }
 
+function hocwp_coupon_filter_bar_html($args = array()) {
+	$term = hocwp_get_value_by_key($args, 'term');
+	$posts_per_page = hocwp_get_value_by_key($args, 'posts_per_page', hocwp_get_posts_per_page());
+	$code_count = absint(hocwp_get_value_by_key($args, 'code_count'));
+	$deal_count = absint(hocwp_get_value_by_key($args, 'deal_count'));
+	?>
+	<ul data-store="<?php echo $term->term_id; ?>" data-paged="<?php echo hocwp_get_paged(); ?>" data-posts-per-page="<?php echo $posts_per_page; ?>" class="filter">
+		<li>
+			<a href="#" data-filter="all" class="active">All (<?php echo $term->count; ?>)</a>
+		</li>
+		<li>
+			<a href="#" data-filter="coupon-code">Coupon Codes (<?php echo $code_count; ?>)</a>
+		</li>
+		<li>
+			<a href="#" data-filter="promotion">Deals (<?php echo $deal_count; ?>)</a>
+		</li>
+	</ul>
+	<?php
+}
+
 function hocwp_coupon_button_html($args = array()) {
 	$post_id = hocwp_get_value_by_key($args, 'post_id', get_the_ID());
 	$type = hocwp_get_value_by_key($args, 'type');
@@ -310,7 +330,7 @@ function hocwp_coupon_button_html($args = array()) {
 	$type_text = hocwp_get_value_by_key($args, 'type_text');
 	$out_url = hocwp_get_value_by_key($args, 'out_url', hocwp_get_coupon_out_url($post_id));
 	?>
-	<a href="#coupon_box_<?php echo $post_id; ?>" data-post-id="<?php echo $post_id; ?>" class="code type-<?php echo $type; ?>" data-out-url="<?php echo $out_url; ?>">
+	<a href="#coupon_box_<?php echo $post_id; ?>" data-post-id="<?php echo $post_id; ?>" class="code type-<?php echo $type; ?>" data-out-url="<?php echo $out_url; ?>" data-toggle="modal">
 		<span class="cc"><?php echo $code_hint; ?></span>
 		<span class="cc-label"><?php printf(__('Get %s', 'hocwp'), $type_text); ?></span>
 	</a>
@@ -327,27 +347,42 @@ function hocwp_coupon_button_code_html($args = array()) {
 		return;
 	}
 	$out_url = hocwp_get_value_by_key($args, 'out_url', hocwp_get_coupon_out_url($post_id));
+	$button_class = hocwp_get_value_by_key($args, 'button_class');
+	hocwp_add_string_with_space_before($button_class, 'copy-button');
+	$input_class = hocwp_get_value_by_key($args, 'input_class');
+	hocwp_add_string_with_space_before($input_class, 'text');
 	?>
-	<div class="code">
-		<input class="text" type="text" value="<?php echo $code; ?>" readonly>
-		<a class="copy-button" data-clipboard-text="<?php echo $code; ?>" data-out-url="<?php echo $out_url; ?>">Copy</a>
+	<div class="code clearfix">
+		<input class="<?php echo $input_class; ?>" type="text" value="<?php echo $code; ?>" readonly>
+		<a class="<?php echo $button_class; ?>" data-clipboard-text="<?php echo $code; ?>" data-out-url="<?php echo $out_url; ?>">Copy</a>
 	</div>
 	<?php
 }
 
 function hocwp_coupon_vote_comment_html($args = array()) {
-	$result = hocwp_get_value_by_key($args, 'result', '100%');
+	$result = hocwp_get_value_by_key($args, 'result');
+	$post_id = hocwp_get_value_by_key($args, 'post_id', get_the_ID());
+	if(empty($result)) {
+		$likes = hocwp_get_post_meta('likes', $post_id);
+		$dislikes = hocwp_get_post_meta('dislikes', $post_id);
+		$result = hocwp_percentage($likes, $dislikes);
+		$result .= '%';
+	}
 	?>
 	<p class="vote-result" data-post-id="<?php the_ID(); ?>">
 		<i class="fa fa-thumbs-o-up"></i>
 		<span><?php printf(__('%s Success', 'hocwp'), $result); ?></span>
 	</p>
-	<p class="add-comment">
-		<a href="#add_comment_<?php the_ID(); ?>">
-			<i class="fa fa-comments-o"></i> <?php _e('Add a Comment', 'hocwp'); ?>
-		</a>
-	</p>
 	<?php
+	if(comments_open($post_id) || get_comments_number($post_id)) {
+		?>
+		<p class="add-comment">
+			<a href="#add_comment_<?php the_ID(); ?>">
+				<i class="fa fa-comments-o"></i> <?php _e('Add a Comment', 'hocwp'); ?>
+			</a>
+		</p>
+		<?php
+	}
 }
 
 function hocwp_get_coupon_store($post_id = null) {
@@ -391,25 +426,29 @@ if(!(bool)$hocwp_coupon_site) {
 	return;
 }
 
-hocwp_meta_box_post_attribute(array('coupon'));
+global $pagenow;
 
-hocwp_term_meta_thumbnail_field(array('store'));
+if('edit-tags.php' == $pagenow) {
+	hocwp_term_meta_thumbnail_field(array('store'));
+	$meta = new HOCWP_Meta('term');
+	$meta->set_taxonomies(array('store'));
+	$meta->add_field(array('id' => 'site', 'label' => __('Store URL', 'hocwp')));
+	$meta->init();
+}
 
-$meta = new HOCWP_Meta('term');
-$meta->set_taxonomies(array('store'));
-$meta->add_field(array('id' => 'site', 'label' => __('Store URL', 'hocwp')));
-$meta->init();
-
-$meta = new HOCWP_Meta('post');
-$meta->set_post_types(array('coupon'));
-$meta->set_id('hocwp_coupon_information');
-$meta->set_title(__('Coupon Information', 'hocwp'));
-$meta->add_field(array('id' => 'percent_label', 'label' => __('Percent Label:', 'hocwp')));
-$meta->add_field(array('id' => 'text_label', 'label' => __('Text Label:', 'hocwp')));
-$meta->add_field(array('id' => 'coupon_code', 'label' => __('Code:', 'hocwp')));
-$meta->add_field(array('id' => 'expired_date', 'label' => __('Expires:', 'hocwp'), 'field_callback' => 'hocwp_field_datetime_picker', 'data_type' => 'timestamp', 'min_date' => 0, 'date_format' => 'm/d/Y'));
-$meta->add_field(array('id' => 'url', 'label' => __('URL:', 'hocwp')));
-$meta->init();
+if('edit.php' == $pagenow || 'post.php' == $pagenow) {
+	hocwp_meta_box_post_attribute(array('coupon'));
+	$meta = new HOCWP_Meta('post');
+	$meta->set_post_types(array('coupon'));
+	$meta->set_id('hocwp_coupon_information');
+	$meta->set_title(__('Coupon Information', 'hocwp'));
+	$meta->add_field(array('id' => 'percent_label', 'label' => __('Percent Label:', 'hocwp')));
+	$meta->add_field(array('id' => 'text_label', 'label' => __('Text Label:', 'hocwp')));
+	$meta->add_field(array('id' => 'coupon_code', 'label' => __('Code:', 'hocwp')));
+	$meta->add_field(array('id' => 'expired_date', 'label' => __('Expires:', 'hocwp'), 'field_callback' => 'hocwp_field_datetime_picker', 'data_type' => 'timestamp', 'min_date' => 0, 'date_format' => 'm/d/Y'));
+	$meta->add_field(array('id' => 'url', 'label' => __('URL:', 'hocwp')));
+	$meta->init();
+}
 
 function hocwp_coupon_on_save_post($post_id) {
 	if(!hocwp_can_save_post($post_id)) {
@@ -439,20 +478,6 @@ function hocwp_coupon_update_post_class($classes) {
 	return $classes;
 }
 add_filter('post_class', 'hocwp_coupon_update_post_class');
-
-function hocwp_coupon_rewrite_rules($rules) {
-	$new_rule = array('([^/]+)/([^/]+)/?$' => 'index.php?action=$matches[1]&store=$matches[2]', 'top');
-	$rules = $new_rule + $rules;
-	return $rules;
-}
-//add_filter('rewrite_rules_array', 'hocwp_coupon_rewrite_rules');
-
-function hocwp_coupon_query_vars($vars) {
-	$vars[] = 'action';
-	$vars[] = 'store';
-	return $vars;
-}
-//add_filter('query_vars', 'hocwp_coupon_query_vars');
 
 function hocwp_coupon_on_init_hook() {
 	add_rewrite_endpoint('go-store', EP_ALL);
@@ -499,6 +524,7 @@ function hocwp_coupon_pre_get_posts($query) {
 		if(is_post_type_archive('coupon') || is_search() || is_tax('store') || is_tax('coupon_cat') || is_tax('coupon_tag')) {
 			$query_vars = $query->query_vars;
 			$expired_coupon = (bool)hocwp_get_value_by_key($query_vars, 'expired_coupon');
+			$expired_coupon = true;
 			if(!$expired_coupon) {
 				$meta_query = hocwp_get_value_by_key($query_vars, 'meta_query');
 				if(hocwp_array_has_value($meta_query)) {
@@ -606,23 +632,7 @@ add_action('wp_ajax_hocwp_coupon_filter', 'hocwp_coupon_filter_ajax_callback');
 add_action('wp_ajax_nopriv_hocwp_coupon_filter', 'hocwp_coupon_filter_ajax_callback');
 
 function hocwp_coupon_tax_store_sidebar() {
-	$terms = get_terms('coupon_cat', array('hide_empty' => false));
-	if(hocwp_array_has_value($terms)) {
-		?>
-		<aside class="widget list-coupon-cats">
-			<h4 class="widget-title">
-				<span class="recent-comments">Coupon Categories</span>
-			</h4>
-			<ul class="list-unstyled">
-				<?php
-				foreach($terms as $term) {
-					echo '<li class="cat-item cat-item-' . $term->term_id . '"><a href="' . get_term_link($term) . '">' . $term->name . '</a> (' . $term->count . ')</li>';
-				}
-				?>
-			</ul>
-		</aside>
-		<?php
-	}
+
 }
 add_action('hocwp_before_primary_sidebar_widget', 'hocwp_coupon_tax_store_sidebar');
 

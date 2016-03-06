@@ -1,5 +1,5 @@
 /**
- * Last updated: 26/02/2016
+ * Last updated: 04/03/2016
  */
 
 /**
@@ -115,6 +115,7 @@
 }
 
 .hocwp.server-information .postbox td.label {
+    vertical-align: top;
     width: 30%;
 }
 

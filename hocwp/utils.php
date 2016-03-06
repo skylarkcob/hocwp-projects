@@ -57,6 +57,53 @@ function hocwp_replace_text_placeholder($text) {
     return $text;
 }
 
+function hocwp_percentage($val1, $val2, $precision = 0) {
+    $total = $val1 + $val2;
+    if(0 == $total) {
+        return 0;
+    }
+    $val1 /= $total;
+    $val1 *= 100;
+    return round($val1, $precision);
+}
+
+function hocwp_widget_item_full_width_result($full_width_value, $total_item_count, $loop_count) {
+    $full_width = false;
+    $loop_count = absint($loop_count);
+    $loop_count++;
+    switch($full_width_value) {
+        case 'all':
+            $full_width = true;
+            break;
+        case 'first':
+            if(0 == $loop_count) {
+                $full_width = true;
+            }
+            break;
+        case 'last':
+            if($loop_count == $total_item_count) {
+                $full_width = true;
+            }
+            break;
+        case 'first_last':
+            if(0 == $loop_count || $loop_count == $total_item_count ) {
+                $full_width = true;
+            }
+            break;
+        case 'odd':
+            if(($loop_count % 2) != 0) {
+                $full_width = true;
+            }
+            break;
+        case 'even':
+            if(($loop_count % 2) == 0) {
+                $full_width = true;
+            }
+            break;
+    }
+    return $full_width;
+}
+
 function hocwp_the_social_list($args = array()) {
     $option_socials = hocwp_option_defaults()['social'];
     $order = hocwp_get_value_by_key($args, 'order', hocwp_get_value_by_key($option_socials, 'order'));

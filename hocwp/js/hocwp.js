@@ -24,6 +24,8 @@ hocwp.media_items = {};
 jQuery(document).ready(function($) {
     'use strict';
 
+    var $body = $('body');
+
     hocwp.getParamByName = function(url, name) {
         name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
         var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
@@ -174,10 +176,13 @@ jQuery(document).ready(function($) {
     };
 
     hocwp.addDefaultQuicktagButton = function() {
-        QTags.addButton('hr', 'hr', '\n<hr>\n', '', 'h', 'Horizontal rule line', 30);
-        QTags.addButton('dl', 'dl', '<dl>\n', '</dl>\n\n', 'd', 'HTML Description List Element', 100);
-        QTags.addButton('dt', 'dt', '\t<dt>', '</dt>\n', '', 'HTML Definition Term Element', 101);
-        QTags.addButton('dd', 'dd', '\t<dd>', '</dd>\n', '', 'HTML Description Element', 102);
+        var $quicktags_toolbar = $body.find('.quicktags-toolbar');
+        if($quicktags_toolbar.length) {
+            QTags.addButton('hr', 'hr', '\n<hr>\n', '', 'h', 'Horizontal rule line', 30);
+            QTags.addButton('dl', 'dl', '<dl>\n', '</dl>\n\n', 'd', 'HTML Description List Element', 100);
+            QTags.addButton('dt', 'dt', '\t<dt>', '</dt>\n', '', 'HTML Definition Term Element', 101);
+            QTags.addButton('dd', 'dd', '\t<dd>', '</dd>\n', '', 'HTML Description Element', 102);
+        }
     };
 
     hocwp.formatNumber = function(number, separator, currency) {

@@ -1,5 +1,5 @@
 /**
- * Last updated: 07/01/2016
+ * Last updated: 04/03/2016
  */
 
 jQuery(document).ready(function($) {
@@ -110,5 +110,33 @@ jQuery(document).ready(function($) {
 
     (function() {
         hocwp.iconChangeCaptchaExecute();
+    })();
+
+    (function() {
+        $('.vote .vote-post').on('click', function(e) {
+            e.preventDefault();
+            var $element = $(this),
+                $parent = $element.parent(),
+                vote_type = $element.attr('data-vote-type'),
+                post_id = $parent.attr('data-post-id');
+            $element.addClass('disabled');
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: hocwp.ajax_url,
+                data: {
+                    action: 'hocwp_vote_post',
+                    post_id: post_id,
+                    vote_type: vote_type,
+                    value: $element.attr('data-vote')
+                },
+                success: function(response){
+                    if(response.success) {
+                        $element.attr('data-vote', response.value);
+                        $parent.addClass('disabled');
+                    }
+                }
+            });
+        });
     })();
 });

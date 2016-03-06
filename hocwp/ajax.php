@@ -73,7 +73,7 @@ function hocwp_vote_post_ajax_callback() {
     $post_id = isset($_POST['post_id']) ? $_POST['post_id'] : '';
     $post_id = absint($post_id);
     if($post_id > 0) {
-        $type = isset($_POST['type']) ? $_POST['type'] : '';
+        $type = isset($_POST['type']) ? $_POST['type'] : hocwp_get_value_by_key($_POST, 'vote_type');
         $session_name = 'hocwp_vote_' . $type . '_post_' . $post_id;
         if(!isset($_SESSION[$session_name]) || 1 != $_SESSION[$session_name]) {
             $value = isset($_POST['value']) ? $_POST['value'] : '';
