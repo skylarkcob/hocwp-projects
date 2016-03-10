@@ -6,6 +6,7 @@ $option = new HOCWP_Option(__('Reading', 'hocwp'), 'hocwp_reading');
 $option->set_parent_slug('hocwp_theme_option');
 $option->add_field(array('id' => 'post_statistics', 'title' => __('Post Statistics', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox', 'label' => __('Track post views on your site.', 'hocwp')));
 $option->add_field(array('id' => 'sticky_widget', 'title' => __('Sticky Widget', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox', 'label' => __('Make last widget fixed when scroll down.', 'hocwp')));
+$option->add_field(array('id' => 'redirect_404', 'title' => __('Redirect 404', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox', 'label' => __('Auto redirect 404 page to homepage.', 'hocwp')));
 $option->add_section(array('id' => 'breadcrumb', 'title' => __('Breadcrumb', 'hocwp'), 'description' => __('Custom breadcrumb on your site.', 'hocwp')));
 $option->add_field(array('id' => 'breadcrumb_label', 'title' => __('Breadcrumb Label', 'hocwp'), 'value' => hocwp_wpseo_internallink_value('breadcrumbs-prefix'), 'section' => 'breadcrumb'));
 $option->add_field(array('id' => 'disable_post_title_breadcrumb', 'title' => __('Disable Post Title', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox', 'label' => __('Prevent post title to be shown on last item.', 'hocwp'), 'section' => 'breadcrumb'));

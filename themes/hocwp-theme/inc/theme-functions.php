@@ -16,6 +16,10 @@ function hocwp_theme_register_lib_fancybox() {
     wp_enqueue_script('fancybox', HOCWP_THEME_URL . '/lib/fancybox/jquery.fancybox.pack.js', array('jquery'), false, true);
 }
 
+function hocwp_theme_register_lib_zeroclipboard() {
+    wp_enqueue_script('zeroclipboard', HOCWP_THEME_URL . '/lib/zeroclipboard/ZeroClipboard.min.js', array('jquery'), false, true);
+}
+
 function hocwp_theme_register_lib_superfish() {
     wp_register_style('superfish-style', get_template_directory_uri() . '/lib/superfish/css/superfish.min.css');
     wp_register_script('superfish', get_template_directory_uri() . '/lib/superfish/js/superfish.min.js', array('jquery'), false, true);
@@ -135,7 +139,7 @@ function hocwp_theme_the_menu($args = array()) {
     $menu_class = isset($args['menu_class']) ? $args['menu_class'] : '';
     hocwp_add_string_with_space_before($menu_class , 'hocwp-menu');
     hocwp_add_string_with_space_before($menu_class , $theme_location);
-    $nav_class = '';
+    $nav_class = hocwp_get_value_by_key($args, 'nav_class');
     if('primary' == $theme_location) {
         hocwp_add_string_with_space_before($nav_class, 'main-navigation');
     }
@@ -199,11 +203,17 @@ function hocwp_theme_add_setting_field_footer_text() {
     hocwp_theme_add_setting_field(array('title' => __('Footer Text', 'hocwp'), 'id' => 'footer_text', 'field_callback' => 'hocwp_field_editor'));
 }
 
-function hocwp_theme_the_footer_text($the_content = true) {
+function hocwp_theme_get_footer_text() {
     $text = hocwp_theme_get_option('footer_text');
     if(function_exists('pll__')) {
         $text = pll__($text);
     }
+    $text = apply_filters('hocwp_replace_text_placeholder', $text);
+    return $text;
+}
+
+function hocwp_theme_the_footer_text($the_content = true) {
+    $text = hocwp_theme_get_footer_text();
     if($the_content) {
         $text = apply_filters('the_content', $text);
     } else {
@@ -214,6 +224,10 @@ function hocwp_theme_the_footer_text($the_content = true) {
 
 function hocwp_theme_add_setting_field_select_page($option_name, $title) {
     hocwp_theme_add_setting_field(array('title' => $title, 'id' => $option_name, 'field_callback' => 'hocwp_field_select_page'));
+}
+
+function hocwp_theme_the_social_list($args = array()) {
+    hocwp_the_social_list($args);
 }
 
 function hocwp_theme_add_setting_field_term_sortable($name, $title, $taxonomies = 'category', $only_parent = true) {
@@ -328,3 +342,5 @@ function hocwp_theme_register_translation_text($name, $text, $multiline = false)
         pll_register_string($name, $text, 'hocwp', $multiline);
     }
 }
+
+hocwp_meta_box_page_additional_information();

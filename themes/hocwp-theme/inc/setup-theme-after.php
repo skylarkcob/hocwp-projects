@@ -59,6 +59,7 @@ function hocwp_more_mce_buttons_toolbar_1($buttons) {
     $last = array_pop($tmp);
     $buttons = array_merge($buttons, $tmp);
     $buttons[] = 'styleselect';
+    $buttons[] = 'newdocument';
     $buttons[] = $last;
     return $buttons;
 }
@@ -70,12 +71,18 @@ function hocwp_more_mce_buttons_toolbar_2($buttons) {
     }
     $buttons[] = 'subscript';
     $buttons[] = 'superscript';
-    $buttons[] = 'hr';
+    //$buttons[] = 'hr';
     $buttons[] = 'cut';
     $buttons[] = 'copy';
     $buttons[] = 'paste';
     $buttons[] = 'backcolor';
-    $buttons[] = 'newdocument';
+    foreach($buttons as $key => $name) {
+        if('wp_help' == $name) {
+            unset($buttons[$key]);
+            break;
+        }
+    }
+    $buttons[] = 'wp_help';
     return $buttons;
 }
 add_filter('mce_buttons_2', 'hocwp_more_mce_buttons_toolbar_2');
@@ -211,6 +218,17 @@ function hocwp_theme_add_full_screen_loading() {
     get_template_part('/hocwp/theme/ajax-loading', 'full-screen');
 }
 add_action('hocwp_close_body', 'hocwp_theme_add_full_screen_loading');
+
+function hocwp_setup_theme_wp_hook() {
+    if(is_404()) {
+        $redirect_404 = (bool)hocwp_option_get_value('reading', 'redirect_404');
+        if($redirect_404) {
+            wp_redirect(home_url('/'));
+            exit;
+        }
+    }
+}
+add_action('wp', 'hocwp_setup_theme_wp_hook');
 
 function hocwp_setup_theme_after_go_to_top_button() {
     $button = (bool)hocwp_option_get_value('reading', 'go_to_top');
@@ -510,6 +528,22 @@ function hocwp_setup_theme_add_required_plugins($plugins) {
 }
 add_filter('hocwp_required_plugins', 'hocwp_setup_theme_add_required_plugins', 99);
 
+function hocwp_setup_theme_change_post_title($title, $post_id) {
+    $tmp_post = get_post($post_id);
+    if(is_a($tmp_post, 'WP_Post')) {
+        if('page' == $tmp_post->post_type) {
+            if(is_page()) {
+                $diff_title = hocwp_get_post_meta('different_title', $post_id);
+                if(!empty($diff_title)) {
+                    $title = $diff_title;
+                }
+            }
+        }
+    }
+    return $title;
+}
+add_filter('the_title', 'hocwp_setup_theme_change_post_title', 10, 2);
+
 function hocwp_setup_theme_remove_vietnamese_permalink($title, $raw_title, $context) {
     $title = hocwp_sanitize_html_class($title);
     return $title;
@@ -650,3 +684,5 @@ function hocwp_setup_theme_custom_footer_data() {
     }
 }
 add_action('wp_footer', 'hocwp_setup_theme_custom_footer_data', 99);
+
+add_filter('hocwp_replace_text_placeholder', 'hocwp_replace_text_placeholder');

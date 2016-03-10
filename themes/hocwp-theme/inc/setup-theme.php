@@ -81,9 +81,12 @@ function hocwp_setup_theme_widgets_init() {
     register_widget('HOCWP_Widget_Icon');
     register_widget('HOCWP_Widget_FeedBurner');
     register_widget('HOCWP_Widget_Social');
+    register_widget('HOCWP_Widget_Term');
     $default_sidebars = array(
         'primary',
         'secondary',
+        'page',
+        '404',
         'footer'
     );
     $default_sidebars = apply_filters('hocwp_theme_default_sidebars', $default_sidebars);
@@ -92,6 +95,12 @@ function hocwp_setup_theme_widgets_init() {
     }
     if(in_array('secondary', $default_sidebars)) {
         hocwp_register_sidebar('secondary', __('Secondary sidebar', 'hocwp'), __('Secondary sidebar on your site.', 'hocwp'));
+    }
+    if(in_array('page', $default_sidebars)) {
+        hocwp_register_sidebar('page', __('Page Sidebar', 'hocwp'), __('Display custom widget on Page.', 'hocwp'));
+    }
+    if(in_array('404', $default_sidebars)) {
+        hocwp_register_sidebar('404', __('404 Sidebar', 'hocwp'), __('Display custom widget on 404 page.', 'hocwp'));
     }
     if(in_array('footer', $default_sidebars)) {
         hocwp_register_sidebar('footer', __('Footer widget area', 'hocwp'), __('The widget area contains footer widgets.', 'hocwp'), 'div');
@@ -170,6 +179,10 @@ add_action('login_enqueue_scripts', 'hocwp_setup_theme_login_scripts');
 
 function hocwp_setup_theme_admin_scripts() {
     hocwp_admin_enqueue_scripts();
+    $jquery_ui_datetime_picker = apply_filters('hocwp_admin_jquery_datetime_picker', false);
+    if((bool)$jquery_ui_datetime_picker) {
+        hocwp_enqueue_jquery_ui_datepicker();
+    }
 }
 add_action('admin_enqueue_scripts', 'hocwp_setup_theme_admin_scripts');
 
@@ -185,9 +198,12 @@ function hocwp_setup_theme_admin_footer_text($text) {
 add_filter('admin_footer_text', 'hocwp_setup_theme_admin_footer_text', 99);
 
 function hocwp_setup_theme_update_footer($text) {
-    $tmp = strtolower($text);
-    if(hocwp_string_contain($tmp, 'version')) {
-        $text = sprintf(__('Theme core version %s', 'hocwp'), HOCWP_THEME_CORE_VERSION);
+    global $pagenow;
+    if('update-core.php' != $pagenow) {
+        $tmp = strtolower($text);
+        if(hocwp_string_contain($tmp, 'version')) {
+            $text = sprintf(__('Theme core version %s', 'hocwp'), HOCWP_THEME_CORE_VERSION);
+        }
     }
     return $text;
 }
