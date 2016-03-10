@@ -388,6 +388,16 @@ button img.hocwp-icon {
     padding-top: 5%;
 }
 
+.admin-bar .modal-dialog {
+    padding-top: 10%;
+}
+
+@media only screen and (max-width: 360px) {
+    .admin-bar .modal-dialog {
+        padding-top: 15%;
+    }
+}
+
 /**
  * Columns
  */

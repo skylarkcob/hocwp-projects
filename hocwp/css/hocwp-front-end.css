@@ -947,6 +947,11 @@ body.hocwp {
     width: 100%;
 }
 
+.hocwp .hocwp-widget-term .list-terms .term-item.no-count > a {
+    display: table-cell;
+    vertical-align: middle;
+}
+
 /**
  * Search form
  */

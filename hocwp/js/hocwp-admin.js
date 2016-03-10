@@ -1,5 +1,5 @@
 /**
- * Last updated: 24/02/2016
+ * Last updated: 09/03/2016
  */
 
 jQuery(document).ready(function($) {
@@ -165,11 +165,11 @@ jQuery(document).ready(function($) {
     })();
 
     (function() {
-        //$('.chooseable').hocwpChosenSelect();
-    })();
-
-    (function() {
         var $choseables = $('.hocwp-widget .chooseable');
+        if($choseables.length) {
+            $choseables.hocwpChosenSelect();
+        }
+        $choseables = $('.hocwp-meta-box .chooseable');
         if($choseables.length) {
             $choseables.hocwpChosenSelect();
         }

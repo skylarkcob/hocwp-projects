@@ -122,12 +122,17 @@ class HOCWP_Widget_Term extends WP_Widget {
                 if($full_width) {
                     hocwp_add_string_with_space_before($item_class, 'full-width');
                 }
+                if((bool)$show_count) {
+                    hocwp_add_string_with_space_before($item_class, 'show-count');
+                } else {
+                    hocwp_add_string_with_space_before($item_class, 'no-count');
+                }
                 $html .= '<li class="' . $item_class . '">';
                 if(!(bool)$hide_thumbnail) {
                     $html .= hocwp_term_get_thumbnail_html(array('term' => $term, 'width' => $thumbnail_size[0], $thumbnail_size[1], 'bfi_thumb' => false));
                 }
                 if(!(bool)$only_thumbnail) {
-                    $html .= '<a href="' . get_term_link($term) . '">' . $term->name . '</a>';
+                    $html .= '<a class="term-name" href="' . get_term_link($term) . '">' . $term->name . '</a>';
                     if((bool)$show_count && !empty($count_format)) {
                         $html .= ' <span class="count">' . str_replace('%TERM_COUNT%', $term->count, $count_format) . '</span>';
                     }
