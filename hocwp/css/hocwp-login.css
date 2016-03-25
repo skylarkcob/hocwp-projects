@@ -1,5 +1,5 @@
 /**
- * Last updated: 07/01/2016
+ * Last updated: 25/03/2016
  */
 
 /**
@@ -41,6 +41,10 @@ body.login.hocwp form input[type="checkbox"] {
 
 body.login.hocwp form input[type="text"] {
     width: 100%;
+}
+
+body.login.hocwp form input.hocwp-captcha-code {
+    width: 50%;
 }
 
 body.login.hocwp #login form p.submit {

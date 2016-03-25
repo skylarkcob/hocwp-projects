@@ -30,15 +30,19 @@ function hocwp_field_captcha($args = array()) {
     $placeholder = isset($args['placeholder']) ? $args['placeholder'] : __('Enter captcha code', 'hocwp');
     $class = isset($args['class']) ? $args['class'] : '';
     $input_width = isset($args['input_width']) ? absint($args['input_width']) : 125;
-    if('%' === hocwp_get_last_char($input_width)) {
+    if(is_numeric($input_width) && '%' !== hocwp_get_last_char($input_width)) {
         $input_width .= 'px';
     }
     $name = hocwp_get_value_by_key($args, 'name', 'captcha');
+    if(empty($name)) {
+        $name = 'captcha';
+        hocwp_transmit_id_and_name($id, $name);
+    }
     hocwp_add_string_with_space_before($class, 'hocwp-captcha-code');
     hocwp_field_before($args);
     $image_url = $captcha->generate_image();
     ?>
-    <input autocomplete="off" id="<?php echo esc_attr($id); ?>" name="<?php echo $name; ?>" placeholder="<?php echo esc_attr($placeholder); ?>" class="<?php echo esc_attr($class); ?>" type="text" style="width: <?php echo $input_width; ?>;" required>
+    <input autocomplete="off" id="<?php echo esc_attr($id); ?>" name="<?php echo esc_attr($name); ?>" placeholder="<?php echo esc_attr($placeholder); ?>" class="<?php echo esc_attr($class); ?>" type="text" style="width: <?php echo $input_width; ?>;" required>
     <img class="hocwp-captcha-image" src="<?php echo $image_url; ?>">
     <img class="hocwp-captcha-reload" src="<?php echo HOCWP_URL . '/images/icon-refresh-captcha.png'; ?>">
     <?php
