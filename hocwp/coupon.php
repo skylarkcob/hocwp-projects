@@ -1,4 +1,44 @@
 <?php
+function hocwp_coupon_store_base() {
+	$option = get_option('hocwp_permalink');
+	$base = hocwp_get_value_by_key($option, 'coupon_store_base', 'store');
+	$base = apply_filters('hocwp_coupon_store_base', $base);
+	if(empty($base)) {
+		$base = 'store';
+	}
+	return $base;
+}
+
+function hocwp_coupon_category_base() {
+	$option = get_option('hocwp_permalink');
+	$base = hocwp_get_value_by_key($option, 'coupon_category_base', 'coupon-cat');
+	$base = apply_filters('hocwp_coupon_category_base', $base);
+	if(empty($base)) {
+		$base = 'coupon-cat';
+	}
+	return $base;
+}
+
+function hocwp_coupon_tag_base() {
+	$option = get_option('hocwp_permalink');
+	$base = hocwp_get_value_by_key($option, 'coupon_tag_base', 'coupon-tag');
+	$base = apply_filters('hocwp_coupon_tag_base', $base);
+	if(empty($base)) {
+		$base = 'coupon-tag';
+	}
+	return $base;
+}
+
+function hocwp_coupon_type_base() {
+	$option = get_option('hocwp_permalink');
+	$base = hocwp_get_value_by_key($option, 'coupon_type_base', 'coupon-type');
+	$base = apply_filters('hocwp_coupon_type_base', $base);
+	if(empty($base)) {
+		$base = 'coupon-type';
+	}
+	return $base;
+}
+
 function hocwp_coupon_install_post_type_and_taxonomy() {
 	$args = array(
 		'name' => __('Coupons', 'hocwp'),
@@ -22,7 +62,8 @@ function hocwp_coupon_install_post_type_and_taxonomy() {
 	$args = array(
 		'name' => __('Stores', 'hocwp'),
 		'singular_name' => __('Store', 'hocwp'),
-		'slug' => 'store',
+		'taxonomy' => 'store',
+		'slug' => hocwp_coupon_store_base(),
 		'post_types' => array('coupon')
 	);
 	hocwp_register_taxonomy($args);
@@ -30,7 +71,9 @@ function hocwp_coupon_install_post_type_and_taxonomy() {
 	$args = array(
 		'name' => __('Coupon Categories', 'hocwp'),
 		'singular_name' => __('Coupon Category', 'hocwp'),
-		'slug' => 'coupon_cat',
+		'menu_name' => __('Categories', 'hocwp'),
+		'slug' => hocwp_coupon_category_base(),
+		'taxonomy' => 'coupon_cat',
 		'post_types' => array('coupon')
 	);
 	hocwp_register_taxonomy($args);
@@ -38,7 +81,9 @@ function hocwp_coupon_install_post_type_and_taxonomy() {
 	$args = array(
 		'name' => __('Coupon Tags', 'hocwp'),
 		'singular_name' => __('Coupon Tag', 'hocwp'),
-		'slug' => 'coupon_tag',
+		'menu_name' => __('Tags', 'hocwp'),
+		'slug' => hocwp_coupon_tag_base(),
+		'taxonomy' => 'coupon_tag',
 		'hierarchical' => false,
 		'post_types' => array('coupon')
 	);
@@ -47,7 +92,9 @@ function hocwp_coupon_install_post_type_and_taxonomy() {
 	$args = array(
 		'name' => __('Coupon Types', 'hocwp'),
 		'singular_name' => __('Coupon Type', 'hocwp'),
-		'slug' => 'coupon_type',
+		'menu_name' => __('Types', 'hocwp'),
+		'slug' => hocwp_coupon_type_base(),
+		'taxonomy' => 'coupon_type',
 		'post_types' => array('coupon')
 	);
 	hocwp_register_taxonomy($args);
@@ -217,6 +264,7 @@ function hocwp_coupon_get_store_by_category($category) {
 		}
 		wp_reset_postdata();
 	}
+	$result = array_unique($result, SORT_REGULAR);
 	return $result;
 }
 
@@ -366,6 +414,7 @@ function hocwp_coupon_vote_comment_html($args = array()) {
 		$likes = hocwp_get_post_meta('likes', $post_id);
 		$dislikes = hocwp_get_post_meta('dislikes', $post_id);
 		$result = hocwp_percentage($likes, $dislikes);
+		$result = apply_filters('hocwp_coupon_rating_percentage', $result, $likes, $dislikes);
 		$result .= '%';
 	}
 	?>
@@ -429,6 +478,7 @@ if(!(bool)$hocwp_coupon_site) {
 global $pagenow;
 
 if('edit-tags.php' == $pagenow) {
+	hocwp_term_meta_different_name_field(array('store', 'coupon_cat'));
 	hocwp_term_meta_thumbnail_field(array('store'));
 	$meta = new HOCWP_Meta('term');
 	$meta->set_taxonomies(array('store'));
@@ -671,3 +721,28 @@ add_action('hocwp_post_meta_box_field', 'hocwp_coupon_attribute_meta_box_field')
 if('post.php' == $pagenow || 'edit.php' == $pagenow) {
 	add_filter('hocwp_use_chosen_select', '__return_true');
 }
+
+if('options-permalink.php' == $pagenow || true) {
+	$data = get_option('hocwp_permalink');
+	$option = new HOCWP_Option('', 'permalink');
+	$option->set_parent_slug('options-permalink.php');
+	$option->set_update_option(true);
+	$option->add_field(array('value' => hocwp_get_value_by_key($data, 'coupon_store_base'), 'id' => 'coupon_store_base', 'title' => __('Coupon store base', 'hocwp'), 'section' => 'optional', 'placeholder' => hocwp_coupon_store_base()));
+	$option->add_field(array('value' => hocwp_get_value_by_key($data, 'coupon_category_base'), 'id' => 'coupon_category_base', 'title' => __('Coupon category base', 'hocwp'), 'section' => 'optional', 'placeholder' => hocwp_coupon_category_base()));
+	$option->add_field(array('value' => hocwp_get_value_by_key($data, 'coupon_tag_base'), 'id' => 'coupon_tag_base', 'title' => __('Coupon tag base', 'hocwp'), 'section' => 'optional', 'placeholder' => hocwp_coupon_tag_base()));
+	$option->add_field(array('value' => hocwp_get_value_by_key($data, 'coupon_type_base'), 'id' => 'coupon_type_base', 'title' => __('Coupon type base', 'hocwp'), 'section' => 'optional', 'placeholder' => hocwp_coupon_type_base()));
+	$option->init();
+}
+
+function hocwp_coupon_filter_taxonomy_base($base, $taxonomy) {
+	switch($taxonomy) {
+		case 'store':
+			$base = 'store';
+			break;
+		case 'coupon_cat':
+			$base = 'coupon_cat';
+			break;
+	}
+	return $base;
+}
+add_filter('hocwp_remove_term_base_taxonomy_base', 'hocwp_coupon_filter_taxonomy_base', 10, 2);

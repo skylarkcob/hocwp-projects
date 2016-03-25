@@ -2,11 +2,10 @@
 if(!function_exists('add_filter')) exit;
 class HOCWP_Widget_Banner extends WP_Widget {
     public $args = array();
+    public $admin_args;
 
     private function get_defaults() {
-        $defaults = array(
-            'admin_width' => 400
-        );
+        $defaults = array();
         $defaults = apply_filters('hocwp_widget_banner_defaults', $defaults);
         $args = apply_filters('hocwp_widget_banner_args', array());
         $args = wp_parse_args($args, $defaults);
@@ -15,13 +14,21 @@ class HOCWP_Widget_Banner extends WP_Widget {
 
     public function __construct() {
         $this->args = $this->get_defaults();
-        parent::__construct('hocwp_widget_banner', 'HOCWP Banner',
+        $this->admin_args = array(
+            'id' => 'hocwp_widget_banner',
+            'name' => 'HOCWP Banner',
+            'class' => 'hocwp-banner-widget',
+            'description' => __('Display banner on sidebar.', 'hocwp'),
+            'width' => 400
+        );
+        $this->admin_args = apply_filters('hocwp_widget_banner_admin_args', $this->admin_args);
+        parent::__construct($this->admin_args['id'], $this->admin_args['name'],
             array(
-                'classname' => 'hocwp-banner-widget',
-                'description' => __('Display banner on sidebar.', 'hocwp'),
+                'classname' => $this->admin_args['class'],
+                'description' => $this->admin_args['description'],
             ),
             array(
-                'width' => $this->args['admin_width']
+                'width' => $this->admin_args['width']
             )
         );
     }
@@ -38,13 +45,21 @@ class HOCWP_Widget_Banner extends WP_Widget {
         $banner_image = $banner_image['url'];
         if(!empty($banner_image)) {
             hocwp_widget_before($args, $instance);
+            $img = new HOCWP_HTML('img');
+            $img->set_image_src($banner_image);
+            $img->set_image_alt($title_text);
+            $img->set_class('hocwp-banner-image');
+            $html = $img->build();
             if(!empty($banner_url)) {
-                echo '<a class="hocwp-banner-link" title="' . $title_text . '" href="' . $banner_url . '">';
+                $a = new HOCWP_HTML('a');
+                $a->set_class('hocwp-banner-link');
+                $a->set_attribute('title', $title_text);
+                $a->set_href($banner_url);
+                $a->set_text($html);
+                $html = $a->build();
             }
-            echo '<img class="hocwp-banner-image" alt="' . $title_text.'" src="' . $banner_image . '">';
-            if(!empty($banner_url)) {
-                echo '</a>';
-            }
+            $widget_html = apply_filters('hocwp_widget_banner_html', $html, $instance, $args, $this);
+            echo $widget_html;
             hocwp_widget_after($args, $instance);
         }
     }
@@ -53,7 +68,7 @@ class HOCWP_Widget_Banner extends WP_Widget {
         $title = isset($instance['title']) ? $instance['title'] : '';
         $banner_image = isset($instance['banner_image']) ? $instance['banner_image'] : '';
         $banner_url = isset($instance['banner_url']) ? $instance['banner_url'] : '';
-        hocwp_field_widget_before();
+        hocwp_field_widget_before($this->admin_args['class']);
         hocwp_widget_field_title($this->get_field_id('title'), $this->get_field_name('title'), $title);
 
         $args = array(

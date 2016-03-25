@@ -2,14 +2,10 @@
 if(!function_exists('add_filter')) exit;
 class HOCWP_Widget_Top_Commenter extends WP_Widget {
     public $args = array();
+    public $admin_args;
 
     private function get_defaults() {
         $defaults = array(
-            'id' => 'hocwp_widget_top_commenter',
-            'name' => 'HOCWP Top Commenter',
-            'class' => 'hocwp-top-commenter-widget',
-            'description' => __('Get top commenters on your site.', 'hocwp'),
-            'admin_width' => 400,
             'number' => 5,
             'time' => 'week',
             'times' => array(
@@ -31,13 +27,21 @@ class HOCWP_Widget_Top_Commenter extends WP_Widget {
 
     public function __construct() {
         $this->args = $this->get_defaults();
-        parent::__construct($this->args['id'], $this->args['name'],
+        $this->admin_args = array(
+            'id' => 'hocwp_widget_top_commenter',
+            'name' => 'HOCWP Top Commenter',
+            'class' => 'hocwp-top-commenter-widget',
+            'description' => __('Get top commenters on your site.', 'hocwp'),
+            'width' => 400
+        );
+        $this->admin_args = apply_filters('hocwp_widget_top_commenter_admin_args', $this->admin_args);
+        parent::__construct($this->admin_args['id'], $this->admin_args['name'],
             array(
-                'classname' => $this->args['class'],
-                'description' => $this->args['description'],
+                'classname' => $this->admin_args['class'],
+                'description' => $this->admin_args['description'],
             ),
             array(
-                'width' => $this->args['admin_width']
+                'width' => $this->admin_args['width']
             )
         );
     }
@@ -66,6 +70,7 @@ class HOCWP_Widget_Top_Commenter extends WP_Widget {
             }
         }
         $commenters = hocwp_get_top_commenters($number, $time, $condition);
+        ob_start();
         if(!hocwp_array_has_value($commenters)) {
             echo wpautop($none_text);
         } else {
@@ -97,6 +102,9 @@ class HOCWP_Widget_Top_Commenter extends WP_Widget {
             </ol>
             <?php
         }
+        $widget_html = ob_get_clean();
+        $widget_html = apply_filters('hocwp_widget_top_commenter_html', $widget_html, $instance, $args, $this);
+        echo $widget_html;
         hocwp_widget_after($args, $instance);
     }
 
@@ -110,7 +118,7 @@ class HOCWP_Widget_Top_Commenter extends WP_Widget {
         $link_author_name = hocwp_get_value_by_key($instance, 'link_author_name', hocwp_get_value_by_key($this->args, 'link_author_name'));
         $none_text = hocwp_get_value_by_key($instance, 'none_text', hocwp_get_value_by_key($this->args, 'none_text'));
 
-        hocwp_field_widget_before();
+        hocwp_field_widget_before($this->admin_args['class']);
         hocwp_widget_field_title($this->get_field_id('title'), $this->get_field_name('title'), $title);
 
         $args = array(

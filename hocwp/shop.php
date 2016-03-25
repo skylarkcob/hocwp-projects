@@ -12,8 +12,9 @@ function hocwp_register_post_type_product() {
 
 function hocwp_register_taxonomy_product_cat() {
     $args = array(
-        'name' => __('Product cats', 'hocwp'),
-        'singular_name' => __('Product cat', 'hocwp'),
+        'name' => __('Product Categories', 'hocwp'),
+        'singular_name' => __('Product Category', 'hocwp'),
+        'menu_name' => __('Categories', 'hocwp'),
         'slug' => 'product_cat',
         'post_types' => 'product'
     );
@@ -22,10 +23,77 @@ function hocwp_register_taxonomy_product_cat() {
 
 function hocwp_register_taxonomy_product_tag() {
     $args = array(
-        'name' => __('Product tags', 'hocwp'),
-        'singular_name' => __('Product tag', 'hocwp'),
+        'name' => __('Product Tags', 'hocwp'),
+        'singular_name' => __('Product Tag', 'hocwp'),
+        'menu_name' => __('Tags', 'hocwp'),
         'slug' => 'product_tag',
         'post_types' => 'product'
     );
     hocwp_register_taxonomy($args);
 }
+
+function hocwp_shop_install_post_type_and_taxonomy() {
+    if(hocwp_wc_installed()) {
+        return;
+    }
+    hocwp_register_post_type_product();
+    hocwp_register_taxonomy_product_cat();
+    hocwp_register_taxonomy_product_tag();
+}
+
+function hocwp_query_best_selling_product($args = array()) {
+    $args['meta_key'] = 'total_sales';
+    $args['orderby'] = 'meta_value_num';
+    $args['order'] = 'DESC';
+    return hocwp_query_product($args);
+}
+
+function hocwp_get_product_cat_base() {
+    $base = get_option('woocommerce_permalinks');
+    $base = hocwp_get_value_by_key($base, 'category_base');
+    if(empty($base)) {
+        $base = 'product-category';
+    }
+    return $base;
+}
+
+function hocwp_get_product_tag_base() {
+    $base = get_option('woocommerce_permalinks');
+    $base = hocwp_get_value_by_key($base, 'tag_base');
+    if(empty($base)) {
+        $base = 'product-tag';
+    }
+    return $base;
+}
+
+function hocwp_get_product_base() {
+    $page = hocwp_wc_get_shop_page();
+    $base = 'product';
+    if(is_a($page, 'WP_Post')) {
+        $base = $page->post_name;
+    }
+    return $base;
+}
+
+$hocwp_shop_site = apply_filters('hocwp_shop_site', false);
+
+if(!(bool)$hocwp_shop_site) {
+    return;
+}
+
+function hocwp_shop_after_setup_theme() {
+    if(hocwp_wc_installed()) {
+        add_theme_support('woocommerce');
+    }
+}
+add_action('after_setup_theme', 'hocwp_shop_after_setup_theme');
+
+function hocwp_shop_pre_get_posts($query) {
+    if($query->is_main_query()) {
+        if(is_search()) {
+            $query->set('post_type', 'product');
+        }
+    }
+    return $query;
+}
+if(!is_admin()) add_action('pre_get_posts', 'hocwp_shop_pre_get_posts');

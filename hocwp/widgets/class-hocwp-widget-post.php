@@ -2,14 +2,10 @@
 if(!function_exists('add_filter')) exit;
 class HOCWP_Widget_Post extends WP_Widget {
     public $args = array();
+    public $admin_args;
 
     private function get_defaults() {
         $defaults = array(
-            'id' => 'hocwp_widget_post',
-            'name' => 'HocWP Post',
-            'class' => 'hocwp-widget-post',
-            'description' => __('Your site’s most recent Posts and more.', 'hocwp'),
-            'admin_width' => 400,
             'bys' => array(
                 'recent' => __('Recent posts', 'hocwp'),
                 'random' => __('Random posts', 'hocwp'),
@@ -74,13 +70,21 @@ class HOCWP_Widget_Post extends WP_Widget {
 
     public function __construct() {
         $this->args = $this->get_defaults();
-        parent::__construct($this->args['id'], $this->args['name'],
+        $this->admin_args = array(
+            'id' => 'hocwp_widget_post',
+            'name' => 'HocWP Post',
+            'class' => 'hocwp-widget-post',
+            'description' => __('Your site’s most recent Posts and more.', 'hocwp'),
+            'width' => 400
+        );
+        $this->admin_args = apply_filters('hocwp_widget_post_admin_args', $this->admin_args);
+        parent::__construct($this->admin_args['id'], $this->admin_args['name'],
             array(
-                'classname' => $this->args['class'],
-                'description' => $this->args['description'],
+                'classname' => $this->admin_args['class'],
+                'description' => $this->admin_args['description'],
             ),
             array(
-                'width' => $this->args['admin_width']
+                'width' => $this->admin_args['width']
             )
         );
     }
@@ -139,6 +143,8 @@ class HOCWP_Widget_Post extends WP_Widget {
                 if((bool)$category_as_widget_title) {
                     $term = get_term($term_id, $taxonomy);
                     $title = $term->name;
+                } else {
+                    $title = apply_filters('widget_title', hocwp_get_value_by_key($instance, 'title'));
                 }
                 $link->set_text($title);
                 $title = hocwp_get_value_by_key($args, 'before_title') . $link->build() . hocwp_get_value_by_key
@@ -392,6 +398,7 @@ class HOCWP_Widget_Post extends WP_Widget {
         $widget_html = apply_filters('hocwp_widget_html', $widget_html, $instance, $query = $w_query, $widget_args = $args, $option_name = $this->option_name, $widget_number = $this->number, $sidebar_id = $sidebar);
         $widget_html = apply_filters($this->option_name . '_html', $widget_html, $instance, $query = $w_query, $widget_args = $args, $widget_number = $this->number, $sidebar_id = $sidebar);
         $widget_html = apply_filters($this->option_name . '_' . $sidebar . '_html', $widget_html, $instance, $query = $w_query, $widget_args = $args, $widget_number = $this->number);
+        $widget_html = apply_filters('hocwp_widget_post_html', $widget_html, $args, $instance, $this);
         echo $widget_html;
     }
 
@@ -410,7 +417,7 @@ class HOCWP_Widget_Post extends WP_Widget {
         $widget_title_link_category = hocwp_get_value_by_key($instance, 'widget_title_link_category', hocwp_get_value_by_key($this->args, 'widget_title_link_category'));
         $category_as_widget_title = hocwp_get_value_by_key($instance, 'category_as_widget_title', hocwp_get_value_by_key($this->args, 'category_as_widget_title'));
 
-        hocwp_field_widget_before('hocwp-widget-post');
+        hocwp_field_widget_before($this->admin_args['class']);
 
         hocwp_widget_field_title($this->get_field_id('title'), $this->get_field_name('title'), $title);
 

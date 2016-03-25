@@ -315,3 +315,22 @@ function hocwp_term_pagination($args = array()) {
     echo $result;
     hocwp_pagination_after();
 }
+
+function hocwp_get_last_paged($query = null) {
+    if(!is_a($query, 'WP_Query')) {
+        $query = $GLOBALS['wp_query'];
+    }
+    $total_page = hocwp_get_total_page(array('query' => $query));
+    return $total_page;
+}
+
+function hocwp_is_last_paged($query = null, $paged = '') {
+    if(empty($paged)) {
+        $paged = hocwp_get_paged();
+    }
+    $total_page = hocwp_get_last_paged($query);
+    if($paged == $total_page) {
+        return true;
+    }
+    return false;
+}

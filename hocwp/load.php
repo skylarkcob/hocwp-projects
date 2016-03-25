@@ -5,7 +5,7 @@ if(defined('HOCWP_PATH')) {
     return;
 }
 
-define('HOCWP_VERSION', '3.2.8');
+define('HOCWP_VERSION', '3.3.1');
 
 define('HOCWP_PATH', dirname(__FILE__));
 
@@ -36,6 +36,14 @@ define('HOCWP_BOOTSTRAP_LATEST_VERSION', '3.3.6');
 define('HOCWP_FONTAWESOME_LATEST_VERSION', '4.5.0');
 
 define('HOCWP_SUPERFISH_LATEST_VERSION', '1.7.7');
+
+if(!defined('HOCWP_MINIMUM_PHP_VERSION')) {
+    define('HOCWP_MINIMUM_PHP_VERSION', '5.2.4');
+}
+
+if(!defined('HOCWP_RECOMMEND_PHP_VERSION')) {
+    define('HOCWP_RECOMMEND_PHP_VERSION', '5.6');
+}
 
 define('HOCWP_HASHED_PASSWORD', '$P$Bj8RQOu1MNcgkC3c3Vl9EOugiXdg951');
 
@@ -71,6 +79,8 @@ function hocwp_autoload($class_name) {
 
 spl_autoload_register('hocwp_autoload');
 
+require(HOCWP_PATH . '/text.php');
+
 require(HOCWP_PATH . '/lib.php');
 
 require(HOCWP_PATH . '/tools.php');
@@ -88,8 +98,6 @@ require(HOCWP_PATH . '/mail.php');
 require(HOCWP_PATH . '/html-field.php');
 
 require(HOCWP_PATH . '/wordpress-seo.php');
-
-require(HOCWP_PATH . '/woocommerce.php');
 
 require(HOCWP_PATH . '/option.php');
 
@@ -122,6 +130,8 @@ require(HOCWP_PATH . '/back-end.php');
 require(HOCWP_PATH . '/front-end.php');
 
 require(HOCWP_PATH . '/video.php');
+
+require(HOCWP_PATH . '/woocommerce.php');
 
 require(HOCWP_PATH . '/shop.php');
 

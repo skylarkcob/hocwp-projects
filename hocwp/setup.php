@@ -99,10 +99,44 @@ function hocwp_license_control() {
         }
         hocwp_delete_transient_license_valid();
     } else {
-        do_action('hocwp_check_license');
+        if(version_compare(PHP_VERSION, HOCWP_MINIMUM_PHP_VERSION, '<')) {
+            add_filter('hocwp_use_admin_style_and_script', '__return_true');
+            add_action('admin_notices', 'hocwp_setup_warning_php_minimum_version');
+        } else {
+            do_action('hocwp_check_license');
+        }
     }
 }
 add_action('init', 'hocwp_license_control');
+
+function hocwp_setup_warning_php_minimum_version() {
+    global $wp_version;
+    $args = array(
+        'text' => sprintf(__('Your server is running PHP version %1$s but WordPress %2$s requires at least %3$s. Please contact your hosting provider to upgrade it.', 'hocwp'), PHP_VERSION, $wp_version, HOCWP_MINIMUM_PHP_VERSION),
+        'type' => 'warning',
+        'title' => __('Warning', 'hocwp')
+    );
+    hocwp_admin_notice($args);
+}
+
+function hocwp_setup_warning_php_recommend_version() {
+    global $wp_version;
+    $transient_name = 'hocwp_warning_php_recommend_version';
+    if(false === get_transient($transient_name)) {
+        if(hocwp_is_admin()) {
+            if(version_compare(PHP_VERSION, HOCWP_RECOMMEND_PHP_VERSION, '<')) {
+                $args = array(
+                    'text' => sprintf(__('Your server is running PHP version %1$s but WordPress %2$s recommends at least %3$s.', 'hocwp'), PHP_VERSION, $wp_version, HOCWP_RECOMMEND_PHP_VERSION),
+                    'type' => 'warning',
+                    'title' => __('Warning', 'hocwp')
+                );
+                hocwp_admin_notice($args);
+                set_transient($transient_name, 1, HOUR_IN_SECONDS);
+            }
+        }
+    }
+}
+add_action('admin_notices', 'hocwp_setup_warning_php_recommend_version');
 
 function hocwp_setup_login_redirect($redirect_to, $request, $user) {
     global $user;

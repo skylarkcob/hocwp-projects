@@ -6,8 +6,81 @@ function hocwp_wrap_tag($text, $tag, $class = '') {
     }
     $html = new HOCWP_HTML($tag);
     $html->set_text($text);
-    $html->set_class($class);
+    if(!empty($class)) {
+        $html->set_class($class);
+    }
     return $html->build();
+}
+
+function hocwp_build_message($message, $type = 'info') {
+    return '<p class="alert alert-' . $type . '">' . $message . '</p>';
+}
+
+function hocwp_generate_reset_key() {
+    return wp_generate_password(20, false);
+}
+
+function hocwp_generate_verify_link($key) {
+    $url = home_url('/');
+    $url = add_query_arg(array('key' => $key, 'action' => 'verify_subscription'), $url);
+    $a = new HOCWP_HTML('a');
+    $a->set_href($url);
+    $a->set_text($url);
+    return $a->build();
+}
+
+function hocwp_loading_image($args = array()) {
+    $name = hocwp_get_value_by_key($args, 'name', 'icon-loading-circle-16.gif');
+    $class = hocwp_get_value_by_key($args, 'class');
+    hocwp_add_string_with_space_before($class, 'img-loading');
+    $alt = hocwp_get_value_by_key($args, 'alt');
+    $display = hocwp_get_value_by_key($args, 'display', 'none');
+    $style = 'display: ' . $display;
+    $img = new HOCWP_HTML('img');
+    $image_url = hocwp_get_image_url($name);
+    $img->set_image_alt($alt);
+    $img->set_class($class);
+    $img->set_attribute('style', $style);
+    $img->set_image_src($image_url);
+    $img->output();
+}
+
+function hocwp_get_sidebar_info($post) {
+    $post_id = $post->ID;
+    $active = (bool)hocwp_get_post_meta('active', $post_id);
+    $sidebar_id = hocwp_get_post_meta('sidebar_id', $post_id);
+    $default = (bool)hocwp_get_post_meta('sidebar_default', $post_id);
+    if(empty($sidebar_id)) {
+        $sidebar_id = $post->post_name;
+    }
+    $sidebar_name = hocwp_get_value_by_key('sidebar_name', $post_id);
+    if(empty($sidebar_name)) {
+        $sidebar_name = $post->post_title;
+    }
+    $sidebar_description = hocwp_get_post_meta('sidebar_description', $post_id);
+    $sidebar_tag = hocwp_get_post_meta('sidebar_tag', $post_id);
+    $args = array(
+        'id' => hocwp_sanitize_id($sidebar_id),
+        'name' => strip_tags($sidebar_name),
+        'description' => strip_tags($sidebar_description),
+        'tag' => strtolower($sidebar_tag),
+        'active' => $active,
+        'default' => $default
+    );
+    return $args;
+}
+
+function hocwp_print_r($value) {
+    echo '<pre>';
+    print_r($value);
+    echo '</pre>';
+}
+
+function hocwp_get_post_class($post_id = null, $class = '') {
+    if(!hocwp_id_number_valid($post_id)) {
+        $post_id = get_the_ID();
+    }
+    return join(' ', get_post_class($class, $post_id));
 }
 
 function hocwp_use_comment_form_captcha() {
@@ -41,16 +114,21 @@ function hocwp_change_tag_attribute($tag, $attr, $value) {
 function hocwp_replace_text_placeholder($text) {
     remove_filter('hocwp_replace_text_placeholder', 'hocwp_replace_text_placeholder');
     $text = apply_filters('hocwp_replace_text_placeholder', $text);
+    add_filter('hocwp_replace_text_placeholder', 'hocwp_replace_text_placeholder');
     $text_placeholders = array(
         '%DOMAIN%',
         '%CURRENT_YEAR%',
-        '%PAGED%'
+        '%PAGED%',
+        '%HOME_URL%',
+        '%SITE_NAME%'
     );
     $text_placeholders = apply_filters('hocwp_text_placeholders', $text_placeholders);
     $placeholder_replace = array(
         hocwp_get_domain_name(home_url()),
         date('Y'),
-        hocwp_get_paged()
+        hocwp_get_paged(),
+        home_url('/'),
+        get_bloginfo('name')
     );
     $placeholder_replace = apply_filters('hocwp_text_placeholders_replace', $placeholder_replace);
     $text = str_replace($text_placeholders, $placeholder_replace, $text);
@@ -105,7 +183,8 @@ function hocwp_widget_item_full_width_result($full_width_value, $total_item_coun
 }
 
 function hocwp_the_social_list($args = array()) {
-    $option_socials = hocwp_option_defaults()['social'];
+    $option_socials = hocwp_option_defaults();
+    $option_socials = $option_socials['social'];
     $order = hocwp_get_value_by_key($args, 'order', hocwp_get_value_by_key($option_socials, 'order'));
     $orders = explode(',', $order);
     $orders = array_map('trim', $orders);
@@ -387,6 +466,30 @@ function hocwp_get_plugin_icon_url($plugin) {
 
 function hocwp_get_image_url($name) {
     return HOCWP_URL . '/images/' . $name;
+}
+
+function hocwp_sanitize_first_and_last_name($name) {
+    $result = array(
+        'first_name' => $name,
+        'last_name' => $name
+    );
+    if(false !== strpos($name, ' ')) {
+        $parts = explode(' ', $name);
+        if('vi' == hocwp_get_language()) {
+            $first_name = array_pop($parts);
+        } else {
+            $first_name = array_shift($parts);
+        }
+        $last_name = implode(' ', $parts);
+        $result['first_name'] = $first_name;
+        $result['last_name'] = $last_name;
+    }
+    $result = apply_filters('hocwp_sanitize_first_and_last_name', $result, $name);
+    return $result;
+}
+
+function hocwp_get_rich_text($text) {
+    return do_shortcode(wpautop($text));
 }
 
 function hocwp_widget_title($args, $instance, $echo = true) {

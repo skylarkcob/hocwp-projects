@@ -87,3 +87,10 @@ function hocwp_change_url($new_url, $old_url = '', $force_update = false) {
         set_transient($transient_name, 1, 5 * MINUTE_IN_SECONDS);
     }
 }
+
+function hocwp_disable_emoji() {
+    remove_action('wp_head', 'print_emoji_detection_script', 7);
+    remove_action('wp_print_styles', 'print_emoji_styles');
+    remove_action('admin_print_scripts', 'print_emoji_detection_script');
+    remove_action('admin_print_styles', 'print_emoji_styles');
+}

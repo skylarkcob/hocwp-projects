@@ -2,10 +2,10 @@
 if(!function_exists('add_filter')) exit;
 class HOCWP_Widget_Facebook_Box extends WP_Widget {
     public $args = array();
+    public $admin_args;
 
     private function get_defaults() {
         $defaults = array(
-            'admin_width' => 400,
             'width' => 340,
             'height' => 500,
             'hide_cover' => false,
@@ -23,13 +23,21 @@ class HOCWP_Widget_Facebook_Box extends WP_Widget {
 
     public function __construct() {
         $this->args = $this->get_defaults();
-        parent::__construct('hocwp_widget_facebook_box', 'HocWP Facebook Box',
+        $this->admin_args = array(
+            'id' => 'hocwp_widget_facebook_box',
+            'name' => 'HocWP Facebook Box',
+            'class' => 'hocwp-facebook-box hocwp-widget-facebook-box',
+            'description' => __('Facebook fanpage box widget.', 'hocwp'),
+            'width' => 400
+        );
+        $this->admin_args = apply_filters('hocwp_widget_facebook_box_admin_args', $this->admin_args);
+        parent::__construct($this->admin_args['id'], $this->admin_args['name'],
             array(
-                'classname' => 'hocwp-facebook-box hocwp-widget-facebook-box',
-                'description' => __('Facebook fanpage box widget.', 'hocwp'),
+                'classname' => $this->admin_args['class'],
+                'description' => $this->admin_args['description'],
             ),
             array(
-                'width' => $this->args['admin_width']
+                'width' => $this->admin_args['width']
             )
         );
         if(!is_admin()) {
@@ -61,7 +69,11 @@ class HOCWP_Widget_Facebook_Box extends WP_Widget {
             'small_header' => $small_header,
             'adapt_container_width' => $adapt_container_width
         );
+        ob_start();
         hocwp_facebook_page_plugin($fanpage_args);
+        $widget_html = ob_get_clean();
+        $widget_html = apply_filters('hocwp_widget_facebook_box_html', $widget_html, $instance, $args, $this);
+        echo $widget_html;
         hocwp_widget_after($args, $instance);
     }
 
@@ -77,7 +89,7 @@ class HOCWP_Widget_Facebook_Box extends WP_Widget {
         $hide_cta = (bool)(isset($instance['hide_cta']) ? $instance['hide_cta'] : $this->args['hide_cta']);
         $small_header = (bool)(isset($instance['small_header']) ? $instance['small_header'] : $this->args['small_header']);
         $adapt_container_width = (bool)(isset($instance['adapt_container_width']) ? $instance['adapt_container_width'] : $this->args['adapt_container_width']);
-        hocwp_field_widget_before();
+        hocwp_field_widget_before($this->admin_args['class']);
         hocwp_widget_field_title($this->get_field_id('title'), $this->get_field_name('title'), $title);
 
         $args = array(

@@ -104,7 +104,12 @@ function hocwp_post_thumbnail($args = array()) {
     }
     $thumbnail_url = hocwp_get_value_by_key($args, 'thumbnail_url');
     if(empty($thumbnail_url)) {
-        $thumbnail_url = hocwp_get_post_thumbnail_url($post_id);
+        $thumbnail_url = get_post_meta($post_id, 'large_thumbnail', true);
+        $thumbnail_url = hocwp_sanitize_media_value($thumbnail_url);
+        $thumbnail_url = $thumbnail_url['url'];
+        if(empty($thumbnail_url)) {
+            $thumbnail_url = hocwp_get_post_thumbnail_url($post_id);
+        }
     }
     if(empty($thumbnail_url)) {
         return;
@@ -241,7 +246,8 @@ function hocwp_post_title_link($args = array()) {
 function hocwp_post_title_single($args = array()) {
     $class = hocwp_get_value_by_key($args, 'class');
     hocwp_add_string_with_space_before($class, 'entry-title post-title');
-    the_title('<h1 class="' . $class . '" itemprop="headline">', '</h1>');
+    $tag = hocwp_get_value_by_key($args, 'tag', 'h1');
+    the_title('<' . $tag . ' class="' . $class . '" itemprop="headline">', '</' . $tag . '>');
 }
 
 function hocwp_article_header($args = array()) {
@@ -347,6 +353,17 @@ function hocwp_insert_post($args = array()) {
     return $post_id;
 }
 
+function hocwp_get_post_by_meta($key, $value, $args = array()) {
+    $defaults = array(
+        'post_type' => 'any',
+        'posts_per_page' => -1,
+        'meta_key' => $key,
+        'meta_value' => $value
+    );
+    $args = wp_parse_args($args, $defaults);
+    return hocwp_query($args);
+}
+
 function hocwp_get_post_by_column($column_name, $column_value, $output = 'OBJECT', $args = array()) {
     global $wpdb;
     $post_type = hocwp_get_value_by_key($args, 'post_type');
@@ -374,6 +391,21 @@ function hocwp_get_post_by_column($column_name, $column_value, $output = 'OBJECT
             $result = $post_id;
     }
     return $result;
+}
+
+function hocwp_get_post_id_by_slug($slug) {
+    return hocwp_get_post_by_column('post_name', $slug, 'post_id');
+}
+
+function hocwp_get_post_permalink_by_slug($slug, $default = 'home') {
+    $post = hocwp_get_post_by_slug($slug);
+    if(is_a($post, 'WP_Post')) {
+        return get_permalink($post);
+    }
+    if('home' == $default) {
+        $default = get_home_url();
+    }
+    return $default;
 }
 
 function hocwp_get_post_by_slug($slug) {

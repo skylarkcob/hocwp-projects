@@ -89,3 +89,65 @@ function hocwp_current_user_can_use_rich_editor() {
     }
     return true;
 }
+
+function hocwp_get_user_viewed_posts($user_id = null) {
+    if(!hocwp_id_number_valid($user_id) && is_user_logged_in()) {
+        $user = wp_get_current_user();
+        $user_id = $user->ID;
+    }
+    if(hocwp_id_number_valid($user_id)) {
+        $viewed_posts = get_user_meta($user_id, 'viewed_posts', true);
+        $viewed_posts = hocwp_sanitize_array($viewed_posts);
+    } else {
+        $viewed_posts = isset($_SESSION['viewed_posts']) ? $_SESSION['viewed_posts'] : '';
+        if(!empty($viewed_posts)) {
+            $viewed_posts = hocwp_json_string_to_array($viewed_posts);
+        }
+        $viewed_posts = hocwp_sanitize_array($viewed_posts);
+    }
+    return $viewed_posts;
+}
+
+function hocwp_track_user_viewed_posts() {
+    $use = apply_filters('hocwp_track_user_viewed_posts', false);
+    return $use;
+}
+
+function hocwp_user_viewed_posts_hook() {
+    $use = hocwp_track_user_viewed_posts();
+    if($use && is_singular()) {
+        $expired_interval = HOUR_IN_SECONDS;
+        $expired_interval = apply_filters('hocwp_track_user_viewed_posts_expired_interval', $expired_interval);
+        $now = time();
+        if(is_user_logged_in()) {
+            $user = wp_get_current_user();
+            $viewed_posts = get_user_meta($user->ID, 'viewed_posts', true);
+            $viewed_posts = hocwp_sanitize_array($viewed_posts);
+            $post_id = get_the_ID();
+            $viewed_posts[$post_id] = $now;
+            foreach($viewed_posts as $post_id => $time) {
+                $dif = $now - $time;
+                if($expired_interval < $dif) {
+                    unset($viewed_posts[$post_id]);
+                }
+            }
+            update_user_meta($user->ID, 'viewed_posts', $viewed_posts);
+        } else {
+            $viewed_posts = isset($_SESSION['viewed_posts']) ? $_SESSION['viewed_posts'] : '';
+            if(!empty($viewed_posts)) {
+                $viewed_posts = hocwp_json_string_to_array($viewed_posts);
+            }
+            $viewed_posts = hocwp_sanitize_array($viewed_posts);
+            $post_id = get_the_ID();
+            $viewed_posts[$post_id] = $now;
+            foreach($viewed_posts as $post_id => $time) {
+                $dif = $now - $time;
+                if($expired_interval < $dif) {
+                    unset($viewed_posts[$post_id]);
+                }
+            }
+            $_SESSION['viewed_posts'] = json_encode($viewed_posts);
+        }
+    }
+}
+add_action('wp', 'hocwp_user_viewed_posts_hook');

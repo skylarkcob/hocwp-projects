@@ -2,12 +2,10 @@
 if(!function_exists('add_filter')) exit;
 class HOCWP_Widget_Icon extends WP_Widget {
     public $args = array();
+    public $admin_args;
 
     private function get_defaults() {
         $defaults = array(
-            'id' => 'hocwp_widget_icon',
-            'name' => 'HOCWP Icon',
-            'admin_width' => 400,
             'title_link' => 0
         );
         $defaults = apply_filters('hocwp_widget_icon_defaults', $defaults);
@@ -18,13 +16,21 @@ class HOCWP_Widget_Icon extends WP_Widget {
 
     public function __construct() {
         $this->args = $this->get_defaults();
-        parent::__construct($this->args['id'], $this->args['name'],
+        $this->admin_args = array(
+            'id' => 'hocwp_widget_icon',
+            'name' => 'HOCWP Icon',
+            'class' => 'hocwp-icon-widget',
+            'description' => __('Display widget with icon.', 'hocwp'),
+            'width' => 400
+        );
+        $this->admin_args = apply_filters('hocwp_widget_icon_admin_args', $this->admin_args);
+        parent::__construct($this->admin_args['id'], $this->admin_args['name'],
             array(
-                'classname' => 'hocwp-icon-widget',
-                'description' => __('Display widget with icon.', 'hocwp'),
+                'classname' => $this->admin_args['class'],
+                'description' => $this->admin_args['description'],
             ),
             array(
-                'width' => $this->args['admin_width']
+                'width' => $this->admin_args['width']
             )
         );
     }
@@ -33,7 +39,6 @@ class HOCWP_Widget_Icon extends WP_Widget {
         $sidebar = hocwp_get_value_by_key($args, 'id', 'default');
         $title = hocwp_widget_title($args, $instance, false);
         $title_link = hocwp_get_value_by_key($instance, 'title_link', hocwp_get_value_by_key($this->args, 'title_link'));
-        hocwp_widget_before($args, $instance, false);
         $icon = hocwp_get_value_by_key($instance, 'icon');
         $icon = hocwp_sanitize_media_value($icon);
         $icon_url = $icon['url'];
@@ -42,6 +47,7 @@ class HOCWP_Widget_Icon extends WP_Widget {
         $icon_hover_url = $icon_hover['url'];
         $link = hocwp_get_value_by_key($instance, 'link');
         $text = hocwp_get_value_by_key($instance, 'text');
+        hocwp_widget_before($args, $instance, false);
         $widget_html = '';
         if(!empty($icon_url)) {
             $widget_html .= '<a href="' . $link . '"><img class="icon" src="' . $icon_url . '" alt="" data-hover="' . $icon_hover_url . '"></a>';
@@ -51,9 +57,10 @@ class HOCWP_Widget_Icon extends WP_Widget {
             $title = apply_filters('hocwp_widget_icon_title_html', $title, $instance, $args, $sidebar);
         }
         $widget_html .= $title;
-        $widget_html .= '<div class="text">' . apply_filters('the_content', $text) . '</div>';
+        $widget_html .= '<div class="text">' . hocwp_get_rich_text($text) . '</div>';
         $widget_html = apply_filters($this->option_name . '_html', $widget_html, $instance, $widget_args = $args, $widget_number = $this->number, $sidebar_id = $sidebar);
         $widget_html = apply_filters($this->option_name . '_' . $sidebar . '_html', $widget_html, $instance, $widget_args = $args, $widget_number = $this->number);
+        $widget_html = apply_filters('hocwp_widget_icon_html', $widget_html, $args, $instance, $this);
         echo $widget_html;
         hocwp_widget_after($args, $instance);
     }
@@ -67,7 +74,7 @@ class HOCWP_Widget_Icon extends WP_Widget {
         $link = hocwp_get_value_by_key($instance, 'link');
         $text = hocwp_get_value_by_key($instance, 'text');
         $title_link = hocwp_get_value_by_key($instance, 'title_link', hocwp_get_value_by_key($this->args, 'title_link'));
-        hocwp_field_widget_before();
+        hocwp_field_widget_before($this->admin_args['class']);
         hocwp_widget_field_title($this->get_field_id('title'), $this->get_field_name('title'), $title);
 
         $args = array(

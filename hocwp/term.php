@@ -22,17 +22,65 @@ function hocwp_get_hierarchical_taxonomies($args = array()) {
 }
 
 function hocwp_term_meta_thumbnail_field($taxonomies = array()) {
-    if(!hocwp_array_has_value($taxonomies)) {
-        $taxonomies = array('category');
+    global $pagenow;
+    if('edit-tags.php' == $pagenow) {
+        if(!hocwp_array_has_value($taxonomies)) {
+            $taxonomies = array('category');
+        }
+        $meta = new HOCWP_Meta('term');
+        $meta->set_taxonomies($taxonomies);
+        $meta->add_field(array('id' => 'thumbnail', 'label' => __('Thumbnail', 'hocwp'), 'field_callback' => 'hocwp_field_media_upload'));
+        $meta->init();
     }
-    $meta = new HOCWP_Meta('term');
-    $meta->set_taxonomies($taxonomies);
-    $meta->add_field(array('id' => 'thumbnail', 'label' => __('Thumbnail', 'hocwp'), 'field_callback' => 'hocwp_field_media_upload'));
-    $meta->init();
+}
+
+function hocwp_term_meta_different_name_field($taxonomies = array()) {
+    global $pagenow;
+    if('edit-tags.php' == $pagenow || true) {
+        if(!hocwp_array_has_value($taxonomies)) {
+            $taxonomies = get_taxonomies(array('public' => true));
+        }
+        $taxonomies = apply_filters('hocwp_term_different_name_field_taxonomies', $taxonomies);
+        hocwp_exclude_special_taxonomies($taxonomies);
+        if(!hocwp_array_has_value($taxonomies)) {
+            $taxonomies = array('category');
+        }
+        $meta = new HOCWP_Meta('term');
+        $meta->set_taxonomies($taxonomies);
+        $meta->add_field(array('id' => 'different_name', 'label' => __('Different Name', 'hocwp')));
+        $meta->init();
+    }
 }
 
 function hocwp_get_term_meta($key, $term_id) {
     return get_term_meta($term_id, $key, true);
+}
+
+function hocwp_term_name($term) {
+    echo hocwp_term_get_name($term);
+}
+
+function hocwp_term_get_name($term) {
+    $name = '';
+    if(is_a($term, 'WP_Term')) {
+        $name = $term->name;
+        $different_name = hocwp_get_term_meta('different_name', $term->term_id);
+        if(!empty($different_name)) {
+            $name = strip_tags($different_name);
+        }
+        $name = apply_filters('hocwp_term_name', $name, $term);
+    }
+    return $name;
+}
+
+function hocwp_term_link_html($term) {
+    return '<a href="' . get_term_link($term) . '">' . $term->name . '</a>';
+}
+
+function hocwp_term_link_li_html($term) {
+    $link = hocwp_term_link_html($term);
+    $link = hocwp_wrap_tag($link, 'li');
+    return $link . PHP_EOL;
 }
 
 function hocwp_term_get_thumbnail_url($args = array()) {

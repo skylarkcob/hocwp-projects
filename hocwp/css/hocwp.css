@@ -1,5 +1,5 @@
 /**
- * Last updated: 04/03/2016
+ * Last updated: 23/03/2016
  */
 
 /**
@@ -354,6 +354,25 @@ label.label-input-size {
 }
 
 /**
+ * Buttons
+ */
+
+.hocwp form .hocwp-button,
+.hocwp .hocwp-button {
+    border-radius: 3px;
+    display: inline-block;
+    line-height: 40px;
+    padding: 0 15px;
+    vertical-align: top;
+}
+
+.hocwp .hocwp-button.btn-grey,
+.hocwp form .hocwp-button.btn-grey {
+    background: #e7e7e7 none repeat scroll 0 0;
+    color: #333;
+}
+
+/**
  * Icons
  */
 
@@ -392,8 +411,26 @@ button img.hocwp-icon {
     padding-top: 10%;
 }
 
+.single-product.woocommerce .modal.product-fast-buy .modal-dialog {
+    padding-top: 2%;
+}
+
+@media only screen and (max-width: 780px) {
+    .admin-bar .modal-dialog {
+        padding-top: 15%;
+    }
+
+    .admin-bar.single-product.woocommerce .modal.product-fast-buy .modal-dialog {
+        padding-top: 15%;
+    }
+}
+
 @media only screen and (max-width: 360px) {
     .admin-bar .modal-dialog {
+        padding-top: 15%;
+    }
+
+    .admin-bar.single-product.woocommerce .modal.product-fast-buy .modal-dialog {
         padding-top: 15%;
     }
 }

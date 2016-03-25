@@ -170,3 +170,11 @@ function hocwp_send_mail_invalid_license($project_name, $type = 'Theme') {
         set_transient($transient_name, 1, DAY_IN_SECONDS);
     }
 }
+
+function hocwp_send_mail_verify_email_subscription($subject, $to_email, $verify_link) {
+    $message = '<p>You received this message because someone requested an email subscription for ' . $to_email . ' to %SITE_NAME%.  If you did not make this request, please ignore the rest of this message.</p>';
+    $message = hocwp_replace_text_placeholder($message);
+    $message .= '<br>';
+    $message .= '<p>Please click here to verify your email: ' . $verify_link . '</p>';
+    hocwp_send_html_mail($to_email, $subject, $message);
+}

@@ -40,6 +40,25 @@ class HOCWP_Option {
     private $exists;
     private $page;
 
+    private $update_option;
+    private $parse_options;
+
+    public function set_parse_options($bool) {
+        $this->parse_options = $bool;
+    }
+
+    public function get_parse_options() {
+        return (bool)$this->parse_options;
+    }
+
+    public function set_update_option($bool) {
+        $this->update_option = $bool;
+    }
+
+    public function get_update_option() {
+        return (bool)$this->update_option;
+    }
+
     public function set_page($page) {
         $this->page = $page;
     }
@@ -347,6 +366,16 @@ class HOCWP_Option {
         }
     }
 
+    public function settings_saved() {
+        $option_name = $this->get_option_name();
+        if(isset($_POST[$option_name])) {
+            $old = (array)get_option($option_name);
+            $new = (array)$_POST[$option_name];
+            $new = wp_parse_args($new, $old);
+            update_option($option_name, $new);
+        }
+    }
+
     public function is_this_page() {
         global $pagenow;
         $page = hocwp_get_current_admin_page();
@@ -407,7 +436,7 @@ class HOCWP_Option {
                     if($this->is_option_page()) {
                         if($this->is_this_page() && (isset($_REQUEST['submit']) || isset($_REQUEST['settings-updated']))) {
                             do_action('hocwp_option_saved');
-                            if('options-general.php' != $this->get_parent_slug()) {
+                            if('options-general.php' != $this->get_parent_slug() && !$this->get_exists()) {
                                 hocwp_admin_notice_setting_saved();
                             }
                             do_action($this->get_menu_slug() . '_option_saved', $this);
@@ -446,6 +475,9 @@ class HOCWP_Option {
                 add_action('admin_head', array($this, 'help_tab_init'));
                 add_action('admin_enqueue_scripts', array($this, 'enqueue_style_and_script'));
             }
+        }
+        if($this->get_update_option()) {
+            $this->settings_saved();
         }
     }
 
@@ -515,6 +547,11 @@ class HOCWP_Option {
     }
 
     public function sanitize($input) {
+        if($this->get_parse_options()) {
+            $old = (array)get_option($this->get_option_name());
+            $input = (array)$input;
+            $input = wp_parse_args($input, $old);
+        }
         $input = apply_filters('hocwp_sanitize_option_' . $this->get_option_name_no_prefix(), $input);
         do_action('hocwp_sanitize_' . $this->get_option_name_no_prefix() . '_option', $input);
         $input = apply_filters('validate_options', $input);
@@ -692,7 +729,17 @@ class HOCWP_Option {
     }
 
     public function add_settings_section($id, $title, $callback) {
-        add_settings_section($id, $title, $callback, $this->get_menu_slug());
+        if(!$this->section_exists($id)) {
+            add_settings_section($id, $title, $callback, $this->get_menu_slug());
+        }
+    }
+
+    public function section_exists($section) {
+        global $wp_settings_sections;
+        if(isset($wp_settings_sections[$this->get_menu_slug()][$section])) {
+            return true;
+        }
+        return false;
     }
 
     public function add_settings_section_default() {
@@ -704,7 +751,17 @@ class HOCWP_Option {
     }
 
     private function add_settings_field($id, $title, $callback, $section = 'default', $args = array()) {
-        add_settings_field($id, $title, $callback, $this->get_menu_slug(), $section, $args);
+        if(!$this->field_exists($section, $id)) {
+            add_settings_field($id, $title, $callback, $this->get_menu_slug(), $section, $args);
+        }
+    }
+
+    public function field_exists($section, $field) {
+        global $wp_settings_fields;
+        if(isset($wp_settings_fields[$this->get_menu_slug()][$section][$field])) {
+            return true;
+        }
+        return false;
     }
 
     public function add_field($args = array()) {

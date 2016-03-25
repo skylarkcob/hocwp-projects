@@ -1,5 +1,5 @@
 /**
- * Last updated: 04/03/2016
+ * Last updated: 23/03/2016
  */
 
 jQuery(document).ready(function($) {
@@ -138,5 +138,181 @@ jQuery(document).ready(function($) {
                 }
             });
         });
+    })();
+
+    (function() {
+        var $cart_preview = $('#hocwpCart');
+        if($cart_preview.length) {
+            $cart_preview.on('click', '.hocwp-post .fa-remove', function(e) {
+                e.preventDefault();
+                var $element = $(this),
+                    post_id = $element.attr('data-id'),
+                    $item = $element.closest('.hocwp-post'),
+                    $cart_contents = $element.closest('.hocwp-cart-contents');
+                $element.addClass('disabled');
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: hocwp.ajax_url,
+                    data: {
+                        action: 'hocwp_wc_remove_cart_item',
+                        post_id: post_id
+                    },
+                    success: function(response){
+                        $item.fadeOut();
+                        $item.remove();
+                        if(response.updated) {
+                            $cart_contents.html(response.cart_contents);
+                        }
+                    }
+                });
+            });
+        }
+    })();
+
+    // Tab widget
+    (function() {
+        var $tabber_widgets = $('.hocwp-tabber-widget');
+        if($tabber_widgets.length) {
+            $tabber_widgets.each(function() {
+                var $element = $(this),
+                    $list_tabs = $element.find('ul.nav-tabs');
+                $element.find('.tab-item').each(function() {
+                    var widget = $(this).attr('id');
+                    $(this).find('a.tab-title').attr('href', '#' + widget).wrap('<li></li>').parent().detach().appendTo($list_tabs);
+                });
+                $list_tabs.find('li:first').addClass('active');
+                $list_tabs.fadeIn();
+                $element.find('.tab-pane:first').addClass('active');
+            });
+            $tabber_widgets.on('click', '.nav-tabs li a', function(e) {
+                e.preventDefault();
+                var $element = $(this),
+                    id = $element.attr('href').replace('#', ''),
+                    $widget = $element.closest('.hocwp-tabber-widget'),
+                    $pane = $widget.find('div[id^="' + id + '"]');
+                $widget.find('.tab-pane').removeClass('active');
+                $pane.addClass('active');
+            });
+        }
+    })();
+
+    // Product fast buy
+    (function() {
+        var $modal = $('.single-product.woocommerce .modal.product-fast-buy');
+        if($modal.length) {
+            $modal.on('click', '.customer-info form button', function(e) {
+                e.preventDefault();
+                var $element = $(this),
+                    $modal_body = $element.closest('.modal-body'),
+                    $attributes_form = $modal_body.find('.attributes-form'),
+                    attributes = [],
+                    $form = $element.closest('form'),
+                    $full_name = $form.find('.full-name'),
+                    $phone = $form.find('.phone'),
+                    $email = $form.find('.email'),
+                    $address = $form.find('.address'),
+                    $message = $form.find('.message');
+                if($full_name.prop('required') && !$.trim($full_name.val())) {
+                    $full_name.focus();
+                } else if($phone.prop('required') && !$.trim($phone.val())) {
+                    $phone.focus();
+                } else if($email.prop('required') && !$.trim($email.val())) {
+                    $email.focus();
+                } else if($address.prop('required') && !$.trim($address.val())) {
+                    $address.focus();
+                } else if($message.prop('required') && !$.trim($message.val())) {
+                    $message.focus();
+                } else {
+                    $element.addClass('disabled');
+                    if($attributes_form.length) {
+                        $attributes_form.find('select').each(function() {
+                            var $select = $(this),
+                                attribute = {name: $select.attr('data-attribute_name'), value: $select.val()};
+                            attributes.push(attribute);
+                        });
+                    }
+                    $.ajax({
+                        type: 'POST',
+                        dataType: 'json',
+                        url: hocwp.ajax_url,
+                        data: {
+                            action: 'hocwp_wc_order_item',
+                            post_id: $element.attr('data-id'),
+                            name: $full_name.val(),
+                            phone: $phone.val(),
+                            email: $email.val(),
+                            message: $message.val(),
+                            address: $address.val(),
+                            attributes: attributes
+                        },
+                        success: function(response){
+                            if($.trim(response.html_data)) {
+                                $modal_body.html(response.html_data);
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    })();
+
+    // User subscribe widget
+    (function() {
+        var $hocwp_widget_subscribe = $('.hocwp-subscribe-widget');
+        if($hocwp_widget_subscribe.length) {
+            $hocwp_widget_subscribe.find('.hocwp-subscribe-form').on('submit', function(e) {
+                e.preventDefault();
+                var $element = $(this),
+                    $messages = $element.find('.messages'),
+                    use_captcha = $element.attr('data-captcha'),
+                    register = $element.attr('data-register'),
+                    $submit = $element.find('input[type="submit"]'),
+                    $email = $element.find('.input-email'),
+                    $name = $element.find('.input-name'),
+                    $phone = $element.find('.input-phone'),
+                    $captcha = $element.find('.hocwp-captcha-code'),
+                    captcha = '';
+                if($name.length && $name.prop('required') && !$.trim($name.val())) {
+                    $name.focus();
+                } else if($phone.length && $phone.prop('required') && !$.trim($phone.val())) {
+                    $phone.focus();
+                } else if($email.length && $email.prop('required') && !$.trim($email.val())) {
+                    $email.focus();
+                } else if($captcha.length && $captcha.prop('required') && !$.trim($captcha.val())) {
+                    $captcha.focus();
+                } else {
+                    if($captcha.length) {
+                        captcha = $captcha.val();
+                    }
+                    $submit.addClass('disabled');
+                    $element.find('.img-loading').show();
+                    $.ajax({
+                        type: 'POST',
+                        dataType: 'json',
+                        url: hocwp.ajax_url,
+                        data: {
+                            action: 'hocwp_widget_subscribe',
+                            name: $name.val(),
+                            phone: $phone.val(),
+                            email: $email.val(),
+                            use_captcha: use_captcha,
+                            captcha: captcha,
+                            register: register
+                        },
+                        success: function(response){
+                            $element.find('.img-loading').hide();
+                            $captcha.next().next().trigger('click');
+                            $messages.html(response.message);
+                            if(response.success) {
+
+                            } else {
+                                $submit.removeClass('disabled');
+                            }
+                        }
+                    });
+                }
+            });
+        }
     })();
 });

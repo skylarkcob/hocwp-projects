@@ -1,5 +1,5 @@
 /**
- * Last updated: 09/03/2016
+ * Last updated: 23/03/2016
  */
 
 window.wp = window.wp || {};
@@ -435,6 +435,41 @@ jQuery(document).ready(function($) {
         $input_result.val(value);
         return value;
     };
+
+    hocwp.sortableTaxonomyStop = function(container) {
+        var $input_result = container.find('.input-result'),
+            $sortable_result = container.find('.connected-result'),
+            value = [];
+        $sortable_result.find('li').each(function(index, el) {
+            var $element = $(el),
+                item = {
+                    id: $element.attr('data-id')
+                };
+            value.push(item);
+        });
+        value = JSON.stringify(value);
+        $input_result.val(value);
+        return value;
+    };
+
+    hocwp.sortableStop = function($element, $container) {
+        var $input_result = $container.find('.input-result'),
+            value = [];
+        $element.find('li').each(function(index, el) {
+            var $element = $(el),
+                taxonomy = $element.attr('data-taxonomy'),
+                item = {
+                    id: $element.attr('data-id')
+                };
+            if(typeof taxonomy !== typeof undefined && taxonomy !== false) {
+                item.taxonomy = taxonomy;
+            }
+            value.push(item);
+        });
+        value = JSON.stringify(value);
+        $input_result.val(value);
+        return value;
+    };
 });
 
 jQuery(document).ready(function($) {
@@ -640,15 +675,25 @@ jQuery(document).ready(function($) {
                 },
                 stop: function() {
                     var $sortable_result = $container.find('.connected-result');
-                    if($sortable_result.hasClass('term-sortable')) {
-                        hocwp.sortableTermStop($container);
-                    } else if($sortable_result.hasClass('post-type-sortable')) {
-                        hocwp.sortablePostTypeStop($container);
+                    if($sortable_result.length) {
+                        if($sortable_result.hasClass('term-sortable')) {
+                            hocwp.sortableTermStop($container);
+                        } else if($sortable_result.hasClass('post-type-sortable')) {
+                            hocwp.sortablePostTypeStop($container);
+                        } else if($sortable_result.hasClass('taxonomy-sortable')) {
+                            hocwp.sortableTaxonomyStop($container);
+                        }
+                    } else {
+                        hocwp.sortableStop($element, $container);
                     }
                 }
             };
         if($sortable_result.length && $sortable_result.hasClass('sortable')) {
-            $sortable_result.css({'height': $element.height()});
+            var element_height = $element.height(),
+                sortable_result_height = $sortable_result.height();
+            if(element_height > sortable_result_height) {
+                $sortable_result.css({'height': element_height});
+            }
         }
         if($element.hasClass('connected-list')) {
             sortable_options.connectWith = '.connected-list';

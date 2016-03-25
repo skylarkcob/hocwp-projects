@@ -1,5 +1,5 @@
 /**
- * Last updated: 04/03/2016
+ * Last updated: 23/03/2016
  */
 
 /**
@@ -292,6 +292,12 @@
     border-color: #fcefa1;
 }
 
+.hocwp-sortable.connected-result + input + .description,
+.hocwp-sortable.connected-result + .description {
+    clear: both;
+    padding-top: 5px;
+}
+
 .hocwp-sortable li {
     background-color: #eee;
     border: 1px solid #ddd;
@@ -332,6 +338,13 @@
 .hocwp div.bs-callout-info,
 .hocwp .bs-callout-info {
     border-left-color: #1b809e;
+}
+
+.bs-callout-warning.notice.updated,
+.bs-callout-warning.notice,
+.bs-callout-warning.updated,
+.bs-callout-warning {
+    border-left-color: #f0ad4e;
 }
 
 /**
@@ -428,4 +441,13 @@
 
 .hocwp .widefat a {
     text-decoration: none;
+}
+
+/**
+ * Table
+ */
+
+.wp-list-table .manage-column.column-featured,
+.wp-list-table .manage-column.column-active {
+    text-align: center;
 }

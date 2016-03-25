@@ -2,11 +2,12 @@
 if(!function_exists('add_filter')) exit;
 class HOCWP_Widget_Social extends WP_Widget {
 	public $args = array();
+	public $admin_args;
 
 	private function get_defaults() {
-		$option_socials = hocwp_option_defaults()['social'];
+		$option_socials = hocwp_option_defaults();
+		$option_socials = $option_socials['social'];
 		$defaults = array(
-			'admin_width' => 400,
 			'order' => $option_socials['order'],
 			'option_names' => $option_socials['option_names'],
 			'icons' => $option_socials['icons']
@@ -19,13 +20,21 @@ class HOCWP_Widget_Social extends WP_Widget {
 
 	public function __construct() {
 		$this->args = $this->get_defaults();
-		parent::__construct('hocwp_widget_social', 'HOCWP Social',
+		$this->admin_args = array(
+			'id' => 'hocwp_widget_social',
+			'name' => 'HOCWP Social',
+			'class' => 'hocwp-social-widget',
+			'description' => __('Display list social icons on sidebar.', 'hocwp'),
+			'width' => 400
+		);
+		$this->admin_args = apply_filters('hocwp_widget_social_admin_args', $this->admin_args);
+		parent::__construct($this->admin_args['id'], $this->admin_args['name'],
 			array(
-				'classname' => 'hocwp-social-widget',
-				'description' => __('Display list social icons on sidebar.', 'hocwp'),
+				'classname' => $this->admin_args['class'],
+				'description' => $this->admin_args['description'],
 			),
 			array(
-				'width' => $this->args['admin_width']
+				'width' => $this->admin_args['width']
 			)
 		);
 	}
@@ -39,16 +48,20 @@ class HOCWP_Widget_Social extends WP_Widget {
 		$options = hocwp_get_option('option_social');
 		$icons = $this->args['icons'];
 		hocwp_widget_before($args, $instance);
+		ob_start();
 		if(hocwp_array_has_value($orders)) {
 			foreach($orders as $social) {
 				$option_name = hocwp_get_value_by_key($option_names, $social);
 				$item = hocwp_get_value_by_key($options, $option_name);
 				if(!empty($item)) {
 					$icon = '<i class="fa ' . $icons[$social] . '"></i>';
-					echo '<a href="' . $item . '" class="link-' . $social . '">' . $icon . '</a>';
+					echo '<a href="' . $item . '" class="link-' . $social . ' social-item">' . $icon . '</a>';
 				}
 			}
 		}
+		$widget_html = ob_get_clean();
+		$widget_html = apply_filters('hocwp_widget_social_html', $widget_html, $instance, $args, $this);
+		echo $widget_html;
 		hocwp_widget_after($args, $instance);
 	}
 
@@ -56,7 +69,7 @@ class HOCWP_Widget_Social extends WP_Widget {
 		$title = hocwp_get_value_by_key($instance, 'title');
 		$order = hocwp_get_value_by_key($instance, 'order', hocwp_get_value_by_key($this->args, 'order'));
 
-		hocwp_field_widget_before();
+		hocwp_field_widget_before($this->admin_args['class']);
 		hocwp_widget_field_title($this->get_field_id('title'), $this->get_field_name('title'), $title);
 
 		$args = array(

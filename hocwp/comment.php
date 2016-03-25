@@ -110,6 +110,7 @@ function hocwp_facebook_comment($args = array()) {
     $order_by = isset($args['order_by']) ? $args['order_by'] : 'social';
     $width = isset($args['width']) ? $args['width'] : '100%';
     $width = apply_filters('hocwp_facebook_comment_width', $width, $args);
+    $loading_text = hocwp_get_value_by_key($args, 'loading_text', __('Loading...', 'hocwp'));
     $div = new HOCWP_HTML('div');
     $div->set_class('fb-comments');
     $atts = array(
@@ -122,7 +123,7 @@ function hocwp_facebook_comment($args = array()) {
     );
     $atts = apply_filters('hocwp_facebook_comment_attributes', $atts, $args);
     $div->set_attribute_array($atts);
-    $div->set_text(__('Loading...', 'hocwp'));
+    $div->set_text($loading_text);
     $div->output();
 }
 

@@ -30,11 +30,15 @@ function hocwp_field_captcha($args = array()) {
     $placeholder = isset($args['placeholder']) ? $args['placeholder'] : __('Enter captcha code', 'hocwp');
     $class = isset($args['class']) ? $args['class'] : '';
     $input_width = isset($args['input_width']) ? absint($args['input_width']) : 125;
+    if('%' === hocwp_get_last_char($input_width)) {
+        $input_width .= 'px';
+    }
+    $name = hocwp_get_value_by_key($args, 'name', 'captcha');
     hocwp_add_string_with_space_before($class, 'hocwp-captcha-code');
     hocwp_field_before($args);
     $image_url = $captcha->generate_image();
     ?>
-    <input autocomplete="off" id="<?php echo esc_attr($id); ?>" name="captcha" placeholder="<?php echo esc_attr($placeholder); ?>" class="<?php echo esc_attr($class); ?>" type="text" style="width: <?php echo $input_width; ?>px;">
+    <input autocomplete="off" id="<?php echo esc_attr($id); ?>" name="<?php echo $name; ?>" placeholder="<?php echo esc_attr($placeholder); ?>" class="<?php echo esc_attr($class); ?>" type="text" style="width: <?php echo $input_width; ?>;" required>
     <img class="hocwp-captcha-image" src="<?php echo $image_url; ?>">
     <img class="hocwp-captcha-reload" src="<?php echo HOCWP_URL . '/images/icon-refresh-captcha.png'; ?>">
     <?php
@@ -173,12 +177,15 @@ function hocwp_field_sortable($args = array()) {
 function hocwp_field_sortable_term($args = array()) {
     $value = isset($args['value']) ? $args['value'] : '';
     $items = isset($args['items']) ? $args['items'] : '';
+    $connect = hocwp_get_value_by_key($args, 'connect', false);
     $active_terms = hocwp_json_string_to_array($value);
     $save_ids = array();
-    foreach($active_terms as $data) {
-        $id = isset($data['id']) ? $data['id'] : '';
-        if(is_numeric($id)) {
-            $save_ids[] = $id;
+    if($connect) {
+        foreach($active_terms as $data) {
+            $id = isset($data['id']) ? $data['id'] : '';
+            if(is_numeric($id)) {
+                $save_ids[] = $id;
+            }
         }
     }
     if(empty($items)) {
@@ -190,6 +197,30 @@ function hocwp_field_sortable_term($args = array()) {
         );
         $term_args = wp_parse_args($term_args, $defaults);
         $terms = get_terms($taxonomy, $term_args);
+        if(!$connect) {
+            $results = $active_terms;
+            if(hocwp_array_has_value($results)) {
+                $new_lists = array();
+                foreach($results as $data) {
+                    $id = isset($data['id']) ? $data['id'] : '';
+                    $dtax = hocwp_get_value_by_key($data, 'taxonomy');
+                    if(!hocwp_id_number_valid($id) || empty($dtax)) {
+                        continue;
+                    }
+                    $item = get_term($id, $dtax);
+                    if(hocwp_object_valid($item)) {
+                        foreach($terms as $key => $aitem) {
+                            if($aitem->term_id == $item->term_id) {
+                                $new_lists[] = $item;
+                                unset($terms[$key]);
+                                break;
+                            }
+                        }
+                    }
+                }
+                $terms = $new_lists + $terms;
+            }
+        }
         foreach($terms as $term) {
             $li = new HOCWP_HTML('li');
             $li->set_class('ui-state-default');
@@ -202,28 +233,30 @@ function hocwp_field_sortable_term($args = array()) {
             $items .= $li->build();
         }
     }
-    $active_items = isset($args['active_items']) ? $args['active_items'] : '';
-    if(empty($active_items)) {
-        foreach($active_terms as $data) {
-            $id = isset($data['id']) ? $data['id'] : '';
-            $id = absint($id);
-            $taxonomy = isset($data['taxonomy']) ? $data['taxonomy'] : '';
-            $term = get_term_by('id', $id, $taxonomy);
-            if(hocwp_object_valid($term)) {
-                $li = new HOCWP_HTML('li');
-                $li->set_class('ui-state-default');
-                $attributes = array(
-                    'data-taxonomy' => $term->taxonomy,
-                    'data-id' => $term->term_id
-                );
-                $li->set_attribute_array($attributes);
-                $li->set_text($term->name);
-                $active_items .= $li->build();
+    if($connect) {
+        $active_items = isset($args['active_items']) ? $args['active_items'] : '';
+        if(empty($active_items)) {
+            foreach($active_terms as $data) {
+                $id = isset($data['id']) ? $data['id'] : '';
+                $id = absint($id);
+                $taxonomy = isset($data['taxonomy']) ? $data['taxonomy'] : '';
+                $term = get_term_by('id', $id, $taxonomy);
+                if(hocwp_object_valid($term)) {
+                    $li = new HOCWP_HTML('li');
+                    $li->set_class('ui-state-default');
+                    $attributes = array(
+                        'data-taxonomy' => $term->taxonomy,
+                        'data-id' => $term->term_id
+                    );
+                    $li->set_attribute_array($attributes);
+                    $li->set_text($term->name);
+                    $active_items .= $li->build();
+                }
             }
         }
+        $args['active_items'] = $active_items;
     }
     $args['items'] = $items;
-    $args['active_items'] = $active_items;
     $class = isset($args['class']) ? $args['class'] : '';
     hocwp_add_string_with_space_before($class, 'term-sortable');
     $args['class'] = $class;
@@ -276,6 +309,80 @@ function hocwp_field_sortable_post_type($args = array()) {
     $args['active_items'] = $active_items;
     $class = isset($args['class']) ? $args['class'] : '';
     hocwp_add_string_with_space_before($class, 'post-type-sortable');
+    $args['class'] = $class;
+    hocwp_field_sortable($args);
+}
+
+function hocwp_field_sortable_taxonomy($args = array()) {
+    $value = isset($args['value']) ? $args['value'] : '';
+    $items = isset($args['items']) ? $args['items'] : '';
+    $connect = hocwp_get_value_by_key($args, 'connect', false);
+    if(empty($items)) {
+        $active_items = hocwp_json_string_to_array($value);
+        $taxonomy_args = isset($args['taxonomy_args']) ? $args['taxonomy_args'] : array();
+        $lists = get_taxonomies($taxonomy_args, 'objects');
+        hocwp_exclude_special_taxonomies($lists);
+        if((bool)$connect) {
+            foreach($active_items as $aitem) {
+                if(hocwp_array_has_value($aitem)) {
+                    unset($lists[$aitem['id']]);
+                }
+            }
+        } else {
+            $results = hocwp_json_string_to_array($value);
+            if(hocwp_array_has_value($results)) {
+                $new_lists = array();
+                foreach($results as $data) {
+                    $id = isset($data['id']) ? $data['id'] : '';
+                    $item = get_taxonomy($id);
+                    if(hocwp_object_valid($item)) {
+                        foreach($lists as $key => $taxonomy) {
+                            if($taxonomy->name == $item->name) {
+                                $new_lists[] = $item;
+                                unset($lists[$key]);
+                                break;
+                            }
+                        }
+                    }
+                }
+                $lists = $new_lists + $lists;
+            }
+        }
+        foreach($lists as $key => $list_item) {
+            $li = new HOCWP_HTML('li');
+            $li->set_class('ui-state-default');
+            $attributes = array(
+                'data-id' => $key
+            );
+            $li->set_attribute_array($attributes);
+            $li->set_text($list_item->labels->singular_name);
+            $items .= $li->build();
+        }
+    }
+    if((bool)$connect) {
+        $active_items = isset($args['active_items']) ? $args['active_items'] : '';
+        if(empty($active_items)) {
+            $lists = hocwp_json_string_to_array($value);
+            foreach($lists as $data) {
+                $id = isset($data['id']) ? $data['id'] : '';
+                $item = get_taxonomy($id);
+                if(hocwp_object_valid($item)) {
+                    $li = new HOCWP_HTML('li');
+                    $li->set_class('ui-state-default');
+                    $attributes = array(
+                        'data-id' => $id
+                    );
+                    $li->set_attribute_array($attributes);
+                    $li->set_text($item->labels->singular_name);
+                    $active_items .= $li->build();
+                }
+            }
+        }
+        $args['active_items'] = $active_items;
+    }
+    $args['items'] = $items;
+    $class = isset($args['class']) ? $args['class'] : '';
+    hocwp_add_string_with_space_before($class, 'taxonomy-sortable');
     $args['class'] = $class;
     hocwp_field_sortable($args);
 }
@@ -431,7 +538,16 @@ function hocwp_field_input($args) {
     $right_label = false;
     $checked = false;
     $value = isset($args['value']) ? $args['value'] : '';
+    $readonly = (bool)hocwp_get_value_by_key($args, 'readonly', false);
     $attributes = isset($args['attributes']) ? $args['attributes'] : array();
+    $placeholder = hocwp_get_value_by_key($args, 'placeholder');
+    $required = (bool)hocwp_get_value_by_key($args, 'required', false);
+    if(!empty($placeholder)) {
+        $attributes['placeholder'] = $placeholder;
+    }
+    if($required) {
+        $attributes['required'] = 'true';
+    }
     if(empty($value)) {
         $value = isset($args['default']) ? $args['default'] : '';
     }
@@ -495,6 +611,9 @@ function hocwp_field_input($args) {
         if(!empty($option_value) || is_numeric($option_value)) {
             $atts['value'] = $option_value;
         }
+    }
+    if($readonly) {
+        $attributes['readonly'] = 'readonly';
     }
     $input->set_attribute_array($attributes);
     $input->set_attribute_array($atts);

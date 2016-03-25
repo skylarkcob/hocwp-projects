@@ -5,7 +5,7 @@ function hocwp_breadcrumb($args = array()) {
     $before = hocwp_get_value_by_key($args, 'before');
     $after = hocwp_get_value_by_key($args, 'after');
     if(function_exists('yoast_breadcrumb') && hocwp_wpseo_breadcrumb_enabled()) {
-        yoast_breadcrumb('<nav class="hocwp-breadcrumb breadcrumb yoast">' . $before, $after . '</nav>');
+        yoast_breadcrumb('<nav class="hocwp-breadcrumb breadcrumb yoast clearfix">' . $before, $after . '</nav>');
         return;
     }
     global $post, $wp_query;
@@ -16,7 +16,7 @@ function hocwp_breadcrumb($args = array()) {
     $class = isset($args['class']) ? $args['class'] : '';
     $class = hocwp_add_string_with_space_before($class, 'list-inline list-unstyled breadcrumbs');
     if(!is_front_page()) {
-        echo '<div class="hocwp-breadcrumb breadcrumb yoast">';
+        echo '<div class="hocwp-breadcrumb breadcrumb default clearfix">';
         echo '<ul id="' . $breadcrums_id . '" class="' . $class . '">';
         echo '<li class="item-home"><a class="bread-link bread-home" href="' . get_home_url() . '" title="' . $home_title . '">' . $home_title . '</a></li>';
         echo '<li class="separator separator-home"> ' . $separator . ' </li>';
@@ -60,11 +60,12 @@ function hocwp_breadcrumb($args = array()) {
             $taxonomy_exists = taxonomy_exists($custom_taxonomy);
             if(empty($last_category) && !empty($custom_taxonomy) && $taxonomy_exists) {
                 $taxonomy_terms = get_the_terms($post->ID, $custom_taxonomy);
-                $cat_id = $taxonomy_terms[0]->term_id;
-                $cat_nicename = $taxonomy_terms[0]->slug;
-                $cat_link = get_term_link($taxonomy_terms[0]->term_id, $custom_taxonomy);
-                $cat_name = $taxonomy_terms[0]->name;
-
+                if(isset($taxonomy_terms[0]) && is_a($taxonomy_terms[0], 'WP_Term')) {
+                    $cat_id = $taxonomy_terms[0]->term_id;
+                    $cat_nicename = $taxonomy_terms[0]->slug;
+                    $cat_link = get_term_link($taxonomy_terms[0]->term_id, $custom_taxonomy);
+                    $cat_name = $taxonomy_terms[0]->name;
+                }
             }
             if(!empty($last_category)) {
                 echo $cat_display;
@@ -133,9 +134,27 @@ function hocwp_breadcrumb($args = array()) {
     }
 }
 
+function hocwp_entry_meta_terms($args = array()) {
+    $taxonomy = hocwp_get_value_by_key($args, 'taxonomy', 'category');
+    if(empty($taxonomy)) {
+        return;
+    }
+    $meta_class = 'entry-terms';
+    hocwp_add_string_with_space_before($meta_class, 'tax-' . hocwp_sanitize_html_class($taxonomy));
+    $icon = hocwp_get_value_by_key($args, 'icon', '<i class="fa fa-list-alt icon-left"></i>');
+    $before = hocwp_get_value_by_key($args, 'before', '<span class="' . $meta_class . '">');
+    $after = hocwp_get_value_by_key($args, 'after', '</span>');
+    $post_id = hocwp_get_value_by_key($args, 'post_id', get_the_ID());
+    $separator = hocwp_get_value_by_key($args, 'separator', ', ');
+    the_terms($post_id, $taxonomy, $before . $icon, $separator, $after);
+}
+
 function hocwp_entry_meta($args = array()) {
     $post_id = hocwp_get_value_by_key($args, 'post_id', get_the_ID());
     $class = hocwp_get_value_by_key($args, 'class');
+    if(!isset($args['taxonomy'])) {
+        $args['taxonomy'] = '';
+    }
     $cpost = get_post($post_id);
     if(!is_a($cpost, 'WP_Post')) {
         return;
@@ -144,16 +163,37 @@ function hocwp_entry_meta($args = array()) {
     $comment_count = hocwp_get_post_comment_count($post_id);
     $comment_text = $comment_count . ' Bình luận';
     hocwp_add_string_with_space_before($class, 'entry-meta');
+    $show_date = hocwp_get_value_by_key($args, 'show_date', true);
+    $show_updated = hocwp_get_value_by_key($args, 'show_updated', true);
+    $show_author = hocwp_get_value_by_key($args, 'show_author', true);
+    $show_term = hocwp_get_value_by_key($args, 'show_term', false);
+    $show_comment = hocwp_get_value_by_key($args, 'show_comment', true);
     ?>
     <p class="<?php echo $class; ?>">
-        <time datetime="<?php the_time('c'); ?>" itemprop="datePublished" class="entry-time published date post-date"><?php echo get_the_date(); ?></time>
-        <time datetime="<?php the_modified_time('c'); ?>" itemprop="dateModified" class="entry-modified-time date modified post-date"><?php the_modified_date(); ?></time>
-        <span itemtype="http://schema.org/Person" itemscope itemprop="author" class="entry-author vcard author post-author">
+        <?php if($show_date) : ?>
+            <time datetime="<?php the_time('c'); ?>" itemprop="datePublished" class="entry-time published date post-date"><?php echo get_the_date(); ?></time>
+        <?php endif; ?>
+        <?php if($show_updated) : ?>
+            <time datetime="<?php the_modified_time('c'); ?>" itemprop="dateModified" class="entry-modified-time date modified post-date"><?php the_modified_date(); ?></time>
+        <?php endif; ?>
+        <?php if($show_author) : ?>
+            <span itemtype="http://schema.org/Person" itemscope itemprop="author" class="entry-author vcard author post-author">
             <span class="fn">
                 <a rel="author" itemprop="url" class="entry-author-link" href="<?php echo $author_url; ?>"><span itemprop="name" class="entry-author-name"><?php the_author(); ?></span></a>
             </span>
         </span>
-        <?php if(comments_open($post_id)) : ?>
+        <?php endif; ?>
+        <?php
+        if($show_term) {
+            $meta_term_args = $args;
+            $term_icon = hocwp_get_value_by_key($args, 'term_icon');
+            if(!empty($term_icon)) {
+                $meta_term_args['icon'] = $term_icon;
+            }
+            hocwp_entry_meta_terms($meta_term_args);
+        }
+        ?>
+        <?php if($show_comment && comments_open($post_id)) : ?>
             <span class="entry-comments-link">
                 <a href="<?php the_permalink(); ?>#comments"><?php echo $comment_text; ?></a>
             </span>

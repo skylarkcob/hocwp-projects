@@ -2,14 +2,10 @@
 if(!function_exists('add_filter')) exit;
 class HOCWP_Widget_Term extends WP_Widget {
     public $args = array();
+    public $admin_args;
 
     private function get_defaults() {
         $defaults = array(
-            'id' => 'hocwp_widget_term',
-            'name' => 'HocWP Term',
-            'class' => 'hocwp-widget-term',
-            'description' => __('A list of terms.', 'hocwp'),
-            'admin_width' => 400,
             'taxonomy' => array(array('value' => 'category')),
             'show_count' => 0,
             'only_thumbnail' => 0,
@@ -37,7 +33,8 @@ class HOCWP_Widget_Term extends WP_Widget {
                 'none' => __('None', 'hocwp')
             ),
             'orderby' => 'name',
-            'count_format' => '(%TERM_COUNT%)'
+            'count_format' => '(%TERM_COUNT%)',
+            'different_name' => 0
         );
         $defaults = apply_filters('hocwp_widget_term_defaults', $defaults);
         $args = apply_filters('hocwp_widget_term_args', array());
@@ -47,13 +44,21 @@ class HOCWP_Widget_Term extends WP_Widget {
 
     public function __construct() {
         $this->args = $this->get_defaults();
-        parent::__construct($this->args['id'], $this->args['name'],
+        $this->admin_args = array(
+            'id' => 'hocwp_widget_term',
+            'name' => 'HocWP Term',
+            'class' => 'hocwp-widget-term',
+            'description' => __('A list of terms.', 'hocwp'),
+            'width' => 400
+        );
+        $this->admin_args = apply_filters('hocwp_widget_term_admin_args', $this->admin_args);
+        parent::__construct($this->admin_args['id'], $this->admin_args['name'],
             array(
-                'classname' => $this->args['class'],
-                'description' => $this->args['description'],
+                'classname' => $this->admin_args['class'],
+                'description' => $this->admin_args['description'],
             ),
             array(
-                'width' => $this->args['admin_width']
+                'width' => $this->admin_args['width']
             )
         );
     }
@@ -91,6 +96,7 @@ class HOCWP_Widget_Term extends WP_Widget {
         $order = hocwp_get_value_by_key($instance, 'order', hocwp_get_value_by_key($this->args, 'order'));
         $orderby = hocwp_get_value_by_key($instance, 'orderby', hocwp_get_value_by_key($this->args, 'orderby'));
         $count_format = hocwp_get_value_by_key($instance, 'count_format', hocwp_get_value_by_key($this->args, 'count_format'));
+        $different_name = (bool)hocwp_get_value_by_key($instance, 'different_name', hocwp_get_value_by_key($this->args, 'different_name'));
 
         if($hide_thumbnail) {
             $only_thumbnail = false;
@@ -104,7 +110,7 @@ class HOCWP_Widget_Term extends WP_Widget {
         $terms = get_terms($taxonomies, $tax_args);
 
         hocwp_widget_before($args, $instance);
-
+        ob_start();
         if(hocwp_array_has_value($terms)) {
             $count_terms = count($terms);
             $html = '<ul class="list-unstyled list-terms">';
@@ -132,7 +138,11 @@ class HOCWP_Widget_Term extends WP_Widget {
                     $html .= hocwp_term_get_thumbnail_html(array('term' => $term, 'width' => $thumbnail_size[0], $thumbnail_size[1], 'bfi_thumb' => false));
                 }
                 if(!(bool)$only_thumbnail) {
-                    $html .= '<a class="term-name" href="' . get_term_link($term) . '">' . $term->name . '</a>';
+                    $term_name = $term->name;
+                    if($different_name) {
+                        $term_name = hocwp_term_get_name($term);
+                    }
+                    $html .= '<a class="term-name" href="' . get_term_link($term) . '">' . $term_name . '</a>';
                     if((bool)$show_count && !empty($count_format)) {
                         $html .= ' <span class="count">' . str_replace('%TERM_COUNT%', $term->count, $count_format) . '</span>';
                     }
@@ -145,7 +155,9 @@ class HOCWP_Widget_Term extends WP_Widget {
         } else {
             _e('Sorry, nothing found.', 'hocwp');
         }
-
+        $widget_html = ob_get_clean();
+        $widget_html = apply_filters('hocwp_widget_term_html', $widget_html, $instance, $args, $this);
+        echo $widget_html;
         hocwp_widget_after($args, $instance);
     }
 
@@ -161,8 +173,9 @@ class HOCWP_Widget_Term extends WP_Widget {
         $only_thumbnail = hocwp_get_value_by_key($instance, 'only_thumbnail', hocwp_get_value_by_key($this->args, 'only_thumbnail'));
         $order = hocwp_get_value_by_key($instance, 'order', hocwp_get_value_by_key($this->args, 'order'));
         $orderby = hocwp_get_value_by_key($instance, 'orderby', hocwp_get_value_by_key($this->args, 'orderby'));
+        $different_name = (bool)hocwp_get_value_by_key($instance, 'different_name', hocwp_get_value_by_key($this->args, 'different_name'));
 
-        hocwp_field_widget_before('hocwp-widget-post');
+        hocwp_field_widget_before($this->admin_args['class']);
 
         hocwp_widget_field_title($this->get_field_id('title'), $this->get_field_name('title'), $title);
 
@@ -296,6 +309,14 @@ class HOCWP_Widget_Term extends WP_Widget {
         );
         hocwp_widget_field('hocwp_field_input_checkbox', $args);
 
+        $args = array(
+            'id' => $this->get_field_id('different_name'),
+            'name' => $this->get_field_name('different_name'),
+            'value' => $different_name,
+            'label' => __('Use different term name?', 'hocwp')
+        );
+        hocwp_widget_field('hocwp_field_input_checkbox', $args);
+
         hocwp_field_widget_after();
     }
 
@@ -314,6 +335,7 @@ class HOCWP_Widget_Term extends WP_Widget {
         $instance['hide_thumbnail'] = hocwp_checkbox_post_data_value($new_instance, 'hide_thumbnail');
         $instance['show_count'] = hocwp_checkbox_post_data_value($new_instance, 'show_count');
         $instance['only_thumbnail'] = hocwp_checkbox_post_data_value($new_instance, 'only_thumbnail');
+        $instance['different_name'] = hocwp_checkbox_post_data_value($new_instance, 'different_name');
         return $instance;
     }
 }

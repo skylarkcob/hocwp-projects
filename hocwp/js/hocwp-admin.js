@@ -1,8 +1,9 @@
 /**
- * Last updated: 09/03/2016
+ * Last updated: 23/03/2016
  */
-
 jQuery(document).ready(function($) {
+    var $body = $('body');
+
     hocwp.addBulkAction = function(actions) {
         actions = actions || [];
         for(var i = 0; i < actions.length; i++) {
@@ -25,81 +26,83 @@ jQuery(document).ready(function($) {
     };
 
     (function() {
-        $(document).on('widget-updated', function(event, widget) {
-            var widget_id = widget[0].id;
-            if(widget_id && widget_id.match('hocwp')) {
-                var $widget = $(this);
-                if(widget_id.match('hocwp_widget_banner')) {
-                    $widget.find('.btn-insert-media').live('click', function(e) {
-                        e.preventDefault();
-                        hocwp.mediaUpload($(this));
-                    });
-                    $widget.find('.btn-remove').live('click', function(e) {
-                        e.preventDefault();
-                        var $container = $(this).parent();
-                        hocwp.mediaUpload($container.find('.btn-insert-media'), {remove: true});
-                    });
-                    $widget.find('input.media-url').live('change input', function(e) {
-                        e.preventDefault();
-                        var $container = $(this).parent();
-                        hocwp.mediaUpload($container.find('.btn-insert-media'), {change: true});
-                    });
-                } else if(widget_id.match('hocwp_widget_post')) {
-                    $widget.find('.hocwp-widget-post .get-by').on('change', function(e) {
-                        e.preventDefault();
-                        hocwp.widgetPostTypeChange(this);
-                    });
-                }
-            }
-        });
-
-        $('div.widgets-sortables').bind('sortreceive', function(event, ui) {
-            var widget_id = $(ui.item).attr('id');
-            if(widget_id && widget_id.match('hocwp')) {
-                var $widget = $(ui.item);
-                if(widget_id.match('hocwp_widget_banner')) {
-                    $widget.find('.btn-insert-media').live('click', function(e) {
-                        e.preventDefault();
-                        hocwp.mediaUpload($(this));
-                    });
-                } else if(widget_id.match('hocwp_widget_post')) {
-                    $widget.find('.hocwp-widget-post .get-by').on('change', function(e) {
-                        e.preventDefault();
-                        hocwp.widgetPostTypeChange(this);
-                    });
-                }
-            }
-        }).bind('sortstop', function(event, ui) {
-            var widget_id = $(ui.item).attr('id');
-            if(widget_id && widget_id.match('hocwp')) {
-                var $widget = $(ui.item);
-                if(widget_id.match('hocwp_widget_post')) {
-                    $widget.find('.hocwp-widget-post .get-by').on('change', function(e) {
-                        e.preventDefault();
-                        hocwp.widgetPostTypeChange(this);
-                    });
-                }
-            }
-        });
-
-        $(document).ajaxSuccess(function(e, xhr, settings) {
-            if(settings.data.search('action=save-widget') != -1) {
-                if(settings.data.search('hocwp') != -1) {
-                    var id_base = hocwp.getParamByName(settings.data, 'id_base'),
-                        $widget = $(this);
-                    if('hocwp_widget_post' == id_base || 'hocwp_widget_top_commenter' == id_base || 'hocwp_widget_term' == id_base) {
-                        $widget.find('.hocwp-widget .chosen-container').hide();
-                        $widget.find('.hocwp-widget .chooseable').hocwpChosenSelect();
-                        $widget.find('.hocwp-widget .chosen-container').show();
+        if($body.hasClass('widgets-php')) {
+            $(document).on('widget-updated', function(event, widget) {
+                var widget_id = widget[0].id;
+                if(widget_id && widget_id.match('hocwp')) {
+                    var $widget = $(this);
+                    if(widget_id.match('hocwp_widget_banner') || widget_id.match('hocwp_widget_icon')) {
+                        $widget.find('.btn-insert-media').live('click', function(e) {
+                            e.preventDefault();
+                            hocwp.mediaUpload($(this));
+                        });
+                        $widget.find('.btn-remove').live('click', function(e) {
+                            e.preventDefault();
+                            var $container = $(this).parent();
+                            hocwp.mediaUpload($container.find('.btn-insert-media'), {remove: true});
+                        });
+                        $widget.find('input.media-url').live('change input', function(e) {
+                            e.preventDefault();
+                            var $container = $(this).parent();
+                            hocwp.mediaUpload($container.find('.btn-insert-media'), {change: true});
+                        });
+                    } else if(widget_id.match('hocwp_widget_post')) {
+                        $widget.find('.hocwp-widget-post .get-by').on('change', function(e) {
+                            e.preventDefault();
+                            hocwp.widgetPostTypeChange(this);
+                        });
                     }
                 }
-            }
-        });
+            });
 
-        $(document).delegate('.btn-insert-media', 'click', function(e) {
-            e.preventDefault();
-            hocwp.mediaUpload($(this));
-        });
+            $('div.widgets-sortables').bind('sortreceive', function(event, ui) {
+                var widget_id = $(ui.item).attr('id');
+                if(widget_id && widget_id.match('hocwp')) {
+                    var $widget = $(ui.item);
+                    if(widget_id.match('hocwp_widget_banner') || widget_id.match('hocwp_widget_icon')) {
+                        $widget.find('.btn-insert-media').live('click', function(e) {
+                            e.preventDefault();
+                            hocwp.mediaUpload($(this));
+                        });
+                    } else if(widget_id.match('hocwp_widget_post')) {
+                        $widget.find('.hocwp-widget-post .get-by').on('change', function(e) {
+                            e.preventDefault();
+                            hocwp.widgetPostTypeChange(this);
+                        });
+                    }
+                }
+            }).bind('sortstop', function(event, ui) {
+                var widget_id = $(ui.item).attr('id');
+                if(widget_id && widget_id.match('hocwp')) {
+                    var $widget = $(ui.item);
+                    if(widget_id.match('hocwp_widget_post')) {
+                        $widget.find('.hocwp-widget-post .get-by').on('change', function(e) {
+                            e.preventDefault();
+                            hocwp.widgetPostTypeChange(this);
+                        });
+                    }
+                }
+            });
+
+            $(document).ajaxSuccess(function(e, xhr, settings) {
+                if(settings.data.search('action=save-widget') != -1) {
+                    if(settings.data.search('hocwp') != -1) {
+                        var id_base = hocwp.getParamByName(settings.data, 'id_base'),
+                            $widget = $(this);
+                        if('hocwp_widget_post' == id_base || 'hocwp_widget_top_commenter' == id_base || 'hocwp_widget_term' == id_base) {
+                            $widget.find('.hocwp-widget .chosen-container').hide();
+                            $widget.find('.hocwp-widget .chooseable').hocwpChosenSelect();
+                            $widget.find('.hocwp-widget .chosen-container').show();
+                        }
+                    }
+                }
+            });
+
+            $(document).delegate('.btn-insert-media', 'click', function(e) {
+                e.preventDefault();
+                hocwp.mediaUpload($(this));
+            });
+        }
     })();
 
     (function() {
@@ -161,7 +164,9 @@ jQuery(document).ready(function($) {
     })();
 
     (function() {
-        hocwp.addDefaultQuicktagButton();
+        if($body.hasClass('post-php') || $body.hasClass('post-new-php')) {
+            hocwp.addDefaultQuicktagButton();
+        }
     })();
 
     (function() {
