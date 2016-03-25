@@ -3,6 +3,8 @@ if(!function_exists('add_filter')) {exit;}
 
 function hocwp_post_class($classes) {
     $classes[] = 'hocwp-post';
+    $classes[] = 'hentry';
+    $classes[] = 'entry';
     return $classes;
 }
 add_filter('post_class', 'hocwp_post_class');
