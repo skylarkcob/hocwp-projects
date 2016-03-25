@@ -1,6 +1,6 @@
 <?php
 if(!function_exists('add_filter')) exit;
-global $hocwp_theme_license;
+global $hocwp_theme_license, $pagenow;
 
 function hocwp_theme_switched($new_name, $new_theme) {
     if(!current_user_can('switch_themes')) {
@@ -80,30 +80,21 @@ function hocwp_setup_theme_widgets_init() {
     register_widget('HOCWP_Widget_Top_Commenter');
     register_widget('HOCWP_Widget_Icon');
     register_widget('HOCWP_Widget_FeedBurner');
+    register_widget('HOCWP_Widget_Subscribe');
     register_widget('HOCWP_Widget_Social');
     register_widget('HOCWP_Widget_Term');
-    $default_sidebars = array(
-        'primary',
-        'secondary',
-        'page',
-        '404',
-        'footer'
-    );
-    $default_sidebars = apply_filters('hocwp_theme_default_sidebars', $default_sidebars);
-    if(in_array('primary', $default_sidebars)) {
-        hocwp_register_sidebar('primary', __('Primary sidebar', 'hocwp'), __('Primary sidebar on your site.', 'hocwp'));
-    }
-    if(in_array('secondary', $default_sidebars)) {
-        hocwp_register_sidebar('secondary', __('Secondary sidebar', 'hocwp'), __('Secondary sidebar on your site.', 'hocwp'));
-    }
-    if(in_array('page', $default_sidebars)) {
-        hocwp_register_sidebar('page', __('Page Sidebar', 'hocwp'), __('Display custom widget on Page.', 'hocwp'));
-    }
-    if(in_array('404', $default_sidebars)) {
-        hocwp_register_sidebar('404', __('404 Sidebar', 'hocwp'), __('Display custom widget on 404 page.', 'hocwp'));
-    }
-    if(in_array('footer', $default_sidebars)) {
-        hocwp_register_sidebar('footer', __('Footer widget area', 'hocwp'), __('The widget area contains footer widgets.', 'hocwp'), 'div');
+    register_widget('HOCWP_Widget_Tabber');
+    $default_sidebars = hocwp_theme_get_default_sidebars();
+    foreach($default_sidebars as $name => $data) {
+        $query = hocwp_get_post_by_meta('sidebar_id', $name, array('post_type' => 'hocwp_sidebar'));
+        $active = true;
+        if($query->have_posts()) {
+            $current = current($query->posts);
+            $active = (bool)hocwp_get_post_meta('active', $current->ID);
+        }
+        if($active) {
+            hocwp_register_sidebar($name, $data['name'], $data['description'], $data['tag']);
+        }
     }
 }
 add_action('widgets_init', 'hocwp_setup_theme_widgets_init');
@@ -155,8 +146,10 @@ function hocwp_setup_theme_scripts() {
         wp_register_script('hocwp-custom-front-end', get_template_directory_uri() . '/js/hocwp-custom-front-end' . HOCWP_JS_SUFFIX, array('superfish', 'bootstrap'), HOCWP_THEME_VERSION, true);
         wp_localize_script('hocwp-custom-front-end', 'hocwp', $localize_object);
     }
-    wp_enqueue_style('hocwp-custom-front-end-style');
-    wp_enqueue_script('hocwp-custom-front-end');
+    if(!hocwp_in_maintenance_mode()) {
+        wp_enqueue_style('hocwp-custom-front-end-style');
+        wp_enqueue_script('hocwp-custom-front-end');
+    }
     if(is_singular()) {
         $post_id = get_the_ID();
         if(comments_open($post_id) && (bool)get_option('thread_comments')) {
@@ -198,12 +191,9 @@ function hocwp_setup_theme_admin_footer_text($text) {
 add_filter('admin_footer_text', 'hocwp_setup_theme_admin_footer_text', 99);
 
 function hocwp_setup_theme_update_footer($text) {
-    global $pagenow;
-    if('update-core.php' != $pagenow) {
-        $tmp = strtolower($text);
-        if(hocwp_string_contain($tmp, 'version')) {
-            $text = sprintf(__('Theme core version %s', 'hocwp'), HOCWP_THEME_CORE_VERSION);
-        }
+    $tmp = strtolower($text);
+    if(hocwp_string_contain($tmp, 'version')) {
+        $text = sprintf(__('Theme core version %s', 'hocwp'), HOCWP_THEME_CORE_VERSION);
     }
     return $text;
 }
@@ -279,6 +269,16 @@ function hocwp_setup_theme_admin_bar_menu($wp_admin_bar) {
         'parent' => 'site-name'
     );
     $wp_admin_bar->add_node($args);
+
+    if(hocwp_wc_installed()) {
+        $args = array(
+            'id' => 'shop-settings',
+            'title' => __('Shop Settings', 'hocwp'),
+            'href' => admin_url('admin.php?page=wc-settings'),
+            'parent' => 'site-name'
+        );
+        $wp_admin_bar->add_node($args);
+    }
 
     $args = array(
         'id' => 'plugins',
@@ -389,3 +389,154 @@ function hocwp_setup_theme_admin_menu() {
     remove_submenu_page('hocwp_theme_option', 'hocwp_theme_option');
 }
 add_action('admin_menu', 'hocwp_setup_theme_admin_menu', 99);
+
+add_filter('hocwp_allow_user_subscribe', '__return_true');
+
+function hocwp_setup_theme_new_post_type_and_taxonomy() {
+    $args = array(
+        'name' => 'Sidebars',
+        'singular_name' => 'Sidebar',
+        'slug' => 'hocwp_sidebar'
+    );
+    hocwp_register_post_type_private($args);
+
+    $user_subscribe = apply_filters('hocwp_allow_user_subscribe', false);
+    if($user_subscribe) {
+        $args = array(
+            'name' => 'Subscribers',
+            'singular_name' => 'Subscriber',
+            'slug' => 'hocwp_subscriber'
+        );
+        hocwp_register_post_type_private($args);
+    }
+}
+add_action('init', 'hocwp_setup_theme_new_post_type_and_taxonomy', 0);
+
+function hocwp_setup_theme_add_default_sidebars() {
+    $added = (bool)get_option('hocwp_default_sidebars_added');
+    if($added) {
+        $query = hocwp_query(array('post_type' => 'hocwp_sidebar', 'posts_per_page' => -1));
+        if(!$query->have_posts()) {
+            $added = false;
+        }
+    }
+    if(!$added) {
+        $sidebars = hocwp_theme_get_default_sidebars();
+        foreach($sidebars as $name => $data) {
+            $post_data = array(
+                'post_title' => $data['name'],
+                'post_type' => 'hocwp_sidebar',
+                'post_status' => 'publish'
+            );
+            $post_id = hocwp_insert_post($post_data);
+            if(hocwp_id_number_valid($post_id)) {
+                update_post_meta($post_id, 'sidebar_default', 1);
+                update_post_meta($post_id, 'sidebar_id', $name);
+                update_post_meta($post_id, 'sidebar_name', $data['name']);
+                update_post_meta($post_id, 'sidebar_description', $data['description']);
+                update_post_meta($post_id, 'sidebar_tag', $data['tag']);
+                update_post_meta($post_id, 'active', 1);
+            }
+        }
+        update_option('hocwp_default_sidebars_added', 1);
+    }
+}
+add_action('admin_init', 'hocwp_setup_theme_add_default_sidebars');
+
+function hocwp_setup_theme_prevent_delete_sidebar($post_id) {
+    $post = get_post($post_id);
+    if('hocwp_sidebar' == $post->post_type) {
+        $prevent = false;
+        if(!is_super_admin()) {
+            $prevent = true;
+        }
+        $default = (bool)get_post_meta($post_id, 'sidebar_default');
+        if($default) {
+            $prevent = true;
+        }
+        if($prevent) {
+            exit(__('You don\'t have permission to delete this post!', 'hocwp'));
+        }
+    }
+}
+add_action('wp_trash_post', 'hocwp_setup_theme_prevent_delete_sidebar', 10, 1);
+add_action('before_delete_post', 'hocwp_setup_theme_prevent_delete_sidebar', 10, 1);
+
+if('post.php' == $pagenow || 'post-new.php' == $pagenow) {
+    $readonly = false;
+    $post_id = 0;
+    if('post.php' == $pagenow) {
+        $post_id = hocwp_get_value_by_key($_REQUEST, 'post');
+        $default = (bool)get_post_meta($post_id, 'sidebar_default');
+        if($default) {
+            $readonly = true;
+        }
+    }
+    $meta = new HOCWP_Meta('post');
+    $meta->set_id('hocwp_sidebar_information');
+    $meta->set_title(__('Sidebar Information', 'hocwp'));
+    $meta->add_post_type('hocwp_sidebar');
+    $field_args = array(
+        'id' => 'sidebar_id',
+        'label' => __('Sidebar ID:', 'hocwp')
+    );
+    if($readonly) {
+        $field_args['readonly'] = true;
+    }
+    $meta->add_field($field_args);
+    $field_args = array(
+        'id' => 'sidebar_name',
+        'label' => __('Sidebar name:', 'hocwp')
+    );
+    if($readonly) {
+        $field_args['readonly'] = true;
+    }
+    $meta->add_field($field_args);
+    $field_args = array(
+        'id' => 'sidebar_description',
+        'label' => __('Sidebar description:', 'hocwp')
+    );
+    if($readonly) {
+        $field_args['readonly'] = true;
+    }
+    $meta->add_field($field_args);
+    $field_args = array(
+        'id' => 'sidebar_tag',
+        'label' => __('Sidebar tag:', 'hocwp')
+    );
+    if($readonly) {
+        $field_args['readonly'] = true;
+    }
+    $meta->add_field($field_args);
+    $meta->init();
+
+    $meta = new HOCWP_Meta('post');
+    $meta->set_id('hocwp_subscriber_information');
+    $meta->set_title(__('Subscriber Information', 'hocwp'));
+    $meta->add_post_type('hocwp_subscriber');
+    $field_args = array(
+        'id' => 'subscriber_email',
+        'label' => __('Email:', 'hocwp'),
+        'readonly' => true
+    );
+    $meta->add_field($field_args);
+    $field_args = array(
+        'id' => 'subscriber_name',
+        'label' => __('Name:', 'hocwp')
+    );
+    $meta->add_field($field_args);
+    $field_args = array(
+        'id' => 'subscriber_phone',
+        'label' => __('Phone:', 'hocwp')
+    );
+    $meta->add_field($field_args);
+    if(hocwp_id_number_valid($post_id)) {
+        $field_args = array(
+            'id' => 'subscriber_user',
+            'label' => __('User ID:', 'hocwp'),
+            'readonly' => true
+        );
+        $meta->add_field($field_args);
+    }
+    $meta->init();
+}

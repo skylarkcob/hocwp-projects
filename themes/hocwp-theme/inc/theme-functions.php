@@ -33,6 +33,12 @@ function hocwp_theme_register_lib_raty() {
     wp_enqueue_script('jquery-raty', get_template_directory_uri() . '/lib/raty/jquery.raty.js', array('jquery'), false, true);
 }
 
+function hocwp_theme_register_lib_owl_carousel() {
+    wp_enqueue_style('owl-carousel-style', get_template_directory_uri() . '/lib/owl-carousel/owl.carousel.css');
+    wp_enqueue_style('owl-carousel-theme-style', get_template_directory_uri() . '/lib/owl-carousel/owl.theme.css');
+    wp_enqueue_script('owl-carousel', get_template_directory_uri() . '/lib/owl-carousel/owl.carousel.min.js', array('jquery'), false, true);
+}
+
 function hocwp_theme_default_script_localize_object() {
     $defaults = hocwp_default_script_localize_object();
     $args = array(
@@ -344,3 +350,36 @@ function hocwp_theme_register_translation_text($name, $text, $multiline = false)
 }
 
 hocwp_meta_box_page_additional_information();
+hocwp_meta_box_side_image(array('post_type' => 'all', 'id' => 'hocwp_large_thumbnail_box', 'title' => __('Large Thumbnail', 'hocwp'), 'field_id' => 'large_thumbnail'));
+
+function hocwp_theme_get_default_sidebars() {
+    $default_sidebars = array(
+        'primary' => array(
+            'name' => __('Primary sidebar', 'hocwp'),
+            'description' => __('Primary sidebar on your site.', 'hocwp'),
+            'tag' => 'div'
+        ),
+        'secondary' => array(
+            'name' => __('Secondary sidebar', 'hocwp'),
+            'description' => __('Secondary sidebar on your site.', 'hocwp'),
+            'tag' => 'div'
+        ),
+        'page' => array(
+            'name' => __('Page Sidebar', 'hocwp'),
+            'description' => __('Display custom widget on Page.', 'hocwp'),
+            'tag' => 'div'
+        ),
+        '404' => array(
+            'name' => __('404 Sidebar', 'hocwp'),
+            'description' => __('Display custom widget on 404 page.', 'hocwp'),
+            'tag' => 'div'
+        ),
+        'footer' => array(
+            'name' => __('Footer widget area', 'hocwp'),
+            'description' => __('The widget area contains footer widgets.', 'hocwp'),
+            'tag' => 'div'
+        )
+    );
+    $default_sidebars = apply_filters('hocwp_theme_default_sidebars', $default_sidebars);
+    return $default_sidebars;
+}

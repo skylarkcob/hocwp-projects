@@ -65,7 +65,7 @@ $field_options = array(
 $option->add_field(array('id' => 'smtp_auth', 'title' => __('Authentication', 'hocwp'), 'field_callback' => 'hocwp_field_input_radio', 'options' => $field_options, 'section' => 'smtp_option'));
 $option->add_field(array('id' => 'smtp_user', 'title' => __('Username', 'hocwp'), 'section' => 'smtp_option'));
 $option->add_field(array('id' => 'smtp_pass', 'title' => __('Password', 'hocwp'), 'section' => 'smtp_option', 'type' => 'password'));
-$option->add_field(array('id' => 'to_email', 'title' => __('To', 'hocwp'), 'section' => 'testing', 'description' => __('Type an email address here and then click Send Test to generate a test email.', 'hocwp'), 'type' => 'email'));
+$option->add_field(array('id' => 'to_email', 'value' => '', 'title' => __('To', 'hocwp'), 'section' => 'testing', 'description' => __('Type an email address here and then click Send Test to generate a test email.', 'hocwp'), 'type' => 'email'));
 
 $option->add_option_tab($hocwp_tos_tabs);
 $option->set_page_header_callback('hocwp_theme_option_form_before');

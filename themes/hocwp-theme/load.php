@@ -5,6 +5,14 @@ if(!defined('HOCWP_REQUIRE_WP_VERSION')) {
     define('HOCWP_REQUIRE_WP_VERSION', '4.2');
 }
 
+if(!defined('HOCWP_MINIMUM_PHP_VERSION')) {
+    define('HOCWP_MINIMUM_PHP_VERSION', '5.2.4');
+}
+
+if(!defined('HOCWP_RECOMMEND_PHP_VERSION')) {
+    define('HOCWP_RECOMMEND_PHP_VERSION', '5.6');
+}
+
 if(version_compare($GLOBALS['wp_version'], HOCWP_REQUIRE_WP_VERSION, '<')) {
     require get_template_directory() . '/inc/back-compat.php';
     return;
@@ -12,7 +20,7 @@ if(version_compare($GLOBALS['wp_version'], HOCWP_REQUIRE_WP_VERSION, '<')) {
 
 define('HOCWP_THEME_CORE_VERSION', '5.1.4');
 
-define('HOCWP_THEME_REQUIRE_CORE_VERSION', '3.2.8');
+define('HOCWP_THEME_REQUIRE_CORE_VERSION', '3.3.1');
 
 define('HOCWP_THEME_PATH', get_template_directory());
 
