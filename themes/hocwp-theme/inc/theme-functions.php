@@ -11,6 +11,11 @@ function hocwp_theme_register_lib_sticky() {
     wp_enqueue_script('sticky');
 }
 
+function hocwp_theme_register_lib_lightslider() {
+    wp_enqueue_style('lightslider-style', get_template_directory_uri() . '/lib/lightslider/css/lightslider.min.css');
+    wp_enqueue_script('lightslider', get_template_directory_uri() . '/lib/lightslider/js/lightslider.min.js', array('jquery'), false, true);
+}
+
 function hocwp_theme_register_lib_fancybox() {
     wp_enqueue_style('fancybox-style', HOCWP_THEME_URL . '/lib/fancybox/jquery.fancybox.css');
     wp_enqueue_script('fancybox', HOCWP_THEME_URL . '/lib/fancybox/jquery.fancybox.pack.js', array('jquery'), false, true);
@@ -39,11 +44,22 @@ function hocwp_theme_register_lib_owl_carousel() {
     wp_enqueue_script('owl-carousel', get_template_directory_uri() . '/lib/owl-carousel/owl.carousel.min.js', array('jquery'), false, true);
 }
 
+function hocwp_theme_register_lib_bxslider() {
+    wp_enqueue_style('bxslider-style', get_template_directory_uri() . '/lib/bxslider/jquery.bxslider.css');
+    wp_enqueue_script('bxslider', get_template_directory_uri() . '/lib/bxslider/jquery.bxslider.min.js', array('jquery'), false, true);
+}
+
+function hocwp_theme_register_lib_google_maps($api_key = null) {
+    hocwp_register_lib_google_maps($api_key);
+}
+
 function hocwp_theme_default_script_localize_object() {
     $defaults = hocwp_default_script_localize_object();
     $args = array(
         'home_url' => esc_url(home_url('/')),
         'login_logo_url' => hocwp_get_login_logo_url(),
+        'login_url' => wp_login_url(),
+        'facebook_appid' => hocwp_get_wpseo_social_facebook_app_id(),
         'mobile_menu_icon' => '<button class="menu-toggle mobile-menu-button" aria-expanded="false" aria-controls=""><i class="fa fa fa-bars"></i><span class="text">' . __('Menu', 'hocwp') . '</span></button>',
         'search_form' => get_search_form(false)
     );
@@ -221,7 +237,7 @@ function hocwp_theme_get_footer_text() {
 function hocwp_theme_the_footer_text($the_content = true) {
     $text = hocwp_theme_get_footer_text();
     if($the_content) {
-        $text = apply_filters('the_content', $text);
+        $text = wpautop(do_shortcode($text));
     } else {
         $text = wpautop($text);
     }

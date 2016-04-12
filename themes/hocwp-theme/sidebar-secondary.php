@@ -1,6 +1,6 @@
 <?php
 if(!function_exists('add_filter')) exit;
-if(is_active_sidebar('secondary')) :
+if(is_active_sidebar('secondary')) {
     do_action('hocwp_before_sidebar');
     do_action('hocwp_before_secondary_sidebar');
     ?>
@@ -16,4 +16,6 @@ if(is_active_sidebar('secondary')) :
     <?php
     do_action('hocwp_after_secondary_sidebar');
     do_action('hocwp_after_sidebar');
-endif; ?>
+} else {
+    get_sidebar();
+}

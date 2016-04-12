@@ -4,7 +4,7 @@ $sidebar = hocwp_get_post_meta('sidebar');
 if(!is_active_sidebar($sidebar)) {
     $sidebar = 'page';
 }
-if(is_active_sidebar($sidebar)) :
+if(is_active_sidebar($sidebar)) {
     do_action('hocwp_before_sidebar');
     do_action('hocwp_before_page_sidebar');
     ?>
@@ -20,4 +20,6 @@ if(is_active_sidebar($sidebar)) :
     <?php
     do_action('hocwp_after_page_sidebar');
     do_action('hocwp_after_sidebar');
-endif; ?>
+} else {
+    get_sidebar('secondary');
+}

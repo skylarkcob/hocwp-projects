@@ -1,5 +1,10 @@
 <?php
 if(!function_exists('add_filter')) exit;
+
+$lang = hocwp_get_language();
+
+remove_action('wp_head', 'wp_generator');
+
 global $hocwp_theme_license, $pagenow;
 
 function hocwp_theme_switched($new_name, $new_theme) {
@@ -50,6 +55,7 @@ function hocwp_theme_hide_admin_bar() {
 add_action('init', 'hocwp_theme_hide_admin_bar');
 
 function hocwp_setup_theme_body_class($classes) {
+    $classes[] = 'front-end';
     if(is_single() || is_page() || is_singular()) {
         $classes[] = 'hocwp-single';
     }
@@ -190,6 +196,14 @@ function hocwp_setup_theme_admin_footer_text($text) {
 }
 add_filter('admin_footer_text', 'hocwp_setup_theme_admin_footer_text', 99);
 
+function hocwp_setup_theme_admin_footer() {
+    global $pagenow;
+    if('index.php' === $pagenow) {
+        hocwp_dashboard_widget_script();
+    }
+}
+add_action('admin_footer', 'hocwp_setup_theme_admin_footer');
+
 function hocwp_setup_theme_update_footer($text) {
     $tmp = strtolower($text);
     if(hocwp_string_contain($tmp, 'version')) {
@@ -298,7 +312,7 @@ function hocwp_setup_theme_admin_bar_menu($wp_admin_bar) {
         $wp_admin_bar->add_node($args);
     }
 }
-if(!is_admin()) add_action('admin_bar_menu', 'hocwp_setup_theme_admin_bar_menu', 99);
+if(!is_admin() && current_user_can('create_users')) add_action('admin_bar_menu', 'hocwp_setup_theme_admin_bar_menu', 99);
 
 function hocwp_setup_theme_language_attributes($output) {
     if(!is_admin()) {
@@ -358,12 +372,110 @@ function hocwp_theme_intermediate_image_sizes_advanced($sizes) {
 }
 add_filter('intermediate_image_sizes_advanced', 'hocwp_theme_intermediate_image_sizes_advanced');
 
+function hocwp_setup_theme_wp_dashboard_setup() {
+    wp_add_dashboard_widget('hocwp_useful_links', __('Useful Links', 'hocwp'), 'hocwp_theme_dashboard_widget_useful_links');
+    wp_add_dashboard_widget('hocwp_services_news', __('Services Information', 'hocwp'), 'hocwp_theme_dashboard_widget_services_news');
+    wp_add_dashboard_widget('hocwp_wordpress_release', __('WordPress Releases', 'hocwp'), 'hocwp_theme_dashboard_widget_wordpress_release');
+
+    global $wp_meta_boxes;
+
+    $normal_dashboard = $wp_meta_boxes['dashboard']['normal']['core'];
+    $backups = array(
+        'hocwp_useful_links' => $normal_dashboard['hocwp_useful_links']
+    );
+    foreach($backups as $key => $widget) {
+        unset($normal_dashboard[$key]);
+    }
+    $sorted_dashboard = array_merge($backups, $normal_dashboard);
+    $wp_meta_boxes['dashboard']['normal']['core'] = $sorted_dashboard;
+
+    $backup = $wp_meta_boxes['dashboard']['normal']['core']['hocwp_services_news'];
+    unset($wp_meta_boxes['dashboard']['normal']['core']['hocwp_services_news']);
+    $wp_meta_boxes['dashboard']['side']['core']['hocwp_services_news'] = $backup;
+    $side_dashboard = $wp_meta_boxes['dashboard']['side']['core'];
+    $backups = array(
+        'hocwp_services_news' => $side_dashboard['hocwp_services_news']
+    );
+    foreach($backups as $key => $widget) {
+        unset($side_dashboard[$key]);
+    }
+    $sorted_dashboard = array_merge($backups, $side_dashboard);
+    $wp_meta_boxes['dashboard']['side']['core'] = $sorted_dashboard;
+
+    $backup = $wp_meta_boxes['dashboard']['normal']['core']['hocwp_wordpress_release'];
+    unset($wp_meta_boxes['dashboard']['normal']['core']['hocwp_wordpress_release']);
+    $wp_meta_boxes['dashboard']['side']['core']['hocwp_wordpress_release'] = $backup;
+}
+if('vi' == $lang) add_action('wp_dashboard_setup', 'hocwp_setup_theme_wp_dashboard_setup');
+
+function hocwp_theme_dashboard_widget_wordpress_release() {
+    $feeds = array(
+        'url' => 'http://wordpress.org/news/category/releases/feed/',
+        'number' => 3
+    );
+    hocwp_dashboard_widget_cache('hocwp_wordpress_release', 'hocwp_dashboard_widget_rss_cache', $feeds);
+}
+
+function hocwp_theme_dashboard_widget_useful_links() {
+    ?>
+    <div class="rss-widget">
+        <ul>
+            <li>
+                <a target="_blank" href="http://hocwp.net/donate/" class="rss-link">Thông tin chuyển khoản</a>
+            </li>
+            <li>
+                <a target="_blank" href="http://hocwp.net/blog/wp-guides/" class="rss-link">Hướng dẫn tạo blog WordPress chi tiết</a>
+            </li>
+            <li>
+                <a target="_blank" href="http://hocwp.net/thong-tin-dich-vu/" class="rss-link">Cập nhật các thông báo, thông tin dịch vụ</a>
+            </li>
+        </ul>
+    </div>
+    <?php
+}
+
+function hocwp_theme_dashboard_widget_services_news() {
+    hocwp_dashboard_widget_cache('hocwp_services_news', 'hocwp_dashboard_widget_rss_cache', trailingslashit(HOCWP_HOMEPAGE) . 'home/feed/');
+}
+
+function hocwp_setup_theme_dashboard_primary_link() {
+    return trailingslashit(HOCWP_HOMEPAGE) . 'blog/';
+}
+if('vi' == $lang) add_filter('dashboard_primary_link', 'hocwp_setup_theme_dashboard_primary_link');
+
+function hocwp_setup_theme_dashboard_secondary_link() {
+    return trailingslashit(HOCWP_HOMEPAGE);
+}
+if('vi' == $lang) add_filter('dashboard_secondary_link', 'hocwp_setup_theme_dashboard_secondary_link');
+
+function hocwp_setup_theme_dashboard_primary_feed() {
+    return trailingslashit(HOCWP_HOMEPAGE) . 'feed/';
+}
+if('vi' == $lang) add_filter('dashboard_primary_feed', 'hocwp_setup_theme_dashboard_primary_feed');
+
+function hocwp_setup_theme_dashboard_secondary_feed() {
+    return trailingslashit(HOCWP_HOMEPAGE) . 'blog/feed/';
+}
+if('vi' == $lang) add_filter('dashboard_secondary_feed', 'hocwp_setup_theme_dashboard_secondary_feed');
+
+function hocwp_setup_theme_dashboard_primary_title() {
+    return __('Services News', 'hocwp');
+}
+if('vi' == $lang) add_filter('dashboard_primary_title', 'hocwp_setup_theme_dashboard_primary_title', 1);
+if('vi' == $lang) add_filter('dashboard_secondary_title', 'hocwp_setup_theme_dashboard_primary_title');
+
+function hocwp_setup_theme_dashboard_secondary_items() {
+    return 5;
+}
+if('vi' == $lang) add_filter('dashboard_secondary_items', 'hocwp_setup_theme_dashboard_secondary_items');
+
 function hocwp_theme_on_upgrade() {
     $version = get_option('hocwp_version');
     if(version_compare($version, HOCWP_VERSION, '<')) {
         update_option('hocwp_version', HOCWP_VERSION);
         do_action('hocwp_theme_upgrade');
     }
+    remove_meta_box('dashboard_quick_press', 'dashboard', 'side');
 }
 add_action('admin_init', 'hocwp_theme_on_upgrade');
 
@@ -411,6 +523,55 @@ function hocwp_setup_theme_new_post_type_and_taxonomy() {
     }
 }
 add_action('init', 'hocwp_setup_theme_new_post_type_and_taxonomy', 0);
+
+function hocwp_setup_theme_the_content($content) {
+    $add_to_content = apply_filters('hocwp_add_to_the_content', false);
+    if($add_to_content) {
+        $backup = $content;
+        $delimiter = '</p>';
+        $paragrahps = explode($delimiter, $content);
+        $count = 1;
+        $custom = false;
+        if(hocwp_array_has_value($paragrahps)) {
+            $paragrahps = hocwp_sanitize_array($paragrahps);
+            $count_p = count($paragrahps);
+            foreach($paragrahps as $key => $value) {
+                if(trim($value)) {
+                    $paragrahps[$key] .= $delimiter;
+                    if(1 == $count) {
+                        $add = apply_filters('hocwp_add_to_the_content_after_first_paragraph', '');
+                        if(!empty($add)) {
+                            $paragrahps[$key] .= $add;
+                            $custom = true;
+                        }
+                    } elseif(2 == $count) {
+                        $add = apply_filters('hocwp_add_to_the_content_after_second_paragraph', '');
+                        if(!empty($add)) {
+                            $paragrahps[$key] .= $add;
+                            $custom = true;
+                        }
+                    }
+                    if($count == ($count_p - 1)) {
+                        $add = apply_filters('hocwp_add_to_the_content_before_last_paragraph', '');
+                        if(!empty($add)) {
+                            $paragrahps[$key] .= $add;
+                            $custom = true;
+                        }
+                    }
+                    $count++;
+                } else {
+                    $count_p--;
+                }
+            }
+            if($custom) {
+                $content = implode('', $paragrahps);
+            }
+            $content = apply_filters('hocwp_custom_the_content', $content, $backup);
+        }
+    }
+    return $content;
+}
+add_filter('the_content', 'hocwp_setup_theme_the_content');
 
 function hocwp_setup_theme_add_default_sidebars() {
     $added = (bool)get_option('hocwp_default_sidebars_added');

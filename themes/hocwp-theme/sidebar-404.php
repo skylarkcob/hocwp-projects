@@ -1,16 +1,7 @@
 <?php
 if(!function_exists('add_filter')) exit;
 $sidebar = '404';
-if(!is_active_sidebar($sidebar)) {
-    $sidebar = 'page';
-}
-if(!is_active_sidebar($sidebar)) {
-    $sidebar = 'secondary';
-}
-if(!is_active_sidebar($sidebar)) {
-    $sidebar = 'primary';
-}
-if(is_active_sidebar($sidebar)) :
+if(is_active_sidebar($sidebar)) {
     do_action('hocwp_before_sidebar');
     do_action('hocwp_before_404_sidebar');
     ?>
@@ -26,4 +17,6 @@ if(is_active_sidebar($sidebar)) :
     <?php
     do_action('hocwp_after_404_sidebar');
     do_action('hocwp_after_sidebar');
-endif; ?>
+} else {
+    get_sidebar('page');
+}

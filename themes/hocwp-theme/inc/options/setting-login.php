@@ -9,8 +9,13 @@ $option->set_parent_slug($parent_slug);
 $option->set_use_style_and_script(true);
 $option->set_use_media_upload(true);
 $option->add_field(array('id' => 'logo', 'title' => __('Logo', 'hocwp'), 'field_callback' => 'hocwp_field_media_upload'));
+$option->add_field(array('id' => 'login_with_email', 'title' => __('Login With Email', 'hocwp'), 'label' => __('Allow user to login with registered email address?', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox'));
 $option->add_field(array('id' => 'users_can_register', 'title' => __('Membership', 'hocwp'), 'label' => __('Anyone can register', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox', 'value' => hocwp_users_can_register()));
 $option->add_field(array('id' => 'use_captcha', 'title' => __('Captcha', 'hocwp'), 'label' => __('Protect your site against bots by using captcha', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox'));
+
+$option->add_section(array('id' => 'social_login', 'title' => __('Social Login', 'hocwp'), 'description' => __('Allow user to login with social account.', 'hocwp')));
+$option->add_field(array('id' => 'login_with_facebook', 'title' => __('Facebook', 'hocwp'), 'label' => __('Check here to allow user connects with Facebook account.', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox', 'section' => 'social_login'));
+$option->add_field(array('id' => 'login_with_google', 'title' => __('Google', 'hocwp'), 'label' => __('Check here to allow user connects with Google account.', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox', 'section' => 'social_login'));
 
 $option->add_option_tab($hocwp_tos_tabs);
 $option->set_page_header_callback('hocwp_theme_option_form_before');
@@ -33,3 +38,8 @@ function hocwp_option_user_login_update($input) {
 	}
 }
 add_action('hocwp_sanitize_' . $option->get_option_name_no_prefix() . '_option', 'hocwp_option_user_login_update');
+
+function hocwp_allow_user_login_with_email() {
+	$options = get_option('hocwp_user_login');
+	return apply_filters('hocwp_allow_user_login_with_email', (bool)hocwp_get_value_by_key($options, 'login_with_email'));
+}

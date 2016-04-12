@@ -24,6 +24,7 @@ require(HOCWP_THEME_INC_PATH . '/options/setting-reading.php');
 require(HOCWP_THEME_INC_PATH . '/options/setting-discussion.php');
 require(HOCWP_THEME_INC_PATH . '/options/setting-permalink.php');
 require(HOCWP_THEME_INC_PATH . '/options/setting-utilities.php');
+require(HOCWP_THEME_INC_PATH . '/options/setting-geo.php');
 require(HOCWP_THEME_INC_PATH . '/options/setting-theme-license.php');
 require(HOCWP_THEME_INC_PATH . '/options/setting-maintenance.php');
 require(HOCWP_THEME_INC_PATH . '/options/setting-recommend-plugin.php');

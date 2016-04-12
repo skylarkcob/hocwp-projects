@@ -26,6 +26,7 @@ $option->add_field(array('id' => 'rss_url', 'title' => __('RSS URL', 'hocwp')));
 $option->add_field(array('id' => 'addthis_id', 'title' => __('AddThis ID', 'hocwp'), 'section' => 'account'));
 $option->add_field(array('id' => 'fbadminapp', 'title' => __('Facebook App ID', 'hocwp'), 'section' => 'facebook', 'value' => hocwp_get_wpseo_social_value('fbadminapp')));
 $option->add_field(array('id' => 'google_api_key', 'title' => __('Google API Key', 'hocwp'), 'section' => 'google'));
+$option->add_field(array('id' => 'google_client_id', 'title' => __('Google Client ID', 'hocwp'), 'section' => 'google'));
 
 $option->add_option_tab($hocwp_tos_tabs);
 $option->set_page_header_callback('hocwp_theme_option_form_before');
