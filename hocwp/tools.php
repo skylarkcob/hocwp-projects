@@ -178,6 +178,7 @@ function hocwp_register_post_type_news($args = array()) {
         'name' => __('News', 'hocwp'),
         'slug' => $slug,
         'post_type' => 'news',
+        'show_in_admin_bar' => true,
         'supports' => array('editor', 'thumbnail', 'comments')
     );
     $args = wp_parse_args($args, $defaults);

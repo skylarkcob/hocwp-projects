@@ -10,7 +10,7 @@ function hocwp_dashboard_widget_loading() {
 function hocwp_dashboard_widget_cache($widget_id, $callback, $args = array()) {
     $loading = hocwp_dashboard_widget_loading();
     $locale = get_locale();
-    $cache_key = 'dash_' . md5($widget_id . '_' . $locale);
+    $cache_key = 'hocwp_dashboard_' . md5($widget_id . '_' . $locale);
     if(false !== ($output = get_transient($cache_key)) && !empty($output)) {
         echo $output;
         return true;
@@ -40,7 +40,12 @@ function hocwp_dashboard_widget_rss_cache($args = array()) {
         $url = $args['url'];
     }
     if(!empty($url)) {
-        $rss = hocwp_get_feed_items(array('url' => $url));
+        $number = hocwp_get_value_by_key($args, 'number');
+        $feed_args = array('url' => $url);
+        if(hocwp_id_number_valid($number)) {
+            $feed_args['number'] = $number;
+        }
+        $rss = hocwp_get_feed_items($feed_args);
         if(is_wp_error($rss)) {
             $error_code = $rss->get_error_code();
             if('feed_down' === $error_code) {
@@ -59,6 +64,7 @@ function hocwp_dashboard_widget_rss_cache($args = array()) {
                 $a = new HOCWP_HTML('a');
                 $a->set_href($item['permalink']);
                 $a->set_text($item['title']);
+                $a->set_attribute('target', '_blank');
                 $li->set_text($a->build());
                 $li->output();
             }
@@ -152,8 +158,12 @@ function hocwp_get_feed_items($args = array()) {
     if(empty($url)) {
         return '';
     }
+    $number = hocwp_get_value_by_key($args, 'number');
     $expiration = hocwp_get_value_by_key($args, 'expiration', 12 * HOUR_IN_SECONDS);
     $transient_name = 'hocwp_fetch_feed_' . md5($url);
+    if(hocwp_id_number_valid($number)) {
+        $transient_name .= '_' . $number;
+    }
     if(false === ($result = get_transient($transient_name))) {
         $items = hocwp_fetch_feed($args);
         if(hocwp_array_has_value($items)) {

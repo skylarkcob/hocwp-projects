@@ -586,6 +586,8 @@ function hocwp_classifieds_pre_get_posts(WP_Query $query) {
 				);
 				hocwp_query_sanitize_tax_query($tax_item, $tax_query);
 			}
+			unset($query->query['salary']);
+			unset($query->query_vars['salary']);
 			if(hocwp_id_number_valid($salary)) {
 				$tax_item = array(
 					'taxonomy' => 'salary',

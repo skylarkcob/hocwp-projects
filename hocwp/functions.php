@@ -812,6 +812,13 @@ function hocwp_sanitize_form_post($key, $type) {
     }
 }
 
+function hocwp_trim_array_item($item) {
+    if(is_string($item)) {
+        $item = trim($item);
+    }
+    return $item;
+}
+
 function hocwp_sanitize_array($arr, $unique = true, $filter = true) {
     if(!is_array($arr)) {
         $arr = (array)$arr;
@@ -820,6 +827,7 @@ function hocwp_sanitize_array($arr, $unique = true, $filter = true) {
         $arr = hocwp_array_unique($arr);
     }
     if($filter && is_array($arr)) {
+        $arr = array_map('hocwp_trim_array_item', $arr);
         $keys = array_keys($arr, '', true);
         if(hocwp_array_has_value($keys)) {
             foreach($keys as $key) {
