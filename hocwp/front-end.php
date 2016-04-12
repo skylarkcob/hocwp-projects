@@ -8,7 +8,7 @@ function hocwp_breadcrumb($args = array()) {
         yoast_breadcrumb('<nav class="hocwp-breadcrumb breadcrumb yoast clearfix">' . $before, $after . '</nav>');
         return;
     }
-    global $post, $wp_query;
+    global $post;
     $separator = isset($args['separator']) ? $args['separator'] : '/';
     $breadcrums_id = isset($args['id']) ? $args['id'] : 'hocwp_breadcrumbs';
     $home_title = __('Home', 'hocwp');
@@ -22,7 +22,6 @@ function hocwp_breadcrumb($args = array()) {
         echo '<li class="separator separator-home"> ' . $separator . ' </li>';
         if(is_post_type_archive()) {
             echo '<li class="item-current item-archive"><strong class="bread-current bread-archive">' . post_type_archive_title('', false) . '</strong></li>';
-
         } elseif(is_archive() && is_tax() && !is_category()) {
             $post_type = get_post_type();
             if($post_type != 'post') {
@@ -33,9 +32,12 @@ function hocwp_breadcrumb($args = array()) {
                     echo '<li class="separator"> ' . $separator . ' </li>';
                 }
             }
-            $custom_tax_name = get_queried_object()->name;
-            echo '<li class="item-current item-archive"><strong class="bread-current bread-archive">' . $custom_tax_name . '</strong></li>';
-
+            if(is_search()) {
+                echo '<li class="item-current item-current-' . get_search_query() . '"><strong class="bread-current bread-current-' . get_search_query() . '" title="Search results for: ' . get_search_query() . '">Search results for: ' . get_search_query() . '</strong></li>';
+            } else {
+                $custom_tax_name = get_queried_object()->name;
+                echo '<li class="item-current item-archive"><strong class="bread-current bread-archive">' . $custom_tax_name . '</strong></li>';
+            }
         } elseif(is_single()) {
             $post_type = get_post_type();
             if($post_type != 'post') {
@@ -78,10 +80,8 @@ function hocwp_breadcrumb($args = array()) {
             } else {
                 echo '<li class="item-current item-' . $post->ID . '"><strong class="bread-current bread-' . $post->ID . '" title="' . get_the_title() . '">' . get_the_title() . '</strong></li>';
             }
-
         } elseif(is_category()) {
             echo '<li class="item-current item-cat"><strong class="bread-current bread-cat">' . single_cat_title('', false) . '</strong></li>';
-
         } elseif(is_page()) {
             if($post->post_parent) {
                 $anc = get_post_ancestors($post->ID);
@@ -97,7 +97,6 @@ function hocwp_breadcrumb($args = array()) {
             } else {
                 echo '<li class="item-current item-' . $post->ID . '"><strong class="bread-current bread-' . $post->ID . '"> ' . get_the_title() . '</strong></li>';
             }
-
         } elseif(is_tag()) {
             $term_id = get_query_var('tag_id');
             $taxonomy = 'post_tag';
@@ -132,6 +131,28 @@ function hocwp_breadcrumb($args = array()) {
         echo '</ul>';
         echo '</div>';
     }
+}
+
+function hocwp_facebook_login_button() {
+    ?>
+    <button type="button" data-action="login-facebook" onclick="hocwp_facebook_login();" class="btn-facebook btn-social-login btn btn-large">
+        <svg class="flicon-facebook flip-icon" viewBox="0 0 256 448" height="448" width="256" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" version="1.1">
+            <path d="M239.75 3v66h-39.25q-21.5 0-29 9t-7.5 27v47.25h73.25l-9.75 74h-63.5v189.75h-76.5v-189.75h-63.75v-74h63.75v-54.5q0-46.5 26-72.125t69.25-25.625q36.75 0 57 3z"/>
+        </svg>
+        <span><?php hocwp_text('Đăng nhập bằng Facebook', __('Login with Facebook', 'hocwp')); ?></span>
+    </button>
+    <?php
+}
+
+function hocwp_google_login_button() {
+    ?>
+    <button type="button" data-action="login-google" onclick="hocwp_google_login();" class="btn-google btn-social-login btn btn-large">
+        <svg class="flicon-google flip-icon" viewBox="0 0 30 28" height="448" width="256" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" version="1.1">
+            <path d="M 17.471,2c0,0-6.28,0-8.373,0C 5.344,2, 1.811,4.844, 1.811,8.138c0,3.366, 2.559,6.083, 6.378,6.083 c 0.266,0, 0.524-0.005, 0.776-0.024c-0.248,0.475-0.425,1.009-0.425,1.564c0,0.936, 0.503,1.694, 1.14,2.313 c-0.481,0-0.945,0.014-1.452,0.014C 3.579,18.089,0,21.050,0,24.121c0,3.024, 3.923,4.916, 8.573,4.916 c 5.301,0, 8.228-3.008, 8.228-6.032c0-2.425-0.716-3.877-2.928-5.442c-0.757-0.536-2.204-1.839-2.204-2.604 c0-0.897, 0.256-1.34, 1.607-2.395c 1.385-1.082, 2.365-2.603, 2.365-4.372c0-2.106-0.938-4.159-2.699-4.837l 2.655,0 L 17.471,2z M 14.546,22.483c 0.066,0.28, 0.103,0.569, 0.103,0.863c0,2.444-1.575,4.353-6.093,4.353 c-3.214,0-5.535-2.034-5.535-4.478c0-2.395, 2.879-4.389, 6.093-4.354c 0.75,0.008, 1.449,0.129, 2.083,0.334 C 12.942,20.415, 14.193,21.101, 14.546,22.483z M 9.401,13.368c-2.157-0.065-4.207-2.413-4.58-5.246 c-0.372-2.833, 1.074-5.001, 3.231-4.937c 2.157,0.065, 4.207,2.338, 4.58,5.171 C 13.004,11.189, 11.557,13.433, 9.401,13.368zM 26,8L 26,2L 24,2L 24,8L 18,8L 18,10L 24,10L 24,16L 26,16L 26,10L 32,10L 32,8 z"/>
+        </svg>
+        <span><?php hocwp_text('Đăng nhập bằng Google', __('Login with Google', 'hocwp')); ?></span>
+    </button>
+    <?php
 }
 
 function hocwp_entry_meta_terms($args = array()) {

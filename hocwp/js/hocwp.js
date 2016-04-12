@@ -1,5 +1,5 @@
 /**
- * Last updated: 23/03/2016
+ * Last updated: 29/03/2016
  */
 
 window.wp = window.wp || {};
@@ -23,7 +23,6 @@ hocwp.media_items = {};
 
 jQuery(document).ready(function($) {
     'use strict';
-
     var $body = $('body');
 
     hocwp.getParamByName = function(url, name) {
@@ -125,6 +124,72 @@ jQuery(document).ready(function($) {
         setTimeout(refresh, delay_time);
     };
 
+    hocwp.autoReloadPage = function(delay_time) {
+        delay_time = delay_time || 2000;
+        var time = new Date().getTime();
+        function refresh() {
+            if(new Date().getTime() - time >= delay_time) {
+                window.location.reload(true);
+            } else {
+                setTimeout(refresh, 1000);
+            }
+        }
+        setTimeout(refresh, 1000);
+    };
+
+    hocwp.debugLog = function(object) {
+        var data = JSON.stringify(object);
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            url: hocwp.ajax_url,
+            data: {
+                action: 'hocwp_debug_log',
+                object: data
+            },
+            success: function(response){
+
+            }
+        });
+    };
+
+    hocwp.limitUploadFile = function($element) {
+        $element.on('change', function() {
+            var count_file = $element.get(0).files.length,
+                max_file = parseInt($element.attr('data-max')),
+                object = this,
+                $image_preview = $element.next();
+            if(!$.isNumeric(max_file)) {
+                max_file = -1;
+            }
+            if(max_file > 0 && count_file > max_file) {
+                alert('Bạn không được chọn quá ' + max_file + ' tập tin.');
+                $element.val('');
+                return false;
+            }
+            if($image_preview.length) {
+                $image_preview.empty();
+                if(typeof (FileReader) != "undefined") {
+                    for(var i = 0; i < count_file; i++) {
+                        var reader = new FileReader(),
+                            file_name = object.files.item(i).name;
+                        reader.onload = function(e) {
+                            var $image = $('<img>', {
+                                src: e.target.result,
+                                class: 'thumb-image',
+                                alt: ''
+                            });
+                            $image.appendTo($image_preview);
+                        };
+                        $image_preview.show();
+                        reader.readAsDataURL($element.get(0).files[i]);
+                    }
+
+                }
+            }
+        });
+    };
+
     hocwp.setCookie = function(cname, cvalue, exmin) {
         var d = new Date();
         d.setTime(d.getTime() + (exmin * 60 * 1000));
@@ -177,7 +242,7 @@ jQuery(document).ready(function($) {
 
     hocwp.addDefaultQuicktagButton = function() {
         var $quicktags_toolbar = $body.find('.quicktags-toolbar');
-        if($quicktags_toolbar.length) {
+        if(!$body.hasClass('front-end') && $quicktags_toolbar.length && $quicktags_toolbar.attr('id') == 'ed_toolbar') {
             QTags.addButton('hr', 'hr', '\n<hr>\n', '', 'h', 'Horizontal rule line', 30);
             QTags.addButton('dl', 'dl', '<dl>\n', '</dl>\n\n', 'd', 'HTML Description List Element', 100);
             QTags.addButton('dt', 'dt', '\t<dt>', '</dt>\n', '', 'HTML Definition Term Element', 101);
@@ -469,6 +534,34 @@ jQuery(document).ready(function($) {
         value = JSON.stringify(value);
         $input_result.val(value);
         return value;
+    };
+
+    hocwp.administrativeBoundaries = function($element, child_name, $container) {
+        $container = $container || $element.closest('form');
+        var $form = $container,
+            $child = $form.find('select[name=' + child_name + ']'),
+            $default = $child.find('option[value=0]'),
+            element_name = $element.attr('name');
+        if($child.length) {
+            if(!$default.length) {
+                $default = $child.find('option[value=""]')
+            }
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: hocwp.ajax_url,
+                data: {
+                    action: 'hocwp_fetch_administrative_boundaries',
+                    parent: $element.val(),
+                    taxonomy: 'category',
+                    type: element_name,
+                    default: $default.prop('outerHTML')
+                },
+                success: function(response){
+                    $child.html(response.html_data);
+                }
+            });
+        }
     };
 });
 
@@ -993,6 +1086,211 @@ jQuery(document).ready(function($) {
 });
 
 jQuery(document).ready(function($) {
+    var $body = $('body');
+    function GoogleMaps(element, options) {
+        this.self = this;
+        this.$element = $(element);
+        if(!this.$element.length || !$body.hasClass('hocwp-google-maps')) {
+            return false;
+        }
+        this.element = element;
+        this.options = $.extend({}, GoogleMaps.DEFAULTS, options);
+        this._defaults = GoogleMaps.DEFAULTS;
+        this._name = GoogleMaps.NAME;
+        this.init();
+        var $element = this.$element,
+            $google_maps = $body.find('#google_maps'),
+            $geo_address = $body.find('.hocwp-geo-address'),
+            $province = $body.find('select[name=province]'),
+            $category_list = $('.classifieds.hocwp-google-maps #categorychecklist'),
+            lat_long = new google.maps.LatLng($element.attr('data-lat'), $element.attr('data-long')),
+            map_options = {
+                zoom: parseInt($element.attr('data-zoom')),
+                center: lat_long,
+                scrollwheel: $element.attr('data-scrollwheel')
+            },
+            map = new google.maps.Map(document.getElementById($element.attr('id')), map_options),
+            marker = new google.maps.Marker({
+                position: lat_long,
+                map: map,
+                draggable: true,
+                title: $element.attr('data-marker-title')
+            }),
+            point = marker.getPosition();
+        google.maps.event.addListener(marker, 'dragend', function(event) {
+            point = marker.getPosition();
+            map.panTo(point);
+            if($google_maps.length) {
+                $google_maps.val(JSON.stringify(point));
+            }
+            $element.attr('data-lat', point.lat);
+            $element.attr('data-long', point.lng);
+        });
+        var geocoder = new google.maps.Geocoder();
+        if($geo_address.length) {
+            $geo_address.on('change', function(e) {
+                e.preventDefault();
+                if($.trim($geo_address.val())) {
+                    if(geocoder == null) {
+                        geocoder = new google.maps.Geocoder();
+                    }
+                    geocoder.geocode({address: $geo_address.val()}, function(results, status) {
+                        if(status == google.maps.GeocoderStatus.OK) {
+                            var bounds = results[0].geometry.bounds;
+                            if(bounds) {
+                                map.fitBounds(bounds);
+                                map.setZoom(14);
+                                lat_long = new google.maps.LatLng(results[0].geometry.location.lat(), results[0].geometry.location.lng());
+                                marker.setPosition(lat_long);
+                                point = marker.getPosition();
+                                if($google_maps.length) {
+                                    $google_maps.val(JSON.stringify(point));
+                                }
+                                map.setCenter(point);
+                                google.maps.event.addListener(marker, 'dragend', function(event) {
+                                    point = marker.getPosition();
+                                    map.panTo(point);
+                                    if($google_maps.length) {
+                                        $google_maps.val(JSON.stringify(point));
+                                    }
+                                    $element.attr('data-lat', point.lat);
+                                    $element.attr('data-long', point.lng);
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        }
+        if($category_list.length) {
+            $category_list.find('input[type="checkbox"]').on('change', function(e) {
+                e.preventDefault();
+                var $input_category = $(this);
+                if($input_category.is(':checked')) {
+                    if(geocoder == null) {
+                        geocoder = new google.maps.Geocoder();
+                    }
+                    if(!$.trim($geo_address.val())) {
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'json',
+                            url: hocwp.ajax_url,
+                            data: {
+                                action: 'hocwp_get_term_administrative_boundaries_address',
+                                term_id: $input_category.val(),
+                                taxonomy: 'category'
+                            },
+                            success: function(response){
+                                if($.trim(response.address)) {
+                                    geocoder.geocode({address: response.address}, function(results, status) {
+                                        if(status == google.maps.GeocoderStatus.OK) {
+                                            var bounds = results[0].geometry.bounds;
+                                            if(bounds) {
+                                                map.fitBounds(bounds);
+                                                map.setZoom(14);
+                                                lat_long = new google.maps.LatLng(results[0].geometry.location.lat(), results[0].geometry.location.lng());
+                                                marker.setPosition(lat_long);
+                                                point = marker.getPosition();
+                                                if($google_maps.length) {
+                                                    $google_maps.val(JSON.stringify(point));
+                                                }
+                                                map.setCenter(point);
+                                                google.maps.event.addListener(marker, 'dragend', function(event) {
+                                                    point = marker.getPosition();
+                                                    map.panTo(point);
+                                                    if($google_maps.length) {
+                                                        $google_maps.val(JSON.stringify(point));
+                                                    }
+                                                    $element.attr('data-lat', point.lat);
+                                                    $element.attr('data-long', point.lng);
+                                                });
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        }
+        if($province.length) {
+            var $district = $body.find('select[name=district]'),
+                $ward = $body.find('select[name=ward]'),
+                $street = $body.find('select[name=street]');
+            $province.add($district).add($ward).add($street).on('change', function(e) {
+                e.preventDefault();
+                var term_id = $(this).val();
+                if($.isNumeric(term_id) && term_id > 0) {
+                    if(geocoder == null) {
+                        geocoder = new google.maps.Geocoder();
+                    }
+                    if(!$.trim($geo_address.val())) {
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'json',
+                            url: hocwp.ajax_url,
+                            data: {
+                                action: 'hocwp_get_term_administrative_boundaries_address',
+                                term_id: term_id,
+                                taxonomy: 'category'
+                            },
+                            success: function(response){
+                                if($.trim(response.address)) {
+                                    geocoder.geocode({address: response.address}, function(results, status) {
+                                        if(status == google.maps.GeocoderStatus.OK) {
+                                            var bounds = results[0].geometry.bounds;
+                                            if(bounds) {
+                                                map.fitBounds(bounds);
+                                                map.setZoom(14);
+                                                lat_long = new google.maps.LatLng(results[0].geometry.location.lat(), results[0].geometry.location.lng());
+                                                marker.setPosition(lat_long);
+                                                point = marker.getPosition();
+                                                if($google_maps.length) {
+                                                    $google_maps.val(JSON.stringify(point));
+                                                }
+                                                map.setCenter(point);
+                                                google.maps.event.addListener(marker, 'dragend', function(event) {
+                                                    point = marker.getPosition();
+                                                    map.panTo(point);
+                                                    if($google_maps.length) {
+                                                        $google_maps.val(JSON.stringify(point));
+                                                    }
+                                                    $element.attr('data-lat', point.lat);
+                                                    $element.attr('data-long', point.lng);
+                                                });
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    }
+
+    GoogleMaps.NAME = 'hocwp.googleMaps';
+
+    GoogleMaps.DEFAULTS = {
+
+    };
+
+    GoogleMaps.prototype.init = function() {
+
+    };
+
+    $.fn.hocwpGoogleMaps = function(options) {
+        return this.each(function() {
+            if(!$.data(this, GoogleMaps.NAME)) {
+                $.data(this, GoogleMaps.NAME, new GoogleMaps(this, options));
+            }
+        });
+    };
+});
+
+jQuery(document).ready(function($) {
     $.fn.hocwpShow = function(show, fade) {
         var that = $(this);
         fade = fade || false;
@@ -1022,5 +1320,12 @@ jQuery(document).ready(function($) {
 jQuery(document).ready(function($) {
     (function() {
         $('.btn-insert-media').hocwpMediaUpload();
+    })();
+
+    (function() {
+        $('.hocwp-geo-address').on('input', function() {
+            $(this).addClass('user-type-address');
+            $(this).attr('data-user-type', 1);
+        });
     })();
 });

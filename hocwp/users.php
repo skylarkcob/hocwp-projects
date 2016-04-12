@@ -1,8 +1,20 @@
 <?php
 if(!function_exists('add_filter')) exit;
+
 function hocwp_get_administrators($args = array()) {
     $args['role'] = 'administrator';
     return get_users($args);
+}
+
+function hocwp_is_subscriber($user = null) {
+    if(!is_a($user, 'WP_User')) {
+        $user = wp_get_current_user();
+    }
+    $role = hocwp_get_user_role($user);
+    if('subscriber' == $role) {
+        return true;
+    }
+    return false;
 }
 
 function hocwp_get_first_admin($args = array()) {
@@ -111,6 +123,19 @@ function hocwp_get_user_viewed_posts($user_id = null) {
 function hocwp_track_user_viewed_posts() {
     $use = apply_filters('hocwp_track_user_viewed_posts', false);
     return $use;
+}
+
+function hocwp_get_user_favorite_posts($user_id) {
+    $favorite_posts = get_user_meta($user_id, 'favorite_posts', true);
+    $favorite_posts = hocwp_sanitize_array($favorite_posts);
+    return $favorite_posts;
+}
+
+function hocwp_check_user_password($password, $user) {
+    if(!is_a($user, 'WP_User')) {
+        return false;
+    }
+    return wp_check_password($password, $user->user_pass, $user->ID);
 }
 
 function hocwp_user_viewed_posts_hook() {

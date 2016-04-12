@@ -1,5 +1,75 @@
 <?php
 if(!function_exists('add_filter')) exit;
+
+function hocwp_dashboard_widget_loading() {
+    $loading = '<p class="hocwp-widget-loading widget-loading hide-if-no-js">' . __('Loading&#8230;', 'hocwp') . '</p>';
+    $loading .= '<p class="hide-if-js">' . __('This widget requires JavaScript.', 'hocwp') . '</p>';
+    return apply_filters('hocwp_dashboard_widget_loading', $loading);
+}
+
+function hocwp_dashboard_widget_cache($widget_id, $callback, $args = array()) {
+    $loading = hocwp_dashboard_widget_loading();
+    $locale = get_locale();
+    $cache_key = 'dash_' . md5($widget_id . '_' . $locale);
+    if(false !== ($output = get_transient($cache_key)) && !empty($output)) {
+        echo $output;
+        return true;
+    }
+    if(!HOCWP_DOING_AJAX) {
+        echo $loading;
+    }
+    if(hocwp_callback_exists($callback)) {
+        ob_start();
+        call_user_func($callback, $args);
+        $html_data = ob_get_clean();
+        if(!empty($html_data)) {
+            set_transient($cache_key, $html_data, 12 * HOUR_IN_SECONDS);
+        }
+    } else {
+        echo hocwp_build_message(__('Please set a valid callback for this widget!', 'hocwp'), '');
+    }
+    return true;
+}
+
+function hocwp_dashboard_widget_rss_cache($args = array()) {
+    echo '<div class="rss-widget">';
+    $url = '';
+    if(is_string($args)) {
+        $url = $args;
+    } elseif(is_array($args) && isset($args['url'])) {
+        $url = $args['url'];
+    }
+    if(!empty($url)) {
+        $rss = hocwp_get_feed_items(array('url' => $url));
+        if(is_wp_error($rss)) {
+            $error_code = $rss->get_error_code();
+            if('feed_down' === $error_code) {
+                echo '<ul><li>' . $rss->get_error_message() . '</li></ul>';
+            } else {
+                if(is_admin() || current_user_can('manage_options')) {
+                    echo '<p>' . sprintf(__('<strong>RSS Error</strong>: %s'), $rss->get_error_message()) . '</p>';
+                }
+            }
+            return;
+        }
+        if(hocwp_array_has_value($rss)) {
+            echo '<ul>';
+            foreach($rss as $item) {
+                $li = new HOCWP_HTML('li');
+                $a = new HOCWP_HTML('a');
+                $a->set_href($item['permalink']);
+                $a->set_text($item['title']);
+                $li->set_text($a->build());
+                $li->output();
+            }
+            echo '</ul>';
+        }
+    } else {
+        echo hocwp_build_message(__('Please set a valid feed url for this widget!', 'hocwp'), '');
+    }
+    echo '</div>';
+}
+
 function hocwp_wrap_tag($text, $tag, $class = '') {
     if(empty($text)) {
         return $text;
@@ -12,8 +82,133 @@ function hocwp_wrap_tag($text, $tag, $class = '') {
     return $html->build();
 }
 
+function hocwp_fetch_feed($args = array()) {
+    $number = absint(hocwp_get_value_by_key($args, 'number', 5));
+    $offset = hocwp_get_value_by_key($args, 'offset', 0);
+    $url = hocwp_get_value_by_key($args, 'url');
+    if(empty($url)) {
+        return '';
+    }
+    if(!function_exists('fetch_feed')) {
+        include_once(ABSPATH . WPINC . '/feed.php');
+    }
+    $rss = fetch_feed($url);
+    if(!is_wp_error($rss)) {
+        if(!$rss->get_item_quantity()) {
+            $error = new WP_Error('feed_down', __('An error has occurred, which probably means the feed is down. Try again later.'));
+            $rss->__destruct();
+            unset($rss);
+            return $error;
+        }
+        $max = $rss->get_item_quantity($number);
+        $result = $rss->get_items($offset, $max);
+
+    } else {
+        $result = $rss;
+    }
+    return $result;
+}
+
+function hocwp_dashboard_widget_script() {
+    ?>
+    <script type="text/javascript">
+        jQuery(document).ready(function($) {
+            var $hocwp_widget_loading = $('.index-php div.inside:visible .hocwp-widget-loading'),
+                ajax_url = '<?php echo admin_url('admin-ajax.php'); ?>';
+            $hocwp_widget_loading.each(function(i, el) {
+                var $element = $(el),
+                    $post_box = $element.closest('.postbox'),
+                    $parent = $element.parent(),
+                    widget_id = '';
+                if($post_box.length) {
+                    widget_id = $post_box.attr('id');
+                }
+                if($.trim(widget_id)) {
+                    $.ajax({
+                        type: 'POST',
+                        dataType: 'json',
+                        url: ajax_url,
+                        data: {
+                            action: 'hocwp_dashboard_widget',
+                            widget: widget_id
+                        },
+                        success: function(response){
+                            if(response.html_data) {
+                                $parent.html('');
+                                $parent.hide().slideDown();
+                                $parent.html(response.html_data);
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+    <?php
+}
+
+function hocwp_get_feed_items($args = array()) {
+    $url = hocwp_get_value_by_key($args, 'url');
+    if(empty($url)) {
+        return '';
+    }
+    $expiration = hocwp_get_value_by_key($args, 'expiration', 12 * HOUR_IN_SECONDS);
+    $transient_name = 'hocwp_fetch_feed_' . md5($url);
+    if(false === ($result = get_transient($transient_name))) {
+        $items = hocwp_fetch_feed($args);
+        if(hocwp_array_has_value($items)) {
+            $result = array();
+            foreach($items as $item) {
+                if(!hocwp_object_valid($item)) {
+                    continue;
+                }
+                $description = $item->get_description();
+                $thumbnail = hocwp_get_first_image_source($description);
+                $description = wp_strip_all_tags($description);
+                $content = $item->get_content();
+                if(empty($thumbnail)) {
+                    $thumbnail = hocwp_get_first_image_source($content);
+                }
+                $value = array(
+                    'permalink' => $item->get_permalink(),
+                    'title' => $item->get_title(),
+                    'date' => $item->get_date(),
+                    'image_url' => $thumbnail,
+                    'description' => $description,
+                    'content' => $content
+                );
+                array_push($result, $value);
+            }
+            if(hocwp_array_has_value($result)) {
+                set_transient($transient_name, $result, $expiration);
+            }
+        } else {
+            return $items;
+        }
+    }
+    return $result;
+}
+
+function hocwp_read_xml($xml, $is_url = false) {
+    if($is_url) {
+        $transient_name = 'hocwp_read_xml_' . md5($xml);
+        if(false === ($saved = get_transient($transient_name))) {
+            $saved = @file_get_contents($xml);
+            set_transient($transient_name, $saved, HOUR_IN_SECONDS);
+        }
+        $xml = $saved;
+    }
+    $object = new SimpleXMLElement($xml);
+    return $object;
+}
+
 function hocwp_build_message($message, $type = 'info') {
-    return '<p class="alert alert-' . $type . '">' . $message . '</p>';
+    $p = new HOCWP_HTML('p');
+    if(!empty($type)) {
+        $p->set_class('text-left alert alert-' . $type);
+    }
+    $p->set_text($message);
+    return $p->build();
 }
 
 function hocwp_generate_reset_key() {
@@ -45,6 +240,35 @@ function hocwp_loading_image($args = array()) {
     $img->output();
 }
 
+function hocwp_get_allowed_image_mime_types() {
+    $types = get_allowed_mime_types();
+    $result = array();
+    foreach($types as $key => $text) {
+        if(false !== strpos($text, 'image')) {
+            $result[$key] = $text;
+        }
+    }
+    return $result;
+}
+
+function hocwp_auto_reload_script($delay = 2000) {
+    ?>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var time = new Date().getTime();
+            function refresh() {
+                if(new Date().getTime() - time >= <?php echo $delay; ?>) {
+                    window.location.href = window.location.href;
+                } else {
+                    setTimeout(refresh, 1000);
+                }
+            }
+            setTimeout(refresh, 1000);
+        });
+    </script>
+    <?php
+}
+
 function hocwp_get_sidebar_info($post) {
     $post_id = $post->ID;
     $active = (bool)hocwp_get_post_meta('active', $post_id);
@@ -59,6 +283,9 @@ function hocwp_get_sidebar_info($post) {
     }
     $sidebar_description = hocwp_get_post_meta('sidebar_description', $post_id);
     $sidebar_tag = hocwp_get_post_meta('sidebar_tag', $post_id);
+    if(empty($sidebar_tag)) {
+        $sidebar_tag = 'div';
+    }
     $args = array(
         'id' => hocwp_sanitize_id($sidebar_id),
         'name' => strip_tags($sidebar_name),
@@ -111,6 +338,11 @@ function hocwp_change_tag_attribute($tag, $attr, $value) {
     return $tag;
 }
 
+function hocwp_add_html_attribute($tag, $html, $attribute) {
+    $html = preg_replace('^' . preg_quote('<' . $tag . ' ') . '^', '<' . $tag . ' ' . $attribute . ' ', $html);
+    return $html;
+}
+
 function hocwp_replace_text_placeholder($text) {
     remove_filter('hocwp_replace_text_placeholder', 'hocwp_replace_text_placeholder');
     $text = apply_filters('hocwp_replace_text_placeholder', $text);
@@ -133,6 +365,11 @@ function hocwp_replace_text_placeholder($text) {
     $placeholder_replace = apply_filters('hocwp_text_placeholders_replace', $placeholder_replace);
     $text = str_replace($text_placeholders, $placeholder_replace, $text);
     return $text;
+}
+
+function hocwp_redirect_home() {
+    wp_redirect(home_url('/'));
+    exit;
 }
 
 function hocwp_percentage($val1, $val2, $precision = 0) {
@@ -627,8 +864,8 @@ function hocwp_loop_plugin_card($plugin, $allow_tags = array(), $base_name = '')
         $description = strip_tags($local_plugin['Description']);
         $description = str_replace(' By HocWP.', '', $description);
         $action_links = array();
-        $version = wp_kses($local_plugin['Version'], $allow_tags);
-        $name = strip_tags($title . ' ' . $version);
+        //$version = wp_kses($local_plugin['Version'], $allow_tags);
+        //$name = strip_tags($title . ' ' . $version);
         $author = wp_kses($local_plugin['Author'], $allow_tags);
         if(!empty($author)) {
             $author = ' <cite>' . sprintf(__('By %s'), $author) . '</cite>';

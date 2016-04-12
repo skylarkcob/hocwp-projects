@@ -591,6 +591,9 @@ class HOCWP_Option {
             unset($args['class']);
             if(!isset($args['value'])) {
                 $value = $this->get_by_key($name, hocwp_get_value_by_key($args, 'default'));
+                if(is_array($value) && 'hocwp_field_input' == $callback) {
+                    $value = '';
+                }
                 $args['value'] = $value;
             }
             if('hocwp_field_size' == $callback || 'hocwp_field_input_size' == $callback) {
@@ -624,6 +627,9 @@ class HOCWP_Option {
                     }
                     if(!isset($option['value'])) {
                         $value = $this->get_by_key($name, hocwp_get_value_by_key($option, 'default'));
+                        if(is_array($value) && 'hocwp_field_input' == $callback) {
+                            $value = '';
+                        }
                         $option['value'] = $value;
                     }
                     $option['name'] = $this->get_field_name($name);

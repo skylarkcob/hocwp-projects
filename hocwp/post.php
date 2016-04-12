@@ -213,7 +213,16 @@ function hocwp_get_pages($args = array()) {
 function hocwp_get_pages_by_template($template_name, $args = array()) {
     $args['meta_key'] = '_wp_page_template';
     $args['meta_value'] = $template_name;
-    return hocwp_get_pages($args);
+    $result = hocwp_get_pages($args);
+    $output = strtoupper(hocwp_get_value_by_key($args, 'output'));
+    if(OBJECT === $output && hocwp_array_has_value($result)) {
+        $result = array_shift($result);
+    }
+    return $result;
+}
+
+function hocwp_get_page_by_template($template_name) {
+    return hocwp_get_pages_by_template($template_name, array('output' => 'object'));
 }
 
 function hocwp_article_before($post_class = '') {
@@ -307,9 +316,12 @@ function hocwp_post_get_taxonomies($object, $output = 'names') {
     return get_object_taxonomies($object, $output);
 }
 
-function hocwp_post_get_top_parent_terms($post) {
+function hocwp_post_get_top_parent_terms($post, $taxonomy = 'any') {
     $result = array();
-    $taxonomies = hocwp_post_get_taxonomies($post);
+    $taxonomies = array($taxonomy);
+    if('any' === $taxonomy) {
+        $taxonomies = hocwp_post_get_taxonomies($post);
+    }
     foreach($taxonomies as $tax) {
         $terms = wp_get_post_terms($post->ID, $tax);
         foreach($terms as $term) {
@@ -320,6 +332,17 @@ function hocwp_post_get_top_parent_terms($post) {
         }
     }
     return $result;
+}
+
+function hocwp_post_get_first_term($post_id = null, $taxonomy = 'category') {
+    if(!hocwp_id_number_valid($post_id)) {
+        $post_id = get_the_ID();
+    }
+    $terms = wp_get_post_terms($post_id, $taxonomy);
+    if(hocwp_array_has_value($terms)) {
+        $terms = current($terms);
+    }
+    return $terms;
 }
 
 function hocwp_insert_post($args = array()) {

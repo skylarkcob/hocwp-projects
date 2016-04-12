@@ -47,8 +47,12 @@ class HOCWP_Widget_Social extends WP_Widget {
 		$option_names = $this->args['option_names'];
 		$options = hocwp_get_option('option_social');
 		$icons = $this->args['icons'];
+		$description = hocwp_get_value_by_key($instance, 'description');
 		hocwp_widget_before($args, $instance);
 		ob_start();
+		if(!empty($description)) {
+			echo hocwp_wrap_tag(wpautop($description), 'div', 'description');
+		}
 		if(hocwp_array_has_value($orders)) {
 			foreach($orders as $social) {
 				$option_name = hocwp_get_value_by_key($option_names, $social);
@@ -68,6 +72,7 @@ class HOCWP_Widget_Social extends WP_Widget {
 	public function form($instance) {
 		$title = hocwp_get_value_by_key($instance, 'title');
 		$order = hocwp_get_value_by_key($instance, 'order', hocwp_get_value_by_key($this->args, 'order'));
+		$description = hocwp_get_value_by_key($instance, 'description');
 
 		hocwp_field_widget_before($this->admin_args['class']);
 		hocwp_widget_field_title($this->get_field_id('title'), $this->get_field_name('title'), $title);
@@ -80,6 +85,14 @@ class HOCWP_Widget_Social extends WP_Widget {
 		);
 		hocwp_widget_field('hocwp_field_input_text', $args);
 
+		$args = array(
+			'id' => $this->get_field_id('description'),
+			'name' => $this->get_field_name('description'),
+			'value' => $description,
+			'label' => __('Description:', 'hocwp')
+		);
+		hocwp_widget_field('hocwp_field_textarea', $args);
+
 		hocwp_field_widget_after();
 	}
 
@@ -87,6 +100,7 @@ class HOCWP_Widget_Social extends WP_Widget {
 		$instance = $old_instance;
 		$instance['title'] = strip_tags(hocwp_get_value_by_key($new_instance, 'title'));
 		$instance['order'] = hocwp_get_value_by_key($new_instance, 'order', hocwp_get_value_by_key($this->args, 'order'));
+		$instance['description'] = hocwp_get_value_by_key($new_instance, 'description');
 		return $instance;
 	}
 }

@@ -1,5 +1,46 @@
 <?php
 if(!function_exists('add_filter')) exit;
+
+function hocwp_field_google_maps($args = array()) {
+    hocwp_field_sanitize_args($args);
+    $lat_lng = hocwp_get_default_lat_long();
+    $id = hocwp_get_value_by_key($args, 'id', 'maps_content');
+    if(empty($id)) {
+        $id = 'maps_content';
+    }
+    $address = hocwp_get_value_by_key($args, 'address');
+    $long = hocwp_get_value_by_key($args, 'long');
+    $lat = hocwp_get_value_by_key($args, 'lat');
+    $lang = hocwp_get_language();
+    $zoom = hocwp_get_value_by_key($args, 'zoom', 15);
+    $google_maps = hocwp_get_value_by_key($args, 'google_maps');
+    if(empty($long) || empty($lat)) {
+        $lat = $lat_lng['lat'];
+        $long = $lat_lng['lng'];
+        $zoom = 5;
+    }
+    if(empty($google_maps)) {
+        $google_maps = json_encode(array('lat' => $lat, 'lng' => $long));
+    }
+    $draggable = hocwp_get_value_by_key($args, 'draggable', false);
+    $marker_title = hocwp_get_value_by_key($args, 'marker_title');
+    $post_id = hocwp_get_value_by_key($args, 'post_id');
+    $scrollwheel = hocwp_get_value_by_key($args, 'scrollwheel', false);
+    if(empty($marker_title)) {
+        if('vi' == $lang) {
+            $marker_title = 'Di chuyển để tìm địa điểm!';
+        } else {
+            $marker_title = __('Drag to find address!', 'hocwp');
+        }
+    }
+    hocwp_field_before($args);
+    ?>
+    <div id="<?php echo $id; ?>" class="hocwp-field-maps" data-scrollwheel="<?php echo hocwp_bool_to_int($scrollwheel); ?>" data-post-id="<?php echo $post_id; ?>" data-zoom="<?php echo $zoom; ?>" data-marker-title="<?php echo $marker_title; ?>" data-draggable="<?php echo hocwp_bool_to_int($draggable); ?>" data-address="<?php echo $address; ?>" data-long="<?php echo $long; ?>" data-lat="<?php echo $lat; ?>" style="width: 100%; height: 350px; position: relative; background-color: rgb(229, 227, 223); overflow: hidden;"></div>
+    <?php
+    hocwp_field_input_hidden(array('id' => 'google_maps', 'label' => '', 'field_callback' => 'hocwp_field_input_hidden', 'value' => $google_maps));
+    hocwp_field_after($args);
+}
+
 function hocwp_field_before(&$args = array()) {
     //$container_class = isset($args['container_class']) ? $args['container_class'] : '';
     $before = isset($args['before']) ? $args['before'] : '';
@@ -24,10 +65,11 @@ function hocwp_field_after($args = array()) {
 }
 
 function hocwp_field_captcha($args = array()) {
+    $lang = hocwp_get_language();
     hocwp_sanitize_field_args($args);
     $captcha = new HOCWP_Captcha();
     $id = isset($args['id']) ? $args['id'] : 'hocwp_captcha';
-    $placeholder = isset($args['placeholder']) ? $args['placeholder'] : __('Enter captcha code', 'hocwp');
+    $placeholder = isset($args['placeholder']) ? $args['placeholder'] : ('vi' == $lang) ? 'Nhập mã bảo mật' : __('Enter captcha code', 'hocwp');
     $class = isset($args['class']) ? $args['class'] : '';
     $input_width = isset($args['input_width']) ? absint($args['input_width']) : 125;
     if(is_numeric($input_width) && '%' !== hocwp_get_last_char($input_width)) {
@@ -587,7 +629,7 @@ function hocwp_field_input($args) {
     if($widefat && !$right_label) {
         hocwp_add_string_with_space_before($class, 'widefat');
     }
-    $regular_text = isset($args['regular_text']) ? (bool)$args['regular_text'] : true;
+    $regular_text = isset($args['regular_text']) ? (bool)$args['regular_text'] : ($GLOBALS['pagenow'] == 'widgets.php' || defined('DOING_AJAX')) ? false : true;
     if($regular_text && !$right_label) {
         hocwp_add_string_with_space_before($class, 'regular-text');
     }
@@ -627,6 +669,43 @@ function hocwp_field_input($args) {
         $args['label'] = $label;
     }
     hocwp_field_after($args);
+}
+
+function hocwp_field_input_file($args = array()) {
+    $args['type'] = 'file';
+    $image = (bool)hocwp_get_value_by_key($args, 'image');
+    $max = hocwp_get_value_by_key($args, 'max');
+    $attributes = hocwp_get_value_by_key($args, 'attributes');
+    $attributes = hocwp_sanitize_array($attributes);
+    $multiple = hocwp_get_value_by_key($args, 'multiple');
+    $class = hocwp_get_value_by_key($args, 'class');
+    $name = hocwp_get_value_by_key($args, 'name');
+    if(empty($name)) {
+        $name = 'file_names';
+    }
+    hocwp_add_string_with_space_before($class, 'hocwp-field-upload');
+    $args['class'] = $class;
+    if($image) {
+        $attributes['accept'] = 'image/*';
+    }
+    if(hocwp_id_number_valid($max)) {
+        $attributes['data-max'] = $max;
+        if(1 < $max) {
+            $multiple = true;
+        }
+    }
+    if($multiple) {
+        $attributes['multiple'] = 'multiple';
+        if(false === strpos($name, '[]')) {
+            $name .= '[]';
+        }
+    }
+    $args['attributes'] = $attributes;
+    $after = hocwp_get_value_by_key($args, 'after');
+    $after = '<div class="image-preview"></div>' . $after;
+    $args['after'] = $after;
+    $args['name'] = $name;
+    hocwp_field_input($args);
 }
 
 function hocwp_field_input_text($args = array()) {
@@ -840,6 +919,21 @@ function hocwp_field_editor($args = array()) {
     $args['textarea_name'] = $name;
     $args['editor_class'] = $class;
     $args['textarea_rows'] = $textarea_rows;
+    $teeny = hocwp_get_value_by_key($args, 'teeny', false);
+    if($teeny) {
+        $args['tinymce'] = false;
+        $args['wpautop'] = false;
+    }
+    $toolbar = hocwp_get_value_by_key($args, 'toolbar', true);
+    if(!$toolbar) {
+        $args['quicktags'] = false;
+    }
+    $prevent_id = array(
+        'gallery'
+    );
+    if(in_array($prevent_id, $prevent_id)) {
+        $id = 'hocwp_' . $id;
+    }
     wp_editor($value, $id, $args);
     hocwp_field_after($args);
 }

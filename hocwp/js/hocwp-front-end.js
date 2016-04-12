@@ -3,6 +3,8 @@
  */
 
 jQuery(document).ready(function($) {
+    var $body = $('body');
+
     (function() {
         $('.sf-menu, .hocwp-superfish-menu > ul').each(function() {
             var $element = $(this),
@@ -40,6 +42,10 @@ jQuery(document).ready(function($) {
 
     (function() {
         $('.hocwp-go-top').hocwpScrollTop();
+    })();
+
+    (function() {
+        hocwp.limitUploadFile($('input[type="file"]'));
     })();
 
     (function() {
@@ -110,6 +116,10 @@ jQuery(document).ready(function($) {
 
     (function() {
         hocwp.iconChangeCaptchaExecute();
+    })();
+
+    (function() {
+        $('.hocwp.hocwp-google-maps .hocwp-field-maps').hocwpGoogleMaps();
     })();
 
     (function() {
@@ -314,5 +324,33 @@ jQuery(document).ready(function($) {
                 }
             });
         }
+    })();
+
+    (function() {
+        $('.hocwp').on('click', '.save-post, .favorite-post, .interest-post, .love-post', function(e) {
+            e.preventDefault();
+            if($body.hasClass('hocwp-user')) {
+                var $element = $(this),
+                    post_id = $element.attr('data-post-id');
+                $element.addClass('disabled');
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: hocwp.ajax_url,
+                    data: {
+                        action: 'hocwp_favorite_post',
+                        post_id: post_id
+                    },
+                    success: function(response){
+                        if(response.success) {
+                            $element.html(response.html_data);
+                            $element.removeClass('disabled');
+                        }
+                    }
+                });
+            } else {
+                window.location.href = hocwp.login_url;
+            }
+        });
     })();
 });

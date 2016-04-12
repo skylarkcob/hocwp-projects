@@ -18,7 +18,7 @@ class HOCWP_Remove_Term_Base {
 
 	public function set_base($base) {
 		$this->base = $base;
-		$this->set_query_var($base);
+		$this->set_query_var($this->taxonomy);
 	}
 
 	public function set_query_var($query_var) {
@@ -46,7 +46,10 @@ class HOCWP_Remove_Term_Base {
 		return $result;
 	}
 
-	public function get_taxonomy_base($taxonomy) {
+	public function get_taxonomy_base($taxonomy = null) {
+		if(empty($taxonomy)) {
+			$taxonomy = $this->taxonomy;
+		}
 		$base_slug = '';
 		if(taxonomy_exists($taxonomy)) {
 			$taxonomy = get_taxonomy($taxonomy);
@@ -56,22 +59,15 @@ class HOCWP_Remove_Term_Base {
 	}
 
 	public function add_permastructs() {
-		global $wp_rewrite;
-		$wp_rewrite->extra_permastructs[$this->taxonomy]['struct'] = '%' . $this->taxonomy . '%';
+		$this->extra_permastructs($this->taxonomy, '%' . $this->taxonomy . '%');
 	}
 
 	public function add_query_vars($query_vars) {
-		$query_vars[] = $this->query_var_redirect;
-		return $query_vars;
+		return $this->add_query_var($query_vars, $this->query_var_redirect);
 	}
 
 	public function control_request($query_vars) {
-		if(isset($query_vars[$this->query_var_redirect])) {
-			$term_name = user_trailingslashit($query_vars[$this->query_var_redirect], $this->taxonomy);
-			$term_permalink = site_url($term_name);
-			wp_redirect($term_permalink, 301);
-			exit;
-		}
+		$this->control_request_helper($this->taxonomy, $query_vars, $this->query_var_redirect);
 		return $query_vars;
 	}
 
@@ -85,16 +81,8 @@ class HOCWP_Remove_Term_Base {
 		return $termlink;
 	}
 
-	public function term_rewrite_rules() {
-		$rules = array();
-		$terms = get_terms($this->taxonomy, array('hide_empty' => false));
-		foreach($terms as $term) {
-			$rules['(' . $term->slug . ')/(?:feed/)?(feed|rdf|rss|rss2|atom)/?$'] = 'index.php?' . $this->query_var . '=$matches[1]&feed=$matches[2]';
-			$rules['(' . $term->slug . ')/page/?([0-9]{1,})/?$'] = 'index.php?' . $this->query_var . '=$matches[1]&paged=$matches[2]';
-			$rules['(' . $term->slug . ')/?$'] = 'index.php?' . $this->query_var . '=$matches[1]';
-		}
-		$tax_base = trim($this->base, '/');
-		$rules[$tax_base . '/(.*)$'] = 'index.php?' . $this->query_var_redirect . '=$matches[1]';
+	public function term_rewrite_rules($rules) {
+		$rules = $this->add_rewrite_rule($this->taxonomy, $this->get_taxonomy_base(), $this->query_var, $this->query_var_redirect, $rules);
 		return $rules;
 	}
 
@@ -119,7 +107,7 @@ class HOCWP_Remove_Term_Base {
 			add_action('init', array($this, 'add_permastructs'));
 			add_filter('query_vars', array($this, 'add_query_vars'));
 			add_filter('request', array($this, 'control_request'));
-			add_filter($this->base . '_rewrite_rules', array($this, 'term_rewrite_rules'));
+			add_filter($this->taxonomy . '_rewrite_rules', array($this, 'term_rewrite_rules'));
 			add_filter('term_link', array($this, 'term_link'), 10, 3);
 			add_action('created_' . $this->taxonomy, array($this, 'flush_rewrite_rule'));
 			add_action('edited_' . $this->taxonomy, array($this, 'flush_rewrite_rule'));

@@ -120,6 +120,10 @@ function hocwp_setup_warning_php_minimum_version() {
 }
 
 function hocwp_setup_warning_php_recommend_version() {
+    if(function_exists('hocwp_theme_license_valid') && !hocwp_theme_license_valid()) {
+        unset($_GET['activated']);
+        return;
+    }
     global $wp_version;
     $transient_name = 'hocwp_warning_php_recommend_version';
     if(false === get_transient($transient_name)) {
@@ -131,7 +135,7 @@ function hocwp_setup_warning_php_recommend_version() {
                     'title' => __('Warning', 'hocwp')
                 );
                 hocwp_admin_notice($args);
-                set_transient($transient_name, 1, HOUR_IN_SECONDS);
+                set_transient($transient_name, 1, WEEK_IN_SECONDS);
             }
         }
     }
@@ -152,6 +156,7 @@ add_filter('login_redirect', 'hocwp_setup_login_redirect', 10, 3);
 
 function hocwp_setup_script_loader_tag($tag, $handle) {
     switch($handle) {
+        case 'google-client':
         case 'recaptcha':
             $tag = str_replace(' src', ' defer async src', $tag);
             break;

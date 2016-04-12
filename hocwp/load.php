@@ -5,7 +5,7 @@ if(defined('HOCWP_PATH')) {
     return;
 }
 
-define('HOCWP_VERSION', '3.3.1');
+define('HOCWP_VERSION', '3.3.2');
 
 define('HOCWP_PATH', dirname(__FILE__));
 
@@ -31,6 +31,8 @@ define('HOCWP_MINIMUM_JQUERY_VERSION', '1.9.1');
 
 define('HOCWP_JQUERY_LATEST_VERSION', '1.11.4');
 
+define('HOCWP_TINYMCE_VERSION', '4');
+
 define('HOCWP_BOOTSTRAP_LATEST_VERSION', '3.3.6');
 
 define('HOCWP_FONTAWESOME_LATEST_VERSION', '4.5.0');
@@ -52,6 +54,8 @@ define('HOCWP_REQUIRED_HTML', '<span style="color:#FF0000">*</span>');
 define('HOCWP_PLUGIN_LICENSE_OPTION_NAME', 'hocwp_plugin_licenses');
 
 define('HOCWP_PLUGIN_LICENSE_ADMIN_URL', admin_url('admin.php?page=hocwp_plugin_license'));
+
+define('HOCWP_FACEBOOK_GRAPH_API_VERSION', '2.5');
 
 require(HOCWP_PATH . '/lib/bfi-thumb/BFI_Thumb.php');
 
@@ -136,5 +140,7 @@ require(HOCWP_PATH . '/woocommerce.php');
 require(HOCWP_PATH . '/shop.php');
 
 require(HOCWP_PATH . '/coupon.php');
+
+require(HOCWP_PATH . '/classifieds.php');
 
 require(HOCWP_PATH . '/ajax.php');

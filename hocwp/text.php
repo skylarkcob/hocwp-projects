@@ -1,6 +1,15 @@
 <?php
 if(!function_exists('add_filter')) exit;
 
+function hocwp_text($vi, $en) {
+	$lang = hocwp_get_language();
+	if('vi' == $lang) {
+		echo $vi;
+	} else {
+		echo $en;
+	}
+}
+
 function hocwp_get_text($lang, $args = array()) {
 	$text = apply_filters('hocwp_get_text', hocwp_get_value_by_key($args, $lang), $lang, $args);
 	return $text;

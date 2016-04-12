@@ -1,7 +1,29 @@
 <?php
 if(!function_exists('add_filter')) exit;
+
 function hocwp_get_term_link($term) {
-    return '<a href="' . esc_url(get_term_link($term)) . '" rel="category tag">' . $term->name.'</a>';
+    return '<a href="' . esc_url(get_term_link($term)) . '" rel="category ' . hocwp_sanitize_html_class($term->taxonomy) . ' tag">' . $term->name.'</a>';
+}
+
+function hocwp_the_terms($args = array()) {
+    $terms = hocwp_get_value_by_key($args, 'terms');
+    $before = hocwp_get_value_by_key($args, 'before');
+    $sep = hocwp_get_value_by_key($args, 'separator', ', ');
+    $after = hocwp_get_value_by_key($args, 'after');
+    if(hocwp_array_has_value($terms)) {
+        echo $before;
+        $html = '';
+        foreach($terms as $term) {
+            $html .= hocwp_get_term_link($term) . $sep;
+        }
+        $html = trim($html, $sep);
+        echo $html;
+        echo $after;
+    } else {
+        $post_id = hocwp_get_value_by_key($args, 'post_id', get_the_ID());
+        $taxonomy = hocwp_get_value_by_key($args, 'taxonomy');
+        the_terms($post_id, $taxonomy, $before, $sep, $after);
+    }
 }
 
 function hocwp_get_hierarchical_terms($taxonomies, $args = array()) {
@@ -74,7 +96,7 @@ function hocwp_term_get_name($term) {
 }
 
 function hocwp_term_link_html($term) {
-    return '<a href="' . get_term_link($term) . '">' . $term->name . '</a>';
+    return hocwp_get_term_link($term);
 }
 
 function hocwp_term_link_li_html($term) {
@@ -205,4 +227,15 @@ function hocwp_term_get_by_count($taxonomy = 'category', $args = array()) {
 
 function hocwp_get_term_by_slug($slug, $taxonomy = 'category') {
     return get_term_by('slug', $slug, $taxonomy);
+}
+
+function hocwp_insert_term($term, $taxonomy, $args = array()) {
+    $override = hocwp_get_value_by_key($args, 'override', false);
+    if(!$override) {
+        $exists = get_term_by('name', $term, $taxonomy);
+        if(is_a($exists, 'WP_Term')) {
+            return;
+        }
+    }
+    wp_insert_term($term, $taxonomy, $args);
 }

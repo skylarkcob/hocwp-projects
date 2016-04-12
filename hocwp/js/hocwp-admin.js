@@ -1,5 +1,5 @@
 /**
- * Last updated: 23/03/2016
+ * Last updated: 29/03/2016
  */
 jQuery(document).ready(function($) {
     var $body = $('body');
@@ -223,5 +223,19 @@ jQuery(document).ready(function($) {
                 $main.css({'min-height' : $sidebar.height() + 50 + 'px'});
             }
         }
+    })();
+
+    (function() {
+        $('.hocwp-field-maps').hocwpGoogleMaps();
+        var $category_list = $('.classifieds.hocwp-google-maps #categorychecklist, .classifieds #classifieds_typechecklist, .classifieds #classifieds_objectchecklist, .classifieds #pricechecklist, .classifieds #acreagechecklist');
+        $category_list.find('input[type="checkbox"]').on('change', function() {
+            var $element = $(this),
+                checked = $element.is(':checked'),
+                $list_item = $element.closest('ul');
+            $list_item.find('input[type="checkbox"]').attr('checked', false);
+            if(checked) {
+                $element.attr('checked', true);
+            }
+        });
     })();
 });

@@ -213,7 +213,7 @@ body.hocwp {
 }
 
 .hocwp optgroup {
-    font-weight: bold;
+    font-weight: 700;
 }
 
 .hocwp table {
@@ -224,6 +224,10 @@ body.hocwp {
 /**
  * Global
  */
+
+.font-weight-normal {
+    font-weight: 400;
+}
 
 .hocwp img {
     height: auto;
@@ -397,6 +401,24 @@ button img.hocwp-icon {
     padding: 0;
     vertical-align: -4px;
     width: 18px;
+}
+
+/*
+ * Upload
+ */
+
+input[type="file"].hocwp-field-upload + .image-preview {
+    display: none;
+    margin-top: 10px;
+}
+
+input[type="file"].hocwp-field-upload + .image-preview img {
+    border: 4px solid #ddd;
+    display: inline-block;
+    height: 140px;
+    margin-bottom: 15px;
+    margin-right: 15px;
+    width: 210px;
 }
 
 /*

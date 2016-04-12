@@ -1,5 +1,5 @@
 /**
- * Last updated: 25/03/2016
+ * Last updated: 31/03/2016
  */
 
 /**
@@ -101,7 +101,7 @@ body.hocwp {
     overflow: hidden;
 }
 
-.hocwp .site-content *:not(.row):not(.owl-wrapper) {
+.hocwp .site-content p *:not(.row):not(.owl-wrapper):not(.bxslider):not(.slider):not(.lSGallery):not(.pager):not(.carousel):not(.gm-bundled-control):not(.gmnoprint):not(.gm-svpc) {
     max-width: 100%;
 }
 
@@ -588,6 +588,86 @@ body.hocwp {
 }
 
 /**
+ * bxSlider, gallery
+ */
+
+#bx-pager {
+    background: #ddd none repeat scroll 0 0;
+    padding: 10px;
+    text-align: center;
+    width: 100%;
+}
+
+.lSSlideOuter .lSPager.lSGallery li a img {
+    border: 4px solid #ddd;
+    height: 45px;
+}
+
+#bx-pager a img {
+    border: 4px solid #ddd;
+    box-sizing: content-box;
+    height: 45px;
+    margin: 0 2px;
+}
+
+.lSSlideOuter .lSPager.lSGallery li a img {
+    width: 100%;
+}
+
+#bx-pager a img {
+    width: 9%;
+}
+
+.hocwp .lSSlideOuter .lSPager.lSGallery li.active,
+.hocwp .lSSlideOuter .lSPager.lSGallery li:hover {
+    border-radius: 0;
+}
+
+.lSSlideOuter .lSPager.lSGallery li.active a img,
+.lSPager a img:hover,
+#bx-pager a img:hover,
+#bx-pager a.active img {
+    border-color: #ed145b;
+    border-radius: 0;
+}
+
+.galleries .bx-wrapper {
+    background-color: #000;
+    border-color: #000;
+    box-shadow: none;
+    margin-bottom: 0;
+    padding: 0;
+}
+
+.bx-wrapper .bxslider img {
+    height: 400px;
+    width: 100%;
+}
+
+.hocwp-gallery li img {
+    width: 100%;
+}
+
+.lSSlideOuter .lSAction .lSNext,
+.lSSlideOuter .lSAction .lSPrev {
+    background-position: center center;
+    background-repeat: no-repeat;
+    height: 60px;
+    margin-top: -30px;
+    width: 60px;
+}
+
+.lSSlideOuter .lSAction .lSPrev {
+    background-image: url("../images/icon-keyboard-arrow-left-60.png");
+    left: 0;
+}
+
+.lSSlideOuter .lSAction .lSNext {
+    background-image: url("../images/icon-keyboard-arrow-right-60.png");
+    right: 0;
+}
+
+/**
  * Table
  */
 
@@ -650,7 +730,6 @@ body.hocwp {
 
 .entry-meta > *::before {
     color: #eb242b;
-    font-family: "FontAwesome";
     margin-right: 5px;
 }
 
@@ -707,6 +786,12 @@ body.hocwp {
 .hocwp .entry-content h4 {
     font-size: 15px;
     font-weight: 700;
+}
+
+.entry-content p img + em,
+.entry-content p img + br + em {
+    display: block;
+    margin-top: 5px;
 }
 
 /**
@@ -925,7 +1010,6 @@ body.hocwp {
 
 .single-product .hocwp-post .entry-summary .product_meta > span:before {
     color: #777;
-    font-family: "FontAwesome";
     font-size: 15px;
     margin-right: 5px;
     vertical-align: -1px;
@@ -1347,6 +1431,90 @@ body.hocwp {
 }
 
 /**
+ * Account
+ */
+
+.hocwp-login-box {
+    margin: auto;
+    max-width: 500px;
+    padding: 1%;
+    width: 500px;
+}
+
+.hocwp-login-box .logo img {
+    display: block;
+    margin: 10px auto;
+    width: 33%;
+}
+
+.hocwp-login-box .module-body {
+    background-color: #e5e5e5;
+    border-color: transparent #cdcdcd #cdcdcd;
+    border-radius: 0.4em;
+    border-style: solid;
+    border-width: 0 1px 1px;
+    color: #282828;
+    padding: 35px;
+}
+
+.hocwp-login-box .module-body label {
+    display: block;
+    font-weight: 400;
+    margin-bottom: 2px;
+}
+
+.hocwp-login-box .module-body input.input {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 0;
+    color: #434343;
+    font-size: 1.2em;
+    height: 2.5em;
+    padding: 0.3em;
+    width: 100%;
+}
+
+.hocwp-login-box .module-body input[type="checkbox"] {
+    vertical-align: -1px;
+}
+
+.hocwp-login-box .module-body p:last-child {
+    margin-bottom: 0;
+}
+
+.hocwp .hocwp-login-box .module-body input[type="submit"],
+.hocwp .hocwp-login-box .module-body .submit input,
+.hocwp .hocwp-login-box .module-body .login-submit input {
+    line-height: 25px;
+    width: 100%;
+}
+
+.hocwp .hocwp-login-box .form-nav {
+    color: #333;
+    display: inline-block;
+    font-size: 13px;
+    margin: 0;
+    padding: 15px 0;
+}
+
+.hocwp .hocwp-login-box .form-nav * {
+    float: left;
+}
+
+.hocwp .hocwp-login-box .form-nav .sep {
+    margin: 0 5px;
+}
+
+.hocwp .hocwp-login-box .form-title {
+    font-size: 25px;
+    font-weight: 700;
+    margin-bottom: 25px;
+    margin-top: 0;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+/**
  * Widgets
  */
 
@@ -1446,18 +1614,18 @@ body.hocwp {
     width: 70%;
 }
 
-.hocwp form button,
-.hocwp form .button,
-.hocwp form input[type="submit"] {
+.hocwp form:not(.tinymce-form) button,
+.hocwp form:not(.tinymce-form) .button:not(#wp-link-submit),
+.hocwp form input[type="submit"]:not(#wp-link-submit) {
     background: transparent none repeat scroll 0 0;
     border: 1px solid transparent;
     border-radius: 0;
     cursor: pointer;
 }
 
-.hocwp form button,
-.hocwp form .button,
-.hocwp form input[type="submit"] {
+.hocwp form:not(.tinymce-form) button,
+.hocwp form:not(.tinymce-form) .button:not(#wp-link-submit),
+.hocwp form input[type="submit"]:not(#wp-link-submit) {
     padding: 8px 20px;
 }
 
@@ -1523,8 +1691,10 @@ body.hocwp {
 .hocwp-widget-post li .wp-post-image {
     float: left;
     margin-right: 10px;
+}
+
+.hocwp-widget-post li:not(.full-width) .wp-post-image {
     max-width: 100px;
-    width: auto;
 }
 
 .hocwp-widget-post .full-width .wp-post-image {
@@ -1672,10 +1842,25 @@ body.hocwp {
     margin-bottom: 10px;
 }
 
+.hocwp .hocwp-login-box form .hocwp-captcha-code {
+    background-color: #fff;
+    min-width: 50%;
+}
+
+.hocwp .hocwp-login-box form .hocwp-captcha-code + .hocwp-captcha-image {
+
+}
+
+.hocwp .hocwp-login-box form .btn-social-login {
+    width: 100%;
+}
+
 /**
  * Search form
  */
 
+.single-product .hocwp-post .entry-summary .product_meta > span:before,
+.entry-meta > *::before,
 .search-form.use-icon-search .search-submit {
     font-family: "FontAwesome";
 }
@@ -1687,9 +1872,9 @@ body.hocwp {
 .hocwp .comment-list .comment-body .comment-tools > a:hover,
 .hocwp .pagination .nav-links a.page-numbers:hover,
 .hocwp .hocwp-pagination .link-item:hover,
-.hocwp form button,
-.hocwp form .button,
-.hocwp form input[type="submit"]
+.hocwp form:not(.tinymce-form) button,
+.hocwp form:not(.tinymce-form) .button:not(#wp-link-submit),
+.hocwp form input[type="submit"]:not(#wp-link-submit),
 .hocwp .widget li a:hover {
     text-decoration: none;
 }
@@ -1714,14 +1899,46 @@ body.hocwp {
 }
 
 .hocwp #wp-calendar tbody td,
-.hocwp form button,
-.hocwp form .button,
-.hocwp form input[type="submit"],
+.hocwp form:not(.tinymce-form) button,
+.hocwp form:not(.tinymce-form) .button:not(#wp-link-submit),
+.hocwp form input[type="submit"]:not(#wp-link-submit),
 .hocwp .hocwp-widget-facebook-box > div,
 .one-widget .widget,
 .hocwp #wp-calendar thead th,
 .hocwp .comment-list .comment-body .comment-tools .list-share .fa {
     text-align: center;
+}
+
+/**
+ * TinyMCE
+ */
+
+.tinymce-form .mce-tinymce > .mce-container-body,
+.tinymce-form .quicktags-toolbar {
+    border: 1px solid #dedede;
+}
+
+.tinymce-form .wp-editor-container textarea {
+    border-top: medium none;
+}
+
+.hocwp .wp-core-ui div label input,
+.tinymce-form .wp-editor-container textarea,
+.tinymce-form .wp-editor-container textarea:focus {
+    background-color: #fff;
+}
+
+.tinymce-form .quicktags-toolbar .button {
+    box-shadow: none;
+}
+
+.wp-core-ui #link-options label {
+    width: 100%;
+}
+
+.hocwp .wp-core-ui div label,
+.wp-core-ui div label input {
+    font-weight: 400;
 }
 
 /**
@@ -1750,9 +1967,9 @@ body.hocwp {
 .hocwp .hocwp-feedburner-widget .email-field,
 .hocwp .widget-sb-subscribe .email-field,
 .hocwp .widget_search .search-field,
-.hocwp form button,
-.hocwp form .button,
-.hocwp form input[type="submit"] {
+.hocwp form:not(.tinymce-form) button,
+.hocwp form:not(.tinymce-form) .button:not(#wp-link-submit),
+.hocwp form input[type="submit"]:not(#wp-link-submit) {
     -webkit-transition: all 0.25s linear 0s;
     -moz-transition: all 0.25s linear 0s;
     -ms-transition: all 0.25s linear 0s;
@@ -1765,9 +1982,9 @@ body.hocwp {
  */
 
 .hocwp div blockquote,
-.hocwp form button,
-.hocwp form .button,
-.hocwp form input[type="submit"],
+.hocwp form:not(.tinymce-form) button,
+.hocwp form:not(.tinymce-form) .button:not(#wp-link-submit),
+.hocwp form input[type="submit"]:not(#wp-link-submit),
 .hocwp .comments-area .comments-title .title-left {
     border-color: #9ed461;
 }
@@ -1813,18 +2030,18 @@ body.hocwp {
     border-color: #e4e4e4;
 }
 
-.hocwp form button:hover,
-.hocwp form .button:hover,
-.hocwp form input[type="submit"]:hover,
+.hocwp form:not(.tinymce-form) button:hover,
+.hocwp form:not(.tinymce-form) .button:not(#wp-link-submit):hover,
+.hocwp form input[type="submit"]:not(#wp-link-submit):hover,
 .hocwp .hocwp-mobile-menu li:first-child {
     border-color: #222;
 }
 
 .hocwp .pagination .nav-links .page-numbers,
 .hocwp .hocwp-pagination .item,
-.hocwp form button,
-.hocwp form .button,
-.hocwp form input[type="submit"],
+.hocwp form:not(.tinymce-form) button,
+.hocwp form:not(.tinymce-form) .button:not(#wp-link-submit),
+.hocwp form input[type="submit"]:not(#wp-link-submit),
 .hocwp .hocwp-mobile-menu li.menu-item-has-children > .fa,
 .hocwp .hocwp-mobile-menu li a {
     color: #fff;
@@ -1877,9 +2094,9 @@ body.hocwp {
 .hocwp .hocwp-widget-post .post-slider .carousel-indicators .indicator-item.active span,
 .hocwp .pagination .nav-links .page-numbers,
 .hocwp .hocwp-pagination .item,
-.hocwp form button,
-.hocwp form .button,
-.hocwp form input[type="submit"] {
+.hocwp form:not(.tinymce-form) button,
+.hocwp form:not(.tinymce-form) .button:not(#wp-link-submit),
+.hocwp form input[type="submit"]:not(#wp-link-submit) {
     background-color: #9ed461;
 }
 
@@ -1891,9 +2108,9 @@ body.hocwp {
 .hocwp .hocwp-pagination .current-item,
 .hocwp .pagination .nav-links a.page-numbers:hover,
 .hocwp .hocwp-pagination .link-item:hover,
-.hocwp form button:hover,
-.hocwp form .button:hover,
-.hocwp form input[type="submit"]:hover {
+.hocwp form:not(.tinymce-form) button:hover,
+.hocwp form:not(.tinymce-form) .button:not(#wp-link-submit):hover,
+.hocwp form input[type="submit"]:not(#wp-link-submit):hover {
     background-color: #222;
 }
 
@@ -2089,6 +2306,65 @@ body.hocwp {
 .hocwp .clearfix:after,
 .hocwp .comment-list .comment-body:after {
     content: " ";
+}
+
+.hocwp form .btn-social-login {
+    text-align: left;
+}
+
+.hocwp .btn-ajax:focus,
+.hocwp .btn-ajax:active,
+.hocwp form .btn-ajax:focus,
+.hocwp form .btn-ajax:active,
+.hocwp form .btn-social-login:focus,
+.hocwp form .btn-social-login:active {
+    cursor: wait;
+}
+
+.hocwp form button.btn-facebook {
+    background: rgba(0, 0, 0, 0) linear-gradient(to bottom, #3b5998 0px, #344e86 100%) repeat scroll 0 0;
+    border: 1px solid #344e86;
+}
+
+.hocwp form .btn-social-login {
+    color: #f7f7f7;
+    display: inline;
+    font-weight: 700;
+    margin: 0;
+    outline: 0 none;
+    transition: none 0s ease 0s;
+}
+
+.hocwp form button.btn-google {
+    background: #d14836 linear-gradient(to bottom, #dd4b39 0px, #d14836 100%) repeat scroll 0 0;
+    border: 1px solid #d14836;
+}
+
+.hocwp form button.btn-google:hover {
+    background: #d14836 none repeat scroll 0 0;
+    border-color: #d14836;
+    transition: none 0s ease 0s;
+}
+
+.hocwp form button.btn-facebook:hover {
+    background: #344e86 none repeat scroll 0 0;
+    border-color: #344e86;
+    transition: none 0s ease 0s;
+}
+
+.hocwp form button.btn-social-login [class*="flicon"] {
+    fill: #f7f7f7;
+}
+
+.btn [class*="fl-icon-"], .btn [class*="flicon-"] {
+    display: inline-block;
+    font-size: 16px;
+    height: 18px;
+    line-height: 12px;
+    margin-right: 7px;
+    margin-top: -3px;
+    vertical-align: middle;
+    width: 18px;
 }
 
 .hocwp .fa-facebook {

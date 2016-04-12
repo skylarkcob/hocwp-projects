@@ -8,6 +8,7 @@ class HOCWP_Widget_Post extends WP_Widget {
         $defaults = array(
             'bys' => array(
                 'recent' => __('Recent posts', 'hocwp'),
+                'recent_modified' => __('Recent modified posts', 'hocwp'),
                 'random' => __('Random posts', 'hocwp'),
                 'comment' => __('Most comment posts', 'hocwp'),
                 'category' => __('Posts by category', 'hocwp'),
@@ -163,6 +164,11 @@ class HOCWP_Widget_Post extends WP_Widget {
             case 'recent':
                 $get_by = true;
                 break;
+            case 'recent_modified':
+                $get_by = true;
+                $query_args['orderby'] = 'modified';
+                $query_args['order'] = 'DESC';
+                break;
             case 'random':
                 $get_by = true;
                 $query_args['orderby'] = 'rand';
@@ -212,7 +218,7 @@ class HOCWP_Widget_Post extends WP_Widget {
                 break;
         }
         if($get_by) {
-            $query_args = apply_filters('hocwp_sidebar_' . $sidebar . '_widget_post_query_args', $query_args, $instance, $widget_args = $args);
+            $query_args = apply_filters('hocwp_widget_post_query_args', $query_args, $args, $instance, $this);
             if('related' == $by) {
                 $w_query = hocwp_query_related_post($query_args);
             } else {
@@ -229,7 +235,7 @@ class HOCWP_Widget_Post extends WP_Widget {
             if((bool)$slider) {
                 $four_posts = array_slice($w_query->posts, 0, 4);
                 $next_posts = array_slice($w_query->posts, 4, absint($w_query->post_count - 4));
-                $widget_content = apply_filters('hocwp_widget_post_slider_html', '', $w_query, $data = $instance);
+                $widget_content = apply_filters('hocwp_widget_post_slider_html', '', $args, $instance, $this);
                 if(empty($widget_content)) {
                     $carousel_id = $this->id;
                     $carousel_id = hocwp_sanitize_id($carousel_id);
@@ -249,15 +255,15 @@ class HOCWP_Widget_Post extends WP_Widget {
                                 <div class="<?php echo $class; ?>">
                                     <?php
                                     hocwp_article_before();
-                                    do_action('hocwp_post_widget_before_post', $sidebar_id = $sidebar);
+                                    do_action('hocwp_widget_post_before_post', $args, $instance, $this);
                                     if(!(bool)$hide_thumbnail) {
                                         hocwp_post_thumbnail(array('width' => 300, 'height' => 200));
                                     }
-                                    do_action('hocwp_post_widget_before_post_title', $sidebar_id = $sidebar);
+                                    do_action('hocwp_widget_post_before_post_title', $args, $instance, $this);
                                     hocwp_post_title_link(array('title' => hocwp_substr(get_the_title(), $title_length)));
-                                    do_action('hocwp_post_widget_after_post_title', $sidebar_id = $sidebar);
+                                    do_action('hocwp_widget_post_after_post_title', $args, $instance, $this);
                                     hocwp_entry_summary();
-                                    do_action('hocwp_post_widget_after_post', $sidebar_id = $sidebar);
+                                    do_action('hocwp_widget_post_after_post', $args, $instance, $this);
                                     hocwp_article_after();
                                     ?>
                                 </div>
@@ -299,7 +305,7 @@ class HOCWP_Widget_Post extends WP_Widget {
                         <div class="more-posts">
                             <?php
                             $widget_content .= '<ul class="' . $list_class . '">';
-                            $loop_html = apply_filters('hocwp_sidebar_' . $sidebar . '_widget_post_loop_html', '', $w_query, $data = $instance);
+                            $loop_html = apply_filters('hocwp_widget_post_loop_html', '', $args, $instance, $this);
                             if(empty($loop_html)) {
                                 $count = 0;
                                 ob_start();
@@ -313,15 +319,15 @@ class HOCWP_Widget_Post extends WP_Widget {
                                     ?>
                                     <li <?php post_class($class); ?>>
                                         <?php
-                                        do_action('hocwp_post_widget_before_post', $sidebar_id = $sidebar);
+                                        do_action('hocwp_widget_post_before_post', $args, $instance, $this);
                                         if(!(bool)$hide_thumbnail) {
                                             hocwp_post_thumbnail(array('width' => $thumbnail_size[0], 'height' => $thumbnail_size[1]));
                                         }
-                                        do_action('hocwp_post_widget_before_post_title', $sidebar_id = $sidebar);
+                                        do_action('hocwp_widget_post_before_post_title', $args, $instance, $this);
                                         hocwp_post_title_link(array('title' => hocwp_substr(get_the_title(), $title_length)));
-                                        do_action('hocwp_post_widget_after_post_title', $sidebar_id = $sidebar);
+                                        do_action('hocwp_widget_post_after_post_title', $args, $instance, $this);
                                         the_excerpt();
-                                        do_action('hocwp_post_widget_after_post', $sidebar_id = $sidebar);
+                                        do_action('hocwp_widget_post_after_post', $args, $instance, $this);
                                         ?>
                                     </li>
                                     <?php
@@ -340,7 +346,7 @@ class HOCWP_Widget_Post extends WP_Widget {
                 $widget_html .= $widget_content;
             } else {
                 $widget_html .= '<ul class="' . $list_class . '">';
-                $loop_html = apply_filters('hocwp_sidebar_' . $sidebar . '_widget_post_loop_html', '', $w_query, $data = $instance);
+                $loop_html = apply_filters('hocwp_widget_post_loop_html', '', $args, $instance, $this);
                 if(empty($loop_html)) {
                     $count = 0;
                     ob_start();
@@ -367,7 +373,7 @@ class HOCWP_Widget_Post extends WP_Widget {
                         ?>
                         <li <?php post_class($class); ?>>
                             <?php
-                            do_action('hocwp_post_widget_before_post', $sidebar_id = $sidebar);
+                            do_action('hocwp_widget_post_before_post', $args, $instance, $this);
                             if(!(bool)$hide_thumbnail) {
                                 if($full_width) {
                                     hocwp_post_thumbnail(array('bfi_thumb' => false));
@@ -375,10 +381,10 @@ class HOCWP_Widget_Post extends WP_Widget {
                                     hocwp_post_thumbnail(array('width' => $thumbnail_size[0], 'height' => $thumbnail_size[1]));
                                 }
                             }
-                            do_action('hocwp_post_widget_before_post_title', $sidebar_id = $sidebar);
+                            do_action('hocwp_widget_post_before_post_title', $args, $instance, $this);
                             hocwp_post_title_link(array('title' => hocwp_substr(get_the_title(), $title_length)));
-                            do_action('hocwp_post_widget_after_post_title', $sidebar_id = $sidebar);
-                            do_action('hocwp_post_widget_after_post', $sidebar_id = $sidebar);
+                            do_action('hocwp_widget_post_after_post_title', $args, $instance, $this);
+                            do_action('hocwp_widget_post_after_post', $args, $instance, $this);
                             ?>
                         </li>
                         <?php
@@ -395,9 +401,6 @@ class HOCWP_Widget_Post extends WP_Widget {
         }
         $widget_html .= '</div>';
         $widget_html .= hocwp_get_value_by_key($args, 'after_widget');
-        $widget_html = apply_filters('hocwp_widget_html', $widget_html, $instance, $query = $w_query, $widget_args = $args, $option_name = $this->option_name, $widget_number = $this->number, $sidebar_id = $sidebar);
-        $widget_html = apply_filters($this->option_name . '_html', $widget_html, $instance, $query = $w_query, $widget_args = $args, $widget_number = $this->number, $sidebar_id = $sidebar);
-        $widget_html = apply_filters($this->option_name . '_' . $sidebar . '_html', $widget_html, $instance, $query = $w_query, $widget_args = $args, $widget_number = $this->number);
         $widget_html = apply_filters('hocwp_widget_post_html', $widget_html, $args, $instance, $this);
         echo $widget_html;
     }

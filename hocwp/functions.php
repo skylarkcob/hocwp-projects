@@ -182,6 +182,22 @@ function hocwp_get_value_by_key($arr, $key, $default = '') {
     return $value;
 }
 
+function hocwp_get_method_value($key, $method = 'post', $default = '') {
+    $result = '';
+    $method = strtoupper($method);
+    switch($method) {
+        case 'POST':
+            $result = hocwp_get_value_by_key($_POST, $key, $default);
+            break;
+        case 'GET':
+            $result = hocwp_get_value_by_key($_GET, $key, $default);
+            break;
+        default:
+            $result = hocwp_get_value_by_key($_REQUEST, $key, $default);
+    }
+    return $result;
+}
+
 function hocwp_array_unique($arr) {
     if(is_array($arr)) {
         $arr = array_map('unserialize', array_unique(array_map('serialize', $arr)));
@@ -233,6 +249,14 @@ function hocwp_get_term_drop_down($args = array()) {
     );
     $args = wp_parse_args($args, $defaults);
     $select = wp_dropdown_categories($args);
+    $required = hocwp_get_value_by_key($args, 'required', false);
+    $autocomplete = (bool)hocwp_get_value_by_key($args, 'autocomplete', false);
+    if($required) {
+        $select = hocwp_add_html_attribute('select', $select, 'required aria-required="true"');
+    }
+    if(!$autocomplete) {
+        $select = hocwp_add_html_attribute('select', $select, 'autocomplete="off"');
+    }
     return $select;
 }
 
@@ -795,8 +819,13 @@ function hocwp_sanitize_array($arr, $unique = true, $filter = true) {
     if($unique) {
         $arr = hocwp_array_unique($arr);
     }
-    if($filter) {
-        $arr = array_filter($arr);
+    if($filter && is_array($arr)) {
+        $keys = array_keys($arr, '', true);
+        if(hocwp_array_has_value($keys)) {
+            foreach($keys as $key) {
+                unset($arr[$key]);
+            }
+        }
     }
     return $arr;
 }
@@ -1017,6 +1046,7 @@ function hocwp_is_force_mobile_cookie($cookie) {
 }
 
 function hocwp_get_domain_name($url) {
+    $url = strval($url);
     $parse = parse_url($url);
     $result = isset($parse['host']) ? $parse['host'] : '';
     return $result;
@@ -1101,6 +1131,19 @@ function hocwp_url_exists($url) {
 function hocwp_get_all_image_from_string($data) {
     preg_match_all('/<img[^>]+>/i', $data, $matches);
     $matches = isset($matches[0]) ? $matches[0] : array();
+    if(!hocwp_array_has_value($matches) && !empty($data)) {
+        if(false !== strpos($data, '//') && (false !== strpos($data, '.jpg') || false !== strpos($data, '.png') || false !== strpos($data, '.gif'))) {
+            $sources = explode(PHP_EOL, $data);
+            if(hocwp_array_has_value($sources)) {
+                foreach($sources as $src) {
+                    if(hocwp_is_image($src)) {
+                        $matches[] = '<img src="' . $src . '">';
+                    }
+                }
+
+            }
+        }
+    }
     return $matches;
 }
 
@@ -1296,6 +1339,9 @@ function hocwp_register_taxonomy($args = array()) {
     $show_in_nav_menus = isset($args['show_in_nav_menus']) ? $args['show_in_nav_menus'] : true;
     $show_tagcloud = isset($args['show_tagcloud']) ? $args['show_tagcloud'] : (($hierarchical === true) ? false : true);
     $post_types = isset($args['post_types']) ? $args['post_types'] : array();
+    if(!is_array($post_types)) {
+        $post_types = array($post_types);
+    }
     $slug = isset($args['slug']) ? $args['slug'] : '';
     $private = isset($args['private']) ? $args['private'] : false;
     if(empty($singular_name)) {
@@ -1355,6 +1401,9 @@ function hocwp_register_taxonomy($args = array()) {
 }
 
 function hocwp_register_post_type_private($args = array()) {
+    if(!hocwp_is_admin()) {
+        return;
+    }
     global $hocwp_private_post_types;
     $args['public'] = false;
     $args['exclude_from_search'] = true;
@@ -1398,6 +1447,10 @@ function hocwp_build_css_rule($elements, $properties) {
     foreach($elements as $element) {
         if(empty($element)) {
             continue;
+        }
+        $first_char = hocwp_get_first_char($element);
+        if('.' !== $first_char) {
+            $element = '.' . $element;
         }
         $before .= $element . ',';
     }
@@ -1735,6 +1788,9 @@ function hocwp_menu_page_exists($slug) {
 
 function hocwp_callback_exists($callback) {
     if(empty($callback) || (!is_array($callback) && !function_exists($callback)) || (is_array($callback) && count($callback) != 2) || (is_array($callback) && !method_exists($callback[0], $callback[1]))) {
+        return false;
+    }
+    if(!is_callable($callback)) {
         return false;
     }
     return true;
@@ -2154,6 +2210,7 @@ function hocwp_default_script_localize_object() {
         'ajax_url' => admin_url('admin-ajax.php'),
         'datepicker_icon' => $datepicker_icon,
         'shortcodes' => $shortcodes,
+        'logged_in' => hocwp_bool_to_int(is_user_logged_in()),
         'i18n' => array(
             'jquery_undefined_error' => __('HocWP\'s JavaScript requires jQuery', 'hocwp'),
             'jquery_version_error' => sprintf(__('HocWP\'s JavaScript requires jQuery version %s or higher', 'hocwp'), HOCWP_MINIMUM_JQUERY_VERSION),
@@ -2240,6 +2297,10 @@ function hocwp_get_admin_email() {
     return get_bloginfo('admin_email');
 }
 
+function hocwp_google_plus_client_script() {
+    wp_enqueue_script('google-client', 'https://plus.google.com/js/client:platform.js', array(), false, true);
+}
+
 function hocwp_facebook_javascript_sdk($args = array()) {
     $language = isset($args['language']) ? $args['language'] : 'vi_VN';
     $language = apply_filters('hocwp_facebook_javascript_sdk_language', $language);
@@ -2248,7 +2309,7 @@ function hocwp_facebook_javascript_sdk($args = array()) {
     if(empty($app_id)) {
         return;
     }
-    $version = isset($args['version']) ? $args['version'] : '2.4';
+    $version = isset($args['version']) ? $args['version'] : HOCWP_FACEBOOK_GRAPH_API_VERSION;
     $version = apply_filters('hocwp_facebook_javascript_sdk_version', $version);
     $use = hocwp_use_facebook_javascript_sdk();
     if(!(bool)$use) {
@@ -2256,13 +2317,15 @@ function hocwp_facebook_javascript_sdk($args = array()) {
     }
     ?>
     <div id="fb-root"></div>
-    <script>(function(d, s, id) {
+    <script>
+        (function(d, s, id) {
             var js, fjs = d.getElementsByTagName(s)[0];
             if (d.getElementById(id)) return;
             js = d.createElement(s); js.id = id;
             js.src = "//connect.facebook.net/<?php echo $language; ?>/sdk.js#xfbml=1&version=v<?php echo $version; ?>&appId=<?php echo $app_id; ?>";
             fjs.parentNode.insertBefore(js, fjs);
-        }(document, 'script', 'facebook-jssdk'));</script>
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
     <?php
 }
 
@@ -2458,4 +2521,180 @@ function hocwp_get_wp_version() {
 
 function hocwp_get_ip_address() {
     return isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
+}
+
+function hocwp_get_upload_folder_details() {
+    $upload = wp_upload_dir();
+    $dir = isset($upload['basedir']) ? $upload['basedir'] : '';
+    $url = isset($upload['baseurl']) ? $upload['baseurl'] : '';
+    if(empty($dir)) {
+        $dir = WP_CONTENT_DIR . '/uploads';
+    }
+    if(empty($url)) {
+        $url = content_url('uploads');
+    }
+    return array('path' => $dir, 'url' => $url);
+}
+
+function hocwp_is_phone_number($number) {
+    $regex = "/^(\d[\s-]?)?[\(\[\s-]{0,2}?\d{3}[\)\]\s-]{0,2}?\d{3}[\s-]?\d{4}$/i";
+    $result = (preg_match($regex, $number)) ? true : false;
+    if($result) {
+        $len = strlen($number);
+        if($len < 7 || $len > 20) {
+            $result = false;
+        }
+    }
+    return $result;
+}
+
+function hocwp_image_base64($file) {
+    $image_data = @file_get_contents($file);
+    return 'data:image/png;base64,' . base64_encode($image_data);
+}
+
+function hocwp_upload($args = array()) {
+    $name = isset($args['name']) ? $args['name'] : '';
+    $path = isset($args['path']) ? $args['path'] : '';
+    $size = isset($args['size']) ? $args['size'] : 0;
+    $max_size = isset($args['max_size']) ? $args['max_size'] : -1;
+    $is_image = isset($args['is_image']) ? $args['is_image'] : false;
+    $extensions = isset($args['extensions']) ? $args['extensions'] : array();
+    $tmp_name = isset($args['tmp_name']) ? $args['tmp_name'] : '';
+    $duplicate_exists = isset($args['duplicate_exists']) ? $args['duplicate_exists'] : true;
+    $result = array(
+        'success' => false
+    );
+    $result['image_base64'] = hocwp_image_base64($tmp_name);
+    $name = strtolower($name);
+    $file_path = $path . '/' . basename($name);
+    $file_type = pathinfo($file_path, PATHINFO_EXTENSION);
+    if($is_image && !empty($tmp_name)) {
+        $check = getimagesize($tmp_name);
+        if($check === false) {
+            $result['message'][] = 'Tập tin ' . $name . ' không phải là hình ảnh.';
+            return $result;
+        }
+    }
+    if(file_exists($file_path)) {
+        if($duplicate_exists) {
+            $path_info = pathinfo($file_path);
+            $name = $path_info['filename'] . '-' . hocwp_random_string() . '.' . $file_type;
+            $name = strtolower($name);
+            $file_path = $path . '/' . basename($name);
+        } else {
+            $result['message'][] = 'Tập tin ' . $name . ' đã tồn tại.';
+            return $result;
+        }
+    }
+    if($max_size > 0 && $size > $max_size) {
+        $result['message'][] = 'Dung lượng tập tin không được quá ' . $max_size . 'KB.';
+        return $result;
+    }
+    if(count($extensions) > 0 && !in_array($file_type, $extensions)) {
+        $result['message'][] = 'Bạn không được phép upload tập tin với định dạng ' . $file_type . '.';
+        return $result;
+    }
+    $file_path = strtolower($file_path);
+    if(move_uploaded_file($tmp_name, $file_path)) {
+        $result['success'] = true;
+    } else {
+        $result['message'][] = 'Đã có lỗi xảy ra, tập tin của bạn chưa được upload.';
+    }
+    $result['name'] = $name;
+    $result['path'] = $file_path;
+    return $result;
+}
+
+function hocwp_execute_upload($args = array()) {
+    $files = isset($args['files']) ? $args['files'] : array();
+    unset($args['files']);
+    $upload_path = isset($args['upload_path']) ? $args['upload_path'] : '';
+    unset($args['upload_path']);
+    $upload_url = isset($args['upload_url']) ? $args['upload_url'] : '';
+    unset($args['upload_url']);
+    if(empty($upload_path)) {
+        $upload_dir = hocwp_get_upload_folder_details();
+        $target_dir = untrailingslashit($upload_dir['path']) . '/hocwp';
+        $upload_url = untrailingslashit($upload_dir['url']) . '/hocwp';
+        if(!file_exists($target_dir)) {
+            mkdir($target_dir, 0777);
+        }
+        $upload_path = $target_dir;
+    }
+    $is_multiple = false;
+    $file_names = isset($files['name']) ? $files['name'] : array();
+    $file_count = count($file_names);
+    if($file_count > 1) {
+        $is_multiple = true;
+    }
+    $list_files = array();
+    for($i = 0; $i < $file_count; $i++) {
+        $name = isset($files['name'][$i]) ? $files['name'][$i] : '';
+        $type = isset($files['type'][$i]) ? $files['type'][$i] : '';
+        $tmp_name = isset($files['tmp_name'][$i]) ? $files['tmp_name'][$i] : '';
+        $error = isset($files['error'][$i]) ? $files['error'][$i] : '';
+        $size = isset($files['size'][$i]) ? $files['size'][$i] : '';
+        $file_item = array(
+            'name' => $name,
+            'type' => $type,
+            'tmp_name' => $tmp_name,
+            'error' => $error,
+            'size' => $size
+        );
+        $list_files[] = $file_item;
+    }
+    $list_results = array();
+    foreach($list_files as $key => $file) {
+        $file['path'] = $upload_path;
+        $file = wp_parse_args($args, $file);
+        $result = hocwp_upload($file);
+        if($result['success']) {
+            $file_name = $file['name'];
+            $file_path = untrailingslashit($upload_path) . '/' . $file_name;
+            $file_url = untrailingslashit($upload_url) . '/' . basename($result['name']);
+            $attachment = array(
+                'guid' => $file_url
+            );
+            hocwp_insert_attachment($attachment, $file_path);
+            $result['url'] = $file_url;
+        }
+        $list_results[] = $result;
+    }
+    return $list_results;
+}
+
+function hocwp_insert_attachment($attachment, $file_path, $parent_post_id = 0) {
+    if(!file_exists($file_path)) {
+        return 0;
+    }
+    $file_type = wp_check_filetype(basename($file_path), null);
+    $attachment['post_mime_type'] = $file_type['type'];
+    if(!isset($attachment['guid'])) {
+        return 0;
+    }
+    $attachment['post_status'] = isset($attachment['post_status']) ? $attachment['post_status'] : 'inherit';
+    if(!isset($attachment['post_title'])) {
+        $attachment['post_title'] = preg_replace('/\.[^.]+$/', '', basename($file_path));
+    }
+    $attach_id = wp_insert_attachment($attachment, $file_path, $parent_post_id);
+    if($attach_id > 0) {
+        hocwp_update_attachment_meta($attach_id, $file_path);
+        if($parent_post_id > 0) {
+            hocwp_set_thumbnail($parent_post_id, $attach_id);
+        }
+    }
+    return $attach_id;
+}
+
+function hocwp_update_attachment_meta($attach_id, $file_path) {
+    if(!function_exists('wp_generate_attachment_metadata')) {
+        require_once(ABSPATH . 'wp-admin/includes/image.php');
+    }
+    $attach_data = wp_generate_attachment_metadata($attach_id, $file_path);
+    wp_update_attachment_metadata($attach_id, $attach_data);
+}
+
+function hocwp_set_thumbnail($post_id, $attach_id) {
+    return set_post_thumbnail($post_id, $attach_id);
 }
