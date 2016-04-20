@@ -237,7 +237,7 @@ function hocwp_get_method_value($key, $method = 'post', $default = '') {
     $method = strtoupper($method);
     switch($method) {
         case 'POST':
-            $result = hocwp_get_value_by_key($key, $default);
+            $result = hocwp_get_value_by_key($_POST, $key, $default);
             break;
         case 'GET':
             $result = hocwp_get_value_by_key($_GET, $key, $default);
@@ -2141,10 +2141,14 @@ function hocwp_get_media_size($id) {
 }
 
 function hocwp_get_image_sizes($id) {
-    if(!hocwp_id_number_valid($id)) {
+    $path = $id;
+    if(hocwp_id_number_valid($id)) {
+        $path = get_attached_file($id);
+    }
+    if(!file_exists($path)) {
         return null;
     }
-    return getimagesize(get_attached_file($id));
+    return getimagesize($path);
 }
 
 function hocwp_get_media_option_url($value) {
