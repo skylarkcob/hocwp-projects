@@ -2,7 +2,7 @@
 if(!function_exists('add_filter')) exit;
 
 function hocwp_debug_log_ajax_callback() {
-    $object = hocwp_get_value_by_key($_POST, 'object');
+    $object = hocwp_get_method_value('object');
     $object = hocwp_json_string_to_array($object);
     hocwp_debug_log($object);
     exit;
@@ -83,7 +83,7 @@ function hocwp_vote_post_ajax_callback() {
     $post_id = isset($_POST['post_id']) ? $_POST['post_id'] : '';
     $post_id = absint($post_id);
     if($post_id > 0) {
-        $type = isset($_POST['type']) ? $_POST['type'] : hocwp_get_value_by_key($_POST, 'vote_type');
+        $type = isset($_POST['type']) ? $_POST['type'] : hocwp_get_method_value('vote_type');
         $session_name = 'hocwp_vote_' . $type . '_post_' . $post_id;
         if(!isset($_SESSION[$session_name]) || 1 != $_SESSION[$session_name]) {
             $value = isset($_POST['value']) ? $_POST['value'] : '';
@@ -114,7 +114,7 @@ function hocwp_favorite_post_ajax_callback() {
         'success' => false,
         'remove' => false
     );
-    $post_id = hocwp_get_value_by_key($_POST, 'post_id');
+    $post_id = hocwp_get_method_value('post_id');
     if(hocwp_id_number_valid($post_id) && is_user_logged_in()) {
         $user = wp_get_current_user();
         $favorites = get_user_meta($user->ID, 'favorite_posts', true);
@@ -155,16 +155,16 @@ add_action('wp_ajax_nopriv_hocwp_sanitize_media_value', 'hocwp_sanitize_media_va
 
 function hocwp_fetch_administrative_boundaries_ajax_callback() {
     $result = array();
-    $default = hocwp_get_value_by_key($_POST, 'default');
+    $default = hocwp_get_method_value('default');
     $default = str_replace('\\', '', $default);
-    $type = hocwp_get_value_by_key($_POST, 'type');
+    $type = hocwp_get_method_value('type');
     if(empty($default)) {
 
     }
     $html_data = $default;
-    $parent = hocwp_get_value_by_key($_POST, 'parent');
+    $parent = hocwp_get_method_value('parent');
     if(hocwp_id_number_valid($parent)) {
-        $taxonomy = hocwp_get_value_by_key($_POST, 'taxonomy');
+        $taxonomy = hocwp_get_method_value('taxonomy');
         if(!empty($taxonomy)) {
             $terms = hocwp_get_terms($taxonomy, array('parent' => $parent, 'orderby' => 'NAME'));
             if(hocwp_array_has_value($terms)) {
@@ -182,12 +182,12 @@ add_action('wp_ajax_hocwp_fetch_administrative_boundaries', 'hocwp_fetch_adminis
 add_action('wp_ajax_nopriv_hocwp_fetch_administrative_boundaries', 'hocwp_fetch_administrative_boundaries_ajax_callback');
 
 function hocwp_get_term_ajax_callback() {
-    $term_id = hocwp_get_value_by_key($_POST, 'term_id');
+    $term_id = hocwp_get_method_value('term_id');
     $result = array(
         'term' => new WP_Error()
     );
     if(hocwp_id_number_valid($term_id)) {
-        $taxonomy = hocwp_get_value_by_key($_POST, 'taxonomy');
+        $taxonomy = hocwp_get_method_value('taxonomy');
         if(!empty($taxonomy)) {
             $result['term'] = get_term($term_id, $taxonomy);
         }
@@ -201,9 +201,9 @@ function hocwp_get_term_administrative_boundaries_address_ajax_callback() {
     $result = array(
         'address' => ''
     );
-    $term_id = hocwp_get_value_by_key($_POST, 'term_id');
+    $term_id = hocwp_get_method_value('term_id');
     if(hocwp_id_number_valid($term_id)) {
-        $taxonomy = hocwp_get_value_by_key($_POST, 'taxonomy');
+        $taxonomy = hocwp_get_method_value('taxonomy');
         if(!empty($taxonomy)) {
             $term = get_term($term_id, $taxonomy);
             $address = $term->name;
@@ -246,13 +246,13 @@ function hocwp_social_login_facebook_ajax_callback() {
         'redirect_to' => '',
         'logged_in' => false
     );
-    $data = hocwp_get_value_by_key($_POST, 'data');
+    $data = hocwp_get_method_value('data');
     $data = hocwp_json_string_to_array($data);
     if(hocwp_array_has_value($data) && !is_user_logged_in()) {
         $verified = (bool)hocwp_get_value_by_key($data, 'verified');
         if($verified) {
             $id = hocwp_get_value_by_key($data, 'id');
-            $requested_redirect_to = hocwp_get_value_by_key($_POST, 'redirect_to');
+            $requested_redirect_to = hocwp_get_method_value('redirect_to');
             $redirect_to = home_url('/');
             $transient_name = 'hocwp_social_login_facebook_' . md5($id);
             if(false === ($user_id = get_transient($transient_name)) || !hocwp_id_number_valid($user_id)) {
@@ -323,13 +323,13 @@ function hocwp_social_login_google_ajax_callback() {
         'redirect_to' => '',
         'logged_in' => false
     );
-    $data = hocwp_get_value_by_key($_POST, 'data');
+    $data = hocwp_get_method_value('data');
     $data = hocwp_json_string_to_array($data);
     if(hocwp_array_has_value($data) && !is_user_logged_in()) {
         $verified = (bool)hocwp_get_value_by_key($data, 'verified');
         if($verified || true) {
             $id = hocwp_get_value_by_key($data, 'id');
-            $requested_redirect_to = hocwp_get_value_by_key($_POST, 'redirect_to');
+            $requested_redirect_to = hocwp_get_method_value('redirect_to');
             $redirect_to = home_url('/');
             $transient_name = 'hocwp_social_login_google_' . md5($id);
             if(false === ($user_id = get_transient($transient_name)) || !hocwp_id_number_valid($user_id)) {

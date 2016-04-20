@@ -248,6 +248,9 @@ function hocwp_register_taxonomy_administrative_boundaries($post_type = null) {
 
 function hocwp_classifieds_get_saved_posts_page() {
 	$result = hocwp_get_option_page('saved_posts_page', 'tin-da-luu', 'hocwp-theme-setting', 'page-templates/saved-posts.php');
+	if(!is_a($result, 'WP_Post')) {
+		$result = hocwp_get_page_by_template('page-templates/favorite-posts.php');
+	}
 	return apply_filters('hocwp_classifieds_get_saved_posts_page', $result);
 }
 
@@ -264,12 +267,17 @@ function hocwp_classifieds_get_manage_profile_page() {
 function hocwp_classifieds_get_price($post_id = null) {
 	$price = hocwp_get_post_meta('price', $post_id);
 	if(empty($price)) {
-		$price = 'Thỏa thuận';
+		$price = hocwp_post_get_first_term($post_id, 'price');
+		if(is_a($price, 'WP_Term')) {
+			$price = $price->name;
+		} else {
+			$price = 'Thỏa thuận';
+		}
 	}
 	return $price;
 }
 
-function hocwp_classifieds_get_administrative_boundary($post_id = null) {
+function hocwp_classifieds_get_administrative_boundary($post_id = null, $only_province = false) {
 	if(!hocwp_id_number_valid($post_id)) {
 		$post_id = get_the_ID();
 	}
@@ -290,7 +298,11 @@ function hocwp_classifieds_get_administrative_boundary($post_id = null) {
 				$child = $parent;
 				$parent = get_category($child->parent);
 			}
-			$result = $child->name . ', ' . $parent->name;
+			if($only_province) {
+				$result = $parent->name;
+			} else {
+				$result = $child->name . ', ' . $parent->name;
+			}
 		} else {
 			$term = array_shift($terms);
 			$result = $term->name;
@@ -488,13 +500,30 @@ function hocwp_classifieds_widget_post_after_post($args, $instance, $widget) {
 	if(is_a($post, 'WP_Post')) {
 		if('post' == $post->post_type) {
 			$modified = get_post_modified_time('U', false, $post);
+			$salary = hocwp_post_get_first_term($post->ID, 'salary');
 			?>
 			<div class="metas">
-				<div class="meta price pull-left">
-					<span><strong><?php echo hocwp_classifieds_get_price(); ?></strong></span>
+				<div class="pull-left">
+					<?php
+					if(is_a($salary, 'WP_Term')) {
+						?>
+						<div class="meta price">
+							<span><strong><?php echo $salary->name; ?></strong></span>
+						</div>
+						<?php
+					} else {
+						?>
+						<div class="meta price">
+							<span><strong><?php echo hocwp_classifieds_get_price(); ?></strong></span>
+						</div>
+						<?php
+					}
+					?>
 				</div>
-				<div class="meta modified pull-right">
-					<?php echo hocwp_human_time_diff_to_now($modified) . ' trước'; ?>
+				<div class="pull-right">
+					<div class="meta modified">
+						<?php echo hocwp_human_time_diff_to_now($modified) . ' trước'; ?>
+					</div>
 				</div>
 			</div>
 			<?php
@@ -642,16 +671,16 @@ function hocwp_classifieds_save_post($post_id) {
 			$price = hocwp_get_value_by_key($taxonomies, 'price');
 			$classifieds_object = hocwp_get_value_by_key($taxonomies, 'classifieds_object');
 			if(hocwp_object_valid($salary)) {
-				$custom_taxonomies[$salary->name] = $salary;
+				//$custom_taxonomies[$salary->name] = $salary;
 			}
 			if(hocwp_object_valid($price)) {
-				$custom_taxonomies[$price->name] = $price;
+				//$custom_taxonomies[$price->name] = $price;
 			}
 			if(hocwp_object_valid($acreage)) {
-				$custom_taxonomies[$acreage->name] = $acreage;
+				//$custom_taxonomies[$acreage->name] = $acreage;
 			}
 			if(hocwp_object_valid($classifieds_object)) {
-				$custom_taxonomies[$classifieds_object->name] = $classifieds_object;
+				//$custom_taxonomies[$classifieds_object->name] = $classifieds_object;
 			}
 			unset($taxonomies['salary']);
 			unset($taxonomies['acreage']);
@@ -663,7 +692,7 @@ function hocwp_classifieds_save_post($post_id) {
 					if($taxonomy->hierarchical) {
 						$terms = wp_get_post_terms($post_id, $taxonomy->name);
 						if(!hocwp_array_has_value($terms)) {
-							$errors[] = sprintf(__('Please set %s for this post.', 'hocwp'), '<strong>' . $taxonomy->labels->singular_name . '</strong>');
+							//$errors[] = sprintf(__('Please set %s for this post.', 'hocwp'), '<strong>' . $taxonomy->labels->singular_name . '</strong>');
 						}
 					}
 				}
@@ -682,7 +711,7 @@ function hocwp_classifieds_save_post($post_id) {
 				}
 			}
 			if(!hocwp_array_has_value($errors) && !hocwp_array_has_value($terms)) {
-				$errors[] = __('Please set term for this post in right way.', 'hocwp');
+				//$errors[] = __('Please set term for this post in right way.', 'hocwp');
 			}
 			if(hocwp_array_has_value($errors)) {
 				if(get_post_status($post_id) == 'publish') {
@@ -697,7 +726,7 @@ function hocwp_classifieds_save_post($post_id) {
 		}
 	}
 }
-add_action('save_post', 'hocwp_classifieds_save_post');
+add_action('save_post', 'hocwp_classifieds_save_post', 99);
 
 function hocwp_classifieds_admin_notice() {
 	$post_id = hocwp_get_method_value('post', 'request');

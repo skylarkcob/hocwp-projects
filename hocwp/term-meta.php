@@ -1,5 +1,6 @@
 <?php
 if(!function_exists('add_filter')) exit;
+
 define('HOCWP_TERM_META_TABLE', 'termmeta');
 
 function hocwp_term_meta_table_init() {
@@ -76,4 +77,33 @@ function hocwp_term_delete_meta($term_id, $meta_key, $meta_value = '', $delete_a
 		return delete_term_meta($term_id, $meta_key, $meta_value);
 	}
 	return delete_metadata('term', $term_id, $meta_value, $meta_value, $delete_all);
+}
+
+function hocwp_term_meta_icon_field($taxonomies = array()) {
+	global $pagenow;
+	if('edit-tags.php' == $pagenow || 'term.php' == $pagenow) {
+		if(!hocwp_array_has_value($taxonomies)) {
+			$taxonomies = array('category');
+		}
+		$meta = new HOCWP_Meta('term');
+		$meta->set_taxonomies($taxonomies);
+		$meta->set_use_media_upload(true);
+		$meta->add_field(array('id' => 'icon', 'label' => __('Icon', 'hocwp'), 'field_callback' => 'hocwp_field_media_upload'));
+		$meta->init();
+		hocwp_term_meta_icon_html_field($taxonomies);
+	}
+}
+
+function hocwp_term_meta_icon_html_field($taxonomies = array()) {
+	global $pagenow;
+	if('edit-tags.php' == $pagenow || 'term.php' == $pagenow) {
+		if(!hocwp_array_has_value($taxonomies)) {
+			$taxonomies = array('category');
+		}
+		$meta = new HOCWP_Meta('term');
+		$meta->set_taxonomies($taxonomies);
+		$meta->set_use_media_upload(true);
+		$meta->add_field(array('id' => 'icon_html', 'label' => __('Icon HTML', 'hocwp')));
+		$meta->init();
+	}
 }

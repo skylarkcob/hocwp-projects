@@ -1,5 +1,5 @@
 <?php
-if(!function_exists('add_filter')) {exit;}
+if(!function_exists('add_filter')) exit;
 
 function hocwp_post_class($classes) {
     $classes[] = 'hocwp-post';
@@ -129,7 +129,10 @@ function hocwp_post_thumbnail($args = array()) {
         if(is_numeric($height) && $height > 0) {
             $params['height'] = $height;
         }
-        $bfi_url = bfi_thumb($thumbnail_url, $params);
+        $bfi_url = apply_filters('hocwp_pre_bfi_thumb', '', $thumbnail_url, $params);
+        if(empty($bfi_url)) {
+            $bfi_url = bfi_thumb($thumbnail_url, $params);
+        }
         if(!empty($bfi_url)) {
             $thumbnail_url = $bfi_url;
         }

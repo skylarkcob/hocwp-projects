@@ -477,7 +477,7 @@ if(!(bool)$hocwp_coupon_site) {
 
 global $pagenow;
 
-if('edit-tags.php' == $pagenow) {
+if('edit-tags.php' == $pagenow || 'term.php' == $pagenow) {
 	hocwp_term_meta_different_name_field(array('store', 'coupon_cat'));
 	hocwp_term_meta_thumbnail_field(array('store'));
 	$meta = new HOCWP_Meta('term');
@@ -509,7 +509,7 @@ function hocwp_coupon_on_save_post($post_id) {
 		wp_set_object_terms($post_id, 'Promo Codes', 'coupon_type');
 	}
 	if('coupon' == $current_post->post_type) {
-		$event = hocwp_get_value_by_key($_POST, 'event');
+		$event = hocwp_get_method_value('event');
 		update_post_meta($post_id, 'event', $event);
 	}
 }
@@ -635,11 +635,11 @@ function hocwp_coupon_filter_ajax_callback() {
 	$result = array(
 		'have_posts' => false
 	);
-	$term = hocwp_get_value_by_key($_POST, 'term');
-	$filter = hocwp_get_value_by_key($_POST, 'filter');
+	$term = hocwp_get_method_value('term');
+	$filter = hocwp_get_method_value('filter');
 	if(hocwp_id_number_valid($term)) {
-		$posts_per_page = hocwp_get_value_by_key($_POST, 'posts_per_page');
-		$paged = hocwp_get_value_by_key($_POST, 'paged');
+		$posts_per_page = hocwp_get_method_value('posts_per_page');
+		$paged = hocwp_get_method_value('paged');
 		$args = array(
 			'post_type' => 'coupon',
 			'posts_per_page' => $posts_per_page,

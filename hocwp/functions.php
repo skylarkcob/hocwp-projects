@@ -1,5 +1,6 @@
 <?php
 if(!function_exists('add_filter')) exit;
+
 function hocwp_use_session() {
     $use_session = apply_filters('hocwp_track_user_viewed_posts', false);
     $use_session = apply_filters('hocwp_use_session', $use_session);
@@ -152,42 +153,91 @@ function hocwp_get_plugin_name($plugin_file, $default = '') {
     return hocwp_get_value_by_key($plugin, 'Name', $default);
 }
 
+function hocwp_string_empty($string) {
+    if('' === $string) {
+        return true;
+    }
+    return false;
+}
+
 function hocwp_get_value_by_key($arr, $key, $default = '') {
-    $value = $default;
-    $tmp = $arr;
-    if(!is_array($key)) {
-        $value = isset($arr[$key]) ? $arr[$key] : $default;
-        return $value;
+    if(is_object($key) || is_object($arr) || hocwp_string_empty($key)) {
+        return $default;
     }
-    foreach($key as $child_key) {
-        $has_value = false;
-        $tmp = (array)$tmp;
-        if(is_array($child_key)) {
-            continue;
-        }
-        if(isset($tmp[$child_key])) {
-            $has_value = true;
-            $tmp = $tmp[$child_key];
-        }
-        if(empty($tmp) || !is_array($tmp)) {
-            if($has_value) {
-                $value = $tmp;
+    $has_key = false;
+    $arr = hocwp_sanitize_array($arr);
+    $result = '';
+    if(hocwp_array_has_value($arr)) {
+        if(is_array($key)) {
+            if(count($key) == 1) {
+                $key = array_shift($key);
+                if(isset($arr[$key])) {
+                    return $arr[$key];
+                }
+            } else {
+                $tmp = $arr;
+                if(is_array($tmp)) {
+                    $has_value = false;
+                    $level = 0;
+                    foreach($key as $index => $child_key) {
+                        if(is_array($child_key)) {
+                            if(count($child_key) == 1) {
+                                $child_key = array_shift($child_key);
+                            }
+                            $result = hocwp_get_value_by_key($tmp, $child_key);
+                        } else {
+                            if(isset($tmp[$child_key])) {
+                                $tmp = $tmp[$child_key];
+                                $has_value = true;
+                                $level++;
+                                $has_key = true;
+                            }
+                        }
+                    }
+                    if(!$has_value) {
+                        reset($key);
+                        $first_key = current($key);
+                        if(hocwp_array_has_value($arr)) {
+                            $tmp = hocwp_get_value_by_key($arr, $first_key);
+                            if(hocwp_array_has_value($tmp)) {
+                                $result = hocwp_get_value_by_key($tmp, $key);
+                            }
+                        }
+                    }
+                    if($has_value && hocwp_string_empty($result)) {
+                        $result = $tmp;
+                    }
+                }
             }
-            break;
+        } else {
+            if(isset($arr[$key])) {
+                $result = $arr[$key];
+                $has_key = true;
+            } else {
+                foreach($arr as $index => $value) {
+                    if(is_array($value)) {
+                        $result = hocwp_get_value_by_key($value, $key);
+                    } else {
+                        if($key === $index) {
+                            $has_key = true;
+                            $result = $value;
+                        }
+                    }
+                }
+            }
         }
     }
-    if(!empty($tmp)) {
-        $value = $tmp;
+    if(!$has_key) {
+        $result = $default;
     }
-    return $value;
+    return $result;
 }
 
 function hocwp_get_method_value($key, $method = 'post', $default = '') {
-    $result = '';
     $method = strtoupper($method);
     switch($method) {
         case 'POST':
-            $result = hocwp_get_value_by_key($_POST, $key, $default);
+            $result = hocwp_get_value_by_key($key, $default);
             break;
         case 'GET':
             $result = hocwp_get_value_by_key($_GET, $key, $default);
@@ -207,7 +257,8 @@ function hocwp_array_unique($arr) {
 
 function hocwp_get_terms($taxonomy, $args = array()) {
     $args['hide_empty'] = 0;
-    return get_terms($taxonomy, $args);
+    $args['taxonomy'] = $taxonomy;
+    return get_terms($args);
 }
 
 function hocwp_remove_select_tag_keep_content($content) {
@@ -241,6 +292,7 @@ function hocwp_check_password($password) {
 function hocwp_get_term_drop_down($args = array()) {
     $defaults = array(
         'hide_empty' => false,
+        'hide_if_empty' => true,
         'hierarchical' => true,
         'orderby' => 'NAME',
         'show_count' => true,
@@ -249,13 +301,15 @@ function hocwp_get_term_drop_down($args = array()) {
     );
     $args = wp_parse_args($args, $defaults);
     $select = wp_dropdown_categories($args);
-    $required = hocwp_get_value_by_key($args, 'required', false);
-    $autocomplete = (bool)hocwp_get_value_by_key($args, 'autocomplete', false);
-    if($required) {
-        $select = hocwp_add_html_attribute('select', $select, 'required aria-required="true"');
-    }
-    if(!$autocomplete) {
-        $select = hocwp_add_html_attribute('select', $select, 'autocomplete="off"');
+    if(!empty($select)) {
+        $required = hocwp_get_value_by_key($args, 'required', false);
+        $autocomplete = (bool)hocwp_get_value_by_key($args, 'autocomplete', false);
+        if($required) {
+            $select = hocwp_add_html_attribute('select', $select, 'required aria-required="true"');
+        }
+        if(!$autocomplete) {
+            $select = hocwp_add_html_attribute('select', $select, 'autocomplete="off"');
+        }
     }
     return $select;
 }
@@ -315,7 +369,10 @@ function hocwp_uppercase_first_char($string, $encoding = 'utf-8') {
     return $first_char . $then;
 }
 
-function hocwp_uppercase_first_char_words($string, $encoding = 'utf-8') {
+function hocwp_uppercase_first_char_words($string, $deprecated = '') {
+    if(!empty($deprecated)) {
+        _deprecated_argument(__FUNCTION__, '3.3.4');
+    }
     $words = explode(' ', $string);
     $words = array_map('hocwp_uppercase_first_char', $words);
     return implode(' ', $words);
@@ -797,7 +854,7 @@ function hocwp_json_string_to_array($json_string) {
     return $json_string;
 }
 
-function hocwp_sanitize_form_post($key, $type) {
+function hocwp_sanitize_form_post($key, $type = 'default') {
     switch($type) {
         case 'checkbox':
             return isset($_POST[$key]) ? 1 : 0;
@@ -819,20 +876,21 @@ function hocwp_trim_array_item($item) {
     return $item;
 }
 
-function hocwp_sanitize_array($arr, $unique = true, $filter = true) {
+function hocwp_sanitize_array($arr, $unique = '', $filter = '') {
+    if(is_bool($unique) || '' !== $unique) {
+        _deprecated_argument(__FUNCTION__, '3.3.3');
+    }
+    if(is_bool($filter) || '' !== $filter) {
+        _deprecated_argument(__FUNCTION__, '3.3.3');
+    }
     if(!is_array($arr)) {
         $arr = (array)$arr;
     }
-    if($unique) {
-        $arr = hocwp_array_unique($arr);
-    }
-    if($filter && is_array($arr)) {
-        $arr = array_map('hocwp_trim_array_item', $arr);
-        $keys = array_keys($arr, '', true);
-        if(hocwp_array_has_value($keys)) {
-            foreach($keys as $key) {
-                unset($arr[$key]);
-            }
+    foreach($arr as $key => $item) {
+        if(hocwp_string_empty($item)) {
+            unset($arr[$key]);
+        } elseif(is_array($item)) {
+            $arr[$key] = hocwp_sanitize_array($item);
         }
     }
     return $arr;
@@ -1054,6 +1112,9 @@ function hocwp_is_force_mobile_cookie($cookie) {
 }
 
 function hocwp_get_domain_name($url) {
+    if(is_object($url) || is_array($url)) {
+        return '';
+    }
     $url = strval($url);
     $parse = parse_url($url);
     $result = isset($parse['host']) ? $parse['host'] : '';
@@ -1648,7 +1709,6 @@ function hocwp_convert_day_name_to_vietnamese($day_name) {
 
 function hocwp_get_current_weekday($format = 'd/m/Y H:i:s', $args = array()) {
     $weekday = hocwp_get_current_date('l');
-    $labels = isset($args['labels']) ? $args['labels'] : array();
     $separator = isset($args['separator'] ) ? $args['separator'] : ', ';
     $weekday = hocwp_convert_day_name_to_vietnamese($weekday);
     return $weekday . $separator . hocwp_get_current_date($format);
@@ -1689,7 +1749,6 @@ function hocwp_get_social_share_url($args = array()) {
     $result = '';
     $title = get_the_title();
     $permalink = get_the_permalink();
-    $url = $permalink;
     $social_name = '';
     $thumbnail = '';
     $excerpt = get_the_excerpt();
@@ -1826,6 +1885,14 @@ function hocwp_add_string_with_space_before(&$string, $add) {
 
 function hocwp_get_current_admin_page() {
     return isset($_REQUEST['page']) ? $_REQUEST['page'] : '';
+}
+
+function hocwp_is_current_admin_page($page) {
+    $admin_page = hocwp_get_current_admin_page();
+    if(!empty($admin_page) && $admin_page == $page) {
+        return true;
+    }
+    return false;
 }
 
 function hocwp_get_plugins($folder = '') {
@@ -2048,6 +2115,12 @@ function hocwp_media_file_exists($id) {
     return false;
 }
 
+function hocwp_get_media_id($url) {
+    global $wpdb;
+    $attachment = $wpdb->get_col($wpdb->prepare("SELECT ID FROM $wpdb->posts WHERE guid='%s';", $url));
+    return $attachment[0];
+}
+
 function hocwp_get_media_image_detail($id) {
     return wp_get_attachment_image_src($id, 'full');
 }
@@ -2065,6 +2138,13 @@ function hocwp_size_converter($bytes, $decimals = 2) {
 
 function hocwp_get_media_size($id) {
     return filesize(get_attached_file($id));
+}
+
+function hocwp_get_image_sizes($id) {
+    if(!hocwp_id_number_valid($id)) {
+        return null;
+    }
+    return getimagesize(get_attached_file($id));
 }
 
 function hocwp_get_media_option_url($value) {
@@ -2630,12 +2710,8 @@ function hocwp_execute_upload($args = array()) {
         }
         $upload_path = $target_dir;
     }
-    $is_multiple = false;
     $file_names = isset($files['name']) ? $files['name'] : array();
     $file_count = count($file_names);
-    if($file_count > 1) {
-        $is_multiple = true;
-    }
     $list_files = array();
     for($i = 0; $i < $file_count; $i++) {
         $name = isset($files['name'][$i]) ? $files['name'][$i] : '';

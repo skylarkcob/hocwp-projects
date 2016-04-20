@@ -84,7 +84,7 @@ function hocwp_meta_box_google_maps($args = array()) {
 		$meta->set_title($title);
 		$meta->set_id($id);
 		$meta->set_post_types($post_types);
-		$map_args = array('id' => 'maps_content', 'label' => '', 'field_callback' => 'hocwp_field_google_maps');
+		$map_args = array('id' => 'maps_content', 'label' => '', 'field_callback' => 'hocwp_field_google_maps', 'names' => array('google_maps'));
 		if(hocwp_id_number_valid($post_id)) {
 			$google_maps = hocwp_get_post_meta('google_maps', $post_id);
 			$google_maps = hocwp_json_string_to_array($google_maps);

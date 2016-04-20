@@ -594,7 +594,7 @@ function hocwp_field_input($args) {
     if($required) {
         $attributes['required'] = 'true';
     }
-    if(empty($value)) {
+    if(hocwp_string_empty($value)) {
         $value = isset($args['default']) ? $args['default'] : '';
     }
     if(is_array($value)) {
@@ -762,7 +762,7 @@ function hocwp_field_input_right_label($type, $args = array()) {
         $option['after'] = isset($args['after']) ? $args['after'] : '</p>';
         $option['name'] = isset($option['name']) ? $option['name'] : $name;
         $option['value'] = $value;
-        if(empty($value) && 0 == $count && 'radio' == $type) {
+        if(hocwp_string_empty($value) && 0 == $count && 'radio' == $type) {
             $option['attributes']['checked'] = 'checked';
         }
         hocwp_field_input($option);

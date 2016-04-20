@@ -122,7 +122,6 @@ class HOCWP_Widget_Post extends WP_Widget {
         $thumbnail_size = isset($instance['thumbnail_size']) ? $instance['thumbnail_size'] : $this->args['thumbnail_size'];
         $thumbnail_size = hocwp_sanitize_size($thumbnail_size);
         $full_width_post = hocwp_get_value_by_key($instance, 'full_width_post', $this->args['full_width_post']);
-        $sidebar = isset($args['id']) ? $args['id'] : 'default';
         $content_class = 'widget-content';
         $slider = hocwp_get_value_by_key($instance, 'slider', hocwp_get_value_by_key($this->args, 'slider'));
         $title_length = hocwp_get_value_by_key($instance, 'title_length', hocwp_get_value_by_key($this->args, 'title_length'));

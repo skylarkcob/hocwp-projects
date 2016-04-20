@@ -66,12 +66,12 @@ class HOCWP_Widget_Subscribe extends WP_Widget {
 	}
 
 	function hocwp_widget_subscribe_ajax_callback() {
-		$use_captcha = (bool)hocwp_get_value_by_key($_POST, 'use_captcha');
-		$captcha_code = hocwp_get_value_by_key($_POST, 'captcha');
-		$email = hocwp_get_value_by_key($_POST, 'email');
-		$name = hocwp_get_value_by_key($_POST, 'name');
-		$phone = hocwp_get_value_by_key($_POST, 'phone');
-		$register = (bool)hocwp_get_value_by_key($_POST, 'register');
+		$use_captcha = (bool)hocwp_get_method_value('use_captcha');
+		$captcha_code = hocwp_get_method_value('captcha');
+		$email = hocwp_get_method_value('email');
+		$name = hocwp_get_method_value('name');
+		$phone = hocwp_get_method_value('phone');
+		$register = (bool)hocwp_get_method_value('register');
 		$result = array(
 			'success' => false,
 			'message' => hocwp_build_message(hocwp_text_error_default(), 'danger')

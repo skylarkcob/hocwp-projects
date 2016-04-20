@@ -1,5 +1,6 @@
 <?php
 if(!function_exists('add_filter')) exit;
+
 class HOCWP_Meta {
     private $type;
     private $fields;
@@ -191,7 +192,7 @@ class HOCWP_Meta {
 
     public function term_meta_init() {
         global $pagenow;
-        if('edit-tags.php' == $pagenow || $this->get_use_media_upload()) {
+        if('edit-tags.php' == $pagenow || 'term.php' == $pagenow || $this->get_use_media_upload()) {
             add_filter('hocwp_wp_enqueue_media', '__return_true');
             add_filter('hocwp_use_admin_style_and_script', '__return_true');
             add_filter('hocwp_admin_jquery_datetime_picker', '__return_true');
@@ -239,14 +240,15 @@ class HOCWP_Meta {
             foreach($this->get_fields() as $field) {
                 $field_args = isset($field['field_args']) ? $field['field_args'] : array();
                 $callback = isset($field['field_callback']) ? $field['field_callback'] : 'hocwp_field_input';
-                if(!isset($field_args['value'])) {
-                    $field_args['value'] = hocwp_term_get_meta($term_id, $field_args['name']);
-                }
                 $label = isset($field_args['label']) ? $field_args['label'] : '';
                 unset($field_args['label']);
                 $id = isset($field_args['id']) ? $field_args['id'] : '';
                 $name = isset($field_args['name']) ? $field_args['name'] : '';
                 hocwp_transmit_id_and_name($id, $name);
+                if(!isset($field_args['value'])) {
+                    $value = hocwp_term_get_meta($term_id, $name);
+                    $field_args['value'] = $value;
+                }
                 $class = 'term-' . $name . '-wrap';
                 $class = hocwp_sanitize_file_name($class);
                 hocwp_add_string_with_space_before($class, 'form-field hocwp');
@@ -269,7 +271,8 @@ class HOCWP_Meta {
     }
 
     public function save_term_data($term_id) {
-        foreach($this->get_fields() as $field) {
+        $fields = $this->get_fields();
+        foreach($fields as $field) {
             $type = isset($field['type']) ? $field['type'] : 'default';
             $name = isset($field['field_args']['name']) ? $field['field_args']['name'] : '';
             if(empty($name)) {
@@ -372,6 +375,15 @@ class HOCWP_Meta {
             }
             $value = hocwp_sanitize_form_post($name, $type);
             update_post_meta($post_id, $name, $value);
+            $names = hocwp_get_value_by_key($field, 'names');
+            if(hocwp_array_has_value($names)) {
+                $names = array_combine($names, $names);
+                foreach($names as $child_name => $child) {
+                    $type = hocwp_get_value_by_key($child, 'type', 'default');
+                    $value = hocwp_sanitize_form_post($child_name, $type);
+                    update_post_meta($post_id, $child_name, $value);
+                }
+            }
         }
         return $post_id;
     }

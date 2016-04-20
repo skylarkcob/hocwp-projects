@@ -243,14 +243,14 @@ function hocwp_execute_register() {
     }
     $transient = '';
     if($http_post) {
-        $action = hocwp_get_value_by_key($_POST, 'action');
+        $action = hocwp_get_method_value('action');
         if('register' === $action) {
-            $user_login = hocwp_get_value_by_key($_POST, 'user_login');
-            $user_email = hocwp_get_value_by_key($_POST, 'user_email');
-            $pwd = hocwp_get_value_by_key($_POST, 'pwd');
-            $pwd_again = hocwp_get_value_by_key($_POST, 'pwd_again');
-            $phone = hocwp_get_value_by_key($_POST, 'phone');
-            $captcha = hocwp_get_value_by_key($_POST, 'captcha');
+            $user_login = hocwp_get_method_value('user_login');
+            $user_email = hocwp_get_method_value('user_email');
+            $pwd = hocwp_get_method_value('pwd');
+            $pwd_again = hocwp_get_method_value('pwd_again');
+            $phone = hocwp_get_method_value('phone');
+            $captcha = hocwp_get_method_value('captcha');
             $user_login = sanitize_user($user_login, true);
             $user_email = sanitize_email($user_email);
             $transient_name = 'hocwp_register_user_' . md5($user_email);
@@ -387,14 +387,7 @@ function hocwp_register_form($args = array()) {
                     <label for="phone"><?php echo $args['label_phone']; ?><br />
                         <input type="text" name="phone" id="phone" class="input" value="<?php echo $phone; ?>" size="20" /></label>
                 </p>
-                <?php
-                /**
-                 * Fires following the 'Email' field in the user registration form.
-                 *
-                 * @since 2.1.0
-                 */
-                do_action( 'register_form' );
-                ?>
+                <?php do_action('register_form'); ?>
                 <input type="hidden" name="action" value="register">
                 <input type="hidden" name="redirect_to" value="<?php echo esc_attr( $redirect_to ); ?>" />
                 <p class="submit"><input type="submit" name="wp-submit" id="wp-submit" class="button button-primary button-large" value="<?php echo $args['text_register_link']; ?>" /></p>

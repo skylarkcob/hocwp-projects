@@ -5,7 +5,7 @@ if(defined('HOCWP_PATH')) {
     return;
 }
 
-define('HOCWP_VERSION', '3.3.3');
+define('HOCWP_VERSION', '3.3.5');
 
 define('HOCWP_PATH', dirname(__FILE__));
 
@@ -35,9 +35,9 @@ define('HOCWP_TINYMCE_VERSION', '4');
 
 define('HOCWP_BOOTSTRAP_LATEST_VERSION', '3.3.6');
 
-define('HOCWP_FONTAWESOME_LATEST_VERSION', '4.5.0');
+define('HOCWP_FONTAWESOME_LATEST_VERSION', '4.6.1');
 
-define('HOCWP_SUPERFISH_LATEST_VERSION', '1.7.7');
+define('HOCWP_SUPERFISH_LATEST_VERSION', '1.7.8');
 
 if(!defined('HOCWP_MINIMUM_PHP_VERSION')) {
     define('HOCWP_MINIMUM_PHP_VERSION', '5.2.4');

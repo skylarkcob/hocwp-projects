@@ -101,6 +101,9 @@ class HOCWP_Option {
 
     public function set_use_media_upload($use) {
         $this->use_media_upload = $use;
+        if($use) {
+            $this->set_use_style_and_script(true);
+        }
     }
 
     public function get_use_media_upload() {
@@ -547,6 +550,18 @@ class HOCWP_Option {
     }
 
     public function sanitize($input) {
+        $fields = $this->get_fields();
+        if(hocwp_array_has_value($fields)) {
+            foreach($fields as $field) {
+                $data_type = hocwp_get_value_by_key($field, 'data_type');
+                if('checkbox' == $data_type) {
+                    $name = hocwp_get_value_by_key($field, 'name');
+                    if(!empty($name)) {
+                        $input[$name] = hocwp_checkbox_post_data_value($input, $name);
+                    }
+                }
+            }
+        }
         if($this->get_parse_options()) {
             $old = (array)get_option($this->get_option_name());
             $input = (array)$input;
@@ -555,7 +570,7 @@ class HOCWP_Option {
         $input = apply_filters('hocwp_sanitize_option_' . $this->get_option_name_no_prefix(), $input);
         do_action('hocwp_sanitize_' . $this->get_option_name_no_prefix() . '_option', $input);
         $input = apply_filters('validate_options', $input);
-        return $input;
+        return apply_filters('hocwp_validate_options', $input);
     }
 
     public function field_init() {
@@ -665,6 +680,8 @@ class HOCWP_Option {
         $options = $this->get();
         if(is_array($options)) {
             $result = hocwp_get_value_by_key($options, $key, $default);
+        } elseif('' != $options) {
+            $result = $options;
         }
         return $result;
     }
@@ -771,6 +788,12 @@ class HOCWP_Option {
     }
 
     public function add_field($args = array()) {
+        $data_type = hocwp_get_value_by_key($args, 'data_type', 'default');
+        $callback = hocwp_get_value_by_key($args, 'field_callback');
+        if(hocwp_callback_exists($callback) && 'hocwp_field_input_checkbox' == $callback) {
+            $data_type = 'checkbox';
+        }
+        $args['data_type'] = $data_type;
         $id = isset($args['id']) ? $args['id'] : '';
         $name = isset($args['name']) ? $args['name'] : '';
         $class = isset($args['class']) ? $args['class'] : '';

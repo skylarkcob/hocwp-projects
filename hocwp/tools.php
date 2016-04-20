@@ -23,7 +23,7 @@ function hocwp_google_login_script($args = array()) {
     }
     $clientid = hocwp_get_value_by_key($args, 'clientid', hocwp_get_google_client_id());
     if(empty($clientid)) {
-        _e('Please set your Google Client ID first.', 'hocwp');
+        hocwp_debug_log(__('Please set your Google Client ID first.', 'hocwp'));
         return;
     }
     ?>
@@ -90,7 +90,7 @@ function hocwp_facebook_login_script($args = array()) {
     }
     $app_id = hocwp_get_wpseo_social_facebook_app_id();
     if(empty($app_id)) {
-        _e('Please set your Facebook APP ID first.', 'hocwp');
+        hocwp_debug_log(__('Please set your Facebook APP ID first.', 'hocwp'));
         return;
     }
     ?>

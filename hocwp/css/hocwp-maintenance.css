@@ -1,14 +1,11 @@
 /**
- * Last updated: 25/02/2016
+ * Last updated: 20/04/2016
  */
 
 .hocwp-maintenance {
-    background-attachment: fixed;
-    background-color: #fff;
-    background-position: center center;
-    background-repeat: no-repeat;
+    background: #fff no-repeat fixed center center;
     background-size: cover;
-    font-family: arial;
+    font-family: arial, Tahoma, sans-serif;
     font-size: 200%;
     line-height: 38px;
     text-align: center;

@@ -480,7 +480,7 @@ function hocwp_wc_remove_cart_item_ajax_callback() {
     $result = array(
         'updated' => false
     );
-    $post_id = hocwp_get_value_by_key($_POST, 'post_id');
+    $post_id = hocwp_get_method_value('post_id');
     if(hocwp_id_number_valid($post_id)) {
         $WC = WC();
         $updated = false;
@@ -513,16 +513,16 @@ function hocwp_wc_order_item_ajax_callback() {
         'success' => false,
         'html_data' => '<p class="alert alert-danger">Đã có lỗi xảy ra, xin vui lòng thử lại sau.</p>'
     );
-    $post_id = hocwp_get_value_by_key($_POST, 'post_id');
+    $post_id = hocwp_get_method_value('post_id');
     if(hocwp_id_number_valid($post_id)) {
         $post = get_post($post_id);
         if(is_a($post, 'WP_Post') && 'product' == $post->post_type) {
-            $name = hocwp_get_value_by_key($_POST, 'name');
-            $phone = hocwp_get_value_by_key($_POST, 'phone');
-            $email = hocwp_get_value_by_key($_POST, 'email');
-            $address = hocwp_get_value_by_key($_POST, 'address');
-            $message = hocwp_get_value_by_key($_POST, 'message');
-            $attributes = hocwp_get_value_by_key($_POST, 'attributes');
+            $name = hocwp_get_method_value('name');
+            $phone = hocwp_get_method_value('phone');
+            $email = hocwp_get_method_value('email');
+            $address = hocwp_get_method_value('address');
+            $message = hocwp_get_method_value('message');
+            $attributes = hocwp_get_method_value('attributes');
             $order = hocwp_wc_insert_order(array(
                 'post_id' => $post_id,
                 'name' => $name,

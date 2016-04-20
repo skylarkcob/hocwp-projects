@@ -59,7 +59,11 @@ class HOCWP_Widget_Social extends WP_Widget {
 				$item = hocwp_get_value_by_key($options, $option_name);
 				if(!empty($item)) {
 					$icon = '<i class="fa ' . $icons[$social] . '"></i>';
-					echo '<a href="' . $item . '" class="link-' . $social . ' social-item">' . $icon . '</a>';
+					$a = new HOCWP_HTML('a');
+					$a->set_href($item);
+					$a->set_class('social-item link-' . $social);
+					$a->set_text($icon);
+					$a->output();
 				}
 			}
 		}
