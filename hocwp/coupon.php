@@ -579,7 +579,7 @@ function hocwp_coupon_pre_get_posts($query) {
 			$query->set('post_type', 'coupon');
 		}
 		if(is_post_type_archive('coupon') || is_search() || is_tax('store') || is_tax('coupon_cat') || is_tax('coupon_tag')) {
-			$exclude_expired = apply_filters('hocwp_exlude_expired_coupon', true);
+			$exclude_expired = apply_filters('hocwp_exclude_expired_coupon', false);
 			if($exclude_expired) {
 				$query_vars = $query->query_vars;
 				$expired_coupon = (bool)hocwp_get_value_by_key($query_vars, 'expired_coupon');
