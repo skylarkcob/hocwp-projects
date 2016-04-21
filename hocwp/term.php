@@ -31,7 +31,7 @@ function hocwp_get_hierarchical_terms($taxonomies, $args = array()) {
         $taxonomies = array('category');
     }
     $args['hierarchical'] = true;
-    return get_terms($taxonomies, $args);
+    return hocwp_get_terms($taxonomies, $args);
 }
 
 function hocwp_get_taxonomies($args = array()) {
@@ -219,7 +219,7 @@ function hocwp_term_get_by_count($taxonomy = 'category', $args = array()) {
     $result = array();
     $args['orderby'] = 'count';
     $args['order'] = 'DESC';
-    $terms = get_terms($taxonomy, $args);
+    $terms = hocwp_get_terms($taxonomy, $args);
     if(hocwp_array_has_value($terms)) {
         $result = $terms;
     }

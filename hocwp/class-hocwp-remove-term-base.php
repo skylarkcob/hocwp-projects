@@ -147,7 +147,7 @@ class HOCWP_Remove_Term_Base {
 
 	public function add_rewrite_rule($taxonomy_name, $tax_base, $wp_query_var, $query_var, $rules) {
 		$rules = array();
-		$terms = get_terms($taxonomy_name, array('hide_empty' => false));
+		$terms = hocwp_get_terms($taxonomy_name, array('hide_empty' => false));
 		foreach($terms as $term) {
 			$rules['(' . $term->slug . ')/(?:feed/)?(feed|rdf|rss|rss2|atom)/?$'] = 'index.php?' . $wp_query_var . '=$matches[1]&feed=$matches[2]';
 			$rules['(' . $term->slug . ')/page/?([0-9]{1,})/?$'] = 'index.php?' . $wp_query_var . '=$matches[1]&paged=$matches[2]';

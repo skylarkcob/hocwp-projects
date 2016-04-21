@@ -107,7 +107,7 @@ class HOCWP_Widget_Term extends WP_Widget {
             'orderby' => $orderby,
             'number' => absint($number)
         );
-        $terms = get_terms($taxonomies, $tax_args);
+        $terms = hocwp_get_terms($taxonomies, $tax_args);
 
         hocwp_widget_before($args, $instance);
         ob_start();

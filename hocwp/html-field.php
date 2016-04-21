@@ -68,7 +68,10 @@ function hocwp_field_captcha($args = array()) {
     $lang = hocwp_get_language();
     hocwp_sanitize_field_args($args);
     $captcha = new HOCWP_Captcha();
-    $id = isset($args['id']) ? $args['id'] : 'hocwp_captcha';
+    $id = isset($args['id']) ? $args['id'] : '';
+    if(hocwp_string_empty($id)) {
+        $id = 'hocwp_captcha';
+    }
     $placeholder = isset($args['placeholder']) ? $args['placeholder'] : ('vi' == $lang) ? 'Nhập mã bảo mật' : __('Enter captcha code', 'hocwp');
     $class = isset($args['class']) ? $args['class'] : '';
     $input_width = isset($args['input_width']) ? absint($args['input_width']) : 125;
@@ -81,6 +84,7 @@ function hocwp_field_captcha($args = array()) {
         hocwp_transmit_id_and_name($id, $name);
     }
     hocwp_add_string_with_space_before($class, 'hocwp-captcha-code');
+    $args['id'] = $id;
     hocwp_field_before($args);
     $image_url = $captcha->generate_image();
     ?>
@@ -242,7 +246,7 @@ function hocwp_field_sortable_term($args = array()) {
             'exclude' => $save_ids
         );
         $term_args = wp_parse_args($term_args, $defaults);
-        $terms = get_terms($taxonomy, $term_args);
+        $terms = hocwp_get_terms($taxonomy, $term_args);
         if(!$connect) {
             $results = $active_terms;
             if(hocwp_array_has_value($results)) {

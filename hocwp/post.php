@@ -185,7 +185,7 @@ function hocwp_post_thumbnail($args = array()) {
             ?>
         </div>
     <?php else : ?>
-        <a class="post-thumbnail entry-thumb" href="<?php echo $permalink; ?>" aria-hidden="true"<?php hocwp_html_tag_attributes('a', 'entry_thumb'); ?>>
+        <a class="post-thumbnail-loop entry-thumb" href="<?php echo $permalink; ?>" aria-hidden="true"<?php hocwp_html_tag_attributes('a', 'entry_thumb'); ?>>
             <?php
             $img->output();
             if((bool)$lazyload) {

@@ -256,9 +256,18 @@ function hocwp_array_unique($arr) {
 }
 
 function hocwp_get_terms($taxonomy, $args = array()) {
-    $args['hide_empty'] = 0;
-    $args['taxonomy'] = $taxonomy;
-    return get_terms($args);
+    global $wp_version;
+    $defaults = array(
+        'hide_empty' => 0,
+        'taxonomy' => $taxonomy
+    );
+    $args = wp_parse_args($args, $defaults);
+    if(version_compare($wp_version, '4.5', '>=')) {
+        $terms = get_terms($args);
+    } else {
+        $terms = get_terms($taxonomy, $args);
+    }
+    return $terms;
 }
 
 function hocwp_remove_select_tag_keep_content($content) {

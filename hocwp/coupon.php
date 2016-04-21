@@ -144,11 +144,11 @@ function hocwp_get_top_category_by_coupon_count($args = array()) {
 }
 
 function hocwp_get_coupon_categories($args = array()) {
-	return get_terms('coupon_cat', $args);
+	return hocwp_get_terms('coupon_cat', $args);
 }
 
 function hocwp_get_coupon_stores($args = array()) {
-	return get_terms('store', $args);
+	return hocwp_get_terms('store', $args);
 }
 
 function hocwp_get_coupon_hint($post_id = null) {

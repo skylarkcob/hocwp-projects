@@ -300,7 +300,7 @@ function hocwp_term_pagination($args = array()) {
         'number' => 0,
         'hide_empty' => false
     );
-    $terms = get_terms($taxonomy, $term_args);
+    $terms = hocwp_get_terms($taxonomy, $term_args);
     $total_page = 1;
     if(0 < $posts_per_page) {
         $total_page = ceil(count($terms) / $posts_per_page);

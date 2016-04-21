@@ -101,7 +101,7 @@ function hocwp_breadcrumb($args = array()) {
             $term_id = get_query_var('tag_id');
             $taxonomy = 'post_tag';
             $args ='include=' . $term_id;
-            $terms = get_terms($taxonomy, $args);
+            $terms = hocwp_get_terms($taxonomy, $args);
             if(hocwp_array_has_value($terms)) {
                 echo '<li class="item-current item-tag-' . $terms[0]->term_id . ' item-tag-' . $terms[0]->slug . '"><strong class="bread-current bread-tag-' . $terms[0]->term_id . ' bread-tag-' . $terms[0]->slug . '">' . $terms[0]->name . '</strong></li>';
             }
