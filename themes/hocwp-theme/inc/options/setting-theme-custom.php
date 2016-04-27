@@ -14,13 +14,18 @@ $lists = hocwp_get_value_by_key($defaults, array('theme_custom', 'background_mus
 $play_on = hocwp_get_value_by_key($defaults, array('theme_custom', 'background_music', 'play_on'));
 $all_option = '';
 $value = hocwp_get_value_by_key($options, 'play_on');
+
 if(empty($value)) {
     $value = $play_on;
 }
-foreach($lists as $key => $item) {
-    $tmp_option = hocwp_field_get_option(array('value' => $key, 'text' => $item, 'selected' => $value));
-    $all_option .= $tmp_option;
+
+if(hocwp_array_has_value($lists)) {
+    foreach($lists as $key => $item) {
+        $tmp_option = hocwp_field_get_option(array('value' => $key, 'text' => $item, 'selected' => $value));
+        $all_option .= $tmp_option;
+    }
 }
+
 $option->add_field(array('id' => 'play_on', 'title' => __('Play On', 'hocwp'), 'field_callback' => 'hocwp_field_select', 'section' => 'music', 'all_option' => $all_option, 'default' => $play_on));
 $option->add_section(array('id' => 'background', 'title' => __('Background', 'hocwp'), 'description' => __('Custom background of your site.', 'hocwp')));
 $option->add_field(array('id' => 'background_image', 'title' => __('Image', 'hocwp'), 'field_callback' => 'hocwp_field_media_upload', 'section' => 'background'));

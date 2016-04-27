@@ -391,6 +391,9 @@ function hocwp_theme_translation_gettext_woocommerce($translation, $text) {
         case 'Subtotal:':
             $translation = 'Tạm tính:';
             break;
+        case 'Shipping:':
+            $translation = 'Phí vận chuyển:';
+            break;
         case 'Customer details':
         case 'Customer Details':
             $translation = 'Thông tin khách hàng';
@@ -630,6 +633,19 @@ function hocwp_theme_translation_gettext_woocommerce($translation, $text) {
         case 'Sort Code':
             $translation = 'Mã số';
             break;
+        case 'Calculate Shipping':
+            $translation = 'Tính phí vận chuyển';
+            break;
+        case 'Update Totals':
+            $translation = 'Cập nhật chi phí';
+            break;
+        case 'Select a country&hellip;':
+        case 'Select a country...':
+            $translation = 'Chọn quốc gia...';
+            break;
+        case 'State / county':
+            $translation = 'Tỉnh / Thành Phố';
+            break;
     }
     return $translation;
 }
@@ -670,6 +686,9 @@ function hocwp_theme_translation_ngettext_woocommerce($translation, $single, $pl
         case '%s for %s items';
         case '%s for %s item':
             $translation = '%s cho %s sản phẩm';
+            break;
+        case 'Shipping':
+            $translation = 'Phí vận chuyển';
             break;
     }
     return $translation;

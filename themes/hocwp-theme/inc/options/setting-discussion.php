@@ -2,8 +2,10 @@
 if(!function_exists('add_filter')) exit;
 
 global $hocwp_tos_tabs;
+
 $option = new HOCWP_Option(__('Discussion', 'hocwp'), 'hocwp_discussion');
 $option->set_parent_slug('hocwp_theme_option');
+
 $option->add_field(array('id' => 'allow_shortcode', 'title' => __('Shortcode', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox', 'label' => __('Allow user to post shortcode in comment.', 'hocwp')));
 $option->add_section(array('id' => 'comment_form', 'title' => __('Comment Form', 'hocwp'), 'description' => __('These options can help you to customize comment form on your site.', 'hocwp')));
 $field_options = array(
@@ -37,9 +39,12 @@ $field_options = array(
 	)
 );
 $option->add_field(array('id' => 'captcha', 'title' => __('Captcha', 'hocwp'), 'options' => $field_options, 'field_callback' => 'hocwp_field_input_checkbox', 'section' => 'comment_form'));
+
 $option->add_option_tab($hocwp_tos_tabs);
 $option->set_page_header_callback('hocwp_theme_option_form_before');
 $option->set_page_footer_callback('hocwp_theme_option_form_after');
 $option->set_page_sidebar_callback('hocwp_theme_option_sidebar_tab');
+
 $option->init();
+
 hocwp_option_add_object_to_list($option);

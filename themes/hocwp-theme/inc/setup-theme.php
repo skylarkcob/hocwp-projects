@@ -2,6 +2,7 @@
 if(!function_exists('add_filter')) exit;
 
 $lang = hocwp_get_language();
+$dash_widget = hocwp_dashboard_services_news_widget();
 
 remove_action('wp_head', 'wp_generator');
 
@@ -406,7 +407,6 @@ function hocwp_setup_theme_wp_dashboard_setup() {
     unset($wp_meta_boxes['dashboard']['normal']['core']['hocwp_wordpress_release']);
     $wp_meta_boxes['dashboard']['side']['core']['hocwp_wordpress_release'] = $backup;
 }
-if('vi' == $lang) add_action('wp_dashboard_setup', 'hocwp_setup_theme_wp_dashboard_setup');
 
 function hocwp_theme_dashboard_widget_wordpress_release() {
     $feeds = array(
@@ -439,35 +439,39 @@ function hocwp_theme_dashboard_widget_services_news() {
 }
 
 function hocwp_setup_theme_dashboard_primary_link() {
-    return trailingslashit(HOCWP_HOMEPAGE) . 'blog/';
-}
-if('vi' == $lang) add_filter('dashboard_primary_link', 'hocwp_setup_theme_dashboard_primary_link');
-
-function hocwp_setup_theme_dashboard_secondary_link() {
     return trailingslashit(HOCWP_HOMEPAGE);
 }
-if('vi' == $lang) add_filter('dashboard_secondary_link', 'hocwp_setup_theme_dashboard_secondary_link');
 
 function hocwp_setup_theme_dashboard_primary_feed() {
     return trailingslashit(HOCWP_HOMEPAGE) . 'feed/';
 }
-if('vi' == $lang) add_filter('dashboard_primary_feed', 'hocwp_setup_theme_dashboard_primary_feed');
+
+function hocwp_setup_theme_dashboard_secondary_link() {
+    return trailingslashit(HOCWP_HOMEPAGE) . 'blog/';
+}
 
 function hocwp_setup_theme_dashboard_secondary_feed() {
     return trailingslashit(HOCWP_HOMEPAGE) . 'blog/feed/';
 }
-if('vi' == $lang) add_filter('dashboard_secondary_feed', 'hocwp_setup_theme_dashboard_secondary_feed');
 
 function hocwp_setup_theme_dashboard_primary_title() {
     return __('Services News', 'hocwp');
 }
-if('vi' == $lang) add_filter('dashboard_primary_title', 'hocwp_setup_theme_dashboard_primary_title', 1);
-if('vi' == $lang) add_filter('dashboard_secondary_title', 'hocwp_setup_theme_dashboard_primary_title');
 
 function hocwp_setup_theme_dashboard_secondary_items() {
     return 5;
 }
-if('vi' == $lang) add_filter('dashboard_secondary_items', 'hocwp_setup_theme_dashboard_secondary_items');
+
+if('vi' == $lang && $dash_widget) {
+    add_action('wp_dashboard_setup', 'hocwp_setup_theme_wp_dashboard_setup');
+    add_filter('dashboard_primary_link', 'hocwp_setup_theme_dashboard_primary_link');
+    add_filter('dashboard_primary_feed', 'hocwp_setup_theme_dashboard_primary_feed');
+    add_filter('dashboard_secondary_link', 'hocwp_setup_theme_dashboard_secondary_link');
+    add_filter('dashboard_secondary_feed', 'hocwp_setup_theme_dashboard_secondary_feed');
+    add_filter('dashboard_primary_title', 'hocwp_setup_theme_dashboard_primary_title', 1);
+    add_filter('dashboard_secondary_title', 'hocwp_setup_theme_dashboard_primary_title');
+    add_filter('dashboard_secondary_items', 'hocwp_setup_theme_dashboard_secondary_items');
+}
 
 function hocwp_theme_on_upgrade() {
     $version = get_option('hocwp_version');
@@ -499,6 +503,14 @@ function hocwp_setup_theme_admin_menu() {
     global $submenu;
     unset($submenu['themes.php'][6]);
     remove_submenu_page('hocwp_theme_option', 'hocwp_theme_option');
+    global $hocwp_private_post_types;
+    $hocwp_private_post_types = hocwp_sanitize_array($hocwp_private_post_types);
+    if(hocwp_array_has_value($hocwp_private_post_types)) {
+        foreach($hocwp_private_post_types as $post_type) {
+            $object = get_post_type_object($post_type);
+            add_submenu_page('hocwp_theme_option', $object->labels->name, $object->labels->name, 'manage_options', 'edit.php?post_type=' . $post_type);
+        }
+    }
 }
 add_action('admin_menu', 'hocwp_setup_theme_admin_menu', 99);
 
@@ -508,7 +520,22 @@ function hocwp_setup_theme_new_post_type_and_taxonomy() {
     $args = array(
         'name' => 'Sidebars',
         'singular_name' => 'Sidebar',
-        'slug' => 'hocwp_sidebar'
+        'slug' => 'hocwp_sidebar',
+        'show_in_menu' => '',
+        'labels' => array(
+            'all_items' => 'Sidebars'
+        )
+    );
+    hocwp_register_post_type_private($args);
+
+    $args = array(
+        'name' => 'Ads',
+        'singular_name' => 'Ads',
+        'slug' => 'hocwp_ads',
+        'show_in_menu' => '',
+        'labels' => array(
+            'all_items' => 'Ads'
+        )
     );
     hocwp_register_post_type_private($args);
 
@@ -517,12 +544,16 @@ function hocwp_setup_theme_new_post_type_and_taxonomy() {
         $args = array(
             'name' => 'Subscribers',
             'singular_name' => 'Subscriber',
-            'slug' => 'hocwp_subscriber'
+            'slug' => 'hocwp_subscriber',
+            'show_in_menu' => '',
+            'labels' => array(
+                'all_items' => 'Subscribers'
+            )
         );
         hocwp_register_post_type_private($args);
     }
 }
-add_action('init', 'hocwp_setup_theme_new_post_type_and_taxonomy', 0);
+add_action('init', 'hocwp_setup_theme_new_post_type_and_taxonomy', 99);
 
 function hocwp_setup_theme_the_content($content) {
     $add_to_content = apply_filters('hocwp_add_to_the_content', false);
@@ -584,19 +615,22 @@ function hocwp_setup_theme_add_default_sidebars() {
     if(!$added) {
         $sidebars = hocwp_theme_get_default_sidebars();
         foreach($sidebars as $name => $data) {
-            $post_data = array(
-                'post_title' => $data['name'],
-                'post_type' => 'hocwp_sidebar',
-                'post_status' => 'publish'
-            );
-            $post_id = hocwp_insert_post($post_data);
-            if(hocwp_id_number_valid($post_id)) {
-                update_post_meta($post_id, 'sidebar_default', 1);
-                update_post_meta($post_id, 'sidebar_id', $name);
-                update_post_meta($post_id, 'sidebar_name', $data['name']);
-                update_post_meta($post_id, 'sidebar_description', $data['description']);
-                update_post_meta($post_id, 'sidebar_tag', $data['tag']);
-                update_post_meta($post_id, 'active', 1);
+            $sidebar = hocwp_get_post_by_meta('sidebar_id', $name);
+            if(!$sidebar->have_posts()) {
+                $post_data = array(
+                    'post_title' => $data['name'],
+                    'post_type' => 'hocwp_sidebar',
+                    'post_status' => 'publish'
+                );
+                $post_id = hocwp_insert_post($post_data);
+                if(hocwp_id_number_valid($post_id)) {
+                    update_post_meta($post_id, 'sidebar_default', 1);
+                    update_post_meta($post_id, 'sidebar_id', $name);
+                    update_post_meta($post_id, 'sidebar_name', $data['name']);
+                    update_post_meta($post_id, 'sidebar_description', $data['description']);
+                    update_post_meta($post_id, 'sidebar_tag', $data['tag']);
+                    update_post_meta($post_id, 'active', 1);
+                }
             }
         }
         update_option('hocwp_default_sidebars_added', 1);
@@ -608,7 +642,7 @@ function hocwp_setup_theme_prevent_delete_sidebar($post_id) {
     $post = get_post($post_id);
     if('hocwp_sidebar' == $post->post_type) {
         $prevent = false;
-        if(!is_super_admin()) {
+        if(!hocwp_is_admin()) {
             $prevent = true;
         }
         $default = (bool)get_post_meta($post_id, 'sidebar_default');
@@ -624,6 +658,8 @@ add_action('wp_trash_post', 'hocwp_setup_theme_prevent_delete_sidebar', 10, 1);
 add_action('before_delete_post', 'hocwp_setup_theme_prevent_delete_sidebar', 10, 1);
 
 if('post.php' == $pagenow || 'post-new.php' == $pagenow) {
+    $post_type = hocwp_get_current_post_type();
+
     $readonly = false;
     $post_id = 0;
     if('post.php' == $pagenow) {
@@ -700,4 +736,34 @@ if('post.php' == $pagenow || 'post-new.php' == $pagenow) {
         $meta->add_field($field_args);
     }
     $meta->init();
+
+    if(empty($post_type) || 'hocwp_ads' == $post_type) {
+        $meta = new HOCWP_Meta('post');
+        $meta->add_post_type('hocwp_ads');
+        $meta->set_id('hocwp_ads_information');
+        $meta->set_title(__('Ads Information', 'hocwp'));
+
+        $positions = hocwp_get_ads_positions();
+
+        if(hocwp_array_has_value($positions)) {
+            $all_option = hocwp_field_get_option(array('text' => '--Choose Position--'));
+            $selected = get_post_meta($post_id, 'position', true);
+            foreach($positions as $position) {
+                $all_option .= hocwp_field_get_option(array('text' => $position['name'], 'value' => $position['id'], 'selected' => $selected));
+            }
+            $field_args = array(
+                'id' => 'position',
+                'label' => __('Position:', 'hocwp'),
+                'field_callback' => 'hocwp_field_select',
+                'all_option' => $all_option
+            );
+
+            $meta->add_field($field_args);
+        }
+
+        $meta->add_field(array('id' => 'expire', 'label' => __('Expire:', 'hocwp'), 'field_callback' => 'hocwp_field_datetime_picker'));
+        $meta->add_field(array('id' => 'code', 'label' => __('Code:', 'hocwp'), 'field_callback' => 'hocwp_field_textarea'));
+
+        $meta->init();
+    }
 }

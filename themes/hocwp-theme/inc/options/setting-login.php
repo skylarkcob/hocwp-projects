@@ -8,6 +8,7 @@ $option = new HOCWP_Option(__('Login settings', 'hocwp'), 'hocwp_user_login');
 $option->set_parent_slug($parent_slug);
 $option->set_use_style_and_script(true);
 $option->set_use_media_upload(true);
+
 $option->add_field(array('id' => 'logo', 'title' => __('Logo', 'hocwp'), 'field_callback' => 'hocwp_field_media_upload'));
 $option->add_field(array('id' => 'login_with_email', 'title' => __('Login With Email', 'hocwp'), 'label' => __('Allow user to login with registered email address?', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox'));
 $option->add_field(array('id' => 'users_can_register', 'title' => __('Membership', 'hocwp'), 'label' => __('Anyone can register', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox', 'value' => hocwp_users_can_register()));

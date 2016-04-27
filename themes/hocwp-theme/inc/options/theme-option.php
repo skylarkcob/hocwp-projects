@@ -11,6 +11,7 @@ $hocwp_theme_option->set_use_style_and_script(true);
 $hocwp_theme_option->init();
 
 require(HOCWP_THEME_INC_PATH . '/options/setting-theme-setting.php');
+require(HOCWP_THEME_INC_PATH . '/options/setting-theme-home.php');
 require(HOCWP_THEME_INC_PATH . '/options/setting-theme-custom.php');
 require(HOCWP_THEME_INC_PATH . '/options/setting-theme-custom-css.php');
 require(HOCWP_THEME_INC_PATH . '/options/setting-theme-add-to-head.php');

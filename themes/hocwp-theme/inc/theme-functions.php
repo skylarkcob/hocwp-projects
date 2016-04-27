@@ -1,9 +1,20 @@
 <?php
 if(!function_exists('add_filter')) exit;
+
 function hocwp_theme_register_lib_bootstrap() {
-    wp_register_style('bootstrap-style', get_template_directory_uri() . '/lib/bootstrap/css/bootstrap.min.css');
-    wp_register_style('bootstrap-theme-style', get_template_directory_uri() . '/lib/bootstrap/css/bootstrap-theme.min.css', array('bootstrap-style'));
-    wp_register_script('bootstrap', get_template_directory_uri() . '/lib/bootstrap/js/bootstrap.min.js', array('jquery'), false, true);
+    $options = hocwp_option_optimize();
+    $cdn = (bool)hocwp_get_value_by_key($options, 'use_bootstrap_cdn', true);
+    $style_url = get_template_directory_uri() . '/lib/bootstrap/css/bootstrap.min.css';
+    $theme_style_url = get_template_directory_uri() . '/lib/bootstrap/css/bootstrap-theme.min.css';
+    $script_url = get_template_directory_uri() . '/lib/bootstrap/js/bootstrap.min.js';
+    if($cdn) {
+        $style_url = 'https://maxcdn.bootstrapcdn.com/bootstrap/' . HOCWP_BOOTSTRAP_LATEST_VERSION . '/css/bootstrap.min.css';
+        $theme_style_url = 'https://maxcdn.bootstrapcdn.com/bootstrap/' . HOCWP_BOOTSTRAP_LATEST_VERSION . '/css/bootstrap-theme.min.css';
+        $script_url = 'https://maxcdn.bootstrapcdn.com/bootstrap/' . HOCWP_BOOTSTRAP_LATEST_VERSION . '/js/bootstrap.min.js';
+    }
+    wp_register_style('bootstrap-style', $style_url);
+    wp_register_style('bootstrap-theme-style', $theme_style_url, array('bootstrap-style'));
+    wp_register_script('bootstrap', $script_url, array('jquery'), false, true);
 }
 
 function hocwp_theme_register_lib_sticky() {
@@ -26,12 +37,26 @@ function hocwp_theme_register_lib_zeroclipboard() {
 }
 
 function hocwp_theme_register_lib_superfish() {
-    wp_register_style('superfish-style', get_template_directory_uri() . '/lib/superfish/css/superfish.min.css');
-    wp_register_script('superfish', get_template_directory_uri() . '/lib/superfish/js/superfish.min.js', array('jquery'), false, true);
+    $options = hocwp_option_optimize();
+    $cdn = (bool)hocwp_get_value_by_key($options, 'use_superfish_cdn', true);
+    $style_url = get_template_directory_uri() . '/lib/superfish/css/superfish.min.css';
+    $script_url = get_template_directory_uri() . '/lib/superfish/js/superfish.min.js';
+    if($cdn) {
+        $style_url = 'https://cdnjs.cloudflare.com/ajax/libs/superfish/' . HOCWP_SUPERFISH_LATEST_VERSION . '/css/superfish.min.css';
+        $script_url = 'https://cdnjs.cloudflare.com/ajax/libs/superfish/' . HOCWP_SUPERFISH_LATEST_VERSION . '/js/superfish.min.js';
+    }
+    wp_register_style('superfish-style', $style_url);
+    wp_register_script('superfish', $script_url, array('jquery'), false, true);
 }
 
 function hocwp_theme_register_lib_font_awesome() {
-    wp_register_style('font-awesome-style', get_template_directory_uri() . '/lib/font-awesome/css/font-awesome.min.css');
+    $options = hocwp_option_optimize();
+    $cdn = (bool)hocwp_get_value_by_key($options, 'use_fontawesome_cdn', true);
+    $url = get_template_directory_uri() . '/lib/font-awesome/css/font-awesome.min.css';
+    if($cdn) {
+        $url = 'https://maxcdn.bootstrapcdn.com/font-awesome/' . HOCWP_FONTAWESOME_LATEST_VERSION . '/css/font-awesome.min.css';
+    }
+    wp_register_style('font-awesome-style', $url);
 }
 
 function hocwp_theme_register_lib_raty() {
@@ -120,6 +145,10 @@ function hocwp_theme_get_image_url($name) {
     return get_template_directory_uri() . '/images/' . $name;
 }
 
+function hocwp_theme_get_home_setting($key) {
+    return hocwp_theme_get_option($key, 'home_setting');
+}
+
 function hocwp_theme_get_option($key, $base = 'theme_setting') {
     return hocwp_option_get_value($base, $key);
 }
@@ -203,6 +232,26 @@ function hocwp_theme_site_main_after() {
 
 function hocwp_theme_add_setting_section($args) {
     hocwp_option_add_setting_section('theme_setting', $args);
+}
+
+function hocwp_theme_add_home_setting_field($args) {
+    hocwp_option_add_setting_field('home_setting', $args);
+}
+
+function hocwp_theme_add_home_setting_section($args) {
+    hocwp_option_add_setting_section('home_setting', $args);
+}
+
+function hocwp_theme_add_setting_field_sortable_category($args = array()) {
+    $name = hocwp_get_value_by_key($args, 'name', 'sortable_category');
+    $title = hocwp_get_value_by_key($args, 'title', __('Sortable Category', 'hocwp'));
+    if(!isset($args['connect'])) {
+        $args['connect'] = true;
+    }
+    $args['name'] = $name;
+    $args['title'] = $title;
+    $args['field_callback'] = 'hocwp_field_sortable_term';
+    hocwp_theme_add_home_setting_field($args);
 }
 
 function hocwp_theme_add_setting_field($args) {
