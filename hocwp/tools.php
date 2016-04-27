@@ -160,9 +160,17 @@ function hocwp_get_default_lat_long() {
         'lat' => '37.42200662799378',
         'lng' => '-122.08403290000001'
     );
-    if('vi' == hocwp_get_language()) {
-        $lat_long['lat'] = '21.003118';
-        $lat_long['lng'] = '105.820141';
+    $data = get_option('hocwp_geo');
+    $lat = hocwp_get_value_by_key($data, 'default_lat');
+    $lng = hocwp_get_value_by_key($data, 'default_lng');
+    if(!empty($lat) && !empty($lng)) {
+        $lat_long['lat'] = $lat;
+        $lat_long['lng'] = $lng;
+    } else {
+        if('vi' == hocwp_get_language()) {
+            $lat_long['lat'] = '21.003118';
+            $lat_long['lng'] = '105.820141';
+        }
     }
     return apply_filters('hocwp_default_lat_lng', $lat_long);
 }
@@ -292,6 +300,94 @@ function hocwp_get_geo_code($args = array()) {
         }
     }
     return $results;
+}
+
+function hocwp_generate_min_file($file, $extension = 'js') {
+    $transient_name = 'hocwp_minified_' . md5($file);
+    if(false === get_transient($transient_name) || true) {
+        if(file_exists($file)) {
+            $extension = strtolower($extension);
+            if('js' === $extension) {
+                $minified = hocwp_minify_js($file);
+            } else {
+                $minified = hocwp_minify_css($file, true);
+            }
+            if(!empty($minified)) {
+                $info = pathinfo($file);
+                $basename = $info['basename'];
+                $filename = $info['filename'];
+                $extension = $info['extension'];
+                $min_name = $filename;
+                $min_name .= '.min';
+                if(!empty($extension)) {
+                    $min_name .= '.' . $extension;
+                }
+                $min_file = str_replace($basename, $min_name, $file);
+                $handler = fopen($min_file, 'w');
+                fwrite($handler, $minified);
+                fclose($handler);
+                set_transient($transient_name, 1, 15 * MINUTE_IN_SECONDS);
+                hocwp_debug_log(sprintf(__('File %s is compressed successfully!', 'hocwp'), $file));
+            }
+        }
+    }
+}
+
+function hocwp_compress_style($dir) {
+    $files = scandir($dir);
+    $my_files = array();
+    foreach($files as $file) {
+        $info = pathinfo($file);
+        if(isset($info['extension']) && 'css' == $info['extension']) {
+            $base_name = $info['basename'];
+            if(false !== strpos($base_name, '.min')) {
+                continue;
+            }
+            $my_files[] = trailingslashit($dir) . $file;
+        }
+    }
+    if(hocwp_array_has_value($my_files)) {
+        foreach($my_files as $file) {
+            hocwp_generate_min_file($file, 'css');
+        }
+    }
+}
+
+function hocwp_compress_script($dir) {
+    $files = scandir($dir);
+    $my_files = array();
+    foreach($files as $file) {
+        $info = pathinfo($file);
+        if(isset($info['extension']) && 'js' == $info['extension']) {
+            $base_name = $info['basename'];
+            if(false !== strpos($base_name, '.min')) {
+                continue;
+            }
+            $my_files[] = trailingslashit($dir) . $file;
+        }
+    }
+    if(hocwp_array_has_value($my_files)) {
+        foreach($my_files as $file) {
+            hocwp_generate_min_file($file);
+        }
+    }
+}
+
+function hocwp_compress_style_and_script() {
+    $hocwp_js_path = HOCWP_PATH . '/js';
+    $hocwp_css_path = HOCWP_PATH . '/css';
+    hocwp_compress_script($hocwp_js_path);
+    hocwp_compress_style($hocwp_css_path);
+    if(defined('HOCWP_THEME_VERSION')) {
+        $hocwp_js_path = HOCWP_THEME_PATH . '/js';
+        $hocwp_css_path = HOCWP_THEME_PATH . '/css';
+        hocwp_compress_script($hocwp_js_path);
+        hocwp_compress_style($hocwp_css_path);
+    }
+}
+
+function hocwp_php_thumb() {
+
 }
 
 function hocwp_post_rating_ajax_callback() {

@@ -369,13 +369,16 @@ class HOCWP_Widget_Post extends WP_Widget {
                         if($full_width) {
                             hocwp_add_string_with_space_before($class, 'full-width');
                         }
+                        if($hide_thumbnail) {
+                            hocwp_add_string_with_space_before($class, 'hide-thumbnail');
+                        }
                         ?>
                         <li <?php post_class($class); ?>>
                             <?php
                             do_action('hocwp_widget_post_before_post', $args, $instance, $this);
                             if(!(bool)$hide_thumbnail) {
                                 if($full_width) {
-                                    hocwp_post_thumbnail(array('bfi_thumb' => false));
+                                    hocwp_post_thumbnail(array('width' => 310, 'height' => 230));
                                 } else {
                                     hocwp_post_thumbnail(array('width' => $thumbnail_size[0], 'height' => $thumbnail_size[1]));
                                 }
@@ -394,13 +397,14 @@ class HOCWP_Widget_Post extends WP_Widget {
                 }
                 $widget_html .= $loop_html;
                 $widget_html .= '</ul>';
+                $widget_html .= apply_filters('hocwp_widget_post_after_loop', '', $args, $instance, $this);
             }
         } else {
             $widget_html .= '<p class="nothing-found">' . __('Nothing found!', 'hocwp') . '</p>';
         }
+        $widget_html = apply_filters('hocwp_widget_post_html', $widget_html, $args, $instance, $this);
         $widget_html .= '</div>';
         $widget_html .= hocwp_get_value_by_key($args, 'after_widget');
-        $widget_html = apply_filters('hocwp_widget_post_html', $widget_html, $args, $instance, $this);
         echo $widget_html;
     }
 

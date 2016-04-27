@@ -45,7 +45,9 @@ jQuery(document).ready(function($) {
     })();
 
     (function() {
-        hocwp.limitUploadFile($('input[type="file"]'));
+        $('input[type="file"].hocwp-field-upload').each(function() {
+            hocwp.limitUploadFile($(this));
+        });
     })();
 
     (function() {

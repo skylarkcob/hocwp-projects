@@ -172,7 +172,7 @@ function hocwp_field_datetime_picker($args = array()) {
     hocwp_add_string_with_space_before($class, 'hocwp-datetime-picker');
     $min_date = hocwp_get_value_by_key($args, 'min_date');
     $max_date = hocwp_get_value_by_key($args, 'max_date');
-    $date_format = hocwp_get_value_by_key($args, 'date_format');
+    $date_format = hocwp_get_value_by_key($args, 'date_format', hocwp_get_date_format());
     $value = hocwp_get_value_by_key($args, 'value');
     $args['class'] = $class;
     $atts = hocwp_get_value_by_key($args, 'attributes');
@@ -183,8 +183,12 @@ function hocwp_field_datetime_picker($args = array()) {
     $args['attributes'] = $atts;
     $args['type'] = 'text';
     if(is_numeric($value) && $value > 0) {
-        $args['value'] = date($date_format, $value);
+        $value = date($date_format, $value);
     }
+    if(is_numeric($value) && 0 == $value) {
+        $value = '';
+    }
+    $args['value'] = $value;
     hocwp_field_input($args);
 }
 
@@ -688,7 +692,6 @@ function hocwp_field_input_file($args = array()) {
         $name = 'file_names';
     }
     hocwp_add_string_with_space_before($class, 'hocwp-field-upload');
-    $args['class'] = $class;
     if($image) {
         $attributes['accept'] = 'image/*';
     }
@@ -703,8 +706,12 @@ function hocwp_field_input_file($args = array()) {
         if(false === strpos($name, '[]')) {
             $name .= '[]';
         }
+        hocwp_add_string_with_space_before($class, 'multiple-file');
+    } else {
+        hocwp_add_string_with_space_before($class, 'single-file');
     }
     $args['attributes'] = $attributes;
+    $args['class'] = $class;
     $after = hocwp_get_value_by_key($args, 'after');
     $after = '<div class="image-preview"></div>' . $after;
     $args['after'] = $after;
@@ -1149,6 +1156,7 @@ function hocwp_field_select_term($args = array()) {
     $taxonomy = hocwp_get_value_by_key($args, 'taxonomy');
     $taxonomies = hocwp_get_value_by_key($args, 'taxonomies');
     $taxonomies = hocwp_sanitize_array($taxonomies);
+    $taxonomies = hocwp_remove_empty_array_item($taxonomies);
     if(!hocwp_array_has_value($taxonomies) && empty($taxonomy)) {
         $taxonomy = 'category';
     }
@@ -1198,6 +1206,9 @@ function hocwp_field_select_term($args = array()) {
                 $term_args = array();
                 if($only_parent) {
                     $term_args['parent'] = 0;
+                }
+                if(!is_object($tax)) {
+                    continue;
                 }
                 $terms = hocwp_get_terms($tax->name, $term_args);
                 if(hocwp_array_has_value($terms)) {

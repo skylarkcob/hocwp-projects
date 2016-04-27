@@ -394,3 +394,10 @@ function hocwp_social_login_google_ajax_callback() {
 }
 add_action('wp_ajax_hocwp_social_login_google', 'hocwp_social_login_google_ajax_callback');
 add_action('wp_ajax_nopriv_hocwp_social_login_google', 'hocwp_social_login_google_ajax_callback');
+
+function hocwp_compress_style_and_script_ajax_callback() {
+    $result = array();
+    hocwp_compress_style_and_script();
+    wp_send_json($result);
+}
+add_action('wp_ajax_hocwp_compress_style_and_script', 'hocwp_compress_style_and_script_ajax_callback');

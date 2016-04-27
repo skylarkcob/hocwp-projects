@@ -247,7 +247,16 @@ function hocwp_loop_pagination_item($args = array()) {
                 $link_href = hocwp_get_pagenum_link(array('pagenum' => $i, 'request' => $request));
                 $result .= '<a class="item link-item current-item" href="' . $link_href . '" data-paged="' . $i . '">' . $i . '</a>';
             } else {
-                $result .= '<span class="item current-item">' . $i .'</span>';
+                $ajax = (bool)hocwp_get_value_by_key($args, 'ajax');
+                $current_item = new HOCWP_HTML('span');
+                if($ajax) {
+                    $current_item = new HOCWP_HTML('a');
+                    $current_item->add_class('link-item');
+                    $current_item->set_attribute('data-paged', $i);
+                }
+                $current_item->add_class('item current-item');
+                $current_item->set_text($i);
+                $result .= $current_item->build();
             }
         } else {
             $count_hidden_button_before = $before_current - ($anchor + 1);

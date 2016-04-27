@@ -1,5 +1,5 @@
 /**
- * Last updated: 20/04/2016
+ * Last updated: 21/04/2016
  */
 
 window.wp = window.wp || {};
@@ -858,10 +858,12 @@ jQuery(document).ready(function($) {
             }
             $mobile_menu_button.css({'line-height' : height + 'px'});
             $mobile_menu_button.show();
-            $menu_parent.find('.mobile-menu-button').on('click', function() {
+
+            $menu_parent.on('click', $mobile_menu_button, function() {
                 $element.toggleClass('active');
             });
-            $element.on('click', function(e) {
+
+            $menu_parent.on('click', $element, function(e) {
                 if(e.target == this) {
                     $element.toggleClass('active');
                 }

@@ -19,6 +19,24 @@ class HOCWP_Meta {
     private $edit_callback;
 
     private $use_media_upload = false;
+    private $use_color_picker = false;
+    private $use_datetime_picker = false;
+
+    public function set_use_datetime_picker($use) {
+        $this->use_datetime_picker = $use;
+    }
+
+    public function get_use_datetime_picker() {
+        return (bool)$this->use_datetime_picker;
+    }
+
+    public function set_use_color_picker($use) {
+        $this->use_color_picker = $use;
+    }
+
+    public function get_use_color_picker() {
+        return (bool)$this->use_color_picker;
+    }
 
     public function set_edit_callback($edit_callback) {
         $this->edit_callback = $edit_callback;
@@ -154,11 +172,23 @@ class HOCWP_Meta {
     }
 
     public function add_field($args) {
+        $callback = hocwp_get_value_by_key($args, 'field_callback');
         $field_args = isset($args['field_args']) ? $args['field_args'] : $args;
+        $data_type = hocwp_get_value_by_key($args, 'data_type', 'default');
+        if('hocwp_field_datetime_picker' == $callback) {
+            $this->set_use_datetime_picker(true);
+            $field_args['type'] = 'datetime';
+            $args['type'] = 'datetime';
+            $data_type = 'datetime';
+        }
         $this->sanitize_field_args($field_args);
         if(isset($args['options'])) {
             $field_args['options'] = $args['options'];
         }
+        if($this->get_type() != 'post' && !isset($field_args['label']) && isset($field_args['title'])) {
+            $field_args['label'] = $field_args['title'];
+        }
+        $field_args['data_type'] = $data_type;
         $args['field_args'] = $field_args;
         $this->fields[] = $args;
     }
@@ -195,6 +225,12 @@ class HOCWP_Meta {
         if('edit-tags.php' == $pagenow || 'term.php' == $pagenow || $this->get_use_media_upload()) {
             add_filter('hocwp_wp_enqueue_media', '__return_true');
             add_filter('hocwp_use_admin_style_and_script', '__return_true');
+            add_filter('hocwp_admin_jquery_datetime_picker', '__return_true');
+        }
+        if($this->get_use_color_picker()) {
+            add_filter('hocwp_use_color_picker', '__return_true');
+        }
+        if($this->get_use_color_picker()) {
             add_filter('hocwp_admin_jquery_datetime_picker', '__return_true');
         }
         foreach($this->get_taxonomies() as $taxonomy) {
@@ -240,13 +276,18 @@ class HOCWP_Meta {
             foreach($this->get_fields() as $field) {
                 $field_args = isset($field['field_args']) ? $field['field_args'] : array();
                 $callback = isset($field['field_callback']) ? $field['field_callback'] : 'hocwp_field_input';
-                $label = isset($field_args['label']) ? $field_args['label'] : '';
-                unset($field_args['label']);
+                $label = hocwp_get_value_by_key($field_args, 'title', hocwp_get_value_by_key($field_args, 'label'));
+                if('hocwp_field_input_checkbox' != $callback && 'hocwp_field_input_radio' != $callback) {
+                    unset($field_args['label']);
+                }
                 $id = isset($field_args['id']) ? $field_args['id'] : '';
                 $name = isset($field_args['name']) ? $field_args['name'] : '';
                 hocwp_transmit_id_and_name($id, $name);
                 if(!isset($field_args['value'])) {
                     $value = hocwp_term_get_meta($term_id, $name);
+                    if(empty($value) && 'hocwp_field_input_radio' == $callback) {
+                        $value = hocwp_get_value_by_key($field, 'default');
+                    }
                     $field_args['value'] = $value;
                 }
                 $class = 'term-' . $name . '-wrap';
@@ -379,7 +420,7 @@ class HOCWP_Meta {
             if(hocwp_array_has_value($names)) {
                 $names = array_combine($names, $names);
                 foreach($names as $child_name => $child) {
-                    $type = hocwp_get_value_by_key($child, 'type', 'default');
+                    $type = hocwp_get_value_by_key($child, 'type', hocwp_get_value_by_key($field, 'data_type', 'default'));
                     $value = hocwp_sanitize_form_post($child_name, $type);
                     update_post_meta($post_id, $child_name, $value);
                 }

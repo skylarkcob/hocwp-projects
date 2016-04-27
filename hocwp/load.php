@@ -5,7 +5,7 @@ if(defined('HOCWP_PATH')) {
     return;
 }
 
-define('HOCWP_VERSION', '3.3.6');
+define('HOCWP_VERSION', '3.3.8');
 
 define('HOCWP_PATH', dirname(__FILE__));
 
@@ -17,9 +17,11 @@ define('HOCWP_EMAIL', 'hocwp.net@gmail.com');
 
 define('HOCWP_HOMEPAGE', 'http://hocwp.net');
 
-define('HOCWP_CSS_SUFFIX', ((defined('WP_DEBUG') && true === WP_DEBUG) ? '.css' : '.min.css'));
+define('HOCWP_DEVELOPING', ((defined('WP_DEBUG') && true === WP_DEBUG) ? true : false));
 
-define('HOCWP_JS_SUFFIX', ((defined('WP_DEBUG') && true === WP_DEBUG) ? '.js' : '.min.js'));
+define('HOCWP_CSS_SUFFIX', (HOCWP_DEVELOPING) ? '.css' : '.min.css');
+
+define('HOCWP_JS_SUFFIX', (HOCWP_DEVELOPING) ? '.js' : '.min.js');
 
 define('HOCWP_DOING_AJAX', ((defined('DOING_AJAX') && true === DOING_AJAX) ? true : false));
 
@@ -133,6 +135,8 @@ require(HOCWP_PATH . '/back-end.php');
 
 require(HOCWP_PATH . '/front-end.php');
 
+require(HOCWP_PATH . '/ads.php');
+
 require(HOCWP_PATH . '/video.php');
 
 require(HOCWP_PATH . '/woocommerce.php');
@@ -144,3 +148,5 @@ require(HOCWP_PATH . '/coupon.php');
 require(HOCWP_PATH . '/classifieds.php');
 
 require(HOCWP_PATH . '/ajax.php');
+
+require(HOCWP_PATH . '/options/setting-tool-developer.php');

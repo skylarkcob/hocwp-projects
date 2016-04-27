@@ -166,6 +166,7 @@ function hocwp_post_thumbnail($args = array()) {
     }
     $loop = isset($args['loop']) ? $args['loop'] : true;
     $custom_html = isset($args['custom_html']) ? $args['custom_html'] : '';
+    $cover = hocwp_get_value_by_key($args, 'cover');
     echo $before;
     if(is_singular() && !$loop) : ?>
         <div class="post-thumbnail entry-thumb"<?php hocwp_html_tag_attributes('div', 'entry_thumb'); ?>>
@@ -185,13 +186,18 @@ function hocwp_post_thumbnail($args = array()) {
             ?>
         </div>
     <?php else : ?>
+        <?php if(!empty($custom_html)) : ?>
+            <div class="thumbnail-wrap">
+        <?php endif; ?>
         <a class="post-thumbnail-loop entry-thumb" href="<?php echo $permalink; ?>" aria-hidden="true"<?php hocwp_html_tag_attributes('a', 'entry_thumb'); ?>>
             <?php
             $img->output();
             if((bool)$lazyload) {
                 echo $bk_img;
             }
-            echo $custom_html;
+            if($cover) {
+                echo '<span class="cover"></span>';
+            }
             if(current_theme_supports('hocwp-schema')) {
                 ?>
                 <meta itemprop="url" content="<?php echo $thumbnail_url; ?>">
@@ -201,7 +207,12 @@ function hocwp_post_thumbnail($args = array()) {
             }
             ?>
         </a>
-    <?php endif;
+        <?php echo $custom_html; ?>
+        <?php if(!empty($custom_html)) : ?>
+            </div>
+        <?php endif; ?>
+    <?php
+    endif;
     echo $after;
 }
 

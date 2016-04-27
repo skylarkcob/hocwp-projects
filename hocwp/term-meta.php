@@ -107,3 +107,17 @@ function hocwp_term_meta_icon_html_field($taxonomies = array()) {
 		$meta->init();
 	}
 }
+
+function hocwp_term_meta_color_field($taxonomies = array()) {
+	global $pagenow;
+	if('edit-tags.php' == $pagenow || 'term.php' == $pagenow) {
+		if(!hocwp_array_has_value($taxonomies)) {
+			$taxonomies = array('category');
+		}
+		$meta = new HOCWP_Meta('term');
+		$meta->set_taxonomies($taxonomies);
+		$meta->set_use_color_picker(true);
+		$meta->add_field(array('id' => 'color', 'label' => __('Color', 'hocwp'), 'field_callback' => 'hocwp_field_color_picker'));
+		$meta->init();
+	}
+}

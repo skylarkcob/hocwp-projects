@@ -93,6 +93,9 @@ class HOCWP_HTML {
     }
 
     public function set_text($value) {
+        if(is_a($value, 'HOCWP_HTML')) {
+            $value = $value->build();
+        }
         $this->set_html($value);
     }
 

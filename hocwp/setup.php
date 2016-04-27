@@ -175,3 +175,11 @@ function hocwp_setup_admin_init() {
     }
 }
 add_action('admin_init', 'hocwp_setup_admin_init');
+
+function hocwp_setup_admin_body_class($class) {
+    if(HOCWP_DEVELOPING && hocwp_is_localhost()) {
+        hocwp_add_string_with_space_before($class, 'hocwp-developing');
+    }
+    return $class;
+}
+add_filter('admin_body_class', 'hocwp_setup_admin_body_class');

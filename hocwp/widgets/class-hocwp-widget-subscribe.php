@@ -273,10 +273,11 @@ class HOCWP_Widget_Subscribe extends WP_Widget {
 					} else {
 						$field_label .= ':';
 					}
+					$field_value = $this->get_value_field($instance, $field_name, $key);
 					$args = array(
 						'id' => $this->get_field_id('subscribe_' . $field_name . '_' . $key),
 						'name' => $this->get_field_name('subscribe_' . $field_name . '_' . $key),
-						'value' => $this->get_value_field($instance, $field_name, $key),
+						'value' => $field_value,
 						'label' => $field_label
 					);
 					hocwp_widget_field($field_callback, $args);

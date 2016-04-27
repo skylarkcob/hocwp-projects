@@ -199,6 +199,18 @@ function hocwp_get_feed_items($args = array()) {
     return $result;
 }
 
+function hocwp_rest_api_get($base_url, $object = 'posts', $query = '') {
+    $base_url = trailingslashit($base_url) . 'wp-json/wp/v2/' . $object;
+    if(!empty($query)) {
+        $base_url .= '?' . $query;
+    }
+    $data = @file_get_contents($base_url);
+    if(!empty($data)) {
+        $data = json_decode($data);
+    }
+    return $data;
+}
+
 function hocwp_read_xml($xml, $is_url = false) {
     if($is_url) {
         $transient_name = 'hocwp_read_xml_' . md5($xml);
@@ -968,6 +980,24 @@ function hocwp_facebook_like_button($args = array()) {
     $share = hocwp_bool_to_string($share);
     ?>
     <div class="<?php echo $class; ?>" data-href="<?php echo $permalink; ?>" data-layout="<?php echo $layout; ?>" data-action="<?php echo $action; ?>" data-show-faces="<?php echo $show_faces; ?>" data-share="<?php echo $share; ?>"></div>
+    <?php
+}
+
+function hocwp_facebook_like_and_recommend_button($args = array()) {
+    $url = isset($args['url']) ? $args['url'] : '';
+    if(empty($url)) {
+        $url = get_permalink();
+    }
+    $app_id = hocwp_get_wpseo_social_facebook_app_id();
+    ?>
+    <div class="fb-like-buttons like-recommend like-recommend-buttons">
+        <div class="item">
+            <div data-share="false" data-show-faces="false" data-action="like" data-layout="button_count" data-href="<?php echo $url; ?>" class="fb-like fb_iframe_widget" fb-xfbml-state="rendered" fb-iframe-plugin-query="action=like&amp;app_id=<?php echo $app_id; ?>&amp;container_width=0&amp;href=<?php echo $url; ?>&amp;layout=button_count&amp;locale=en_US&amp;sdk=joey&amp;share=false&amp;show_faces=false"></div>
+        </div>
+        <div class="item">
+            <div data-share="true" data-show-faces="false" data-action="recommend" data-layout="button_count" data-href="<?php echo $url; ?>" class="fb-like fb_iframe_widget" fb-xfbml-state="rendered" fb-iframe-plugin-query="action=recommend&amp;app_id=<?php echo $app_id; ?>&amp;container_width=0&amp;href=<?php echo $url; ?>&amp;layout=button_count&amp;locale=en_US&amp;sdk=joey&amp;share=false&amp;show_faces=false"></div>
+        </div>
+    </div>
     <?php
 }
 

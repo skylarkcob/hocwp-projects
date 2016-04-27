@@ -239,3 +239,25 @@ jQuery(document).ready(function($) {
         });
     })();
 });
+
+jQuery(document).ready(function($) {
+    (function() {
+        var $body = $('body');
+        if($body.hasClass('tools_page_hocwp_developers')) {
+            $body.css({cursor: 'wait'});
+            alert('Styles and Scripts are compressing, please wait...');
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: hocwp.ajax_url,
+                data: {
+                    action: 'hocwp_compress_style_and_script'
+                },
+                success: function(response){
+                    $body.css({cursor: 'auto'});
+                    alert('These files compressed successfully!');
+                }
+            });
+        }
+    })();
+});

@@ -111,7 +111,7 @@ function hocwp_get_ipinfo($ip) {
     if(!hocwp_is_ip($ip)) {
         return '';
     }
-    $json = file_get_contents('http://ipinfo.io/' . $ip);
+    $json = @file_get_contents('http://ipinfo.io/' . $ip);
     $details = json_decode($json);
     $details = (array)$details;
     return $details;
@@ -405,7 +405,11 @@ function hocwp_can_redirect() {
 }
 
 function hocwp_carousel_bootstrap($args = array()) {
-    $container_class = isset($args['container_class']) ? $args['container_class'] : 'slide';
+    $container_class = isset($args['container_class']) ? $args['container_class'] : '';
+    $slide = hocwp_get_value_by_key($args, 'slide', true);
+    if($slide) {
+        hocwp_add_string_with_space_before($container_class, 'slide');
+    }
     $id = isset($args['id']) ? $args['id'] : '';
     $callback = isset($args['callback']) ? $args['callback'] : '';
     $posts = isset($args['posts']) ? $args['posts'] : array();
@@ -421,8 +425,8 @@ function hocwp_carousel_bootstrap($args = array()) {
     if(empty($id) || !hocwp_callback_exists($callback)) {
         return;
     }
-    $data_interval = '6000';
-    if(!$auto_slide) {
+    $data_interval = hocwp_get_value_by_key($args, 'interval', 6000);
+    if(!$auto_slide || 1000 > $data_interval) {
         $data_interval = 'false';
     }
     $indicator_with_control = isset($args['indicator_with_control']) ? $args['indicator_with_control'] : false;
@@ -436,7 +440,7 @@ function hocwp_carousel_bootstrap($args = array()) {
             if(0 == $i) {
                 hocwp_add_string_with_space_before($indicator_class, 'active');
             }
-            $li = '<li data-slide-to="' . $i . '" data-target="#' . $id . '" class="' . $indicator_class . '"></li>';
+            $li = '<li data-slide-to="' . $i . '" data-target="#' . $id . '" class="' . $indicator_class . '" data-text="' . ($i + 1) . '"></li>';
             $ol_items .= $li;
         }
         $ol->set_text($ol_items);
@@ -451,7 +455,7 @@ function hocwp_carousel_bootstrap($args = array()) {
         $control->set_href('#' . $id);
         $control->set_attribute('data-slide', 'prev');
         $control->set_attribute('role', 'button');
-        $control->set_text('<span class="fa fa-chevron-left"></span><span class="sr-only">' . __('Previous', 'hocwp') . '</span>');
+        $control->set_text('<i class="fa fa-chevron-left"></i><span class="sr-only">' . __('Previous', 'hocwp') . '</span>');
         $li_items .= '<li class="prev">' . $control->build() . '</li>';
     }
     if($indicator_with_control) {
@@ -463,7 +467,7 @@ function hocwp_carousel_bootstrap($args = array()) {
         $control->set_href('#' . $id);
         $control->set_attribute('data-slide', 'next');
         $control->set_attribute('role', 'button');
-        $control->set_text('<span class="fa fa-chevron-right"></span><span class="sr-only">' . __('Next', 'hocwp') . '</span>');
+        $control->set_text('<i class="fa fa-chevron-right"></i><span class="sr-only">' . __('Next', 'hocwp') . '</span>');
         $li_items .= '<li class="next">' . $control->build() . '</li>';
     }
     $ul->set_text($li_items);
@@ -471,11 +475,24 @@ function hocwp_carousel_bootstrap($args = array()) {
     if(!$indicator_with_control) {
         $controls .= $indicator_html;
     }
-
+    $title = hocwp_get_value_by_key($args, 'title');
     ?>
     <div data-ride="carousel" class="<?php echo $container_class; ?>" id="<?php echo $id; ?>" data-interval="<?php echo $data_interval; ?>">
+        <?php
+        $title_html = hocwp_get_value_by_key($args, 'title_html');
+        if(empty($title_html)) {
+            if(!empty($title)) {
+                echo '<div class="title-wrap"><h4>' . $title. '</h4></div>';
+            }
+        } else {
+            echo $title_html;
+        }
+        ?>
         <div class="carousel-inner">
-            <?php call_user_func($callback, $args); ?>
+            <?php
+            $args['posts_per_page'] = $posts_per_page;
+            call_user_func($callback, $args);
+            ?>
         </div>
         <?php echo $controls; ?>
     </div>
@@ -868,7 +885,7 @@ function hocwp_sanitize_form_post($key, $type = 'default') {
         case 'checkbox':
             return isset($_POST[$key]) ? 1 : 0;
         case 'datetime':
-            return isset($_POST[$key]) ? hocwp_string_to_datetime($_POST[$key]) : '';
+            return isset($_POST[$key]) ? strtotime(hocwp_string_to_datetime($_POST[$key])) : '';
         case 'timestamp':
             $value = isset($_POST[$key]) ? $_POST[$key] : '';
             $value = strtotime($value);
@@ -885,6 +902,19 @@ function hocwp_trim_array_item($item) {
     return $item;
 }
 
+function hocwp_remove_empty_array_item($arr) {
+    if(is_array($arr)) {
+        foreach($arr as $key => $item) {
+            if(hocwp_string_empty($item)) {
+                unset($arr[$key]);
+            } elseif(is_array($item)) {
+                $arr[$key] = hocwp_remove_empty_array_item($item);
+            }
+        }
+    }
+    return $arr;
+}
+
 function hocwp_sanitize_array($arr, $unique = '', $filter = '') {
     if(is_bool($unique) || '' !== $unique) {
         _deprecated_argument(__FUNCTION__, '3.3.3');
@@ -894,13 +924,6 @@ function hocwp_sanitize_array($arr, $unique = '', $filter = '') {
     }
     if(!is_array($arr)) {
         $arr = (array)$arr;
-    }
-    foreach($arr as $key => $item) {
-        if(hocwp_string_empty($item)) {
-            unset($arr[$key]);
-        } elseif(is_array($item)) {
-            $arr[$key] = hocwp_sanitize_array($item);
-        }
     }
     return $arr;
 }
@@ -1332,6 +1355,8 @@ function hocwp_register_post_type($args = array()) {
     $feeds = isset($args['feeds']) ? $args['feeds'] : true;
     $query_var = isset($args['query_var']) ? $args['query_var'] : '';
     $capabilities = isset($args['capabilities']) ? $args['capabilities'] : array();
+    $custom_labels = hocwp_get_value_by_key($args, 'labels');
+    $custom_labels = hocwp_sanitize_array($custom_labels);
 
     if(empty($singular_name)) {
         $singular_name = $name;
@@ -1365,6 +1390,8 @@ function hocwp_register_post_type($args = array()) {
         'parent_item' => sprintf(__('Parent %s', 'hocwp'), $singular_name),
         'update_item' => sprintf(__('Update %s', 'hocwp'), $singular_name)
     );
+    $labels = wp_parse_args($custom_labels, $labels);
+
     $rewrite_slug = str_replace('_', '-', $slug);
     $rewrite_defaults = array(
         'slug' => $rewrite_slug,
@@ -1479,15 +1506,12 @@ function hocwp_register_taxonomy($args = array()) {
 }
 
 function hocwp_register_post_type_private($args = array()) {
-    if(!hocwp_is_admin()) {
-        return;
-    }
     global $hocwp_private_post_types;
     $args['public'] = false;
     $args['exclude_from_search'] = true;
     $args['show_in_nav_menus'] = false;
     $args['show_in_admin_bar'] = false;
-    $args['menu_position'] = 107;
+    $args['menu_position'] = 9999999;
     $args['has_archive'] = false;
     $args['feeds'] = false;
     $slug = isset($args['slug']) ? $args['slug'] : '';
@@ -1573,15 +1597,44 @@ function hocwp_strip_white_space_css($content) {
     return trim($content);
 }
 
-function hocwp_minify_css($css_content) {
-    $buffer = $css_content;
-    $buffer = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $buffer);
-    $buffer = str_replace(': ', ':', $buffer);
-    $buffer = str_replace(array("\r\n", "\r", "\n", "\t", '  ', '    ', '    '), '', $buffer);
-    $buffer = hocwp_shorten_hex_css($buffer);
-    $buffer = hocwp_shorten_zero_css($buffer);
-    $buffer = hocwp_strip_white_space_css($buffer);
+function hocwp_minify_css($css_content, $online = false) {
+    if($online) {
+        $buffer = hocwp_get_minified('https://cssminifier.com/raw', $css_content);
+    } else {
+        if(file_exists($css_content)) {
+            $css_content = @file_get_contents($css_content);
+        }
+        $buffer = $css_content;
+        $buffer = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $buffer);
+        $buffer = str_replace(': ', ':', $buffer);
+        $buffer = str_replace(array("\r\n", "\r", "\n", "\t", '  ', '    ', '    '), '', $buffer);
+        $buffer = hocwp_shorten_hex_css($buffer);
+        $buffer = hocwp_shorten_zero_css($buffer);
+        $buffer = hocwp_strip_white_space_css($buffer);
+    }
     return $buffer;
+}
+
+function hocwp_minify_js($js) {
+    return hocwp_get_minified('https://javascript-minifier.com/raw', $js);
+}
+
+function hocwp_get_minified($url, $content) {
+    if(file_exists($content)) {
+        $content = @file_get_contents($content);
+    }
+    $postdata = array(
+        'http' => array(
+            'method'  => 'POST',
+            'header'  => 'Content-type: application/x-www-form-urlencoded',
+            'content' => http_build_query(
+                array(
+                    'input' => $content
+                )
+            )
+        )
+    );
+    return @file_get_contents($url, false, stream_context_create($postdata));
 }
 
 function hocwp_the_posts_navigation() {
@@ -2127,7 +2180,7 @@ function hocwp_media_file_exists($id) {
 function hocwp_get_media_id($url) {
     global $wpdb;
     $attachment = $wpdb->get_col($wpdb->prepare("SELECT ID FROM $wpdb->posts WHERE guid='%s';", $url));
-    return $attachment[0];
+    return isset($attachment[0]) ? $attachment[0] : 0;
 }
 
 function hocwp_get_media_image_detail($id) {
@@ -2318,7 +2371,8 @@ function hocwp_default_script_localize_object() {
             'insert_media_title' => __('Insert media', 'hocwp'),
             'insert_media_button_text' => __('Use this media', 'hocwp'),
             'insert_media_button_texts' => __('Use these medias', 'hocwp')
-        )
+        ),
+        'ajax_loading' => '<p class="ajax-wrap"><img class="ajax-loading" src="' . hocwp_get_image_url('icon-loading-circle-light-full.gif') . '" alt=""></p>'
     );
     return apply_filters('hocwp_default_script_object', $args);
 }

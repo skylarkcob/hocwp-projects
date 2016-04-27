@@ -188,6 +188,40 @@ function hocwp_entry_meta_terms($args = array()) {
     the_terms($post_id, $taxonomy, $before . $icon, $separator, $after);
 }
 
+function hocwp_the_date() {
+    ?>
+    <time datetime="<?php the_time('c'); ?>" itemprop="datePublished" class="entry-time published date post-date"><?php echo get_the_date(); ?></time>
+    <?php
+}
+
+function hocwp_the_comment_link() {
+    $post_id = get_the_ID();
+    if(comments_open($post_id)) {
+        $comment_count = hocwp_get_post_comment_count($post_id);
+        $comment_text = $comment_count . ' Bình luận';
+        ?>
+        <span class="entry-comments-link">
+            <a href="<?php the_permalink(); ?>#comments"><?php echo $comment_text; ?></a>
+        </span>
+        <?php
+    }
+}
+
+function hocwp_the_author($args = array()) {
+    $before = hocwp_get_value_by_key($args, 'before');
+    $author_url = hocwp_get_author_posts_url();
+    ?>
+    <span itemtype="http://schema.org/Person" itemscope itemprop="author" class="entry-author vcard author post-author">
+        <?php if(!empty($before)) : ?>
+            <span class="before-text"><?php echo $before; ?></span>
+        <?php endif; ?>
+        <span class="fn">
+            <a rel="author" itemprop="url" class="entry-author-link" href="<?php echo $author_url; ?>"><span itemprop="name" class="entry-author-name"><?php the_author(); ?></span></a>
+        </span>
+    </span>
+    <?php
+}
+
 function hocwp_entry_meta($args = array()) {
     $post_id = hocwp_get_value_by_key($args, 'post_id', get_the_ID());
     $class = hocwp_get_value_by_key($args, 'class');
@@ -210,17 +244,13 @@ function hocwp_entry_meta($args = array()) {
     ?>
     <p class="<?php echo $class; ?>">
         <?php if($show_date) : ?>
-            <time datetime="<?php the_time('c'); ?>" itemprop="datePublished" class="entry-time published date post-date"><?php echo get_the_date(); ?></time>
+            <?php hocwp_the_date(); ?>
         <?php endif; ?>
         <?php if($show_updated) : ?>
             <time datetime="<?php the_modified_time('c'); ?>" itemprop="dateModified" class="entry-modified-time date modified post-date"><?php the_modified_date(); ?></time>
         <?php endif; ?>
         <?php if($show_author) : ?>
-            <span itemtype="http://schema.org/Person" itemscope itemprop="author" class="entry-author vcard author post-author">
-            <span class="fn">
-                <a rel="author" itemprop="url" class="entry-author-link" href="<?php echo $author_url; ?>"><span itemprop="name" class="entry-author-name"><?php the_author(); ?></span></a>
-            </span>
-        </span>
+            <?php hocwp_the_author(); ?>
         <?php endif; ?>
         <?php
         if($show_term) {
@@ -233,9 +263,7 @@ function hocwp_entry_meta($args = array()) {
         }
         ?>
         <?php if($show_comment && comments_open($post_id)) : ?>
-            <span class="entry-comments-link">
-                <a href="<?php the_permalink(); ?>#comments"><?php echo $comment_text; ?></a>
-            </span>
+            <?php hocwp_the_comment_link(); ?>
         <?php endif; ?>
         <?php if(current_theme_supports('hocwp-schema')) : ?>
             <?php

@@ -1,5 +1,5 @@
 /**
- * Last updated: 20/04/2016
+ * Last updated: 21/04/2016
  */
 
 /**
@@ -123,6 +123,13 @@
     content: ":";
 }
 
+.form-field input[type="radio"] + label img.layout {
+    display: inline-block;
+    margin-bottom: 20px;
+    max-width: 215px;
+    vertical-align: top;
+}
+
 /**
  * Option Page
  */
@@ -131,7 +138,7 @@
     padding-top: 25px;
 }
 
-.hocwp.option-page > .page-title {
+.hocwp.option-page.has-sidebar > .page-title {
     display: none;
 }
 
@@ -167,7 +174,7 @@
     text-decoration: none;
 }
 
-.hocwp.option-page .page-content {
+.hocwp.option-page .page-content:not(.no-sidebar) {
     background-color: #f3f3f3;
     border-left: 1px solid #d5d5d5;
     border-right: 1px solid #d5d5d5;

@@ -413,13 +413,15 @@ function hocwp_classifieds_post_type_and_taxonomy() {
 add_action('init', 'hocwp_classifieds_post_type_and_taxonomy', 10);
 
 if('post.php' == $GLOBALS['pagenow'] || 'post-new.php' == $GLOBALS['pagenow']) {
+	$current_user = wp_get_current_user();
 	$meta = new HOCWP_Meta('post');
 	$meta->add_post_type('post');
 	$meta->set_title(__('General Information', 'hocwp'));
 	$meta->set_id('classifieds_general_information');
-	$meta->add_field(array('id' => 'address', 'label' => __('Address:', 'hocwp'), 'class' => 'hocwp-geo-address'));
+	$meta->add_field(array('id' => 'address', 'label' => __('Address:', 'hocwp'), 'class' => 'hocwp-geo-address', 'default' => get_user_meta($current_user->ID, 'address', true)));
 	$meta->add_field(array('id' => 'price', 'label' => __('Price:', 'hocwp')));
-	$meta->add_field(array('id' => 'phone', 'label' => __('Phone:', 'hocwp')));
+	$meta->add_field(array('id' => 'phone', 'label' => __('Phone:', 'hocwp'), 'default' => get_user_meta($current_user->ID, 'phone', true)));
+	$meta->add_field(array('id' => 'email', 'label' => __('Email:', 'hocwp'), 'default' => $current_user->user_email));
 	$meta->add_field(array('id' => 'acreage', 'label' => __('Acreage:', 'hocwp')));
 	$meta->init();
 	hocwp_meta_box_editor_gallery(array('post_type' => 'post'));
