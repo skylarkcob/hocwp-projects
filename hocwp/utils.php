@@ -626,19 +626,25 @@ function hocwp_load_jquery_from_cdn() {
             $enqueued = wp_script_is($handle);
             wp_enqueue_script($handle);
             $version = '';
+            $jquery_url = '';
+            $google_not_exists = array(
+                '1.12.3'
+            );
             if(is_a($wp_scripts, 'WP_Scripts')) {
                 $registered = $wp_scripts->registered;
                 if(isset($registered[$handle])) {
                     $version = $registered[$handle]->ver;
-                    if(version_compare($version, '1.12.3', '>=')) {
-                        return;
+                    if(in_array($version, $google_not_exists)) {
+                        $jquery_url = '//code.jquery.com/jquery-' . $version . '.min.js';
                     }
                 }
             }
             if(empty($version)) {
                 $version = HOCWP_JQUERY_LATEST_VERSION;
             }
-            $jquery_url = '//ajax.googleapis.com/ajax/libs/jquery/'. $version . '/jquery.min.js';
+            if(empty($jquery_url)) {
+                $jquery_url = '//ajax.googleapis.com/ajax/libs/jquery/'. $version . '/jquery.min.js';
+            }
             wp_dequeue_script($handle);
             wp_deregister_script($handle);
             wp_register_script($handle, $jquery_url);
