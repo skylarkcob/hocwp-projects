@@ -458,3 +458,31 @@
 .wp-list-table .manage-column.column-active {
     text-align: center;
 }
+
+/**
+ * Menu item
+ */
+
+.hocwp-custom-fields.menu-item-fields .description {
+    color: #666;
+    margin: 2px 0 5px;
+}
+
+.hocwp-custom-fields.menu-item-fields label {
+    display: block;
+    font-style: italic;
+}
+
+.hocwp-custom-fields.menu-item-fields .media-preview {
+    display: block;
+}
+
+.hocwp-custom-fields.menu-item-fields input.media-url {
+    margin-right: 5px;
+    width: 70%;
+}
+
+.hocwp-custom-fields.menu-item-fields .media-preview img {
+    background-color: #eee;
+    margin: 2px 0;
+}

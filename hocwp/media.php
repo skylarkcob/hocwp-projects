@@ -145,9 +145,13 @@ function hocwp_crop_image($args = array()) {
             }
         }
     }
-    $output = hocwp_get_value_by_key($args, 'output', 'url');
-    if('url' == $output) {
-        $cropped = hocwp_media_path_to_url($attachment_id, $cropped, $base_url);
+    if(file_exists($cropped)) {
+        $output = hocwp_get_value_by_key($args, 'output', 'url');
+        if('url' == $output) {
+            $cropped = hocwp_media_path_to_url($attachment_id, $cropped, $base_url);
+        }
+    } else {
+        $cropped = $url;
     }
     return apply_filters('hocwp_crop_image', $cropped, $args);
 }

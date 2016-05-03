@@ -118,27 +118,37 @@ function hocwp_term_get_thumbnail_url($args = array()) {
         $term_id = 0;
     }
     $value = get_term_meta($term_id, 'thumbnail', true);
-    $use_default_term_thumbnail = apply_filters('hocwp_use_default_term_thumbnail', true);
+    $use_default_term_thumbnail = apply_filters('hocwp_use_default_term_thumbnail', hocwp_get_value_by_key($args, 'use_default_thumbnail', true));
     $value = hocwp_sanitize_media_value($value);
     $value = $value['url'];
-    if(empty($value) && (bool)$use_default_term_thumbnail) {
-        $value = hocwp_get_image_url('no-thumbnail.png');
+    $icon = false;
+    if(empty($value)) {
+        $icon_url = hocwp_get_term_icon($term_id);
+        $value = $icon_url;
+        if(!empty($value)) {
+            $icon = true;
+        }
     }
-    $bfi_thumb = hocwp_get_value_by_key($args, 'bfi_thumb', true);
-    if((bool)$bfi_thumb) {
-        $size = hocwp_sanitize_size($args);
-        $params = array();
-        $width = $size[0];
-        if(hocwp_id_number_valid($width)) {
-            $params['width'] = $width;
+    if(!$icon) {
+        if(empty($value) && (bool)$use_default_term_thumbnail) {
+            $value = hocwp_get_image_url('no-thumbnail.png');
         }
-        $height = $size[1];
-        if(hocwp_id_number_valid($height)) {
-            $params['height'] = $height;
+        $bfi_thumb = hocwp_get_value_by_key($args, 'bfi_thumb', true);
+        if((bool)$bfi_thumb) {
+            $size = hocwp_sanitize_size($args);
+            $params = array();
+            $width = $size[0];
+            if(hocwp_id_number_valid($width)) {
+                $params['width'] = $width;
+            }
+            $height = $size[1];
+            if(hocwp_id_number_valid($height)) {
+                $params['height'] = $height;
+            }
+            $crop = hocwp_get_value_by_key($args, 'crop', true);
+            $params['crop'] = $crop;
+            $value = bfi_thumb($value, $params);
         }
-        $crop = hocwp_get_value_by_key($args, 'crop', true);
-        $params['crop'] = $crop;
-        $value = bfi_thumb($value, $params);
     }
     return apply_filters('hocwp_term_thumbnail', $value, $term_id);
 }
@@ -249,4 +259,10 @@ function hocwp_get_term_icon($term_id) {
         $icon = $icon['url'];
     }
     return $icon;
+}
+
+function hocwp_get_child_terms($parent_id, $taxonomy, $args = array()) {
+    $args['child_of'] = $parent_id;
+    $terms = hocwp_get_terms($taxonomy, $args);
+    return $terms;
 }

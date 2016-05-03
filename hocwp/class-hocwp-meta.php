@@ -180,7 +180,12 @@ class HOCWP_Meta {
             $field_args['type'] = 'datetime';
             $args['type'] = 'datetime';
             $data_type = 'datetime';
+        } elseif('hocwp_field_color_picker' == $callback) {
+            $this->set_use_color_picker(true);
+        } elseif('hocwp_field_media_upload' == $callback) {
+            $this->set_use_media_upload(true);
         }
+
         $this->sanitize_field_args($field_args);
         if(isset($args['options'])) {
             $field_args['options'] = $args['options'];
@@ -215,23 +220,135 @@ class HOCWP_Meta {
     public function init() {
         if($this->is_term_meta()) {
             $this->term_meta_init();
+        } elseif($this->is_menu_item_meta()) {
+            $this->menu_item_meta_init();
         } else {
             $this->post_meta_box_init();
         }
     }
 
-    public function term_meta_init() {
-        global $pagenow;
-        if('edit-tags.php' == $pagenow || 'term.php' == $pagenow || $this->get_use_media_upload()) {
+    public function add_custom_menu_item_meta_field($item, $args, $depth) {
+        echo '<div class="hocwp-custom-fields menu-item-fields">';
+        if(hocwp_callback_exists($this->get_callback())) {
+            call_user_func($this->get_callback());
+        } else {
+            $menu_id = $item->ID;
+            foreach($this->get_fields() as $field) {
+                $field_args = isset($field['field_args']) ? $field['field_args'] : array();
+                $callback = isset($field['field_callback']) ? $field['field_callback'] : 'hocwp_field_input';
+                $id = hocwp_get_value_by_key($field_args, 'id');
+                $name = hocwp_get_value_by_key($field_args, 'name');
+                $data = $this->build_menu_item_field_data($name, $menu_id);
+                $field_args['id'] = $data['id'];
+                $field_args['name'] = $data['name'];
+                $field_args['class'] = $data['class'];
+                if(!isset($field_args['value'])) {
+                    $field_args['value'] = $item->{$name};
+                }
+                if(hocwp_callback_exists($callback)) {
+                    call_user_func($callback, $field_args);
+                } else {
+                    echo '<p>' . sprintf(__('The callback function %s does not exists!', 'hocwp'), '<strong>' . $callback . '</strong>') . '</p>';
+                }
+            }
+        }
+        echo '</div>';
+    }
+
+    public function load_style_and_script() {
+        if($this->get_use_media_upload()) {
             add_filter('hocwp_wp_enqueue_media', '__return_true');
-            add_filter('hocwp_use_admin_style_and_script', '__return_true');
-            add_filter('hocwp_admin_jquery_datetime_picker', '__return_true');
         }
         if($this->get_use_color_picker()) {
             add_filter('hocwp_use_color_picker', '__return_true');
         }
-        if($this->get_use_color_picker()) {
+        if($this->get_use_datetime_picker()) {
             add_filter('hocwp_admin_jquery_datetime_picker', '__return_true');
+        }
+    }
+
+    public function add_menu_item_meta($menu_item) {
+        foreach($this->get_fields() as $field) {
+            $name = $field['field_args']['name'];
+            $menu_item->{$name} = hocwp_get_post_meta($this->build_menu_item_meta_key($name), $menu_item->ID);
+        }
+        return $menu_item;
+    }
+
+    public function build_menu_item_meta_key($key_name) {
+        $key_name = str_replace('-', '_', $key_name);
+        return '_menu_item_' . $key_name;
+    }
+
+    public function menu_item_meta_init() {
+        global $pagenow;
+        $this->load_style_and_script();
+        if('nav-menus.php' == $pagenow) {
+            add_filter('hocwp_use_admin_style_and_script', '__return_true');
+        }
+        add_filter('wp_setup_nav_menu_item', array($this, 'setup_nav_menu_item'));
+        add_action('wp_update_nav_menu_item', array($this, 'update_nav_menu_item'), 10, 3);
+        add_filter('wp_edit_nav_menu_walker', array($this, 'edit_nav_menu_walker'), 10, 2);
+        add_action('hocwp_edit_menu_item_field', array($this, 'add_custom_menu_item_meta_field'), 10, 3);
+        add_filter('hocwp_setup_nav_menu_item', array($this, 'add_menu_item_meta'));
+    }
+
+    public function setup_nav_menu_item($menu_item) {
+        $menu_item = apply_filters('hocwp_setup_nav_menu_item', $menu_item);
+        return $menu_item;
+    }
+
+    public function update_nav_menu_item($menu_id, $menu_item_db_id, $args) {
+        do_action('hocwp_update_nav_menu_item', $menu_id, $menu_item_db_id, $args);
+        foreach($this->get_fields() as $field) {
+            $name = $field['field_args']['name'];
+            $this->update_menu_item_meta_on_save($name, $menu_item_db_id);
+        }
+    }
+
+    public function update_menu_item_meta_on_save($field_name, $menu_item_db_id) {
+        $field_name = str_replace('_', '-', $field_name);
+        $key = 'menu-item-' . $field_name;
+        if(isset($_REQUEST[$key]) && is_array($_REQUEST[$key])) {
+            $value = $_REQUEST[$key][$menu_item_db_id];
+            update_post_meta($menu_item_db_id, $this->build_menu_item_meta_key($field_name), $value);
+        }
+    }
+
+    function edit_nav_menu_walker($walker, $menu_id) {
+        $walker = apply_filters('hocwp_edit_nav_menu_walker', 'HOCWP_Menu_Edit_Walker', $menu_id);
+        return $walker;
+    }
+
+    public function build_menu_item_field_id($field_name, $item_id) {
+        $id = str_replace('_', '-', $field_name);
+        return 'edit-menu-item-' . $id . '-' . $item_id;
+    }
+
+    public function build_menu_item_field_name($field_name, $item_id) {
+        $name = str_replace('_', '-', $field_name);
+        return 'menu-item-' . $name . '[' . $item_id . ']';
+    }
+
+    public function build_menu_item_field_class($field_name) {
+        $field_name = str_replace('_', '-', $field_name);
+        return 'edit-menu-item-' . $field_name;
+    }
+
+    public function build_menu_item_field_data($field_name, $item_id) {
+        $result = array(
+            'id' => $this->build_menu_item_field_id($field_name, $item_id),
+            'name' => $this->build_menu_item_field_name($field_name, $item_id),
+            'class' => $this->build_menu_item_field_class($field_name)
+        );
+        return $result;
+    }
+
+    public function term_meta_init() {
+        global $pagenow;
+        $this->load_style_and_script();
+        if('edit-tags.php' == $pagenow || 'term.php' == $pagenow) {
+            add_filter('hocwp_use_admin_style_and_script', '__return_true');
         }
         foreach($this->get_taxonomies() as $taxonomy) {
             add_action($taxonomy . '_add_form_fields', array($this, 'term_field_add_page'));
@@ -333,6 +450,9 @@ class HOCWP_Meta {
         $args['name'] = $name;
         if($this->is_term_meta()) {
 
+        } elseif($this->is_menu_item_meta()) {
+            $args['before'] = '<div class="field-' . hocwp_sanitize_html_class($name) . ' description description-wide">';
+            $args['after'] = '</div>';
         } else {
             $args['before'] = '<div class="meta-row">';
             $args['after'] = '</div>';
@@ -347,12 +467,18 @@ class HOCWP_Meta {
         return false;
     }
 
+    public function is_menu_item_meta() {
+        if('menu_item' == $this->get_type()) {
+            return true;
+        }
+        return false;
+    }
+
     public function post_meta_box_init() {
         global $pagenow;
+        $this->load_style_and_script();
         if('post-new.php' == $pagenow || 'post.php' == $pagenow || $this->get_use_media_upload()) {
-            add_filter('hocwp_wp_enqueue_media', '__return_true');
             add_filter('hocwp_use_admin_style_and_script', '__return_true');
-            add_filter('hocwp_admin_jquery_datetime_picker', '__return_true');
         }
         add_action('add_meta_boxes', array($this, 'add_meta_box'));
         add_action('save_post', array($this, 'save_post'));

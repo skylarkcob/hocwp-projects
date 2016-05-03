@@ -1741,32 +1741,108 @@ function hocwp_comment_nav() {
     endif;
 }
 
+function hocwp_get_current_day_of_week($full = true) {
+    $format = 'l';
+    if(!$full) {
+        $format = 'D';
+    }
+    return date($format);
+}
+
 function hocwp_convert_day_name_to_vietnamese($day_name) {
     $weekday = $day_name;
     switch($weekday) {
+        case 'Mon':
         case 'Monday':
             $weekday = 'Thứ hai';
             break;
+        case 'Tue':
         case 'Tuesday':
             $weekday = 'Thứ ba';
             break;
+        case 'Wed':
         case 'Wednesday':
             $weekday = 'Thứ tư';
             break;
+        case 'Thur':
         case 'Thursday':
             $weekday = 'Thứ năm';
             break;
+        case 'Fri':
         case 'Friday':
             $weekday = 'Thứ sáu';
             break;
+        case 'Sat':
         case 'Saturday':
             $weekday = 'Thứ bảy';
             break;
+        case 'Sun':
         case 'Sunday':
             $weekday = 'Chủ nhật';
             break;
     }
     return $weekday;
+}
+
+function hocwp_get_current_month_of_year($full = true) {
+    $format = 'F';
+    if(!$full) {
+        $format = 'M';
+    }
+    return date($format);
+}
+
+function hocwp_convert_month_name_to_vietnamese($month_full_name) {
+    switch($month_full_name) {
+        case 'Jan':
+        case 'January':
+            $month_full_name = 'Tháng một';
+            break;
+        case 'Feb':
+        case 'February':
+            $month_full_name = 'Tháng hai';
+            break;
+        case 'Mar';
+        case 'March':
+            $month_full_name = 'Tháng ba';
+            break;
+        case 'Apr':
+        case 'April':
+            $month_full_name = 'Tháng tư';
+            break;
+        case 'May':
+            $month_full_name = 'Tháng năm';
+            break;
+        case 'Jun':
+        case 'June':
+            $month_full_name = 'Tháng sáu';
+            break;
+        case 'Jul':
+        case 'July':
+            $month_full_name = 'Tháng bảy';
+            break;
+        case 'Aug':
+        case 'August':
+            $month_full_name = 'Tháng tám';
+            break;
+        case 'Sep':
+        case 'September':
+            $month_full_name = 'Tháng chín';
+            break;
+        case 'Oct':
+        case 'October':
+            $month_full_name = 'Tháng mười';
+            break;
+        case 'Nov':
+        case 'November':
+            $month_full_name = 'Tháng mười một';
+            break;
+        case 'Dec':
+        case 'December':
+            $month_full_name = 'Tháng mười hai';
+            break;
+    }
+    return $month_full_name;
 }
 
 function hocwp_get_current_weekday($format = 'd/m/Y H:i:s', $args = array()) {

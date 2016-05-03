@@ -2054,7 +2054,7 @@ body.hocwp {
 .hocwp .comment-list li .comment-respond .comment-form p textarea,
 .hocwp .hocwp-widget-facebook-box > div,
 .hocwp .hocwp-mobile-menu li,
-.post-thumbnail .wp-post-image,
+.hocwp div.post-thumbnail .wp-post-image,
 .fb-comments iframe {
     width: 100%;
 }
@@ -2074,6 +2074,10 @@ body.hocwp {
 
 .like-recommend-buttons .item:not(:last-child) {
     margin-right: 5px;
+}
+
+.fb-like iframe {
+    z-index: 499;
 }
 
 /**

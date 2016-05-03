@@ -859,15 +859,25 @@ jQuery(document).ready(function($) {
             $mobile_menu_button.css({'line-height' : height + 'px'});
             $mobile_menu_button.show();
 
-            $menu_parent.on('click', $mobile_menu_button, function() {
+            $menu_parent.on('click', '.mobile-menu-button', function() {
                 $element.toggleClass('active');
             });
 
-            $menu_parent.on('click', $element, function(e) {
+            $menu_parent.on('click', '.hocwp-mobile-menu', function(e) {
                 if(e.target == this) {
                     $element.toggleClass('active');
                 }
             });
+
+            $element.find('.search-field').on('click', function(e) {
+                e.preventDefault();
+            });
+
+            if($body.hasClass('jquery-mobile')) {
+                $menu_parent.on('swipeleft', '.hocwp-mobile-menu', function(e) {
+                    $element.removeClass('active');
+                });
+            }
 
             $element.find('li.menu-item-has-children .fa').on('click', function(e) {
                 e.preventDefault();

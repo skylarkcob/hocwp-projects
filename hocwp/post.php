@@ -121,6 +121,7 @@ function hocwp_post_thumbnail($args = array()) {
     $size = hocwp_sanitize_size($args);
     $width = $size[0];
     $height = $size[1];
+    $original = $thumbnail_url;
     if($bfi_thumb) {
         $params = isset($args['params']) ? $args['params'] : array();
         if(is_numeric($width) && $width > 0) {
@@ -144,6 +145,7 @@ function hocwp_post_thumbnail($args = array()) {
     if(is_numeric($height) && $height > 0) {
         $img->set_attribute('height', $size[1]);
     }
+    $img->set_attribute('data-original', $original);
     $permalink = hocwp_get_value_by_key($args, 'permalink', get_permalink($post_id));
     $lazyload = hocwp_get_value_by_key($args, 'lazyload', false);
     $before = hocwp_get_value_by_key($args, 'before');
@@ -189,7 +191,7 @@ function hocwp_post_thumbnail($args = array()) {
         <?php if(!empty($custom_html)) : ?>
             <div class="thumbnail-wrap">
         <?php endif; ?>
-        <a class="post-thumbnail-loop entry-thumb" href="<?php echo $permalink; ?>" aria-hidden="true"<?php hocwp_html_tag_attributes('a', 'entry_thumb'); ?>>
+        <a class="post-thumbnail-loop entry-thumb post-thumbnail" href="<?php echo $permalink; ?>" aria-hidden="true"<?php hocwp_html_tag_attributes('a', 'entry_thumb'); ?>>
             <?php
             $img->output();
             if((bool)$lazyload) {

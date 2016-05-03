@@ -89,23 +89,13 @@ function hocwp_term_meta_icon_field($taxonomies = array()) {
 		$meta->set_taxonomies($taxonomies);
 		$meta->set_use_media_upload(true);
 		$meta->add_field(array('id' => 'icon', 'label' => __('Icon', 'hocwp'), 'field_callback' => 'hocwp_field_media_upload'));
+		$meta->add_field(array('id' => 'icon_html', 'label' => __('Icon HTML', 'hocwp')));
 		$meta->init();
-		hocwp_term_meta_icon_html_field($taxonomies);
 	}
 }
 
 function hocwp_term_meta_icon_html_field($taxonomies = array()) {
-	global $pagenow;
-	if('edit-tags.php' == $pagenow || 'term.php' == $pagenow) {
-		if(!hocwp_array_has_value($taxonomies)) {
-			$taxonomies = array('category');
-		}
-		$meta = new HOCWP_Meta('term');
-		$meta->set_taxonomies($taxonomies);
-		$meta->set_use_media_upload(true);
-		$meta->add_field(array('id' => 'icon_html', 'label' => __('Icon HTML', 'hocwp')));
-		$meta->init();
-	}
+	_deprecated_function(__FUNCTION__, '3.3.8', 'hocwp_term_meta_icon_field');
 }
 
 function hocwp_term_meta_color_field($taxonomies = array()) {
