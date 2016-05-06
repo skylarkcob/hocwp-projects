@@ -178,7 +178,7 @@ jQuery(document).ready(function($) {
                                 src: e.target.result,
                                 class: 'thumb-image',
                                 alt: ''
-                            });
+                            }).attr('data-file-name', file_name);
                             $image.appendTo($image_preview);
                         };
                         $image_preview.show();
@@ -570,7 +570,7 @@ jQuery(document).ready(function($) {
         this.self = this;
         this.$element = $(element);
         if(!this.$element.length) {
-            return false;
+            return this;
         }
         this.element = element;
         this.options = $.extend({}, MediaUpload.DEFAULTS, options);
@@ -580,7 +580,7 @@ jQuery(document).ready(function($) {
         this.$url = this.$container.find('input.media-url');
         this.$preview = this.$container.find('.media-preview');
         this.$remove = this.$container.find('.btn-remove');
-        this.$th = this.$container.prev();
+        //this.$th = this.$container.prev();
         this._defaults = MediaUpload.DEFAULTS;
         this._name = MediaUpload.NAME;
         this.frame = null;
@@ -687,7 +687,7 @@ jQuery(document).ready(function($) {
         this.self = this;
         this.$element = $(element);
         if(!this.$element.length) {
-            return false;
+            return this;
         }
         this.element = element;
         this.options = $.extend({}, ScrollTop.DEFAULTS, options);
@@ -743,7 +743,7 @@ jQuery(document).ready(function($) {
         this.self = this;
         this.$element = $(element);
         if(!this.$element.length) {
-            return false;
+            return this;
         }
         this.element = element;
         this.options = $.extend({}, SortableList.DEFAULTS, options);
@@ -819,7 +819,7 @@ jQuery(document).ready(function($) {
         this.self = this;
         this.$element = $(element);
         if(!this.$element.length) {
-            return false;
+            return this;
         }
         this.element = element;
         this.options = $.extend({}, MobileMenu.DEFAULTS, options);
@@ -833,6 +833,11 @@ jQuery(document).ready(function($) {
             display_width = parseFloat(this.options.displayWidth),
             height = parseInt(this.options.height),
             body_height = $body.height();
+
+        if(current_width > display_width) {
+            return this;
+        }
+
         this.element_class = $element.attr('class');
         this.html = $element.html();
         var html = this.html,
@@ -874,7 +879,7 @@ jQuery(document).ready(function($) {
             });
 
             if($body.hasClass('jquery-mobile')) {
-                $menu_parent.on('swipeleft', '.hocwp-mobile-menu', function(e) {
+                $menu_parent.on('swipeleft', '.hocwp-mobile-menu', function() {
                     $element.removeClass('active');
                 });
             }
@@ -885,7 +890,7 @@ jQuery(document).ready(function($) {
                     $current_li = $this.parent(),
                     $sub_menu = $current_li.children('.sub-menu');
                 if($this.hasClass('active')) {
-                    $sub_menu.slideUp();
+                    $sub_menu.stop(true, false, true).slideUp();
                     $this.removeClass('fa-minus');
                     $this.addClass('fa-plus');
                     $current_li.find('.fa-minus').each(function() {
@@ -895,7 +900,7 @@ jQuery(document).ready(function($) {
                 } else {
                     $this.removeClass('fa-plus');
                     $this.addClass('fa-minus');
-                    $sub_menu.slideDown();
+                    $sub_menu.stop(true, false, true).slideDown();
                 }
                 $this.toggleClass('active');
                 return false;
@@ -903,8 +908,6 @@ jQuery(document).ready(function($) {
 
             $window.scroll(function() {
                 var pos = $(this).scrollTop(),
-                    $last_item = $element.children('li:last-child'),
-                    last_item_pos = $element.offset().top,
                     $admin_bar = $('#wpadminbar'),
                     admin_bar_height = 0;
                 if($admin_bar.length) {
@@ -970,7 +973,7 @@ jQuery(document).ready(function($) {
         this.self = this;
         this.$element = $(element);
         if(!this.$element.length) {
-            return false;
+            return this;
         }
         this.element = element;
         this.options = $.extend({}, ChosenSelect.DEFAULTS, options);
@@ -1027,7 +1030,7 @@ jQuery(document).ready(function($) {
         this.self = this;
         this.$element = $(element);
         if(!this.$element.length) {
-            return false;
+            return this;
         }
         this.element = element;
         this.options = $.extend({}, PostRating.DEFAULTS, options);
@@ -1103,7 +1106,7 @@ jQuery(document).ready(function($) {
         this.self = this;
         this.$element = $(element);
         if(!this.$element.length || !$body.hasClass('hocwp-google-maps')) {
-            return false;
+            return this;
         }
         this.element = element;
         this.options = $.extend({}, GoogleMaps.DEFAULTS, options);
