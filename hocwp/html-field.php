@@ -634,11 +634,11 @@ function hocwp_field_input($args) {
         $attributes['autocomplete'] = 'off';
     }
     $widefat = $args['widefat'];
-    if($widefat && !$right_label) {
+    if($widefat && !$right_label && 'button' != $type) {
         hocwp_add_string_with_space_before($class, 'widefat');
     }
     $regular_text = isset($args['regular_text']) ? (bool)$args['regular_text'] : ($GLOBALS['pagenow'] == 'widgets.php' || defined('DOING_AJAX')) ? false : true;
-    if($regular_text && !$right_label) {
+    if($regular_text && !$right_label && 'button' != $type) {
         hocwp_add_string_with_space_before($class, 'regular-text');
     }
     $atts = array(
@@ -677,6 +677,15 @@ function hocwp_field_input($args) {
         $args['label'] = $label;
     }
     hocwp_field_after($args);
+}
+
+function hocwp_field_button($args = array()) {
+    $class = hocwp_get_value_by_key($args, 'class');
+    hocwp_add_string_with_space_before($class, 'button');
+    $args['class'] = $class;
+    $args['type'] = 'button';
+    $args['regular_text'] = false;
+    hocwp_field_input($args);
 }
 
 function hocwp_field_input_file($args = array()) {
@@ -924,7 +933,7 @@ function hocwp_field_editor($args = array()) {
     if(empty($id)) {
         $id = hocwp_sanitize_id($name);
     }
-    $textarea_rows = isset($args['textarea_rows']) ? $args['textarea_rows'] : 5;
+    $textarea_rows = isset($args['textarea_rows']) ? $args['textarea_rows'] : hocwp_get_value_by_key($args, 'rows', 5);
     $class = isset($args['class']) ? $args['class'] : '';
     hocwp_field_before($args);
     $args['textarea_name'] = $name;

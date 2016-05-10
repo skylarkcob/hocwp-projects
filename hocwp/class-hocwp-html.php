@@ -96,7 +96,11 @@ class HOCWP_HTML {
         if(is_a($value, 'HOCWP_HTML')) {
             $value = $value->build();
         }
-        $this->set_html($value);
+        if('input' == $this->get_name()) {
+            $this->set_attribute('value', $value);
+        } else {
+            $this->set_html($value);
+        }
     }
 
     public function set_attribute_array($attributes) {

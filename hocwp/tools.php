@@ -18,7 +18,8 @@ function hocwp_maintenance_mode_settings() {
 }
 
 function hocwp_google_login_script($args = array()) {
-    if(is_user_logged_in()) {
+    $connect = hocwp_get_value_by_key($args, 'connect');
+    if(is_user_logged_in() && !$connect) {
         return;
     }
     $clientid = hocwp_get_value_by_key($args, 'clientid', hocwp_get_google_client_id());
@@ -61,7 +62,8 @@ function hocwp_google_login_script($args = array()) {
                     url: hocwp.ajax_url,
                     data: {
                         action: 'hocwp_social_login_google',
-                        data: JSON.stringify(response)
+                        data: JSON.stringify(response),
+                        connect: <?php echo hocwp_bool_to_int($connect); ?>
                     },
                     success: function(response){
                         var href = window.location.href;
@@ -80,7 +82,8 @@ function hocwp_google_login_script($args = array()) {
 }
 
 function hocwp_facebook_login_script($args = array()) {
-    if(is_user_logged_in()) {
+    $connect = hocwp_get_value_by_key($args, 'connect');
+    if(is_user_logged_in() && !$connect) {
         return;
     }
     $lang = hocwp_get_language();
@@ -136,7 +139,8 @@ function hocwp_facebook_login_script($args = array()) {
                         url: hocwp.ajax_url,
                         data: {
                             action: 'hocwp_social_login_facebook',
-                            data: JSON.stringify(response)
+                            data: JSON.stringify(response),
+                            connect: <?php echo hocwp_bool_to_int($connect); ?>
                         },
                         success: function(response){
                             var href = window.location.href;
@@ -302,9 +306,9 @@ function hocwp_get_geo_code($args = array()) {
     return $results;
 }
 
-function hocwp_generate_min_file($file, $extension = 'js') {
+function hocwp_generate_min_file($file, $extension = 'js', $compress_min_file = false, $force_compress = false) {
     $transient_name = 'hocwp_minified_' . md5($file);
-    if(false === get_transient($transient_name) || true) {
+    if(false === get_transient($transient_name) || $force_compress) {
         if(file_exists($file)) {
             $extension = strtolower($extension);
             if('js' === $extension) {
@@ -313,19 +317,29 @@ function hocwp_generate_min_file($file, $extension = 'js') {
                 $minified = hocwp_minify_css($file, true);
             }
             if(!empty($minified)) {
-                $info = pathinfo($file);
-                $basename = $info['basename'];
-                $filename = $info['filename'];
-                $extension = $info['extension'];
-                $min_name = $filename;
-                $min_name .= '.min';
-                if(!empty($extension)) {
-                    $min_name .= '.' . $extension;
+                if($compress_min_file) {
+                    if(!file_exists($file)) {
+                        $handler = fopen($file, 'w');
+                        fwrite($handler, $minified);
+                        fclose($handler);
+                    } else {
+                        @file_put_contents($file, $minified);
+                    }
+                } else {
+                    $info = pathinfo($file);
+                    $basename = $info['basename'];
+                    $filename = $info['filename'];
+                    $extension = $info['extension'];
+                    $min_name = $filename;
+                    $min_name .= '.min';
+                    if(!empty($extension)) {
+                        $min_name .= '.' . $extension;
+                    }
+                    $min_file = str_replace($basename, $min_name, $file);
+                    $handler = fopen($min_file, 'w');
+                    fwrite($handler, $minified);
+                    fclose($handler);
                 }
-                $min_file = str_replace($basename, $min_name, $file);
-                $handler = fopen($min_file, 'w');
-                fwrite($handler, $minified);
-                fclose($handler);
                 set_transient($transient_name, 1, 15 * MINUTE_IN_SECONDS);
                 hocwp_debug_log(sprintf(__('File %s is compressed successfully!', 'hocwp'), $file));
             }
@@ -333,56 +347,101 @@ function hocwp_generate_min_file($file, $extension = 'js') {
     }
 }
 
-function hocwp_compress_style($dir) {
+function hocwp_compress_style($dir, $compress_min_file = false, $force_compress = false) {
     $files = scandir($dir);
     $my_files = array();
+    $min_files = array();
     foreach($files as $file) {
         $info = pathinfo($file);
         if(isset($info['extension']) && 'css' == $info['extension']) {
             $base_name = $info['basename'];
             if(false !== strpos($base_name, '.min')) {
+                if($compress_min_file) {
+                    $min_files[] = trailingslashit($dir) . $file;
+                }
                 continue;
             }
             $my_files[] = trailingslashit($dir) . $file;
         }
     }
+    if(hocwp_array_has_value($min_files) || $compress_min_file) {
+        foreach($min_files as $file) {
+            hocwp_generate_min_file($file, 'css', true, $force_compress);
+        }
+        return;
+    }
     if(hocwp_array_has_value($my_files)) {
         foreach($my_files as $file) {
-            hocwp_generate_min_file($file, 'css');
+            hocwp_generate_min_file($file, 'css', false, $force_compress);
         }
     }
 }
 
-function hocwp_compress_script($dir) {
+function hocwp_compress_script($dir, $compress_min_file = false, $force_compress = false) {
     $files = scandir($dir);
     $my_files = array();
+    $min_files = array();
     foreach($files as $file) {
         $info = pathinfo($file);
         if(isset($info['extension']) && 'js' == $info['extension']) {
             $base_name = $info['basename'];
             if(false !== strpos($base_name, '.min')) {
+                if($compress_min_file) {
+                    $min_files[] = trailingslashit($dir) . $file;
+                }
                 continue;
             }
             $my_files[] = trailingslashit($dir) . $file;
         }
     }
+    if(hocwp_array_has_value($min_files) || $compress_min_file) {
+        foreach($min_files as $file) {
+            hocwp_generate_min_file($file, 'js', true, $force_compress);
+        }
+        return;
+    }
     if(hocwp_array_has_value($my_files)) {
         foreach($my_files as $file) {
-            hocwp_generate_min_file($file);
+            hocwp_generate_min_file($file, 'js', false, $force_compress);
         }
     }
 }
 
-function hocwp_compress_style_and_script() {
-    $hocwp_js_path = HOCWP_PATH . '/js';
-    $hocwp_css_path = HOCWP_PATH . '/css';
-    hocwp_compress_script($hocwp_js_path);
-    hocwp_compress_style($hocwp_css_path);
-    if(defined('HOCWP_THEME_VERSION')) {
-        $hocwp_js_path = HOCWP_THEME_PATH . '/js';
-        $hocwp_css_path = HOCWP_THEME_PATH . '/css';
-        hocwp_compress_script($hocwp_js_path);
-        hocwp_compress_style($hocwp_css_path);
+function hocwp_compress_style_and_script($args = array()) {
+    $type = hocwp_get_value_by_key($args, 'type');
+    $force_compress = hocwp_get_value_by_key($args, 'force_compress');
+    if(hocwp_array_has_value($type)) {
+        $compress_css = false;
+        if(in_array('css', $type)) {
+            $compress_css = true;
+            $hocwp_css_path = HOCWP_PATH . '/css';
+            hocwp_compress_style($hocwp_css_path, false, $force_compress);
+            if(defined('HOCWP_THEME_VERSION')) {
+                $hocwp_css_path = HOCWP_THEME_PATH . '/css';
+                hocwp_compress_style($hocwp_css_path, false, $force_compress);
+            }
+        }
+        $compress_js = false;
+        if(in_array('js', $type)) {
+            $compress_js = true;
+            $hocwp_js_path = HOCWP_PATH . '/js';
+            hocwp_compress_script($hocwp_js_path, false, $force_compress);
+            if(defined('HOCWP_THEME_VERSION')) {
+                $hocwp_js_path = HOCWP_THEME_PATH . '/js';
+                hocwp_compress_script($hocwp_js_path, false, $force_compress);
+            }
+        }
+        if($compress_css || $compress_js) {
+            unset($type['recompress']);
+        }
+        if(in_array('recompress', $type)) {
+            if(defined('HOCWP_THEME_VERSION')) {
+                $hocwp_js_path = HOCWP_THEME_PATH . '/js';
+                hocwp_compress_script($hocwp_js_path, true, $force_compress);
+                $hocwp_css_path = HOCWP_THEME_PATH . '/css';
+                hocwp_compress_style($hocwp_css_path, true, $force_compress);
+            }
+        }
     }
 }
 

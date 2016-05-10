@@ -1527,9 +1527,15 @@ function hocwp_is_debugging() {
 }
 
 function hocwp_is_localhost() {
-    $root_domain = hocwp_get_domain_name_only(get_bloginfo('url'));
+    $site_url = get_bloginfo('url');
+    $domain = hocwp_get_domain_name($site_url);
+    $root_domain = hocwp_get_domain_name_only($domain);
+    if(empty($root_domain)) {
+        $root_domain = $domain;
+    }
     $result = false;
-    if('localhost' == $root_domain || hocwp_is_ip($root_domain)) {
+    $last = substr($domain, -3);
+    if('localhost' == $root_domain || hocwp_is_ip($root_domain) || 'dev' == $last) {
         $result = true;
     }
     return apply_filters('hocwp_is_localhost', $result);
@@ -2446,7 +2452,9 @@ function hocwp_default_script_localize_object() {
             'jquery_version_error' => sprintf(__('HocWP\'s JavaScript requires jQuery version %s or higher', 'hocwp'), HOCWP_MINIMUM_JQUERY_VERSION),
             'insert_media_title' => __('Insert media', 'hocwp'),
             'insert_media_button_text' => __('Use this media', 'hocwp'),
-            'insert_media_button_texts' => __('Use these medias', 'hocwp')
+            'insert_media_button_texts' => __('Use these medias', 'hocwp'),
+            'confirm_message' => __('Are you sure?', 'hocwp'),
+            'disconnect_confirm_message' => __('Are you sure you want to disconnect?', 'hocwp')
         ),
         'ajax_loading' => '<p class="ajax-wrap"><img class="ajax-loading" src="' . hocwp_get_image_url('icon-loading-circle-light-full.gif') . '" alt=""></p>'
     );

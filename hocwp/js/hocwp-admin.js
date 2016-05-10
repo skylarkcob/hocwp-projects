@@ -1,6 +1,9 @@
 /**
- * Last updated: 20/04/2016
+ * Last updated: 07/05/2016
  */
+window.hocwp = window.hocwp || {};
+window.wp = window.wp || {};
+
 jQuery(document).ready(function($) {
     var $body = $('body');
 
@@ -244,20 +247,69 @@ jQuery(document).ready(function($) {
     (function() {
         var $body = $('body');
         if($body.hasClass('tools_page_hocwp_developers')) {
-            $body.css({cursor: 'wait'});
-            alert('Styles and Scripts are compressing, please wait...');
-            $.ajax({
-                type: 'POST',
-                dataType: 'json',
-                url: hocwp.ajax_url,
-                data: {
-                    action: 'hocwp_compress_style_and_script'
-                },
-                success: function(response){
-                    $body.css({cursor: 'auto'});
-                    alert('These files compressed successfully!');
-                }
-            });
+            var $compress_button = $('#hocwp_developers_compress_css_js'),
+                $compress_css = $('#hocwp_developers_compress_css'),
+                $compress_js = $('#hocwp_developers_compress_js'),
+                $recompress = $('#hocwp_developers_re_compress'),
+                $force_compress = $('#hocwp_developers_force_compress'),
+                force_compress = false;
+            if($compress_button.length) {
+                $compress_button.on('click', function() {
+                    var type = [];
+                    if($compress_css.is(':checked')) {
+                        type.push('css');
+                    }
+                    if($compress_js.is(':checked')) {
+                        type.push('js');
+                    }
+                    if($recompress.is(':checked')) {
+                        type.push('recompress');
+                    }
+                    if($force_compress.is(':checked')) {
+                        force_compress = true;
+                    }
+                    $body.css({cursor: 'wait'});
+                    alert('All your files are compressing, please wait...');
+                    $.ajax({
+                        type: 'POST',
+                        dataType: 'json',
+                        url: hocwp.ajax_url,
+                        data: {
+                            action: 'hocwp_compress_style_and_script',
+                            type: JSON.stringify(type),
+                            force_compress: force_compress
+                        },
+                        success: function(response){
+                            $body.css({cursor: 'auto'});
+                            alert('These files compressed successfully!');
+                        }
+                    });
+                });
+            }
         }
+    })();
+
+    (function() {
+        $('.form-table .hocwp-disconnect-social').on('click', function(e) {
+            e.preventDefault();
+            var $element = $(this),
+                user_id = $element.attr('data-user-id'),
+                social = $element.attr('data-social');
+            if(confirm(hocwp.i18n.disconnect_confirm_message)) {
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: hocwp.ajax_url,
+                    data: {
+                        action: 'hocwp_disconnect_social_account',
+                        social: social,
+                        user_id: user_id
+                    },
+                    success: function(response){
+                        window.location.href = window.location.href;
+                    }
+                });
+            }
+        });
     })();
 });

@@ -77,8 +77,10 @@ function hocwp_show_ads($args = array()) {
             $ads = array_shift($posts);
             $ads = hocwp_get_post_meta('code', $ads->ID);
             if(!empty($ads)) {
+                $class = hocwp_get_value_by_key($args, 'class');
+                hocwp_add_string_with_space_before($class, 'hocwp-ads text-center ads position-' . $position);
                 $div = new HOCWP_HTML('div');
-                $div->set_class('hocwp-ads text-center ads position-' . $position);
+                $div->set_class($class);
                 $div->set_text($ads);
                 $div->output();
             }

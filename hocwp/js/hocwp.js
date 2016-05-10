@@ -1,5 +1,5 @@
 /**
- * Last updated: 21/04/2016
+ * Last updated: 07/05/2016
  */
 
 window.wp = window.wp || {};
@@ -833,17 +833,12 @@ jQuery(document).ready(function($) {
             display_width = parseFloat(this.options.displayWidth),
             height = parseInt(this.options.height),
             body_height = $body.height();
-
-        if(current_width > display_width) {
-            return this;
-        }
-
         this.element_class = $element.attr('class');
         this.html = $element.html();
         var html = this.html,
             menu_class = this.element_class,
-            position = this.options.position;
-
+            position = this.options.position,
+            window_resized = false;
         function hocwp_update_mobile_menu() {
             $element.removeClass('sf-menu sf-js-enabled');
             $element.find('li.menu-item-has-children').not('.appended').addClass('appended').append('<i class="fa fa-plus"></i>');
@@ -864,11 +859,17 @@ jQuery(document).ready(function($) {
             $mobile_menu_button.css({'line-height' : height + 'px'});
             $mobile_menu_button.show();
 
-            $menu_parent.on('click', '.mobile-menu-button', function() {
+            $menu_parent.off('click', '.mobile-menu-button').on('click', '.mobile-menu-button', function(e) {
+                e.stopPropagation();
                 $element.toggleClass('active');
             });
 
-            $menu_parent.on('click', '.hocwp-mobile-menu', function(e) {
+            $body.on('click', function() {
+                $element.removeClass('active');
+            });
+
+            $menu_parent.off('click', '.hocwp-mobile-menu').on('click', '.hocwp-mobile-menu', function(e) {
+                e.stopPropagation();
                 if(e.target == this) {
                     $element.toggleClass('active');
                 }
@@ -879,12 +880,13 @@ jQuery(document).ready(function($) {
             });
 
             if($body.hasClass('jquery-mobile')) {
-                $menu_parent.on('swipeleft', '.hocwp-mobile-menu', function() {
+                $menu_parent.on('swipeleft', '.hocwp-mobile-menu', function(e) {
+                    e.preventDefault();
                     $element.removeClass('active');
                 });
             }
 
-            $element.find('li.menu-item-has-children .fa').on('click', function(e) {
+            $element.find('li.menu-item-has-children .fa').off('click').on('click', function(e) {
                 e.preventDefault();
                 var $this = $(this),
                     $current_li = $this.parent(),
@@ -903,7 +905,6 @@ jQuery(document).ready(function($) {
                     $sub_menu.stop(true, false, true).slideDown();
                 }
                 $this.toggleClass('active');
-                return false;
             });
 
             $window.scroll(function() {
@@ -923,21 +924,40 @@ jQuery(document).ready(function($) {
                 }
             });
         }
+        if(current_width > display_width) {
+            if(!window_resized) {
+                $window.on('resize', function() {
+                    window_resized = true;
+                    current_width = $window.width();
+                    if(current_width > display_width) {
+                        $element.attr('class', menu_class);
+                        $element.attr('style', '');
+                        $element.html(html)
+                    } else {
+                        hocwp_update_mobile_menu();
+                    }
+                });
+            }
+            return this;
+        }
 
         if(current_width <= display_width) {
             hocwp_update_mobile_menu();
         }
 
-        $window.on('resize', function() {
-            current_width = $window.width();
-            if(current_width > display_width) {
-                $element.attr('class', menu_class);
-                $element.attr('style', '');
-                $element.html(html)
-            } else {
-                hocwp_update_mobile_menu();
-            }
-        })
+        if(!window_resized) {
+            $window.on('resize', function() {
+                window_resized = true;
+                current_width = $window.width();
+                if(current_width > display_width) {
+                    $element.attr('class', menu_class);
+                    $element.attr('style', '');
+                    $element.html(html)
+                } else {
+                    hocwp_update_mobile_menu();
+                }
+            });
+        }
     }
 
     MobileMenu.NAME = 'hocwp.mobileMenu';

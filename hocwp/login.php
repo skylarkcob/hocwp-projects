@@ -73,6 +73,12 @@ function hocwp_login_form_middle() {
     return ob_get_clean();
 }
 
+function hocwp_login_form_bottom() {
+    ob_start();
+    do_action('hocwp_login_form_after');
+    return ob_get_clean();
+}
+
 function hocwp_verify_login_captcha($user, $password) {
     if(isset($_POST['captcha'])) {
         $captcha_code = $_POST['captcha'];
@@ -114,17 +120,20 @@ if(hocwp_use_captcha_for_login_page()) {
     add_action('login_form', 'hocwp_login_captcha_field');
     add_action('lostpassword_form', 'hocwp_login_captcha_field');
     add_action('register_form', 'hocwp_login_captcha_field');
-    add_filter('login_form_top', 'hocwp_login_form_top');
-    add_filter('login_form_middle', 'hocwp_login_form_middle');
     add_filter('wp_authenticate_user', 'hocwp_verify_login_captcha', 10, 2);
     add_filter('registration_errors', 'hocwp_verify_registration_captcha', 10, 3);
     add_action('lostpassword_post', 'hocwp_verify_lostpassword_captcha');
 }
 
+add_filter('login_form_top', 'hocwp_login_form_top');
+add_filter('login_form_middle', 'hocwp_login_form_middle');
+add_filter('login_form_bottom', 'hocwp_login_form_bottom');
+
 function hocwp_get_account_url($type = 'login', $action = '') {
     $url = '';
     $page_account = hocwp_get_pages_by_template('page-templates/account.php', array('output' => 'object'));
     switch($type) {
+        case 'signup':
         case 'register':
             $page = hocwp_get_pages_by_template('page-templates/register.php', array('output' => 'object'));
             if(is_a($page, 'WP_Post')) {
@@ -417,6 +426,7 @@ function hocwp_login_form($args = array()) {
         $form = str_replace('name="pwd"', 'name="pwd" placeholder="' . $args['placeholder_password'] . '"', $form);
     }
     $logo = hocwp_get_value_by_key($args, 'logo', hocwp_get_login_logo_url());
+    $hide_form = (bool)hocwp_get_value_by_key($args, 'hide_form');
     ?>
     <div class="hocwp-login-box module">
         <div class="module-header text-center">
@@ -442,7 +452,18 @@ function hocwp_login_form($args = array()) {
         </div>
         <div class="module-body">
             <h4 class="form-title">Đăng nhập</h4>
-            <?php echo $form; ?>
+            <?php
+            if($hide_form) {
+                $login_form_top = apply_filters('login_form_top', '', $args);
+                $login_form_middle = apply_filters('login_form_middle', '', $args);
+                $login_form_bottom = apply_filters('login_form_bottom', '', $args);
+                $form = $login_form_top . $login_form_middle . $login_form_bottom;
+                $form = hocwp_wrap_tag($form, 'form', 'login-form hocwp-login-form');
+                echo $form;
+            } else {
+                echo $form;
+            }
+            ?>
         </div>
         <div class="module-footer">
             <div class="text-center">

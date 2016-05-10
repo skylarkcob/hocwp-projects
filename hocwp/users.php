@@ -64,6 +64,7 @@ function hocwp_add_user($args = array()) {
             if(empty($role)) {
                 $role = 'subscriber';
             }
+            $role = apply_filters('hocwp_new_user_role', $role, $args);
         }
         $user->add_role($role);
         $result = $user_id;
@@ -176,3 +177,21 @@ function hocwp_user_viewed_posts_hook() {
     }
 }
 add_action('wp', 'hocwp_user_viewed_posts_hook');
+
+function hocwp_allow_role_upload_media($roles) {
+    $roles = hocwp_sanitize_array($roles);
+    $caps = array(
+        'upload_files',
+        'publish_pages',
+        'edit_published_pages',
+        'edit_others_pages'
+    );
+    foreach($roles as $role) {
+        $role = get_role($role);
+        if(is_a($role, 'WP_Role')) {
+            foreach($caps as $cap) {
+                $role->add_cap($cap);
+            }
+        }
+    }
+}
