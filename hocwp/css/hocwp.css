@@ -430,7 +430,7 @@ input[type="file"].hocwp-field-upload + .image-preview img {
 }
 
 .admin-bar .modal-dialog {
-    padding-top: 10%;
+    padding-top: 6%;
 }
 
 .single-product.woocommerce .modal.product-fast-buy .modal-dialog {

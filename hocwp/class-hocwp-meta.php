@@ -21,6 +21,15 @@ class HOCWP_Meta {
     private $use_media_upload = false;
     private $use_color_picker = false;
     private $use_datetime_picker = false;
+    private $use_select_chosen = false;
+
+    public function set_use_select_chosen($use) {
+        $this->use_select_chosen = $use;
+    }
+
+    public function get_use_select_chosen() {
+        return (bool)$this->use_select_chosen;
+    }
 
     public function set_use_datetime_picker($use) {
         $this->use_datetime_picker = $use;
@@ -184,6 +193,8 @@ class HOCWP_Meta {
             $this->set_use_color_picker(true);
         } elseif('hocwp_field_media_upload' == $callback) {
             $this->set_use_media_upload(true);
+        } elseif('hocwp_field_select_chosen' == $callback) {
+            $this->set_use_select_chosen(true);
         }
 
         $this->sanitize_field_args($field_args);
@@ -264,6 +275,9 @@ class HOCWP_Meta {
         }
         if($this->get_use_datetime_picker()) {
             add_filter('hocwp_admin_jquery_datetime_picker', '__return_true');
+        }
+        if($this->get_use_select_chosen()) {
+            add_filter('hocwp_use_chosen_select', '__return_true');
         }
     }
 

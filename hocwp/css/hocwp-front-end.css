@@ -620,6 +620,10 @@ body.hocwp {
     padding-right: 5px;
 }
 
+.hocwp .modal button.close {
+    font-size: 20px;
+}
+
 /**
  * bxSlider, gallery
  */

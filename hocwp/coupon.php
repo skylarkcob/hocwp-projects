@@ -486,7 +486,7 @@ if('edit-tags.php' == $pagenow || 'term.php' == $pagenow) {
 	$meta->init();
 }
 
-if('edit.php' == $pagenow || 'post.php' == $pagenow) {
+if('post-new.php' == $pagenow || 'post.php' == $pagenow) {
 	hocwp_meta_box_post_attribute(array('coupon'));
 	$meta = new HOCWP_Meta('post');
 	$meta->set_post_types(array('coupon'));

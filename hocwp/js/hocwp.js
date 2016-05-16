@@ -832,7 +832,9 @@ jQuery(document).ready(function($) {
             $search_form = $menu_parent.find('.search-form'),
             display_width = parseFloat(this.options.displayWidth),
             height = parseInt(this.options.height),
-            body_height = $body.height();
+            body_height = $body.height(),
+            force_search_form = this.options.forceSearchForm,
+            search_form_added = false;
         this.element_class = $element.attr('class');
         this.html = $element.html();
         var html = this.html,
@@ -851,9 +853,10 @@ jQuery(document).ready(function($) {
                 $mobile_menu_button = $menu_parent.find('.mobile-menu-button');
                 $mobile_menu_button.attr('aria-controls', $element.attr('id'))
             }
-            if(!$search_form.length) {
-                if(!$element.find('li.search-item').length) {
+            if(!search_form_added && (!$search_form.length || force_search_form)) {
+                if(!search_form_added && (!$element.find('li.search-item').length || force_search_form)) {
                     $element.prepend('<li class="search-item menu-item" style="overflow: hidden">' + hocwp.search_form + '</li>');
+                    search_form_added = true;
                 }
             }
             $mobile_menu_button.css({'line-height' : height + 'px'});
@@ -930,9 +933,12 @@ jQuery(document).ready(function($) {
                     window_resized = true;
                     current_width = $window.width();
                     if(current_width > display_width) {
-                        $element.attr('class', menu_class);
-                        $element.attr('style', '');
-                        $element.html(html)
+                        if($element.hasClass('hocwp-mobile-menu')) {
+                            $element.attr('class', menu_class);
+                            $element.attr('style', '');
+                            $element.html(html);
+                            window.location.href = window.location.href;
+                        }
                     } else {
                         hocwp_update_mobile_menu();
                     }
@@ -950,9 +956,12 @@ jQuery(document).ready(function($) {
                 window_resized = true;
                 current_width = $window.width();
                 if(current_width > display_width) {
-                    $element.attr('class', menu_class);
-                    $element.attr('style', '');
-                    $element.html(html)
+                    if($element.hasClass('hocwp-mobile-menu')) {
+                        $element.attr('class', menu_class);
+                        $element.attr('style', '');
+                        $element.html(html);
+                        window.location.href = window.location.href;
+                    }
                 } else {
                     hocwp_update_mobile_menu();
                 }
@@ -965,7 +974,8 @@ jQuery(document).ready(function($) {
     MobileMenu.DEFAULTS = {
         displayWidth: 980,
         position: 'left',
-        height: 30
+        height: 30,
+        forceSearchForm: false
     };
 
     MobileMenu.prototype.init = function() {

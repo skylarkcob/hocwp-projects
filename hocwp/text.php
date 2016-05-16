@@ -3,6 +3,9 @@ if(!function_exists('add_filter')) exit;
 
 function hocwp_text($vi, $en) {
 	$lang = hocwp_get_language();
+	if(function_exists('qtranxf_getLanguage')) {
+		$lang = qtranxf_getLanguage();
+	}
 	if('vi' == $lang) {
 		echo $vi;
 	} else {

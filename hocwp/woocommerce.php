@@ -547,7 +547,7 @@ function hocwp_wc_after_cart_table() {
     $page = hocwp_wc_get_shop_page();
     $permalink = apply_filters('hocwp_return_shop_url', get_permalink($page));
     ?>
-    <a title="" href="<?php echo $permalink; ?>" class="btn-grey hocwp-button return-shop"><i class="fa fa-angle-left icon-left"></i> Tiếp tục mua hàng</a>
+    <a title="" href="<?php echo $permalink; ?>" class="btn-grey hocwp-button return-shop"><i class="fa fa-angle-left icon-left"></i> <?php hocwp_text('Tiếp tục mua hàng', __('Continue shopping', 'hocwp')); ?></a>
     <?php
     do_action('hocwp_wc_after_return_shop_button');
 }

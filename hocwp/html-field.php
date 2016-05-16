@@ -295,7 +295,7 @@ function hocwp_field_sortable_term($args = array()) {
                 $id = absint($id);
                 $taxonomy = isset($data['taxonomy']) ? $data['taxonomy'] : '';
                 $term = get_term_by('id', $id, $taxonomy);
-                if(hocwp_object_valid($term)) {
+                if(hocwp_object_valid($term) && is_a($term, 'WP_Term') && term_exists($term->term_id, $taxonomy)) {
                     $li = new HOCWP_HTML('li');
                     $li->set_class('ui-state-default');
                     $attributes = array(
@@ -322,7 +322,11 @@ function hocwp_field_sortable_post_type($args = array()) {
     $items = isset($args['items']) ? $args['items'] : '';
     if(empty($items)) {
         $active_items = hocwp_json_string_to_array($value);
+        $default_args = array(
+            'public' => true
+        );
         $post_type_args = isset($args['post_type_args']) ? $args['post_type_args'] : array();
+        $post_type_args = wp_parse_args($post_type_args, $default_args);
         $lists = get_post_types($post_type_args, 'objects');
         unset($lists['nav_menu_item']);
         unset($lists['attachment']);
@@ -347,7 +351,7 @@ function hocwp_field_sortable_post_type($args = array()) {
         foreach($lists as $data) {
             $id = isset($data['id']) ? $data['id'] : '';
             $post_type = get_post_type_object($id);
-            if(hocwp_object_valid($post_type)) {
+            if(hocwp_object_valid($post_type) && isset($post_type->name) && post_type_exists($post_type->name)) {
                 $li = new HOCWP_HTML('li');
                 $li->set_class('ui-state-default');
                 $attributes = array(
@@ -373,7 +377,11 @@ function hocwp_field_sortable_taxonomy($args = array()) {
     $connect = hocwp_get_value_by_key($args, 'connect', false);
     if(empty($items)) {
         $active_items = hocwp_json_string_to_array($value);
+        $default_args = array(
+            'public' => true
+        );
         $taxonomy_args = isset($args['taxonomy_args']) ? $args['taxonomy_args'] : array();
+        $taxonomy_args = wp_parse_args($taxonomy_args, $default_args);
         $lists = get_taxonomies($taxonomy_args, 'objects');
         hocwp_exclude_special_taxonomies($lists);
         if((bool)$connect) {
@@ -389,7 +397,7 @@ function hocwp_field_sortable_taxonomy($args = array()) {
                 foreach($results as $data) {
                     $id = isset($data['id']) ? $data['id'] : '';
                     $item = get_taxonomy($id);
-                    if(hocwp_object_valid($item)) {
+                    if(hocwp_object_valid($item) && taxonomy_exists($item)) {
                         foreach($lists as $key => $taxonomy) {
                             if($taxonomy->name == $item->name) {
                                 $new_lists[] = $item;
@@ -420,7 +428,7 @@ function hocwp_field_sortable_taxonomy($args = array()) {
             foreach($lists as $data) {
                 $id = isset($data['id']) ? $data['id'] : '';
                 $item = get_taxonomy($id);
-                if(hocwp_object_valid($item)) {
+                if(hocwp_object_valid($item) && isset($item->name) && taxonomy_exists($item->name)) {
                     $li = new HOCWP_HTML('li');
                     $li->set_class('ui-state-default');
                     $attributes = array(

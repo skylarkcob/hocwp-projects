@@ -70,6 +70,10 @@
     width: 20%;
 }
 
+.hocwp-meta-box label.display-block {
+    display: block;
+}
+
 .hocwp-meta-box label.full-width {
     padding-right: 0;
     width: auto;
