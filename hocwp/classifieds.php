@@ -645,7 +645,7 @@ function hocwp_classifieds_admin_pre_get_posts($query) {
 	}
 	return $query;
 }
-if(is_admin()) add_action('pre_get_posts', 'hocwp_classifieds_admin_pre_get_posts');
+if(is_admin() && hocwp_prevent_author_see_another_post()) add_action('pre_get_posts', 'hocwp_classifieds_admin_pre_get_posts');
 
 function hocwp_classifieds_save_post($post_id) {
 	if(!hocwp_can_save_post($post_id)) {

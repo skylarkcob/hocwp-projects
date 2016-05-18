@@ -615,6 +615,7 @@ body.hocwp {
     margin-right: -5px;
 }
 
+.row-small [class*="col"],
 .row-small [class^="col"] {
     padding-left: 5px;
     padding-right: 5px;
@@ -829,6 +830,10 @@ body.hocwp {
 .entry-content p img + br + em {
     display: block;
     margin-top: 5px;
+}
+
+.entry-content .bold-it {
+    font-weight: 700;
 }
 
 /**
@@ -1799,12 +1804,21 @@ body.hocwp {
     }
 }
 
+.hocwp .btn-social.btn-facebook,
 .hocwp .fa-facebook {
     background-color: #3b5998;
     border: 1px solid #344e86;
     color: #fff;
 }
 
+.hocwp .btn-social.btn-facebook:hover,
+.hocwp .btn-social.btn-facebook:focus,
+.hocwp .btn-social.btn-facebook:active,
+.hocwp .btn-social.btn-facebook.active,
+.hocwp .btn-social.btn-facebook:hover .fa-facebook,
+.hocwp .btn-social.btn-facebook:focus .fa-facebook,
+.hocwp .btn-social.btn-facebook:active .fa-facebook,
+.hocwp .btn-social.btn-facebook.active .fa-facebook,
 .hocwp .fa-facebook:hover,
 .hocwp .fa-facebook:focus,
 .hocwp .fa-facebook:active,
@@ -1815,12 +1829,24 @@ body.hocwp {
     color: #fff;
 }
 
+.hocwp .btn-social.btn-facebook:active,
+.hocwp .btn-social.btn-facebook.active,
 .hocwp .fa-facebook:active,
 .hocwp .fa-facebook.active,
 .hocwp .open > .fa-facebook.dropdown-toggle {
     background-image: none;
 }
 
+.hocwp .btn-social.btn-facebook.disabled,
+.hocwp .btn-social.btn-facebook.disabled:hover,
+.hocwp .btn-social.btn-facebook.disabled:focus,
+.hocwp .btn-social.btn-facebook.disabled:active,
+.hocwp .btn-social.btn-facebook.disabled.active,
+.hocwp .btn-social.btn-facebook[disabled],
+.hocwp .btn-social.btn-facebook[disabled]:hover,
+.hocwp .btn-social.btn-facebook[disabled]:focus,
+.hocwp .btn-social.btn-facebook[disabled]:active,
+.hocwp .btn-social.btn-facebook[disabled].active,
 .hocwp .fa-facebook.disabled,
 .hocwp .fa-facebook.disabled:hover,
 .hocwp .fa-facebook.disabled:focus,
@@ -1840,37 +1866,61 @@ body.hocwp {
     border: 1px solid #344e86;
 }
 
+.hocwp .btn-social.btn-facebook .badge,
 .fa-facebook .badge {
     background-color: #fff;
     color: #3b5998;
 }
 
+.hocwp .btn-social.btn-twitter,
 .fa-twitter {
     background-color: #26c4f1;
     border: 1px solid #0fbdee;
     color: #fff;
 }
 
+.hocwp .btn-social.btn-twitter:hover,
+.hocwp .btn-social.btn-twitter:focus,
+.hocwp .btn-social.btn-twitter:active,
+.hocwp .btn-social.btn-twitter.active,
+.hocwp .btn-social.btn-twitter:hover .fa-twitter,
+.hocwp .btn-social.btn-twitter:focus .fa-twitter,
+.hocwp .btn-social.btn-twitter:active .fa-twitter,
+.hocwp .btn-social.btn-twitter.active .fa-twitter,
 .fa-twitter:hover, .fa-twitter:focus, .fa-twitter:active, .fa-twitter.active, .open > .fa-twitter.dropdown-toggle {
     background-color: #0eaad6;
     border: 1px solid #0c8fb5;
     color: #fff;
 }
 
+.hocwp .btn-social:active,
+.hocwp .btn-social.active,
 .fa-twitter:active, .fa-twitter.active, .open > .fa-twitter.dropdown-toggle {
     background-image: none;
 }
 
+.hocwp .btn-social.btn-twitter.disabled,
+.hocwp .btn-social.btn-twitter.disabled:hover,
+.hocwp .btn-social.btn-twitter.disabled:focus,
+.hocwp .btn-social.btn-twitter.disabled:active,
+.hocwp .btn-social.btn-twitter.disabled.active,
+.hocwp .btn-social.btn-twitter[disabled],
+.hocwp .btn-social.btn-twitter[disabled]:hover,
+.hocwp .btn-social.btn-twitter[disabled]:focus,
+.hocwp .btn-social.btn-twitter[disabled]:active,
+.hocwp .btn-social.btn-twitter[disabled].active,
 .fa-twitter.disabled, .fa-twitter.disabled:hover, .fa-twitter.disabled:focus, .fa-twitter.disabled:active, .fa-twitter.disabled.active, .fa-twitter[disabled], .fa-twitter[disabled]:hover, .fa-twitter[disabled]:focus, .fa-twitter[disabled]:active, .fa-twitter.active[disabled], fieldset[disabled] .fa-twitter, fieldset[disabled] .fa-twitter:hover, fieldset[disabled] .fa-twitter:focus, fieldset[disabled] .fa-twitter:active, fieldset[disabled] .fa-twitter.active {
     background-color: #26c4f1;
     border: 1px solid #0fbdee;
 }
 
+.hocwp .btn-social.btn-twitter .badge,
 .fa-twitter .badge {
     background-color: #fff;
     color: #26c4f1;
 }
 
+.hocwp .btn-social.btn-google-plus,
 .fa-google-plus,
 .fa-gplus,
 .fa-googleplus {
@@ -1879,6 +1929,14 @@ body.hocwp {
     color: #fff;
 }
 
+.hocwp .btn-social.btn-google-plus:hover,
+.hocwp .btn-social.btn-google-plus:focus,
+.hocwp .btn-social.btn-google-plus:active,
+.hocwp .btn-social.btn-google-plus.active,
+.hocwp .btn-social.btn-google-plus:hover .fa-google-plus,
+.hocwp .btn-social.btn-google-plus:focus .fa-google-plus,
+.hocwp .btn-social.btn-google-plus:active .fa-google-plus,
+.hocwp .btn-social.btn-google-plus.active .fa-google-plus,
 .fa-google-plus:hover, .fa-google-plus:focus, .fa-google-plus:active, .fa-google-plus.active, .open > .fa-google-plus.dropdown-toggle,
 .fa-gplus:hover, .fa-gplus:focus, .fa-gplus:active, .fa-gplus.active, .open > .fa-gplus.dropdown-toggle,
 .fa-googleplus:hover, .fa-googleplus:focus, .fa-googleplus:active, .fa-googleplus.active, .open > .fa-googleplus.dropdown-toggle {
@@ -1907,12 +1965,21 @@ body.hocwp {
     color: #e93f2e;
 }
 
+.hocwp .btn-social.btn-youtube,
 .fa-youtube {
     background-color: #e63127;
     border: 1px solid #cf2c23;
     color: #fff;
 }
 
+.hocwp .btn-social.btn-youtube:hover,
+.hocwp .btn-social.btn-youtube:focus,
+.hocwp .btn-social.btn-youtube:active,
+.hocwp .btn-social.btn-youtube.active,
+.hocwp .btn-social.btn-youtube:hover .fa-youtube,
+.hocwp .btn-social.btn-youtube:focus .fa-youtube,
+.hocwp .btn-social.btn-youtube:active .fa-youtube,
+.hocwp .btn-social.btn-youtube.active .fa-youtube,
 .fa-youtube:hover, .fa-youtube:focus, .fa-youtube:active, .fa-youtube.active, .open > .fa-youtube.dropdown-toggle {
     background-color: #ce2616;
     border: 1px solid #ae2012;
@@ -1923,22 +1990,42 @@ body.hocwp {
     background-image: none;
 }
 
+.hocwp .btn-social.btn-youtube.disabled,
+.hocwp .btn-social.btn-youtube.disabled:hover,
+.hocwp .btn-social.btn-youtube.disabled:focus,
+.hocwp .btn-social.btn-youtube.disabled:active,
+.hocwp .btn-social.btn-youtube.disabled.active,
+.hocwp .btn-social.btn-youtube[disabled],
+.hocwp .btn-social.btn-youtube[disabled]:hover,
+.hocwp .btn-social.btn-youtube[disabled]:focus,
+.hocwp .btn-social.btn-youtube[disabled]:active,
+.hocwp .btn-social.btn-youtube[disabled].active,
 .fa-youtube.disabled, .fa-youtube.disabled:hover, .fa-youtube.disabled:focus, .fa-youtube.disabled:active, .fa-youtube.disabled.active, .fa-youtube[disabled], .fa-youtube[disabled]:hover, .fa-youtube[disabled]:focus, .fa-youtube[disabled]:active, .fa-youtube.active[disabled], fieldset[disabled] .fa-youtube, fieldset[disabled] .fa-youtube:hover, fieldset[disabled] .fa-youtube:focus, fieldset[disabled] .fa-youtube:active, fieldset[disabled] .fa-youtube.active {
     background-color: #e63127;
     border: 1px solid #cf2c23;
 }
 
+.hocwp .btn-social.btn-youtube .badge,
 .fa-youtube .badge {
     background-color: #fff;
     color: #e63127;
 }
 
+.hocwp .btn-social.btn-rss,
 .fa-rss {
     background-color: #feae1b;
     border: 1px solid #e49c18;
     color: #fff;
 }
 
+.hocwp .btn-social.btn-rss:hover,
+.hocwp .btn-social.btn-rss:focus,
+.hocwp .btn-social.btn-rss:active,
+.hocwp .btn-social.btn-rss.active,
+.hocwp .btn-social.btn-rss:hover .fa-rss,
+.hocwp .btn-social.btn-rss:focus .fa-rss,
+.hocwp .btn-social.btn-rss:active .fa-rss,
+.hocwp .btn-social.btn-rss.active .fa-rss,
 .fa-rss:hover, .fa-rss:focus, .fa-rss:active, .fa-rss.active, .open > .fa-rss.dropdown-toggle {
     background-color: #e49c18;
     border: 1px solid #cd8c15;
@@ -1949,22 +2036,42 @@ body.hocwp {
     background-image: none;
 }
 
+.hocwp .btn-social.btn-rss.disabled,
+.hocwp .btn-social.btn-rss.disabled:hover,
+.hocwp .btn-social.btn-rss.disabled:focus,
+.hocwp .btn-social.btn-rss.disabled:active,
+.hocwp .btn-social.btn-rss.disabled.active,
+.hocwp .btn-social.btn-rss[disabled],
+.hocwp .btn-social.btn-rss[disabled]:hover,
+.hocwp .btn-social.btn-rss[disabled]:focus,
+.hocwp .btn-social.btn-rss[disabled]:active,
+.hocwp .btn-social.btn-rss[disabled].active,
 .fa-rss.disabled, .fa-rss.disabled:hover, .fa-rss.disabled:focus, .fa-rss.disabled:active, .fa-rss.disabled.active, .fa-rss[disabled], .fa-rss[disabled]:hover, .fa-rss[disabled]:focus, .fa-rss[disabled]:active, .fa-rss.active[disabled], fieldset[disabled] .fa-rss, fieldset[disabled] .fa-rss:hover, fieldset[disabled] .fa-rss:focus, fieldset[disabled] .fa-rss:active, fieldset[disabled] .fa-rss.active {
     background-color: #feae1b;
     border: 1px solid #e49c18;
 }
 
+.hocwp .btn-social.btn-rss .badge,
 .fa-rss .badge {
     background-color: #fff;
     color: #feae1b;
 }
 
+.hocwp .btn-social.btn-pinterest,
 .fa-pinterest {
     background-color: #b81621;
     border: 1px solid #a1131d;
     color: #fff;
 }
 
+.hocwp .btn-social.btn-pinterest:hover,
+.hocwp .btn-social.btn-pinterest:focus,
+.hocwp .btn-social.btn-pinterest:active,
+.hocwp .btn-social.btn-pinterest.active,
+.hocwp .btn-social.btn-pinterest:hover .fa-pinterest,
+.hocwp .btn-social.btn-pinterest:focus .fa-pinterest,
+.hocwp .btn-social.btn-pinterest:active .fa-pinterest,
+.hocwp .btn-social.btn-pinterest.active .fa-pinterest,
 .fa-pinterest:hover, .fa-pinterest:focus, .fa-pinterest:active, .fa-pinterest.active, .open > .fa-pinterest.dropdown-toggle {
     background-color: #8a1119;
     border: 1px solid #6b0d13;
@@ -1975,22 +2082,42 @@ body.hocwp {
     background-image: none;
 }
 
+.hocwp .btn-social.btn-pinterest.disabled,
+.hocwp .btn-social.btn-pinterest.disabled:hover,
+.hocwp .btn-social.btn-pinterest.disabled:focus,
+.hocwp .btn-social.btn-pinterest.disabled:active,
+.hocwp .btn-social.btn-pinterest.disabled.active,
+.hocwp .btn-social.btn-pinterest[disabled],
+.hocwp .btn-social.btn-pinterest[disabled]:hover,
+.hocwp .btn-social.btn-pinterest[disabled]:focus,
+.hocwp .btn-social.btn-pinterest[disabled]:active,
+.hocwp .btn-social.btn-pinterest[disabled].active,
 .fa-pinterest.disabled, .fa-pinterest.disabled:hover, .fa-pinterest.disabled:focus, .fa-pinterest.disabled:active, .fa-pinterest.disabled.active, .fa-pinterest[disabled], .fa-pinterest[disabled]:hover, .fa-pinterest[disabled]:focus, .fa-pinterest[disabled]:active, .fa-pinterest.active[disabled], fieldset[disabled] .fa-pinterest, fieldset[disabled] .fa-pinterest:hover, fieldset[disabled] .fa-pinterest:focus, fieldset[disabled] .fa-pinterest:active, fieldset[disabled] .fa-pinterest.active {
     background-color: #b81621;
     border: 1px solid #a1131d;
 }
 
+.hocwp .btn-social.btn-pinterest .badge,
 .fa-pinterest .badge {
     background-color: #fff;
     color: #b81621;
 }
 
+.hocwp .btn-social.btn-linkedin,
 .fa-linkedin {
     background-color: #007bb6;
     border: 1px solid #006a9d;
     color: #fff;
 }
 
+.hocwp .btn-social.btn-linkedin:hover,
+.hocwp .btn-social.btn-linkedin:focus,
+.hocwp .btn-social.btn-linkedin:active,
+.hocwp .btn-social.btn-linkedin.active,
+.hocwp .btn-social.btn-linkedin:hover .fa-linkedin,
+.hocwp .btn-social.btn-linkedin:focus .fa-linkedin,
+.hocwp .btn-social.btn-linkedin:active .fa-linkedin,
+.hocwp .btn-social.btn-linkedin.active .fa-linkedin,
 .fa-linkedin:hover, .fa-linkedin:focus, .fa-linkedin:active, .fa-linkedin.active, .open > .fa-linkedin.dropdown-toggle {
     background-color: #005983;
     border: 1px solid #00405f;
@@ -2001,22 +2128,42 @@ body.hocwp {
     background-image: none;
 }
 
+.hocwp .btn-social.btn-linkedin.disabled,
+.hocwp .btn-social.btn-linkedin.disabled:hover,
+.hocwp .btn-social.btn-linkedin.disabled:focus,
+.hocwp .btn-social.btn-linkedin.disabled:active,
+.hocwp .btn-social.btn-linkedin.disabled.active,
+.hocwp .btn-social.btn-linkedin[disabled],
+.hocwp .btn-social.btn-linkedin[disabled]:hover,
+.hocwp .btn-social.btn-linkedin[disabled]:focus,
+.hocwp .btn-social.btn-linkedin[disabled]:active,
+.hocwp .btn-social.btn-linkedin[disabled].active,
 .fa-linkedin.disabled, .fa-linkedin.disabled:hover, .fa-linkedin.disabled:focus, .fa-linkedin.disabled:active, .fa-linkedin.disabled.active, .fa-linkedin[disabled], .fa-linkedin[disabled]:hover, .fa-linkedin[disabled]:focus, .fa-linkedin[disabled]:active, .fa-linkedin.active[disabled], fieldset[disabled] .fa-linkedin, fieldset[disabled] .fa-linkedin:hover, fieldset[disabled] .fa-linkedin:focus, fieldset[disabled] .fa-linkedin:active, fieldset[disabled] .fa-linkedin.active {
     background-color: #007bb6;
     border: 1px solid #006a9d;
 }
 
+.hocwp .btn-social.btn-linkedin .badge,
 .fa-linkedin .badge {
     background-color: #fff;
     color: #007bb6;
 }
 
+.hocwp .btn-social.btn-email,
 .fa-email {
     background-color: #0a88ff;
     border: 1px solid #007bf0;
     color: #fff;
 }
 
+.hocwp .btn-social.btn-email:hover,
+.hocwp .btn-social.btn-email:focus,
+.hocwp .btn-social.btn-email:active,
+.hocwp .btn-social.btn-email.active,
+.hocwp .btn-social.btn-email:hover .fa-email,
+.hocwp .btn-social.btn-email:focus .fa-email,
+.hocwp .btn-social.btn-email:active .fa-email,
+.hocwp .btn-social.btn-email.active .fa-email,
 .fa-email:hover, .fa-email:focus, .fa-email:active, .fa-email.active, .open > .fa-email.dropdown-toggle {
     background-color: #006ed6;
     border: 1px solid #005cb2;
@@ -2027,11 +2174,22 @@ body.hocwp {
     background-image: none;
 }
 
+.hocwp .btn-social.btn-email.disabled,
+.hocwp .btn-social.btn-email.disabled:hover,
+.hocwp .btn-social.btn-email.disabled:focus,
+.hocwp .btn-social.btn-email.disabled:active,
+.hocwp .btn-social.btn-email.disabled.active,
+.hocwp .btn-social.btn-email[disabled],
+.hocwp .btn-social.btn-email[disabled]:hover,
+.hocwp .btn-social.btn-email[disabled]:focus,
+.hocwp .btn-social.btn-email[disabled]:active,
+.hocwp .btn-social.btn-email[disabled].active,
 .fa-email.disabled, .fa-email.disabled:hover, .fa-email.disabled:focus, .fa-email.disabled:active, .fa-email.disabled.active, .fa-email[disabled], .fa-email[disabled]:hover, .fa-email[disabled]:focus, .fa-email[disabled]:active, .fa-email.active[disabled], fieldset[disabled] .fa-email, fieldset[disabled] .fa-email:hover, fieldset[disabled] .fa-email:focus, fieldset[disabled] .fa-email:active, fieldset[disabled] .fa-email.active {
     background-color: #0a88ff;
     border: 1px solid #007bf0;
 }
 
+.hocwp .btn-social.btn-email .badge,
 .fa-email .badge {
     background-color: #fff;
     color: #0a88ff;
@@ -2082,6 +2240,14 @@ body.hocwp {
 
 .fb-like iframe {
     z-index: 499;
+}
+
+.hocwp .btn-social:hover .fa,
+.hocwp .btn-social:focus .fa,
+.hocwp .btn-social:active .fa,
+.hocwp .btn-social.active .fa,
+.hocwp .btn-social .fa {
+    border: medium none !important;
 }
 
 /**

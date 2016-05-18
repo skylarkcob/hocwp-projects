@@ -328,8 +328,7 @@ function hocwp_is_login_page() {
 }
 
 function hocwp_can_save_post($post_id) {
-    global $pagenow;
-    if(hocwp_id_number_valid($post_id) && !HOCWP_DOING_AUTO_SAVE && current_user_can('edit_post', $post_id) && 'edit.php' != $pagenow) {
+    if(hocwp_id_number_valid($post_id) && !HOCWP_DOING_AUTO_SAVE && current_user_can('edit_post', $post_id)) {
         return true;
     }
     return false;
@@ -1930,16 +1929,52 @@ function hocwp_color_hex_to_rgb($color, $opacity = false) {
     return $output;
 }
 
+function hocwp_the_social_share_buttons($args = array()) {
+    $socials = hocwp_get_value_by_key($args, 'socials');
+    if(!hocwp_array_has_value($socials)) {
+        $socials = array(
+            'facebook' => 'Facebook',
+            'twitter' => 'Twitter',
+            'googleplus' => 'Google+',
+            'pinterest' => 'Pinterest',
+            'email' => 'Email'
+        );
+        $socials = apply_filters('hocwp_social_share_buttons', $socials);
+    }
+    ?>
+    <div class="social-share">
+        <ul class="list-inline list-unstyled list-share-buttons">
+            <?php
+            foreach($socials as $social_name => $text) {
+                $font_awesome = 'fa-' . $social_name;
+                $btn_class = 'btn-' . $social_name;
+                switch($social_name) {
+                    case 'email':
+                        hocwp_add_string_with_space_before($font_awesome, 'fa-envelope');
+                        break;
+                    case 'googleplus':
+                    case 'gplus':
+                        hocwp_add_string_with_space_before($font_awesome, 'fa-google-plus');
+                        hocwp_add_string_with_space_before($btn_class, 'btn-google-plus');
+                        break;
+                }
+                echo '<li><a target="_blank" href="' . hocwp_get_social_share_url(array('social_name' => $social_name)) . '" class="btn btn-social ' . $btn_class . '"><i class="fa ' . $font_awesome . ' icon-left"></i> ' . $text . '</a></li>';
+            }
+            ?>
+        </ul>
+    </div>
+    <?php
+}
+
 function hocwp_get_social_share_url($args = array()) {
     $result = '';
-    $title = get_the_title();
-    $permalink = get_the_permalink();
-    $social_name = '';
-    $thumbnail = '';
-    $excerpt = get_the_excerpt();
-    $language = hocwp_get_language();
-    $twitter_account = 'skylarkcob';
-    extract($args, EXTR_OVERWRITE);
+    $title = hocwp_get_value_by_key($args, 'title', get_the_title());
+    $permalink = hocwp_get_value_by_key($args, 'permalink', get_the_permalink());
+    $social_name = hocwp_get_value_by_key($args, 'social_name');
+    $thumbnail = hocwp_get_value_by_key($args, 'thumbnail');
+    $excerpt = hocwp_get_value_by_key($args, 'excerpt', get_the_excerpt());
+    $language = hocwp_get_value_by_key($args, 'language', hocwp_get_language());
+    $twitter_account = hocwp_get_value_by_key($args, 'twitter_account', 'skylarkcob');
     $permalink = urlencode($permalink);
     if(empty($twitter_account)) {
         $twitter_account = hocwp_get_wpseo_social_value('twitter_site');
@@ -2624,7 +2659,7 @@ function hocwp_use_facebook_javascript_sdk() {
 }
 
 function hocwp_facebook_page_plugin($args = array()) {
-    $href = isset($args['href']) ? $args['href'] : '';
+    $href = hocwp_get_value_by_key($args, 'href', hocwp_get_value_by_key($args, 'url'));
     if(empty($href)) {
         $page_id = isset($args['page_id']) ? $args['page_id'] : 'hocwpnet';
         $href = 'https://www.facebook.com/' . $page_id;

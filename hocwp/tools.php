@@ -10,6 +10,35 @@ function hocwp_maintenance_mode_default_settings() {
     return apply_filters('hocwp_maintenance_mode_default_settings', $defaults);
 }
 
+function hocwp_prevent_author_see_another_post() {
+    $use = false;
+    $use = apply_filters('hocwp_prevent_author_see_another_post', $use);
+    return $use;
+}
+
+function hocwp_delete_old_file($path, $interval) {
+    $files = scandir($path);
+    $now = time();
+    foreach($files as $file) {
+        $file = trailingslashit($path) . $file;
+        if(is_file($file)) {
+            $file_time = filemtime($file);
+            if(($now - $file_time) >= $interval) {
+                chmod($file, 0777);
+                @unlink($file);
+            }
+        }
+    }
+}
+
+function hocwp_use_core_style() {
+    return apply_filters('hocwp_use_core_style', true);
+}
+
+function hocwp_use_superfish_menu() {
+    return apply_filters('hocwp_use_superfish_menu', true);
+}
+
 function hocwp_maintenance_mode_settings() {
     $defaults = hocwp_maintenance_mode_default_settings();
     $args = get_option('hocwp_maintenance');

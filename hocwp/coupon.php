@@ -718,7 +718,7 @@ function hocwp_coupon_attribute_meta_box_field($meta) {
 }
 add_action('hocwp_post_meta_box_field', 'hocwp_coupon_attribute_meta_box_field');
 
-if('post.php' == $pagenow || 'edit.php' == $pagenow) {
+if('post.php' == $pagenow || 'post-new.php' == $pagenow) {
 	add_filter('hocwp_use_chosen_select', '__return_true');
 }
 

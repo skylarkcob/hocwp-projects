@@ -401,10 +401,10 @@ class HOCWP_Captcha {
             return false;
         }
         $is_win = ('WIN' === strtoupper(substr(PHP_OS, 0, 3)));
-
         if(!($is_win ? win_is_writable($dir) : @is_writable($dir))) {
             return false;
         }
+        hocwp_delete_old_file($dir, $minutes * MINUTE_IN_SECONDS);
         $count = 0;
         if($handle = @opendir($dir)) {
             while(false !== ($filename = readdir($handle))) {

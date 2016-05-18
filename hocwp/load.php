@@ -1,6 +1,6 @@
 <?php
 /*
- * Last updated: 2016-05-13
+ * Last updated: 2016-05-18
  */
 if(!function_exists('add_filter')) exit;
 
@@ -8,7 +8,7 @@ if(defined('HOCWP_PATH')) {
     return;
 }
 
-define('HOCWP_VERSION', '3.3.9');
+define('HOCWP_VERSION', '3.4.0');
 
 define('HOCWP_PATH', dirname(__FILE__));
 
