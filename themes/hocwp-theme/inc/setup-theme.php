@@ -142,15 +142,32 @@ function hocwp_setup_theme_scripts() {
         'collapse' => '<span class="screen-reader-text">' . esc_html__('collapse child menu', 'hocwp') . '</span>'
     );
     $localize_object = wp_parse_args($localize_object, hocwp_theme_default_script_localize_object());
+    $use = hocwp_use_core_style();
+    $superfish = hocwp_use_superfish_menu();
     if(hocwp_is_debugging()) {
         wp_localize_script('hocwp', 'hocwp', $localize_object);
         wp_register_style('hocwp-front-end-style', get_template_directory_uri() . '/hocwp/css/hocwp-front-end' . HOCWP_CSS_SUFFIX, array('hocwp-style'));
         wp_register_script('hocwp-front-end', get_template_directory_uri() . '/hocwp/js/hocwp-front-end' . HOCWP_JS_SUFFIX, array('hocwp'), false, true);
-        wp_register_style('hocwp-custom-front-end-style', get_template_directory_uri() . '/css/hocwp-custom-front-end' . HOCWP_CSS_SUFFIX, array('bootstrap-style', 'font-awesome-style', 'superfish-style', 'hocwp-front-end-style'));
-        wp_register_script('hocwp-custom-front-end', get_template_directory_uri() . '/js/hocwp-custom-front-end' . HOCWP_JS_SUFFIX, array('superfish', 'bootstrap', 'hocwp-front-end'), false, true);
+        $style_deps = array('bootstrap-style', 'font-awesome-style', 'superfish-style', 'hocwp-front-end-style');
+        $script_deps = array('superfish', 'bootstrap', 'hocwp-front-end');
+        if(!$use) {
+            unset($style_deps[array_search('hocwp-front-end-style', $style_deps)]);
+        }
+        if(!$superfish) {
+            unset($style_deps[array_search('superfish-style', $style_deps)]);
+            unset($script_deps[array_search('superfish', $script_deps)]);
+        }
+        wp_register_style('hocwp-custom-front-end-style', get_template_directory_uri() . '/css/hocwp-custom-front-end' . HOCWP_CSS_SUFFIX, $style_deps);
+        wp_register_script('hocwp-custom-front-end', get_template_directory_uri() . '/js/hocwp-custom-front-end' . HOCWP_JS_SUFFIX, $script_deps, false, true);
     } else {
-        wp_register_style('hocwp-custom-front-end-style', get_template_directory_uri() . '/css/hocwp-custom-front-end' . HOCWP_CSS_SUFFIX, array('bootstrap-style', 'font-awesome-style', 'superfish-style'), HOCWP_THEME_VERSION);
-        wp_register_script('hocwp-custom-front-end', get_template_directory_uri() . '/js/hocwp-custom-front-end' . HOCWP_JS_SUFFIX, array('superfish', 'bootstrap'), HOCWP_THEME_VERSION, true);
+        $style_deps = array('bootstrap-style', 'font-awesome-style', 'superfish-style');
+        $script_deps = array('superfish', 'bootstrap');
+        if(!$superfish) {
+            unset($style_deps[array_search('superfish-style', $style_deps)]);
+            unset($script_deps[array_search('superfish', $script_deps)]);
+        }
+        wp_register_style('hocwp-custom-front-end-style', get_template_directory_uri() . '/css/hocwp-custom-front-end' . HOCWP_CSS_SUFFIX, $style_deps, HOCWP_THEME_VERSION);
+        wp_register_script('hocwp-custom-front-end', get_template_directory_uri() . '/js/hocwp-custom-front-end' . HOCWP_JS_SUFFIX, $script_deps, HOCWP_THEME_VERSION, true);
         wp_localize_script('hocwp-custom-front-end', 'hocwp', $localize_object);
     }
     if(!hocwp_in_maintenance_mode()) {
@@ -182,6 +199,9 @@ function hocwp_setup_theme_admin_scripts() {
     $jquery_ui_datetime_picker = apply_filters('hocwp_admin_jquery_datetime_picker', false);
     if((bool)$jquery_ui_datetime_picker) {
         hocwp_enqueue_jquery_ui_datepicker();
+    }
+    if('profile.php' == $GLOBALS['pagenow']) {
+        hocwp_google_plus_client_script();
     }
 }
 add_action('admin_enqueue_scripts', 'hocwp_setup_theme_admin_scripts');
@@ -374,29 +394,37 @@ function hocwp_theme_intermediate_image_sizes_advanced($sizes) {
 add_filter('intermediate_image_sizes_advanced', 'hocwp_theme_intermediate_image_sizes_advanced');
 
 function hocwp_setup_theme_wp_dashboard_setup() {
-    wp_add_dashboard_widget('hocwp_useful_links', __('Useful Links', 'hocwp'), 'hocwp_theme_dashboard_widget_useful_links');
-    wp_add_dashboard_widget('hocwp_services_news', __('Services Information', 'hocwp'), 'hocwp_theme_dashboard_widget_services_news');
+    $is_admin = hocwp_is_admin();
+    if($is_admin) {
+        wp_add_dashboard_widget('hocwp_useful_links', __('Useful Links', 'hocwp'), 'hocwp_theme_dashboard_widget_useful_links');
+        wp_add_dashboard_widget('hocwp_services_news', __('Services Information', 'hocwp'), 'hocwp_theme_dashboard_widget_services_news');
+    }
     wp_add_dashboard_widget('hocwp_wordpress_release', __('WordPress Releases', 'hocwp'), 'hocwp_theme_dashboard_widget_wordpress_release');
 
     global $wp_meta_boxes;
 
     $normal_dashboard = $wp_meta_boxes['dashboard']['normal']['core'];
-    $backups = array(
-        'hocwp_useful_links' => $normal_dashboard['hocwp_useful_links']
-    );
+    $backups = array();
+    if($is_admin) {
+        $backups['hocwp_useful_links'] = $normal_dashboard['hocwp_useful_links'];
+    }
     foreach($backups as $key => $widget) {
         unset($normal_dashboard[$key]);
     }
     $sorted_dashboard = array_merge($backups, $normal_dashboard);
     $wp_meta_boxes['dashboard']['normal']['core'] = $sorted_dashboard;
 
-    $backup = $wp_meta_boxes['dashboard']['normal']['core']['hocwp_services_news'];
-    unset($wp_meta_boxes['dashboard']['normal']['core']['hocwp_services_news']);
-    $wp_meta_boxes['dashboard']['side']['core']['hocwp_services_news'] = $backup;
+    if($is_admin) {
+        $backup = $wp_meta_boxes['dashboard']['normal']['core']['hocwp_services_news'];
+        unset($wp_meta_boxes['dashboard']['normal']['core']['hocwp_services_news']);
+        $wp_meta_boxes['dashboard']['side']['core']['hocwp_services_news'] = $backup;
+    }
+
     $side_dashboard = $wp_meta_boxes['dashboard']['side']['core'];
-    $backups = array(
-        'hocwp_services_news' => $side_dashboard['hocwp_services_news']
-    );
+    $backups = array();
+    if($is_admin) {
+        $backups['hocwp_services_news'] = $side_dashboard['hocwp_services_news'];
+    }
     foreach($backups as $key => $widget) {
         unset($side_dashboard[$key]);
     }
@@ -767,3 +795,111 @@ if('post.php' == $pagenow || 'post-new.php' == $pagenow) {
         $meta->init();
     }
 }
+
+function hocwp_setup_theme_more_user_profile($user) {
+    $user_id = $user->ID;
+    ?>
+    <h3><?php _e('Social Accounts', 'hocwp'); ?></h3>
+    <table class="form-table">
+        <tr>
+            <th><label for="facebook">Facebook</label></th>
+            <td>
+                <?php
+                $facebook = get_the_author_meta('facebook', $user_id);
+                $input = new HOCWP_HTML('input');
+                $input->set_attribute('name', 'facebook');
+                if(empty($facebook)) {
+                    $input->set_attribute('type', 'button');
+                    $input->set_text(__('Connect with Facebook account', 'hocwp'));
+                    $input->set_class('button button-secondary hide-if-no-js hocwp-connect-facebook facebook');
+                    $input->set_attribute('onclick', 'hocwp_facebook_login();');
+                } else {
+                    $facebook_data = get_the_author_meta('facebook_data', $user_id);
+                    $avatar = hocwp_get_value_by_key($facebook_data, array('picture', 'data', 'url'));
+                    $email = hocwp_get_value_by_key($facebook_data, 'email');
+                    if(!empty($avatar)) {
+                        $img = new HOCWP_HTML('img');
+                        $img->set_image_alt('');
+                        $img->set_image_src($avatar);
+                    }
+                    $input->set_attribute('type', 'text');
+                    $input->set_attribute('readonly', 'readonly');
+                    $input->set_attribute('value', $facebook . ' - ' . $email);
+                    $input->set_class('regular-text hocwp-disconnect-social facebook');
+                    $input->set_attribute('data-user-id', $user_id);
+                    $input->set_attribute('data-social', 'facebook');
+                }
+                if(empty($facebook) && 'profile.php' == $GLOBALS['pagenow']) {
+                    $input->output();
+                    if(empty($facebook)) {
+                        hocwp_facebook_login_script(array('connect' => true));
+                    }
+                } else {
+                    if(!empty($facebook)) {
+                        $input->output();
+                    } else {
+                        _e('You can only connect to social account on profile page.', 'hocwp');
+                    }
+                }
+                ?>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="google">Google</label></th>
+            <td>
+                <?php
+                $social = 'google';
+                $social_id = get_the_author_meta($social, $user_id);
+                $input = new HOCWP_HTML('input');
+                $input->set_attribute('name', $social);
+                if(empty($social_id)) {
+                    $input->set_attribute('type', 'button');
+                    $input->set_text(__('Connect with Google account', 'hocwp'));
+                    $input->set_class('button button-secondary hide-if-no-js hocwp-connect-' . $social . ' ' . $social);
+                    $input->set_attribute('onclick', 'hocwp_google_login();');
+                } else {
+                    $facebook_data = get_the_author_meta($social . '_data', $user_id);
+                    $avatar = hocwp_get_value_by_key($facebook_data, array('picture', 'data', 'url'));
+                    $email = hocwp_get_value_by_key($facebook_data, array('emails', 0, 'value'));
+                    if(!empty($avatar)) {
+                        $img = new HOCWP_HTML('img');
+                        $img->set_image_alt('');
+                        $img->set_image_src($avatar);
+                    }
+                    $input->set_attribute('type', 'text');
+                    $input->set_attribute('readonly', 'readonly');
+                    $input->set_attribute('value', $social_id . ' - ' . $email);
+                    $input->set_class('regular-text hocwp-disconnect-social ' . $social);
+                    $input->set_attribute('data-user-id', $user_id);
+                    $input->set_attribute('data-social', $social);
+                }
+                if(empty($social_id) && 'profile.php' == $GLOBALS['pagenow']) {
+                    $input->output();
+                    if(empty($social_id)) {
+                        hocwp_google_login_script(array('connect' => true));
+                    }
+                } else {
+                    if(!empty($social_id)) {
+                        $input->output();
+                    } else {
+                        _e('You can only connect to social account on profile page.', 'hocwp');
+                    }
+                }
+                ?>
+            </td>
+        </tr>
+    </table>
+    <?php
+}
+add_action('show_user_profile', 'hocwp_setup_theme_more_user_profile', 1);
+add_action('edit_user_profile', 'hocwp_setup_theme_more_user_profile', 1);
+
+if('profile.php' == $pagenow) add_filter('hocwp_use_admin_style_and_script', '__return_true');
+
+function hocwp_setup_theme_change_language($lang) {
+    if(function_exists('qtranxf_getLanguage')) {
+        $lang = qtranxf_getLanguage();
+    }
+    return $lang;
+}
+if(!is_admin()) add_filter('hocwp_language', 'hocwp_setup_theme_change_language');

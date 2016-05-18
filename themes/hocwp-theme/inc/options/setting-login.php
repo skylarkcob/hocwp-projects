@@ -31,7 +31,7 @@ function hocwp_users_can_register() {
 }
 
 function hocwp_option_user_login_update($input) {
-	$users_can_register = isset($input['users_can_register']) ? 1 : 0;
+	$users_can_register = hocwp_checkbox_post_data_value($input, 'users_can_register');
 	if((bool)$users_can_register) {
 		update_option('users_can_register', 1);
 	} else {

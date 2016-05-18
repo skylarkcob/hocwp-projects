@@ -1,8 +1,22 @@
 <?php
 if(!function_exists('add_filter')) exit;
+
 $use = apply_filters('hocwp_admin_translation', false);
 
 if(!$use && is_admin()) {
+    return;
+}
+
+if(function_exists('qtranxf_getLanguage')) {
+    $lang = qtranxf_getLanguage();
+    if('vi' != $lang) {
+        return;
+    }
+}
+
+$use = apply_filters('hocwp_translate_theme_into_vietnamese', true);
+
+if(!$use) {
     return;
 }
 

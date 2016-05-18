@@ -27,6 +27,12 @@ function hocwp_theme_register_lib_lightslider() {
     wp_enqueue_script('lightslider', get_template_directory_uri() . '/lib/lightslider/js/lightslider.min.js', array('jquery'), false, true);
 }
 
+function hocwp_theme_register_lib_slick_slider() {
+    wp_enqueue_style('slick-style', get_template_directory_uri() . '/lib/slick/slick.css');
+    wp_enqueue_style('slick-theme-style', get_template_directory_uri() . '/lib/slick/slick-theme.css');
+    wp_enqueue_script('slick', get_template_directory_uri() . '/lib/slick/slick.min.js', array('jquery'), false, true);
+}
+
 function hocwp_theme_register_lib_fancybox() {
     wp_enqueue_style('fancybox-style', HOCWP_THEME_URL . '/lib/fancybox/jquery.fancybox.css');
     wp_enqueue_script('fancybox', HOCWP_THEME_URL . '/lib/fancybox/jquery.fancybox.pack.js', array('jquery'), false, true);
@@ -210,6 +216,7 @@ function hocwp_theme_the_menu($args = array()) {
             'menu_id' => $menu_id,
             'items_wrap' => $items_wrap
         );
+        $menu_args = wp_parse_args($args, $menu_args);
         wp_nav_menu($menu_args);
         ?>
     </nav><!-- #site-navigation -->
