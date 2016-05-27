@@ -625,6 +625,47 @@ body.hocwp {
     font-size: 20px;
 }
 
+.hocwp .vertical .carousel-inner {
+    height: 100%;
+}
+
+.hocwp .carousel.vertical .item {
+    -webkit-transition: 0.6s ease-in-out top;
+    -moz-transition: 0.6s ease-in-out top;
+    -ms-transition: 0.6s ease-in-out top;
+    -o-transition: 0.6s ease-in-out top;
+    transition: 0.6s ease-in-out top;
+}
+
+.hocwp .carousel.vertical .active {
+    top: 0;
+}
+
+.hocwp .carousel.vertical .next {
+    top: 100%;
+}
+
+.hocwp .carousel.vertical .prev {
+    top: -100%;
+}
+
+.hocwp .carousel.vertical .next.left,
+.hocwp .carousel.vertical .prev.right {
+    top: 0;
+}
+
+.hocwp .carousel.vertical .active.left {
+    top: -100%;
+}
+
+.hocwp .carousel.vertical .active.right {
+    top: 100%;
+}
+
+.hocwp .carousel.vertical .item {
+    left: 0;
+}
+
 /**
  * bxSlider, gallery
  */
@@ -688,8 +729,7 @@ body.hocwp {
 
 .lSSlideOuter .lSAction .lSNext,
 .lSSlideOuter .lSAction .lSPrev {
-    background-position: center center;
-    background-repeat: no-repeat;
+    background: no-repeat center center;
     height: 60px;
     margin-top: -30px;
     width: 60px;
@@ -855,10 +895,9 @@ body.hocwp {
 
 .hocwp-login-box .module-body {
     background-color: #e5e5e5;
-    border-color: transparent #cdcdcd #cdcdcd;
     border-radius: 0.4em;
-    border-style: solid;
-    border-width: 0 1px 1px;
+    border: 1px solid #cdcdcd;
+    border-top: 0 transparent;
     color: #282828;
     padding: 35px;
 }
@@ -1280,6 +1319,30 @@ body.hocwp {
 .entry-meta > *::before,
 .search-form.use-icon-search .search-submit {
     font-family: "FontAwesome";
+}
+
+.hocwp .search-form.icon-in label {
+    float: none;
+    margin: 0;
+    width: 100%;
+}
+
+.hocwp .search-form.icon-in {
+    position: relative;
+}
+
+.hocwp .search-form.icon-in .search-submit {
+    background: rgba(0, 0, 0, 0) none repeat scroll 0 0 !important;
+    border: medium none !important;
+    color: #333 !important;
+    padding: 8px 12px !important;
+    position: absolute;
+    right: 0;
+    width: auto;
+}
+
+.hocwp .search-form.icon-in .search-field {
+    padding-right: 35px;
 }
 
 /**

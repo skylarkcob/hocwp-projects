@@ -13,7 +13,7 @@ define('HOCWP_COUNTER_TABLE_ONLINE', 'hw_statistics_online');
 define('HOCWP_COUNTER_PATH', HOCWP_CONTENT_PATH . '/counter');
 
 if(!file_exists(HOCWP_COUNTER_PATH)) {
-    mkdir(HOCWP_COUNTER_PATH);
+    wp_mkdir_p(HOCWP_COUNTER_PATH);
 }
 
 $use_statistics = apply_filters('hocwp_use_statistics', false);

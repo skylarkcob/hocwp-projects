@@ -2,7 +2,7 @@
 if(!function_exists('add_filter')) exit;
 
 if(!file_exists(HOCWP_CONTENT_PATH)) {
-    mkdir(HOCWP_CONTENT_PATH);
+    wp_mkdir_p(HOCWP_CONTENT_PATH);
 }
 
 function hocwp_setup_product_head_description() {

@@ -117,7 +117,7 @@ function hocwp_crop_image($args = array()) {
                 $upload_dir = hocwp_get_upload_folder_details();
                 $base_path = apply_filters('hocwp_custom_thumbnail_base_path', untrailingslashit($upload_dir['path']) . '/hocwp/thumbs/', $args);
                 if(!file_exists($base_path)) {
-                    mkdir($base_path);
+                    wp_mkdir_p($base_path);
                 }
                 $base_url = apply_filters('hocwp_custom_thumbnail_base_url', untrailingslashit($upload_dir['url']) . '/hocwp/thumbs/', $args);
                 $filename = $path_info['filename'];

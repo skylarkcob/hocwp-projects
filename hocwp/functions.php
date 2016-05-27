@@ -1247,7 +1247,7 @@ function hocwp_random_string_number($length = 6) {
 }
 
 function hocwp_url_valid($url) {
-    if(!filter_var($url, FILTER_VALIDATE_URL) === false) {
+    if(hocwp_is_image($url) || !filter_var($url, FILTER_VALIDATE_URL) === false) {
         return true;
     }
     return false;
@@ -1597,7 +1597,7 @@ function hocwp_build_css_rule($elements, $properties) {
             continue;
         }
         $first_char = hocwp_get_first_char($element);
-        if('.' !== $first_char) {
+        if('.' !== $first_char && strpos($element, '.') === false) {
             $element = '.' . $element;
         }
         $before .= $element . ',';
@@ -2417,6 +2417,10 @@ function hocwp_search_form($args = array()) {
         hocwp_add_string_with_space_before($class, 'use-icon-search');
         $submit_text = '&#xf002;';
     }
+    $icon_in = hocwp_get_value_by_key($args, 'icon_in');
+    if((bool)$icon_in) {
+        hocwp_add_string_with_space_before($class, 'icon-in');
+    }
     $action = hocwp_get_value_by_key($args, 'action', home_url('/'));
     $action = trailingslashit($action);
     $name = hocwp_get_value_by_key($args, 'name', 's');
@@ -2933,7 +2937,7 @@ function hocwp_execute_upload($args = array()) {
         $target_dir = untrailingslashit($upload_dir['path']) . '/hocwp';
         $upload_url = untrailingslashit($upload_dir['url']) . '/hocwp';
         if(!file_exists($target_dir)) {
-            mkdir($target_dir, 0777);
+            wp_mkdir_p($target_dir);
         }
         $upload_path = $target_dir;
     }

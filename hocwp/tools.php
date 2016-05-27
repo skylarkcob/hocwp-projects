@@ -471,6 +471,28 @@ function hocwp_compress_style_and_script($args = array()) {
                 hocwp_compress_style($hocwp_css_path, true, $force_compress);
             }
         }
+        $compress_paths = apply_filters('hocwp_compress_paths', array());
+        foreach($compress_paths as $path) {
+            $css_path = trailingslashit($path) . 'css';
+            $js_path = trailingslashit($path) . 'js';
+            $compress_css = false;
+            if(in_array('css', $type)) {
+                $compress_css = true;
+                hocwp_compress_style($css_path, false, $force_compress);
+            }
+            $compress_js = false;
+            if(in_array('js', $type)) {
+                $compress_js = true;
+                hocwp_compress_script($js_path, false, $force_compress);
+            }
+            if($compress_css || $compress_js) {
+                unset($type['recompress']);
+            }
+            if(in_array('recompress', $type)) {
+                hocwp_compress_script($js_path, true, $force_compress);
+                hocwp_compress_style($css_path, true, $force_compress);
+            }
+        }
     }
 }
 
