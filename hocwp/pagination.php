@@ -147,7 +147,7 @@ function hocwp_build_pagination($args = array()) {
             $result .= '<a class="item link-item first-item" href="' . $link_href . '" data-paged="' . 1 . '">' . $first . '</a>';
         }
         $link_href = hocwp_get_pagenum_link(array('pagenum' => ($current_page - 1), 'request' => $request));
-        $result .= '<a class="item link-item previous-item" href="' . $link_href . '" data-paged="' . ($current_page - 1) . '">' . $previous . '</a>';
+        $result .= '<a class="item link-item previous-item prev-item" href="' . $link_href . '" data-paged="' . ($current_page - 1) . '">' . $previous . '</a>';
     }
     $result .= hocwp_loop_pagination_item($args);
     if($current_page < $total_page) {
@@ -194,7 +194,8 @@ function hocwp_pagination_before($args = array()) {
         $query_vars = hocwp_get_value_by_key($args, 'query_vars', $query->query_vars);
         hocwp_add_string_with_space_before($class, 'ajax');
     }
-    echo '<nav class="' . $class . '" data-query-vars="' . esc_attr(json_encode($query_vars)) . '">';
+    $total_page = hocwp_get_total_page($args);
+    echo '<nav class="' . $class . '" data-query-vars="' . esc_attr(json_encode($query_vars)) . '" data-total-page="' . $total_page . '">';
 }
 
 function hocwp_pagination_after() {

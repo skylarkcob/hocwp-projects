@@ -12,6 +12,27 @@ function hocwp_query_product($args = array()) {
     return hocwp_query($args);
 }
 
+function hocwp_query_featured_product($args = array()) {
+    $meta_item = array(
+        'relation' => 'or',
+        array(
+            'key' => '_featured',
+            'value' => 'yes'
+        ),
+        array(
+            'key' => 'featured',
+            'value' => 1,
+            'type' => 'numeric'
+        )
+    );
+    $args = hocwp_query_sanitize_meta_query($meta_item, $args);
+    return hocwp_query_product($args);
+}
+
+function hocwp_query_sale_product($args = array()) {
+    return hocwp_query_product($args);
+}
+
 function hocwp_query_post_by_category($term, $args = array()) {
     hocwp_query_sanitize_post_by_category($term, $args);
     return hocwp_query($args);

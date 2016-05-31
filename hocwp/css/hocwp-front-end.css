@@ -621,6 +621,17 @@ body.hocwp {
     padding-right: 5px;
 }
 
+.row-medium {
+    margin-left: -10px;
+    margin-right: -10px;
+}
+
+.row-medium [class*="col"],
+.row-medium [class^="col"] {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
 .hocwp .modal button.close {
     font-size: 20px;
 }
@@ -2947,6 +2958,10 @@ body.hocwp {
 
 .hocwp .widget.woocommerce li .star-rating {
     margin-bottom: 5px;
+}
+
+.hocwp .woocommerce-ordering select {
+    width: auto;
 }
 
 @media only screen and (max-width: 980px) {

@@ -106,6 +106,26 @@ function hocwp_wc_add_to_cart($args = array()) {
     echo hocwp_wc_get_add_to_cart($args);
 }
 
+function hocwp_wc_filter_product_by_sort_type() {
+    woocommerce_catalog_ordering();
+}
+
+function hocwp_wc_filter_product_by_price() {
+    the_widget('WC_Widget_Price_Filter');
+}
+
+function hocwp_wc_add_post_type_product_to_search_url() {
+    if(is_search()) {
+        $post_type = hocwp_get_method_value('post_type', 'request');
+        if('product' != $post_type) {
+            $url = hocwp_get_current_url();
+            $url = add_query_arg(array('post_type' => 'product'), $url);
+            wp_redirect($url);
+            exit;
+        }
+    }
+}
+
 function hocwp_wc_insert_order($data) {
     $post_id = hocwp_get_value_by_key($data, 'post_id');
     if(hocwp_id_number_valid($post_id)) {
@@ -579,3 +599,25 @@ function hocwp_wc_after_single_product_meta() {
     do_action('hocwp_wc_after_single_product_meta');
 }
 add_action('woocommerce_single_product_summary', 'hocwp_wc_after_single_product_meta', 41);
+
+function hocwp_wc_on_product_updated($meta_id, $object_id, $meta_key, $meta_value) {
+    if(hocwp_id_number_valid($meta_id)) {
+        $post = get_post($object_id);
+        if('product' == $post->post_type) {
+            if('_featured' == $meta_key) {
+                if('yes' == $meta_value) {
+                    update_post_meta($object_id, 'featured', 1);
+                } else {
+                    update_post_meta($object_id, 'featured', 0);
+                }
+            } elseif('featured' == $meta_key) {
+                if(1 == $meta_value) {
+                    update_post_meta($object_id, '_featured', 'yes');
+                } else {
+                    update_post_meta($object_id, '_featured', 'no');
+                }
+            }
+        }
+    }
+}
+add_action('updated_postmeta', 'hocwp_wc_on_product_updated', 10, 4);

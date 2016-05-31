@@ -41,6 +41,39 @@ jQuery(document).ready(function($) {
         return items.first().toJSON();
     };
 
+    hocwp.wcPriceSliderAuto = function() {
+        $body.bind('price_slider_change', function() {
+            var $price_slider = $('.widget .price_slider'),
+                $form = $price_slider.closest('form');
+            $form.submit();
+        });
+    };
+
+    hocwp.addParamToUrl = function(param, value, url) {
+        var result = new RegExp(param + "=([^&]*)", "i").exec(window.location.search),
+            loc = window.location;
+        result = result && result[1] || "";
+        url = url || loc.protocol + '//' + loc.host + loc.pathname + loc.search;
+        if(result == '') {
+            if(loc.search == '') {
+                url += "?" + param + '=' + value;
+            } else {
+                url += "&" + param + '=' + value;
+            }
+        } else {
+            url = hocwp.updateUrlParam(param, value, url);
+        }
+        return url + loc.hash;
+    };
+
+    hocwp.updateUrlParam = function(param, value, url) {
+        var pattern = new RegExp('\\b(' + param + '=).*?(&|$)');
+        if(url.search(pattern) >= 0) {
+            return url.replace(pattern, '$1' + value + '$2');
+        }
+        return url + (url.indexOf('?') > 0 ? '&' : '?') + param + '=' + value;
+    };
+
     hocwp.isImageUrl = function(url) {
         if(!$.trim(url)) {
             return false;

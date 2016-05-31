@@ -1071,7 +1071,24 @@ function hocwp_get_datetime_ago($ago, $datetime = '') {
 
 function hocwp_get_current_url() {
     global $wp;
-    $current_url = trailingslashit(home_url($wp->request));
+    $request = $wp->request;
+    if(empty($request)) {
+        $uri = basename($_SERVER['REQUEST_URI']);
+        $first_char = hocwp_get_first_char($uri);
+        if('?' === $first_char) {
+            $uri = hocwp_remove_first_char($uri, '?');
+        } else {
+            $parts = explode('?', $uri);
+            if(count($parts) == 2) {
+                $uri = $parts[1];
+            }
+        }
+        $request = '?' . $uri;
+        $current_url = trailingslashit(home_url()) . $request;
+    } else {
+        $current_url = trailingslashit(home_url($request));
+    }
+    $current_url = apply_filters('hocwp_current_url', $current_url);
     return $current_url;
 }
 
