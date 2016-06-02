@@ -50,10 +50,10 @@ class HOCWP_Widget_Icon extends WP_Widget {
         hocwp_widget_before($args, $instance, false);
         $widget_html = '';
         if(!empty($icon_url)) {
-            $widget_html .= '<a href="' . $link . '"><img class="icon" src="' . $icon_url . '" alt="" data-hover="' . $icon_hover_url . '"></a>';
+            $widget_html .= '<a href="' . $link . '" class="icon-link icon-url"><img class="icon" src="' . $icon_url . '" alt="" data-hover="' . $icon_hover_url . '"></a>';
         }
         if((bool)$title_link) {
-            $title = '<a href="' . $link . '">' . $title . '</a>';
+            $title = '<a href="' . $link . '" class="title-link title-url">' . $title . '</a>';
             $title = apply_filters('hocwp_widget_icon_title_html', $title, $instance, $args, $sidebar);
         }
         $widget_html .= $title;

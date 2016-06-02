@@ -867,6 +867,7 @@ jQuery(document).ready(function($) {
             height = parseInt(this.options.height),
             body_height = $body.height(),
             force_search_form = this.options.forceSearchForm,
+            fit_window_height = this.options.fitWindowHeight,
             search_form_added = false;
         this.element_class = $element.attr('class');
         this.html = $element.html();
@@ -875,6 +876,9 @@ jQuery(document).ready(function($) {
             position = this.options.position,
             window_resized = false;
         function hocwp_update_mobile_menu() {
+            if(fit_window_height) {
+                body_height = $(window).height();
+            }
             $element.removeClass('sf-menu sf-js-enabled');
             $element.find('li.menu-item-has-children').not('.appended').addClass('appended').append('<i class="fa fa-plus"></i>');
             $element.css({height: body_height});
@@ -1008,7 +1012,8 @@ jQuery(document).ready(function($) {
         displayWidth: 980,
         position: 'left',
         height: 30,
-        forceSearchForm: false
+        forceSearchForm: false,
+        fitWindowHeight: false
     };
 
     MobileMenu.prototype.init = function() {

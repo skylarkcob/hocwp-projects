@@ -313,6 +313,10 @@ function hocwp_wc_use_fast_buy_button() {
     return $use;
 }
 
+function hocwp_wc_custom_quantity_input() {
+    return apply_filters('hocwp_wc_custom_quantity_input', false);
+}
+
 $hocwp_shop_site = apply_filters('hocwp_shop_site', false);
 
 if(!(bool)$hocwp_shop_site) {
@@ -335,6 +339,7 @@ function hocwp_wc_single_product_fast_buy_button() {
         global $product;
         $button_text = apply_filters('hocwp_wc_fast_buy_button_text', __('Mua hàng nhanh', 'hocwp'));
         $button_description = apply_filters('hocwp_wc_fast_buy_button_description', __('Đặt hàng nhanh, không cần thêm sản phẩm vào giỏ hàng.', 'hocwp'));
+        do_action('hocwp_wc_before_fast_buy_button');
         ?>
         <button data-target="#productBuy<?php the_ID(); ?>" data-toggle="modal" class="btn-clickable orange fast-buy" type="button">
             <?php
@@ -621,6 +626,11 @@ function hocwp_wc_after_single_product_meta() {
 }
 add_action('woocommerce_single_product_summary', 'hocwp_wc_after_single_product_meta', 41);
 
+function hocwp_wc_after_add_to_cart_button() {
+    do_action('hocwp_wc_after_add_to_cart_button');
+}
+add_action('woocommerce_after_add_to_cart_button', 'hocwp_wc_after_add_to_cart_button');
+
 function hocwp_wc_on_product_updated($meta_id, $object_id, $meta_key, $meta_value) {
     if(hocwp_id_number_valid($meta_id)) {
         $post = get_post($object_id);
@@ -642,3 +652,77 @@ function hocwp_wc_on_product_updated($meta_id, $object_id, $meta_key, $meta_valu
     }
 }
 add_action('updated_postmeta', 'hocwp_wc_on_product_updated', 10, 4);
+
+function hocwp_wc_body_classes($classes) {
+    if(hocwp_wc_custom_quantity_input()) {
+        $classes[] = 'hocwp-custom-quantity';
+    }
+    return $classes;
+}
+add_filter('body_class', 'hocwp_wc_body_classes');
+
+$custom_quantity_input = hocwp_wc_custom_quantity_input();
+
+if($custom_quantity_input) {
+    function woocommerce_quantity_input($args = array(), $product = null, $echo = true) {
+        global $product;
+        $defaults = array(
+            'input_name' => 'quantity',
+            'input_value' => '1',
+            'max_value' => apply_filters('woocommerce_quantity_input_max', '', $product),
+            'min_value' => apply_filters('woocommerce_quantity_input_min', '', $product),
+            'step' => apply_filters('woocommerce_quantity_input_step', 1, $product),
+            'style' => apply_filters('woocommerce_quantity_style', 'float:left; margin-right:10px;', $product),
+            'size' => apply_filters('woocommerce_quantity_input_size', 4, $product),
+            'label' => apply_filters('woocommerce_quantity_input_label', '', $product)
+        );
+        $args = apply_filters('woocommerce_quantity_input_args', $args, $product);
+        $args = apply_filters('hocwp_wc_quantity_input_args', $args, $product);
+        $args = wp_parse_args($args, $defaults);
+        $quantity_input = apply_filters('hocwp_wc_quantity_input_pre', '', $product, $args);
+        if(empty($quantity_input)) {
+            $input_name = $args['input_name'];
+            $input_value = $args['input_value'];
+            $label = $args['label'];
+            $min = hocwp_get_value_by_key($args, 'min', 1);
+            $max = hocwp_get_value_by_key($args, 'max', 20);
+            $step = hocwp_get_value_by_key($args, 'step', 1);
+            $size = hocwp_get_value_by_key($args, 'size', 4);
+            $input = new HOCWP_HTML('input');
+            $input->set_attribute('type', 'number');
+            $input->set_attribute('size', $size);
+            $input->set_class('input-text qty text input-number');
+            $input->set_attribute('title', hocwp_text('Số lượng', __('Qty', 'hocwp'), false));
+            $input->set_attribute('value', $input_value);
+            $input->set_attribute('name', $input_name);
+            $input->set_attribute('max', $max);
+            $input->set_attribute('min', $min);
+            $input->set_attribute('step', $step);
+            $container_class = 'quantity hocwp-custom-quantity';
+            if(!empty($label)) {
+                hocwp_add_string_with_space_before($container_class, 'with-label has-label');
+            }
+            ob_start();
+            ?>
+            <div class="<?php echo $container_class; ?>">
+                <?php
+                if(!empty($label)) {
+                    $lb = new HOCWP_HTML('label');
+                    $lb->set_text($label);
+                    $lb->output();
+                }
+                ?>
+                <input type="button" class="minus qty-control btn-down number-down" value="-">
+                <?php $input->output(); ?>
+                <input type="button" class="plus qty-control btn-up number-up" value="+">
+            </div>
+            <?php
+            $quantity_input = ob_get_clean();
+        }
+        $quantity_input = apply_filters('hocwp_wc_quantity_input', $quantity_input, $product, $args);
+        if($echo) {
+            echo $quantity_input;
+        }
+        return $quantity_input;
+    }
+}

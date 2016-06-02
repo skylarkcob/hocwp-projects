@@ -419,6 +419,12 @@ class HOCWP_License {
                 'type' => 'numeric'
             )
         );
+        if(hocwp_is_localhost()) {
+            array_push($meta_item, array(
+                'key' => 'customer_email',
+                'value' => sanitize_email($customer_email)
+            ));
+        }
         $data = hocwp_api_get_by_meta($meta_item, 'license-api');
         if(hocwp_array_has_value($data)) {
             $valid = true;

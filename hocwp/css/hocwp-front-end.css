@@ -238,6 +238,7 @@ body.hocwp {
     border-right: medium none !important;
     margin: 0;
     padding: 0 !important;
+    width: 100% !important;
 }
 
 .hocwp .hocwp-mobile-menu li a {
@@ -255,7 +256,7 @@ body.hocwp {
 }
 
 .hocwp .hocwp-mobile-menu li:last-child {
-    border-bottom: 1px solid transparent;
+    border-bottom: 1px solid transparent !important;
 }
 
 .hocwp .hocwp-mobile-menu li:first-child {
@@ -1349,6 +1350,7 @@ body.hocwp {
     padding: 8px 12px !important;
     position: absolute;
     right: 0;
+    top: 0;
     width: auto;
 }
 
@@ -1491,7 +1493,7 @@ body.hocwp {
 }
 
 .hocwp .hocwp-mobile-menu li:last-child {
-    border-color: #484848;
+    border-color: #484848 !important;
 }
 
 .hocwp .hocwp-widget-post .post-slider .list-posts,
@@ -2605,27 +2607,43 @@ body.hocwp {
 }
 
 .woocommerce-cart form .shop_table.cart .product-remove {
-    width: 10%;
+    width: 6%;
 }
 
 .woocommerce-cart form .shop_table.cart .product-thumbnail {
     width: 10%;
 }
 
+.woocommerce-cart form .shop_table.cart .product-thumbnail a img {
+    width: 100%;
+}
+
 .woocommerce-cart form .shop_table.cart .product-name {
+    width: 35%;
+}
+
+.hocwp.hocwp-custom-quantity.woocommerce-cart form .shop_table.cart .product-name {
     width: 30%;
 }
 
 .woocommerce-cart form .shop_table.cart .product-price {
-    width: 18%;
+    width: 14%;
 }
 
 .woocommerce-cart form .shop_table.cart .product-quantity {
     width: 10%;
 }
 
+.hocwp.hocwp-custom-quantity.woocommerce-cart form .shop_table.cart .product-quantity {
+    width: 20%;
+}
+
 .woocommerce-cart form .shop_table.cart .product-subtotal {
-    width: 22%;
+    width: 25%;
+}
+
+.hocwp.hocwp-custom-quantity.woocommerce-cart form .shop_table.cart .product-subtotal {
+    width: 20%;
 }
 
 @media screen and (max-width: 768px) {
@@ -2675,6 +2693,12 @@ body.hocwp {
     border: 1px solid #ddd;
     height: 20px;
     width: 100%;
+}
+
+.hocwp.hocwp-custom-quantity.woocommerce-cart form .shop_table.cart .product-quantity input.qty {
+    height: auto;
+    padding: 5px 10px;
+    width: 45px;
 }
 
 .hocwp .woocommerce-checkout .woocommerce-shipping-fields .input-text,
@@ -2962,6 +2986,73 @@ body.hocwp {
 
 .hocwp .woocommerce-ordering select {
     width: auto;
+}
+
+.hocwp .quantity.hocwp-custom-quantity label,
+.hocwp .quantity.hocwp-custom-quantity input {
+    display: table-cell;
+}
+
+.single-product .hocwp-post .entry-summary form.cart .quantity.hocwp-custom-quantity input.qty-control,
+.hocwp .quantity.hocwp-custom-quantity input.qty-control {
+    background-color: #fff;
+    border: 1px solid #e5e5e5;
+    padding: 5px 10px;
+    text-align: center;
+    width: 30px;
+}
+
+.single-product .hocwp-post .entry-summary form.cart .quantity.hocwp-custom-quantity input.qty-control:hover,
+.hocwp .quantity.hocwp-custom-quantity input.qty-control:hover {
+    background-color: #f1f1f1;
+}
+
+.hocwp.single-product .hocwp-post .entry-summary form.cart .quantity.hocwp-custom-quantity input.qty-control {
+    width: 35px;
+}
+
+.single-product .hocwp-post .entry-summary form.cart .quantity.hocwp-custom-quantity input.qty-control.minus,
+.hocwp .quantity.hocwp-custom-quantity input.qty-control.minus {
+    border-right: medium none;
+}
+
+.single-product .hocwp-post .entry-summary form.cart .quantity.hocwp-custom-quantity input.qty-control.plus,
+.hocwp .quantity.hocwp-custom-quantity input.qty-control.plus {
+    border-left: medium none;
+}
+
+.hocwp.single-product .hocwp-post .entry-summary form.cart .quantity.hocwp-custom-quantity .qty,
+.hocwp .quantity.hocwp-custom-quantity .qty {
+    width: 50px;
+}
+
+.single-product .hocwp-post .entry-summary form.cart .quantity.hocwp-custom-quantity {
+    width: 20%;
+}
+
+.single-product .hocwp-post .entry-summary form.cart .quantity.hocwp-custom-quantity.has-label {
+    width: 30%;
+}
+
+.hocwp .quantity.hocwp-custom-quantity label {
+    display: none;
+    float: left;
+    font-weight: 400;
+    line-height: 17px;
+    margin-right: 10px;
+    padding-bottom: 7px;
+    padding-right: 1em;
+    padding-top: 7px;
+}
+
+.hocwp.single-product .hocwp-post .entry-summary form.cart .quantity.hocwp-custom-quantity label {
+    display: block;
+}
+
+.hocwp .quantity.hocwp-custom-quantity .minus + .qty {
+    -webkit-appearance: textfield;
+    -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 .hocwp .prices .amount {
