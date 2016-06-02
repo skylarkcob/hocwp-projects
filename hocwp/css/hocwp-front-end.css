@@ -2964,6 +2964,24 @@ body.hocwp {
     width: auto;
 }
 
+.hocwp .prices .amount {
+    text-decoration: none;
+    vertical-align: middle;
+}
+
+.hocwp .prices ins {
+    text-decoration: none;
+}
+
+.hocwp .modal.product-fast-buy .product-info .prices del {
+    margin-right: 15px;
+}
+
+.hocwp .modal.product-fast-buy .product-info .prices del,
+.hocwp .modal.product-fast-buy .product-info .prices del .amount {
+    color: #d5d5d5;
+}
+
 @media only screen and (max-width: 980px) {
     .modal.product-fast-buy .info-column {
         margin-bottom: 10px;

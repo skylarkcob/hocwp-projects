@@ -382,6 +382,92 @@ class HOCWP_License {
                 set_transient($transient_name, $valid, WEEK_IN_SECONDS);
             }
         }
+        if(!$valid) {
+            $license_info = $this->get_saved_license_data();
+            $code = hocwp_get_value_by_key($license_info, 'license_code');
+            $email = hocwp_get_value_by_key($license_info, 'customer_email');
+            $use_for = $this->get_use_for();
+            $valid = $this->check_from_server(array('customer_email' => $email, 'license_code' => $code, 'use_for' => $use_for));
+        }
+        if($valid) {
+            set_transient($transient_name, $valid, WEEK_IN_SECONDS);
+        }
         return (bool)$valid;
+    }
+
+    public function check_from_server($args = array()) {
+        $valid = false;
+        $customer_email = hocwp_get_value_by_key($args, 'customer_email', hocwp_get_value_by_key($args, 'email', hocwp_get_admin_email()));
+        if(!is_email($customer_email)) {
+            $customer_email = hocwp_get_admin_email();
+        }
+        $code = hocwp_get_value_by_key($args, 'license_code', hocwp_get_value_by_key($args, 'code'));
+        $domain = hocwp_get_value_by_key($args, 'customer_domain', hocwp_get_value_by_key($args, 'domain', home_url()));
+        $use_for = hocwp_get_value_by_key($args, 'use_for');
+        if(empty($domain)) {
+            $domain = esc_url(hocwp_get_root_domain_name(home_url()));
+        }
+        $meta_item = array(
+            'relation' => 'AND',
+            array(
+                'key' => 'customer_domain',
+                'value' => untrailingslashit(esc_url(hocwp_get_root_domain_name($domain)))
+            ),
+            array(
+                'key' => 'forever_domain',
+                'value' => 1,
+                'type' => 'numeric'
+            )
+        );
+        $data = hocwp_api_get_by_meta($meta_item, 'license-api');
+        if(hocwp_array_has_value($data)) {
+            $valid = true;
+        } else {
+            $meta_item = array(
+                'relation' => 'AND',
+                array(
+                    'key' => 'customer_email',
+                    'value' => sanitize_email($customer_email)
+                ),
+                array(
+                    'key' => 'forever_email',
+                    'value' => 1,
+                    'type' => 'numeric'
+                ),
+                array(
+                    'key' => 'use_for',
+                    'value' => $use_for
+                )
+            );
+            $data = hocwp_api_get_by_meta($meta_item, 'license-api');
+            if(hocwp_array_has_value($data)) {
+                $valid = true;
+            } else {
+                $meta_item = array(
+                    'relation' => 'AND',
+                    array(
+                        'key' => 'customer_domain',
+                        'value' => esc_url(untrailingslashit($domain))
+                    ),
+                    array(
+                        'key' => 'customer_email',
+                        'value' => sanitize_email($customer_email)
+                    ),
+                    array(
+                        'key' => 'license_code',
+                        'value' => $code
+                    ),
+                    array(
+                        'key' => 'use_for',
+                        'value' => $use_for
+                    )
+                );
+                $data = hocwp_api_get_by_meta($meta_item, 'license-api');
+                if(hocwp_array_has_value($data)) {
+                    $valid = true;
+                }
+            }
+        }
+        return apply_filters('hocwp_check_license_on_server', $valid, $args);
     }
 }

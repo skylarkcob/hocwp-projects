@@ -1414,6 +1414,7 @@ function hocwp_register_post_type($args = array()) {
     $capabilities = isset($args['capabilities']) ? $args['capabilities'] : array();
     $custom_labels = hocwp_get_value_by_key($args, 'labels');
     $custom_labels = hocwp_sanitize_array($custom_labels);
+    $show_in_rest = hocwp_get_value_by_key($args, 'show_in_rest', true);
 
     if(empty($singular_name)) {
         $singular_name = $name;
@@ -1480,6 +1481,15 @@ function hocwp_register_post_type($args = array()) {
         'rewrite' => $rewrite,
         'capability_type' => $capability_type
     );
+    if($show_in_rest) {
+        $rest_base = $rewrite_slug;
+        if('api' != $rest_base) {
+            $rest_base .= '-api';
+        }
+        $args['show_in_rest'] = true;
+        $args['rest_base'] = $rest_base;
+        $args['rest_controller_class'] = 'WP_REST_Posts_Controller';
+    }
     if(count($capabilities) > 0) {
         $args['capabilities'] = $capabilities;
     }
@@ -1545,6 +1555,7 @@ function hocwp_register_taxonomy($args = array()) {
     }
     $update_count_callback = isset($args['update_count_callback']) ? $args['update_count_callback'] : '_update_post_term_count';
     $capabilities = isset($args['capabilities']) ? $args['capabilities'] : array('manage_terms');
+    $show_in_rest = hocwp_get_value_by_key($args, 'show_in_rest', true);
     $args = array(
         'labels' => $labels,
         'hierarchical' => $hierarchical,
@@ -1558,7 +1569,11 @@ function hocwp_register_taxonomy($args = array()) {
         'update_count_callback' => $update_count_callback,
         'capabilities' => $capabilities
     );
-
+    if($show_in_rest) {
+        $args['show_in_rest'] = true;
+        $args['rest_base'] = $rewrite_slug . '-api';
+        $args['rest_controller_class'] = 'WP_REST_Terms_Controller';
+    }
     register_taxonomy($taxonomy, $post_types, $args);
 }
 

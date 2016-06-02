@@ -329,11 +329,13 @@ jQuery(document).ready(function($) {
     })();
 
     (function() {
-        $('.hocwp').on('click', '.save-post, .favorite-post, .interest-post, .love-post', function(e) {
+        $('.hocwp').on('click', '.save-post, .favorite-post, .interest-post, .love-post, .btn-user-save-post', function(e) {
             e.preventDefault();
             if($body.hasClass('hocwp-user')) {
                 var $element = $(this),
-                    post_id = $element.attr('data-post-id');
+                    post_id = $element.attr('data-post-id'),
+                    action = $element.attr('data-action'),
+                    type = $element.attr('data-type');
                 $element.addClass('disabled');
                 $.ajax({
                     type: 'POST',
@@ -341,12 +343,27 @@ jQuery(document).ready(function($) {
                     url: hocwp.ajax_url,
                     data: {
                         action: 'hocwp_favorite_post',
-                        post_id: post_id
+                        post_id: post_id,
+                        type: type,
+                        data_action: action
                     },
                     success: function(response){
                         if(response.success) {
-                            $element.html(response.html_data);
-                            $element.removeClass('disabled');
+                            if($.trim(response.html_data)) {
+                                $element.html(response.html_data);
+                            }
+                            if('do' == action) {
+                                action = 'undo';
+                            } else {
+                                action = 'do';
+                            }
+                            if('undo' != action) {
+                                $element.removeClass('disabled');
+                            }
+                            if(response.remove) {
+                                $body.trigger('hocwp_remove_favorite_post', $element);
+                            }
+                            $element.attr('data-action', action);
                         }
                     }
                 });

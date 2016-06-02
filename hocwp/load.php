@@ -20,6 +20,8 @@ define('HOCWP_EMAIL', 'hocwp.net@gmail.com');
 
 define('HOCWP_HOMEPAGE', 'http://hocwp.net');
 
+define('HOCWP_API_SERVER', HOCWP_HOMEPAGE);
+
 define('HOCWP_DEVELOPING', ((defined('WP_DEBUG') && true === WP_DEBUG) ? true : false));
 
 define('HOCWP_CSS_SUFFIX', (HOCWP_DEVELOPING) ? '.css' : '.min.css');
@@ -137,6 +139,8 @@ require(HOCWP_PATH . '/pagination.php');
 require(HOCWP_PATH . '/back-end.php');
 
 require(HOCWP_PATH . '/front-end.php');
+
+require(HOCWP_PATH . '/api.php');
 
 require(HOCWP_PATH . '/ads.php');
 

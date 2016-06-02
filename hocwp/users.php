@@ -7,12 +7,12 @@ function hocwp_get_administrators($args = array()) {
 }
 
 function hocwp_is_subscriber($user = null) {
-    if(!is_a($user, 'WP_User')) {
-        $user = wp_get_current_user();
-    }
-    $role = hocwp_get_user_role($user);
-    if('subscriber' == $role) {
-        return true;
+    $user = hocwp_return_user($user);
+    if(!is_wp_error($user)) {
+        $role = hocwp_get_user_role($user);
+        if('subscriber' == $role) {
+            return true;
+        }
     }
     return false;
 }
@@ -28,6 +28,7 @@ function hocwp_get_first_admin($args = array()) {
 }
 
 function hocwp_is_admin($user = null) {
+    $user = hocwp_return_user($user);
     if(!is_a($user, 'WP_User')) {
         return current_user_can('manage_options');
     }
@@ -79,12 +80,7 @@ function hocwp_add_user_admin($args = array()) {
 
 function hocwp_get_user_roles($user = null) {
     $roles = array();
-    if(hocwp_id_number_valid($user)) {
-        $user = get_user_by('id', $user);
-    }
-    if(!is_a($user, 'WP_User')) {
-        $user = wp_get_current_user();
-    }
+    $user = hocwp_return_user($user);
     if(is_a($user, 'WP_User')) {
         $roles = (array)$user->roles;
     }
@@ -103,11 +99,39 @@ function hocwp_current_user_can_use_rich_editor() {
     return true;
 }
 
-function hocwp_get_user_viewed_posts($user_id = null) {
-    if(!hocwp_id_number_valid($user_id) && is_user_logged_in()) {
-        $user = wp_get_current_user();
-        $user_id = $user->ID;
+function hocwp_return_user($user_or_id = null, $output = OBJECT) {
+    if(('id' == strtolower($output) && hocwp_id_number_valid($user_or_id)) || ('email' == strtolower($output) && is_email($user_or_id))) {
+        return $user_or_id;
     }
+    if(is_a($user_or_id, 'WP_User')) {
+        $user = $user_or_id;
+    } elseif(hocwp_id_number_valid($user_or_id)) {
+        $user = get_user_by('id', $user_or_id);
+    } elseif(is_email($user_or_id)) {
+        $user = get_user_by('email', $user_or_id);
+    } else {
+        $user = wp_get_current_user();
+    }
+    if(!is_a($user, 'WP_User')) {
+        return new WP_Error();
+    }
+    if(OBJECT == strtoupper($output)) {
+        return $user;
+    } else {
+        $output = strtolower($output);
+        if('id' == $output) {
+            return $user->ID;
+        } elseif('email' == $output) {
+            return $user->user_email;
+        } elseif('username' == $output || 'user_login' == $output) {
+            return $user->user_login;
+        }
+    }
+    return $user->ID;
+}
+
+function hocwp_get_user_viewed_posts($user_id = null) {
+    $user_id = hocwp_return_user($user_id, 'id');
     if(hocwp_id_number_valid($user_id)) {
         $viewed_posts = get_user_meta($user_id, 'viewed_posts', true);
         $viewed_posts = hocwp_sanitize_array($viewed_posts);
@@ -137,6 +161,39 @@ function hocwp_check_user_password($password, $user) {
         return false;
     }
     return wp_check_password($password, $user->user_pass, $user->ID);
+}
+
+function hocwp_get_user_meta($key, $user_id = null, $single = true) {
+    $user_id = hocwp_return_user($user_id, 'id');
+    return get_user_meta($user_id, $key, $single);
+}
+
+function hocwp_get_user_saved_posts($user_id = null) {
+    $user_id = hocwp_return_user($user_id, 'id');
+    $saved = array();
+    if(hocwp_id_number_valid($user_id)) {
+        $saved = hocwp_get_user_meta('saved_posts', $user_id);
+        $saved = hocwp_sanitize_array($saved);
+    }
+    return $saved;
+}
+
+function hocwp_update_user_saved_posts($user_id = null, $post_id = null) {
+    $user_id = hocwp_return_user($user_id, 'id');
+    if(hocwp_id_number_valid($user_id)) {
+        $post_id = hocwp_return_post($post_id, 'id');
+        if(hocwp_id_number_valid($post_id)) {
+            $saved = hocwp_get_user_saved_posts($user_id);
+            $saved = hocwp_sanitize_array($saved);
+            if(in_array($post_id, $saved)) {
+                unset($saved[array_search($post_id, $saved)]);
+            } else {
+                array_push($saved, $post_id);
+            }
+            return update_user_meta($user_id, 'saved_posts', $saved);
+        }
+    }
+    return false;
 }
 
 function hocwp_user_viewed_posts_hook() {

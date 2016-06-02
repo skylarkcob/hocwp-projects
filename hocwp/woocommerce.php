@@ -25,9 +25,19 @@ function hocwp_wc_get_product_price($post_id = null) {
     return $h_product->get_price();
 }
 
-function hocwp_wc_product_price($post_id = null) {
-    $price = hocwp_wc_get_product_price($post_id);
-    echo hocwp_wc_format_price($price);
+function hocwp_wc_product_price($post_id = null, $show_full = false) {
+    if($show_full) {
+        if(!hocwp_id_number_valid($post_id)) {
+            $post_id = get_the_ID();
+        }
+        $product = new WC_Product($post_id);
+        $html = $product->get_price_html();
+        $html = hocwp_wrap_tag($html, 'p', 'prices');
+        echo $html;
+    } else {
+        $price = hocwp_wc_get_product_price($post_id);
+        echo hocwp_wc_format_price($price);
+    }
 }
 
 function hocwp_wc_format_price($price) {
@@ -349,40 +359,42 @@ function hocwp_wc_single_product_fast_buy_button() {
                                     <?php
                                     hocwp_post_thumbnail(array('bfi_thumb' => false, 'loop' => false));
                                     hocwp_post_title_single(array('tag' => 'h2'));
-                                    $get_variations = sizeof( $product->get_children() ) <= apply_filters( 'woocommerce_ajax_variation_threshold', 30, $product );
+                                    $get_variations = sizeof($product->get_children()) <= apply_filters('woocommerce_ajax_variation_threshold', 30, $product);
                                     $attributes = array();
                                     if(hocwp_wc_is_variable($product)) {
                                         $attributes = $product->get_variation_attributes();
                                     }
-                                    $attribute_keys = array_keys( $attributes );
+                                    $attribute_keys = array_keys($attributes);
                                     //$selected_attributes = $product->get_variation_default_attributes();
                                     $available_variations = false;
                                     if(hocwp_wc_is_variable($product)) {
                                         $available_variations = $get_variations ? $product->get_available_variations() : false;
                                     }
-                                    if ( empty( $available_variations ) && false !== $available_variations ) : ?>
-                                        <p class="stock out-of-stock"><?php _e( 'This product is currently out of stock and unavailable.', 'woocommerce' ); ?></p>
+                                    if(empty($available_variations) && false !== $available_variations) : ?>
+                                        <p class="stock out-of-stock"><?php _e( 'This product is currently out of stock and unavailable.', 'hocwp' ); ?></p>
                                     <?php else : ?>
-                                        <form class="variations_form cart attributes-form" method="post">
-                                            <table class="variations" cellspacing="0">
-                                                <tbody>
-                                                <?php foreach ( $attributes as $attribute_name => $options ) : ?>
-                                                    <tr>
-                                                        <td class="label"><label for="<?php echo sanitize_title( $attribute_name ); ?>"><?php echo wc_attribute_label( $attribute_name ); ?></label></td>
-                                                        <td class="value">
-                                                            <?php
-                                                            $selected = isset( $_REQUEST[ 'attribute_' . sanitize_title( $attribute_name ) ] ) ? wc_clean( $_REQUEST[ 'attribute_' . sanitize_title( $attribute_name ) ] ) : $product->get_variation_default_attribute( $attribute_name );
-                                                            wc_dropdown_variation_attribute_options( array( 'options' => $options, 'attribute' => $attribute_name, 'product' => $product, 'selected' => $selected ) );
-                                                            echo end( $attribute_keys ) === $attribute_name ? apply_filters( 'woocommerce_reset_variations_link', '<a class="reset_variations" href="#">' . __( 'Clear', 'woocommerce' ) . '</a>' ) : '';
-                                                            ?>
-                                                        </td>
-                                                    </tr>
-                                                <?php endforeach;?>
-                                                </tbody>
-                                            </table>
-                                        </form>
+                                        <?php if(hocwp_array_has_value($attributes)) : ?>
+                                            <form class="variations_form cart attributes-form" method="post">
+                                                <table class="variations" cellspacing="0">
+                                                    <tbody>
+                                                    <?php foreach ($attributes as $attribute_name => $options) : ?>
+                                                        <tr>
+                                                            <td class="label"><label for="<?php echo sanitize_title($attribute_name); ?>"><?php echo wc_attribute_label($attribute_name); ?></label></td>
+                                                            <td class="value">
+                                                                <?php
+                                                                $selected = isset($_REQUEST['attribute_' . sanitize_title($attribute_name)]) ? wc_clean($_REQUEST['attribute_' . sanitize_title($attribute_name)]) : $product->get_variation_default_attribute($attribute_name);
+                                                                wc_dropdown_variation_attribute_options(array('options' => $options, 'attribute' => $attribute_name, 'product' => $product, 'selected' => $selected));
+                                                                echo end($attribute_keys) === $attribute_name ? apply_filters('woocommerce_reset_variations_link', '<a class="reset_variations" href="#">' . __('Clear', 'hocwp') . '</a>') : '';
+                                                                ?>
+                                                            </td>
+                                                        </tr>
+                                                    <?php endforeach;?>
+                                                    </tbody>
+                                                </table>
+                                            </form>
+                                        <?php endif; ?>
                                     <?php endif;
-                                    hocwp_wc_product_price();
+                                    hocwp_wc_product_price(null, true);
                                     ?>
                                 </div>
                             </div>
@@ -577,6 +589,15 @@ function hocwp_wc_after_single_product_related() {
     do_action('hocwp_wc_after_single_product_related');
 }
 add_action('woocommerce_after_single_product_summary', 'hocwp_wc_after_single_product_related', 21);
+
+function hocwp_wc_disable_related_product($args) {
+    $disable = apply_filters('hocwp_wc_disable_related_product', false);
+    if($disable) {
+        $args = array();
+    }
+    return $args;
+}
+add_filter('woocommerce_related_products_args', 'hocwp_wc_disable_related_product', 10);
 
 function hocwp_wc_checkout_fields($fields) {
     if('vi' == hocwp_get_language()) {

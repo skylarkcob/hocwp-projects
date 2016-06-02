@@ -30,6 +30,22 @@ function hocwp_query_featured_product($args = array()) {
 }
 
 function hocwp_query_sale_product($args = array()) {
+    $meta_item = array(
+        'relation' => 'OR',
+        array(
+            'key' => '_sale_price',
+            'value' => 0,
+            'compare' => '>',
+            'type' => 'numeric'
+        ),
+        array(
+            'key' => '_min_variation_sale_price',
+            'value' => 0,
+            'compare' => '>',
+            'type' => 'numeric'
+        )
+    );
+    $args = hocwp_query_sanitize_meta_query($meta_item, $args);
     return hocwp_query_product($args);
 }
 

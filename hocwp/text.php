@@ -1,16 +1,21 @@
 <?php
 if(!function_exists('add_filter')) exit;
 
-function hocwp_text($vi, $en) {
+function hocwp_text($vi, $en, $echo = true) {
 	$lang = hocwp_get_language();
 	if(function_exists('qtranxf_getLanguage')) {
 		$lang = qtranxf_getLanguage();
 	}
 	if('vi' == $lang) {
-		echo $vi;
+		$text = $vi;
 	} else {
-		echo $en;
+		$text = $en;
 	}
+	$text = apply_filters('hocwp_text', $text, $vi, $en, $echo);
+	if($echo) {
+		echo $text;
+	}
+	return $text;
 }
 
 function hocwp_get_text($lang, $args = array()) {

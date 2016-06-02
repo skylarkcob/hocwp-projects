@@ -117,24 +117,39 @@ function hocwp_favorite_post_ajax_callback() {
     $post_id = hocwp_get_method_value('post_id');
     if(hocwp_id_number_valid($post_id) && is_user_logged_in()) {
         $user = wp_get_current_user();
-        $favorites = get_user_meta($user->ID, 'favorite_posts', true);
-        if(!is_array($favorites)) {
-            $favorites = array();
+        $type = hocwp_get_method_value('type');
+        if(empty($type)) {
+            $type = 'favorite';
         }
-        if(!in_array($post_id, $favorites)) {
-            $favorites[] = $post_id;
-        } else {
-            unset($favorites[array_search($post_id, $favorites)]);
-            $result['remove'] = true;
+        $action = hocwp_get_method_value('data_action');
+        if(empty($action)) {
+            $action = 'do';
         }
-        $updated = update_user_meta($user->ID, 'favorite_posts', $favorites);
-        if($updated) {
-            $result['success'] = true;
-            if($result['remove']) {
-                $result['html_data'] = '<i class="fa fa-heart-o"></i> Lưu tin';
-            } else {
-                $result['html_data'] = '<i class="fa fa-heart"></i> Bỏ lưu';
+        if('favorite' == $type) {
+            $favorites = get_user_meta($user->ID, 'favorite_posts', true);
+            if(!is_array($favorites)) {
+                $favorites = array();
             }
+            if(!in_array($post_id, $favorites)) {
+                $favorites[] = $post_id;
+            } else {
+                unset($favorites[array_search($post_id, $favorites)]);
+                $result['remove'] = true;
+            }
+            $updated = update_user_meta($user->ID, 'favorite_posts', $favorites);
+            if($updated) {
+                $result['success'] = true;
+                if($result['remove']) {
+                    $result['html_data'] = '<i class="fa fa-heart-o"></i> Lưu tin';
+                } else {
+                    $result['html_data'] = '<i class="fa fa-heart"></i> Bỏ lưu';
+                }
+            }
+        } elseif('save' == $type) {
+            $result['success'] = hocwp_update_user_saved_posts($user->ID, $post_id);
+        }
+        if('undo' == $action) {
+            $result['remove'] = true;
         }
     }
     wp_send_json($result);
