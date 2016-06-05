@@ -657,6 +657,7 @@ function hocwp_wc_body_classes($classes) {
     if(hocwp_wc_custom_quantity_input()) {
         $classes[] = 'hocwp-custom-quantity';
     }
+    $classes[] = 'hocwp-shop-site';
     return $classes;
 }
 add_filter('body_class', 'hocwp_wc_body_classes');
@@ -726,3 +727,8 @@ if($custom_quantity_input) {
         return $quantity_input;
     }
 }
+
+function hocwp_wc_is_price_filter_active($use) {
+    return apply_filters('hocwp_wc_use_price_filter', $use);
+}
+add_filter('woocommerce_is_price_filter_active', 'hocwp_wc_is_price_filter_active');

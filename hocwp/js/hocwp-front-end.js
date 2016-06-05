@@ -329,26 +329,28 @@ jQuery(document).ready(function($) {
     })();
 
     (function() {
-        $body.on('click', '.number-up, .number-down', function(e) {
-            e.preventDefault();
-            var $element = $(this),
-                $container = $element.parent(),
-                $input_number = $container.children('.input-number'),
-                value = $input_number.val(),
-                max = parseInt($input_number.attr('max')),
-                min = parseInt($input_number.attr('min'));
-            if($element.hasClass('number-up')) {
-                value++;
-            } else {
-                value--;
-            }
-            if($.isNumeric(min) && value < min) {
-                value = min;
-            } else if($.isNumeric(max) && value > max) {
-                value = max;
-            }
-            $input_number.val(value);
-        });
+        if($body.hasClass('hocwp-shop-site')) {
+            $body.on('click', '.number-up, .number-down', function(e) {
+                e.preventDefault();
+                var $element = $(this),
+                    $container = $element.parent(),
+                    $input_number = $container.children('.input-number'),
+                    value = $input_number.val(),
+                    max = parseInt($input_number.attr('max')),
+                    min = parseInt($input_number.attr('min'));
+                if($element.hasClass('number-up')) {
+                    value++;
+                } else {
+                    value--;
+                }
+                if($.isNumeric(min) && value < min) {
+                    value = min;
+                } else if($.isNumeric(max) && value > max) {
+                    value = max;
+                }
+                $input_number.val(value);
+            });
+        }
     })();
 
     (function() {
