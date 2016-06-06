@@ -536,6 +536,7 @@ function hocwp_setup_theme_admin_menu() {
     if(hocwp_array_has_value($hocwp_private_post_types)) {
         foreach($hocwp_private_post_types as $post_type) {
             $object = get_post_type_object($post_type);
+            remove_menu_page('edit.php?post_type=' . $post_type);
             add_submenu_page('hocwp_theme_option', $object->labels->name, $object->labels->name, 'manage_options', 'edit.php?post_type=' . $post_type);
         }
     }
@@ -903,3 +904,46 @@ function hocwp_setup_theme_change_language($lang) {
     return $lang;
 }
 if(!is_admin()) add_filter('hocwp_language', 'hocwp_setup_theme_change_language');
+
+function hocwp_get_archive_title($prefix = '') {
+    if(is_tax()) {
+        $title = single_term_title('', false);
+    } elseif(is_post_type_archive()) {
+        $title = post_type_archive_title('', false);
+    } elseif(is_author()) {
+        $title = get_the_author();
+    } elseif(is_year()) {
+        $title = get_the_date('Y');
+    } elseif(is_month()) {
+        if('vi' == hocwp_get_language()) {
+            $month = get_the_date('F');
+            $title = hocwp_convert_month_name_to_vietnamese($month);
+            hocwp_add_string_with_space_before($title, get_the_date('Y'));
+        } else {
+            $title = get_the_date('F Y');
+        }
+    } elseif(is_day()) {
+        if('vi' == hocwp_get_language()) {
+            $month = get_the_date('F');
+            $title = hocwp_convert_month_name_to_vietnamese($month);
+            hocwp_add_string_with_space_before($title, get_the_date('Y'));
+            $title = 'Ngày ' . get_the_date('j') . ' ' . strtolower($title);
+        } else {
+            $title = get_the_date('F j, Y');
+        }
+    } else {
+        $title = hocwp_text('Lưu trữ', 'Archive', false);
+    }
+    if(!empty($prefix)) {
+        $title = $prefix . $title;
+    }
+    return apply_filters('hocwp_get_archive_title', $title, $prefix);
+}
+
+function hocwp_setup_theme_archive_title($title) {
+    if('vi' == hocwp_get_language()) {
+        $title = hocwp_get_archive_title();
+    }
+    return $title;
+}
+add_filter('get_the_archive_title', 'hocwp_setup_theme_archive_title');

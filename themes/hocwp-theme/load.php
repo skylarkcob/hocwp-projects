@@ -1,6 +1,6 @@
 <?php
 /*
- * Last updated: 2016-05-18
+ * Last updated: 2016-06-06
  */
 if(!function_exists('add_filter')) exit;
 
@@ -21,9 +21,9 @@ if(version_compare($GLOBALS['wp_version'], HOCWP_REQUIRE_WP_VERSION, '<')) {
     return;
 }
 
-define('HOCWP_THEME_CORE_VERSION', '5.1.8');
+define('HOCWP_THEME_CORE_VERSION', '5.1.9');
 
-define('HOCWP_THEME_REQUIRE_CORE_VERSION', '3.4.0');
+define('HOCWP_THEME_REQUIRE_CORE_VERSION', '3.4.1');
 
 define('HOCWP_THEME_PATH', get_template_directory());
 

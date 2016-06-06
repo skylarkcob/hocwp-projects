@@ -660,6 +660,30 @@ function hocwp_theme_translation_gettext_woocommerce($translation, $text) {
         case 'State / county':
             $translation = 'Tỉnh / Thành Phố';
             break;
+        case 'Default sorting':
+            $translation = 'Sắp xếp mặc định';
+            break;
+        case 'Sort by popularity':
+            $translation = 'Sắp xếp theo độ phổ biến';
+            break;
+        case 'Sort by average rating':
+            $translation = 'Sắp xếp theo đánh giá trung bình';
+            break;
+        case 'Sort by newness':
+            $translation = 'Sắp xếp theo mới nhất';
+            break;
+        case 'Sort by price: low to high':
+            $translation = 'Sắp xếp theo giá thấp đến cao';
+            break;
+        case 'Sort by price: high to low':
+            $translation = 'Sắp xếp theo giá cao đến thấp';
+            break;
+        case 'Price:':
+            $translation = 'Giá:';
+            break;
+        case 'Filter':
+            $translation = 'Lọc';
+            break;
     }
     return $translation;
 }
