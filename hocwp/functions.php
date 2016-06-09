@@ -498,6 +498,45 @@ function hocwp_carousel_bootstrap($args = array()) {
     <?php
 }
 
+function hocwp_tab_content_bootstrap($args = array()) {
+    $class = hocwp_get_value_by_key($args, 'class');
+    hocwp_add_string_with_space_before($class, 'product-tabs');
+    $tabs = hocwp_get_value_by_key($args, 'tabs');
+    $callback = hocwp_get_value_by_key($args, 'callback');
+    if(!hocwp_callback_exists($callback)) {
+        return;
+    }
+    ?>
+    <div class="<?php echo $class; ?>">
+        <?php if(hocwp_array_has_value($tabs)) : ?>
+            <ul class="nav nav-tabs" data-tabs="tabs">
+                <?php
+                $count = 0;
+                foreach($tabs as $tab) {
+                    $href = hocwp_get_value_by_key($tab, 'href');
+                    if(empty($href)) {
+                        continue;
+                    }
+                    $text = hocwp_get_value_by_key($tab, 'text');
+                    $class = 'tab-item';
+                    if(0 === $count) {
+                        hocwp_add_string_with_space_before($class, 'active');
+                    }
+                    ?>
+                    <li class="<?php echo $class; ?>"><a href="#<?php echo $href; ?>" data-toggle="tab"><?php echo $text; ?></a></li>
+                    <?php
+                    $count++;
+                }
+                ?>
+            </ul>
+        <?php endif; ?>
+        <div class="tab-content">
+            <?php call_user_func($callback, $args); ?>
+        </div>
+    </div>
+    <?php
+}
+
 function hocwp_modal_bootstrap($args = array()) {
     $id = hocwp_get_value_by_key($args, 'id');
     $title = hocwp_get_value_by_key($args, 'title');
@@ -1459,6 +1498,10 @@ function hocwp_register_post_type($args = array()) {
     );
     $rewrite = isset($args['rewrite']) ? $args['rewrite'] : array();
     $rewrite = wp_parse_args($rewrite, $rewrite_defaults);
+    if(!$public) {
+        $rewrite = false;
+        $query_var = false;
+    }
     $description = isset($args['description']) ? $args['description'] : '';
     $args = array(
         'labels' => $labels,
@@ -1585,6 +1628,8 @@ function hocwp_register_post_type_private($args = array()) {
     $args['show_in_admin_bar'] = false;
     $args['menu_position'] = 9999999;
     $args['has_archive'] = false;
+    $args['query_var'] = false;
+    $args['rewrite'] = false;
     $args['feeds'] = false;
     $slug = isset($args['slug']) ? $args['slug'] : '';
     if(!empty($slug)) {

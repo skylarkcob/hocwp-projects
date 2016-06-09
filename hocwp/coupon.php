@@ -202,16 +202,18 @@ function hocwp_get_coupon_type_term($post_id = null) {
 	if(!hocwp_id_number_valid($post_id)) {
 		$post_id = get_the_ID();
 	}
+	/*
 	$result = array(
 		'code'
 	);
+	*/
 	$terms = wp_get_post_terms($post_id, 'coupon_type');
 	$term = current($terms);
 	return $term;
 }
 
 function hocwp_get_coupon_type_object($type = 'code') {
-	$term = new WP_Error();
+	//$term = new WP_Error();
 	switch($type) {
 		case 'deal':
 			$term = hocwp_get_term_by_slug('deal', 'coupon_type');
@@ -312,8 +314,8 @@ function hocwp_get_coupon_type($post_id = null) {
 	$term = hocwp_get_coupon_type_term($post_id);
 	$result = array();
 	if(is_a($term, 'WP_Term')) {
-		$type = 'code';
-		$text = $term->name;
+		//$type = 'code';
+		//$text = $term->name;
 		switch($term->slug) {
 			case 'deal':
 			case 'online-deal':
@@ -570,7 +572,7 @@ function hocwp_coupon_on_wp_hook() {
 }
 add_action('wp', 'hocwp_coupon_on_wp_hook');
 
-function hocwp_coupon_pre_get_posts($query) {
+function hocwp_coupon_pre_get_posts(WP_Query $query) {
 	if($query->is_main_query()) {
 		if(is_tax('store')) {
 			$posts_per_page = apply_filters('hocwp_archive_coupon_posts_per_page', 15);
@@ -604,7 +606,7 @@ function hocwp_coupon_pre_get_posts($query) {
 					}
 				}
 				if(!$expired_coupon) {
-					$current_date_time = hocwp_get_current_date('m/d/Y');
+					//$current_date_time = hocwp_get_current_date('m/d/Y');
 					$timestamp = current_time('timestamp', 0);
 					$meta_item = array(
 						'relation' => 'OR',
@@ -746,3 +748,8 @@ function hocwp_coupon_filter_taxonomy_base($base, $taxonomy) {
 	return $base;
 }
 add_filter('hocwp_remove_term_base_taxonomy_base', 'hocwp_coupon_filter_taxonomy_base', 10, 2);
+
+function hocwp_coupon_init() {
+	hocwp_coupon_install_post_type_and_taxonomy();
+}
+add_action('init', 'hocwp_coupon_init');

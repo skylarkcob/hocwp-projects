@@ -1,6 +1,19 @@
 <?php
 if(!function_exists('add_filter')) exit;
 
+function hocwp_translate_text($text) {
+	if(hocwp_qtranslate_x_installed()) {
+		$mo = new HOCWP_MO();
+		$id = $mo->get_id($text);
+		$post = get_post($id);
+		if(is_a($post, 'WP_Post')) {
+			$text = $post->post_content;
+			$text = apply_filters('translate_text', $text);
+		}
+	}
+	return $text;
+}
+
 function hocwp_text($vi, $en, $echo = true) {
 	$lang = hocwp_get_language();
 	if(function_exists('qtranxf_getLanguage')) {

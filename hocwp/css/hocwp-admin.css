@@ -462,6 +462,13 @@
     text-align: center;
 }
 
+.wp-list-table.stringtranslation #the-list td,
+.wp-list-table.stringtranslation #the-list th {
+    -webkit-box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.1) inset;
+    -moz-box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.1) inset;
+    box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.1) inset;
+}
+
 /**
  * Menu item
  */

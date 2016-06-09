@@ -948,6 +948,11 @@ function hocwp_field_editor($args = array()) {
     $args['editor_class'] = $class;
     $args['textarea_rows'] = $textarea_rows;
     $teeny = hocwp_get_value_by_key($args, 'teeny', false);
+    $only_quicktags = hocwp_get_value_by_key($args, 'only_quicktags');
+    if($only_quicktags) {
+        $teeny = true;
+        $args['media_buttons'] = false;
+    }
     if($teeny) {
         $args['tinymce'] = false;
         $args['wpautop'] = false;

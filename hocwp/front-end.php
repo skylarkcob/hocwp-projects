@@ -1,6 +1,55 @@
 <?php
 if(!function_exists('add_filter')) exit;
 
+function hocwp_post_gallery($args = array()) {
+    $galleries =  hocwp_get_value_by_key($args, 'galleries');
+    $id = hocwp_get_value_by_key($args, 'id');
+    $class = hocwp_get_value_by_key($args, 'class');
+    hocwp_add_string_with_space_before($class, 'post-gallery module');
+    if(!empty($id)) {
+        $id = ' id="' . $id . '"';
+    }
+    $title = hocwp_get_value_by_key($args, 'title');
+    if(!hocwp_array_has_value($galleries)) {
+        if(is_string($args)) {
+            $galleries = hocwp_get_all_image_from_string($args);
+        } else {
+            $galleries = $args;
+        }
+    }
+    if(hocwp_array_has_value($galleries)) {
+        ?>
+        <div<?php echo $id; ?> class="<?php echo $class; ?>">
+            <?php if(!empty($title)) : ?>
+                <div class="module-header">
+                    <h4><?php echo $title; ?></h4>
+                </div>
+            <?php endif; ?>
+            <div class="module-body">
+                <div class="galleries">
+                    <ul class="gallery hocwp-gallery list-unstyled cS-hidden">
+                        <?php
+                        $pager = '';
+                        $count = 0;
+                        foreach($galleries as $img) {
+                            $src = hocwp_get_first_image_source($img);
+                            if(!hocwp_is_image($src)) {
+                                continue;
+                            }
+                            $li = new HOCWP_HTML('li');
+                            $li->set_text($img);
+                            $li->set_attribute('data-thumb', $src);
+                            $li->output();
+                        }
+                        ?>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+}
+
 function hocwp_breadcrumb($args = array()) {
     $before = hocwp_get_value_by_key($args, 'before');
     $after = hocwp_get_value_by_key($args, 'after');

@@ -3107,6 +3107,12 @@ body.hocwp {
     color: #d5d5d5;
 }
 
+.single-product.woocommerce .modal.product-fast-buy button.btn-clickable {
+    border-radius: 3px;
+    box-shadow: none;
+    font-weight: 400;
+}
+
 @media only screen and (max-width: 980px) {
     .modal.product-fast-buy .info-column {
         margin-bottom: 10px;

@@ -84,10 +84,14 @@ function hocwp_query_sanitize_post_by_category($term, &$args = array()) {
 function hocwp_query_post_by_meta($meta_key, $meta_value, $args = array(), $meta_type = '', $compare = '=') {
     $meta_item = array(
         'key' => $meta_key,
-        'value' => $meta_value,
-        'type' => $meta_type,
-        'compare' => $compare
+        'value' => $meta_value
     );
+    if(!empty($meta_type)) {
+        $meta_item['type'] = $meta_item;
+    }
+    if(!empty($compare)) {
+        $meta_item['compare'] = $compare;
+    }
     $args = hocwp_query_sanitize_meta_query($meta_item, $args);
     return hocwp_query($args);
 }

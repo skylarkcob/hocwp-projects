@@ -1,6 +1,6 @@
 <?php
 /*
- * Last updated: 2016-05-31
+ * Last updated: 2016-06-09
  */
 if(!function_exists('add_filter')) exit;
 
@@ -8,7 +8,7 @@ if(defined('HOCWP_PATH')) {
     return;
 }
 
-define('HOCWP_VERSION', '3.4.0');
+define('HOCWP_VERSION', '3.4.1');
 
 define('HOCWP_PATH', dirname(__FILE__));
 
@@ -141,6 +141,8 @@ require(HOCWP_PATH . '/back-end.php');
 require(HOCWP_PATH . '/front-end.php');
 
 require(HOCWP_PATH . '/api.php');
+
+require(HOCWP_PATH . '/language.php');
 
 require(HOCWP_PATH . '/ads.php');
 
