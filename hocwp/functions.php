@@ -1544,6 +1544,7 @@ function hocwp_strtolower($str, $charset = 'UTF-8') {
 }
 
 function hocwp_register_taxonomy($args = array()) {
+    $old_args = $args;
     $name = isset($args['name']) ? $args['name'] : '';
     $singular_name = isset($args['singular_name']) ? $args['singular_name'] : '';
     $menu_name = hocwp_get_value_by_key($args, 'menu_name', $name);
@@ -1617,7 +1618,24 @@ function hocwp_register_taxonomy($args = array()) {
         $args['rest_base'] = $rewrite_slug . '-api';
         $args['rest_controller_class'] = 'WP_REST_Terms_Controller';
     }
+    $args = wp_parse_args($args, $old_args);
     register_taxonomy($taxonomy, $post_types, $args);
+}
+
+function hocwp_register_taxonomy_private($args = array()) {
+    $args['exclude_from_search'] = true;
+    $args['show_in_quick_edit'] = false;
+    $args['show_in_nav_menus'] = false;
+    $args['show_admin_column'] = false;
+    $args['show_in_admin_bar'] = false;
+    $args['menu_position'] = 9999999;
+    $args['show_tagcloud'] = false;
+    $args['has_archive'] = false;
+    $args['query_var'] = false;
+    $args['rewrite'] = false;
+    $args['public'] = false;
+    $args['feeds'] = false;
+    hocwp_register_taxonomy($args);
 }
 
 function hocwp_register_post_type_private($args = array()) {

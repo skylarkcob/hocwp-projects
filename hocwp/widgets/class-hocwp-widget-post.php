@@ -144,7 +144,7 @@ class HOCWP_Widget_Post extends WP_Widget {
                     $term = get_term($term_id, $taxonomy);
                     $title = $term->name;
                 } else {
-                    $title = apply_filters('widget_title', hocwp_get_value_by_key($instance, 'title'));
+                    $title = hocwp_widget_title($args, $instance, false);
                 }
                 $link->set_text($title);
                 $title = hocwp_get_value_by_key($args, 'before_title') . $link->build() . hocwp_get_value_by_key

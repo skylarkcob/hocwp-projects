@@ -408,6 +408,22 @@ function hocwp_classifieds_post_type_and_taxonomy() {
 		hocwp_register_taxonomy($args);
 	}
 
+	$name = __('Units', 'hocwp');
+	$singular = __('Unit', 'hocwp');
+	if('vi' == $lang) {
+		$name = 'Đơn vị';
+		$singular = $name;
+	}
+	$args = array(
+		'name' => $name,
+		'singular_name' => $singular,
+		'slug' => 'currency_unit',
+		'taxonomy' => 'currency_unit',
+		'show_admin_column' => false,
+		'post_types' => array('post')
+	);
+	hocwp_register_taxonomy_private($args);
+
 	hocwp_register_post_type_news();
 }
 add_action('init', 'hocwp_classifieds_post_type_and_taxonomy', 10);

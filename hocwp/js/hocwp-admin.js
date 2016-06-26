@@ -268,6 +268,7 @@ jQuery(document).ready(function($) {
                     if($force_compress.is(':checked')) {
                         force_compress = true;
                     }
+                    $compress_button.addClass('disabled');
                     $body.css({cursor: 'wait'});
                     alert('All your files are compressing, please wait...');
                     $.ajax({
@@ -282,6 +283,9 @@ jQuery(document).ready(function($) {
                         success: function(response){
                             $body.css({cursor: 'auto'});
                             alert('These files compressed successfully!');
+                        },
+                        complete: function() {
+                            $compress_button.removeClass('disabled');
                         }
                     });
                 });

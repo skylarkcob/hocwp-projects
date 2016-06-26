@@ -1,6 +1,6 @@
 <?php
 /*
- * Last updated: 2016-06-09
+ * Last updated: 2016-06-26
  */
 if(!function_exists('add_filter')) exit;
 

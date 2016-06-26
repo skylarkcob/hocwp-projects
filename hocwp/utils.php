@@ -7,6 +7,20 @@ function hocwp_dashboard_widget_loading() {
     return apply_filters('hocwp_dashboard_widget_loading', $loading);
 }
 
+function hocwp_add_bulk_action($actions = array()) {
+    $code = 'jQuery(document).ready(function($) {';
+    foreach($actions as $key => $text) {
+        $code .= '$(\'<option>\').val(\'' . $key . '\').text(\'' . $text . '\').appendTo("select[name=\'action\']");';
+        $code .= '$(\'<option>\').val(\'' . $key . '\').text(\'' . $text . '\').appendTo("select[name=\'action2\']")';
+    }
+    $code .= '});';
+    hocwp_inline_script($code);
+}
+
+function hocwp_get_text_base_on_number($single, $plural, $number) {
+    return sprintf(_n($single, $plural, $number), number_format_i18n($number));
+}
+
 function hocwp_dashboard_widget_cache($widget_id, $callback, $args = array()) {
     $loading = hocwp_dashboard_widget_loading();
     $locale = get_locale();
@@ -323,6 +337,105 @@ function hocwp_print_r($value) {
     echo '<pre>';
     print_r($value);
     echo '</pre>';
+}
+
+function hocwp_parse_xml($args = array()) {
+    $result = null;
+    if(function_exists('simplexml_load_file')) {
+        if(!is_array($args)) {
+            $url = $args;
+        } else {
+            $url = hocwp_get_value_by_key($args, 'url');
+        }
+        if(!empty($url)) {
+            $result = simplexml_load_file($url);
+        }
+    }
+    return $result;
+}
+
+function hocwp_parse_vietcombank_exchange_rate($url = '') {
+    $result = null;
+    if(empty($url)) {
+        $url = 'https://www.vietcombank.com.vn/exchangerates/ExrateXML.aspx';
+    }
+    $transient_name = 'hocwp_exchange_rate_vietcombank';
+    if(false === ($result = get_transient($transient_name))) {
+        $xml = hocwp_parse_xml($url);
+        if(is_object($xml)) {
+            $updated = (array)$xml->DateTime;
+            $data = array(
+                'datetime' => array_shift($updated)
+            );
+            $exrates = $xml->Exrate;
+            foreach($exrates as $rate) {
+                $currency_code = (array)$rate['CurrencyCode'];
+                $currency_code = array_shift($currency_code);
+                $currency_name = (array)$rate['CurrencyName'];
+                $buy = (array)$rate['Buy'];
+                $sell = (array)$rate['Sell'];
+                $transfer = (array)$rate['Transfer'];
+                $data['exrate'][hocwp_sanitize_id(hocwp_sanitize_file_name($currency_code))] = array(
+                    'currency_code' => $currency_code,
+                    'currency_name' => array_shift($currency_name),
+                    'buy' => array_shift($buy),
+                    'sell' => array_shift($sell),
+                    'transfer' => array_shift($transfer)
+                );
+            }
+            $result = $data;
+            $expiration = apply_filters('hocwp_vietcombank_exchange_rate_expiration', 30 * MINUTE_IN_SECONDS);
+            set_transient($transient_name, $result, $expiration);
+        }
+    }
+    return $result;
+}
+
+function hocwp_parse_sjc_exchange_rate($url = '') {
+    $result = null;
+    if(empty($url)) {
+        $url = 'http://www.sjc.com.vn/xml/tygiavang.xml';
+    }
+    $transient_name = 'hocwp_exchange_rate_sjc';
+    if(false === ($result = get_transient($transient_name))) {
+        $xml = hocwp_parse_xml($url);
+        if(is_object($xml)) {
+            $updated = (array)$xml->ratelist['updated'];
+            $unit = (array)$xml->ratelist['unit'];
+            $data = array(
+                'updated' => array_shift($updated),
+                'unit' => array_shift($unit)
+            );
+            $cities = $xml->ratelist->city;
+            $lists = array();
+            foreach($cities as $city) {
+                $name = (array)$city['name'];
+                $name = array_shift($name);
+                $items = $city->item;
+                $tmp = array(
+                    'name' => $name
+                );
+                $childs = array();
+                foreach($items as $item) {
+                    $buy = (array)$item['buy'];
+                    $sell = (array)$item['sell'];
+                    $type = (array)$item['type'];
+                    $childs[] = array(
+                        'buy' => array_shift($buy),
+                        'sell' => array_shift($sell),
+                        'type' => array_shift($type)
+                    );
+                }
+                $tmp['item'] = $childs;
+                $lists[hocwp_sanitize_id(hocwp_sanitize_file_name($name))] = $tmp;
+            }
+            $data['city'] = $lists;
+            $result = $data;
+            $expiration = apply_filters('hocwp_sjc_exchange_rate_expiration', HOUR_IN_SECONDS);
+            set_transient($transient_name, $result, $expiration);
+        }
+    }
+    return $result;
 }
 
 function hocwp_get_post_class($post_id = null, $class = '') {
@@ -766,13 +879,14 @@ function hocwp_get_rich_text($text) {
 }
 
 function hocwp_widget_title($args, $instance, $echo = true) {
-    $title = apply_filters('widget_title', $instance['title']);
+    $id_base = hocwp_get_value_by_key($args, 'id_base');
+    $title = apply_filters('widget_title', $instance['title'], $instance, $id_base);
     $before_title = hocwp_get_value_by_key($args, 'before_title');
     $after_title = hocwp_get_value_by_key($args, 'after_title');
     if(!empty($title)) {
         $title = $before_title . $title . $after_title;
     }
-    $title = apply_filters('hocwp_widget_title_html', $title, $args, $instance);
+    $title = apply_filters('hocwp_widget_title_html', $title, $args, $instance, $id_base);
     if((bool)$echo) {
         echo $title;
     }

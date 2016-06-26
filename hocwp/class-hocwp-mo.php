@@ -50,11 +50,15 @@ class HOCWP_MO extends MO {
 		} else {
 			if(hocwp_id_number_valid($this->post_id)) {
 				$postarr['ID'] = $this->post_id;
+			} else {
+				$object = array_shift($query->posts);
+				$postarr['ID'] = $object->ID;
 			}
 		}
 		$post_id = hocwp_insert_post($postarr);
 		if(hocwp_id_number_valid($post_id)) {
 			update_post_meta($post_id, 'encrypted_string', $encrypted_string);
+			update_post_meta($post_id, 'string', $string);
 		}
 		return $post_id;
 	}

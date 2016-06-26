@@ -286,6 +286,13 @@ function hocwp_inline_css($elements, $properties) {
     }
 }
 
+function hocwp_inline_script($code) {
+    $script = new HOCWP_HTML('script');
+    $script->set_attribute('type', 'text/javascript');
+    $script->set_text($code);
+    $script->output();
+}
+
 function hocwp_favorite_post_button_text($post_id = null) {
     if(!hocwp_id_number_valid($post_id)) {
         $post_id = get_the_ID();

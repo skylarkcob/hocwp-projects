@@ -66,6 +66,11 @@ function hocwp_register_string_language($args = array()) {
 		_doing_it_wrong(__FUNCTION__, __('Please call this function in <strong>hocwp_register_string_translation</strong> hook.', 'hocwp'), HOCWP_VERSION);
 		return;
 	}
+	if(!is_array($args)) {
+		$args = array(
+			'string' => $args
+		);
+	}
 	$name = hocwp_get_value_by_key($args, 'name');
 	$string = hocwp_get_value_by_key($args, 'string');
 	$context = hocwp_get_value_by_key($args, 'context', 'HocWP');
@@ -86,7 +91,12 @@ function hocwp_register_string_language($args = array()) {
 		$strings[$key]['multiline'] = $multiline;
 		update_option('hocwp_string_translations', $strings);
 		$mo = new HOCWP_MO();
-		$post_id = $mo->export_to_db($string);
+		$translation = '';
+		$object = $mo->get_object($string);
+		if(is_a($object, 'WP_Post')) {
+			$translation = $object->post_content;
+		}
+		$post_id = $mo->export_to_db($string, $translation);
 		if(hocwp_id_number_valid($post_id)) {
 			set_transient($transient_name, $post_id, WEEK_IN_SECONDS);
 		}
@@ -94,7 +104,8 @@ function hocwp_register_string_language($args = array()) {
 }
 
 function hocwp_translate_x_string_transaltion_update() {
-	if(isset($_REQUEST['hocwp_action'])) {
+	if(isset($_REQUEST['hocwp_action']) && 'string_translation' == $_REQUEST['hocwp_action']) {
+		unset($_REQUEST['hocwp_action']);
 		$search = hocwp_get_method_value('s', 'request');
 		$strings = hocwp_get_method_value('strings');
 		if(hocwp_array_has_value($strings)) {

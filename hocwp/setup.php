@@ -8,7 +8,7 @@ if(!file_exists(HOCWP_CONTENT_PATH)) {
 function hocwp_setup_product_head_description() {
     ?>
 <!--
-    This site is using a product of hocwp.net
+    This site is a product of hocwp.net
     Homepage: <?php echo HOCWP_HOMEPAGE . PHP_EOL; ?>
     Email: <?php echo HOCWP_EMAIL . PHP_EOL; ?>
     -->
@@ -47,7 +47,7 @@ function hocwp_init() {
 }
 add_action('init', 'hocwp_init');
 
-function hocwp_setup_widget_title($title) {
+function hocwp_setup_widget_title($title, $instance, $id_base) {
     $first_char = hocwp_get_first_char($title);
     $char = apply_filters('hocwp_hide_widget_title_special_char', '!');
     if($char === $first_char) {
@@ -60,7 +60,7 @@ function hocwp_setup_widget_title($title) {
     }
     return $title;
 }
-add_filter('widget_title', 'hocwp_setup_widget_title');
+add_filter('widget_title', 'hocwp_setup_widget_title', 10, 3);
 
 function hocwp_setup_body_class($classes) {
     $classes[] = 'hocwp';
@@ -183,3 +183,17 @@ function hocwp_setup_admin_body_class($class) {
     return $class;
 }
 add_filter('admin_body_class', 'hocwp_setup_admin_body_class');
+
+function hocwp_setup_admin_footer_edit_action() {
+    global $post_type;
+    do_action('hocwp_admin_footer_edit', $post_type);
+}
+add_action('admin_footer-edit.php', 'hocwp_setup_admin_footer_edit_action');
+
+function hocwp_setup_load_edit_bulk_action() {
+    //check_admin_referer('bulk-posts');
+    $wp_list_table = _get_list_table('WP_Posts_List_Table');
+    $action = $wp_list_table->current_action();
+    do_action('hocwp_load_edit_bulk_action', $action);
+}
+add_action('load-edit.php', 'hocwp_setup_load_edit_bulk_action');
