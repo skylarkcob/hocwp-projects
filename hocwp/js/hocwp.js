@@ -5,15 +5,15 @@
 window.wp = window.wp || {};
 window.hocwp = window.hocwp || {};
 
-if(typeof jQuery === 'undefined') {
+if (typeof jQuery === 'undefined') {
     throw new Error(hocwp.i18n.jquery_undefined_error)
 }
 
-jQuery(document).ready(function($) {
+jQuery(document).ready(function ($) {
     'use strict';
 
     var version = $.fn.jquery.split(' ')[0].split('.');
-    if((version[0] < 2 && version[1] < 9) || (version[0] == 1 && version[1] == 9 && version[2] < 1)) {
+    if ((version[0] < 2 && version[1] < 9) || (version[0] == 1 && version[1] == 9 && version[2] < 1)) {
         throw new Error(hocwp.i18n.jquery_version_error)
     }
 });
@@ -21,41 +21,41 @@ jQuery(document).ready(function($) {
 hocwp.media_frame = null;
 hocwp.media_items = {};
 
-jQuery(document).ready(function($) {
+jQuery(document).ready(function ($) {
     'use strict';
     var $body = $('body');
 
-    hocwp.getParamByName = function(url, name) {
+    hocwp.getParamByName = function (url, name) {
         name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
         var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
             results = regex.exec(url);
         return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
     };
 
-    hocwp.receiveSelectedMediaItems = function(file_frame) {
+    hocwp.receiveSelectedMediaItems = function (file_frame) {
         return file_frame.state().get('selection');
     };
 
-    hocwp.receiveSelectedMediaItem = function(file_frame) {
+    hocwp.receiveSelectedMediaItem = function (file_frame) {
         var items = hocwp.receiveSelectedMediaItems(file_frame);
         return items.first().toJSON();
     };
 
-    hocwp.wcPriceSliderAuto = function() {
-        $body.bind('price_slider_change', function() {
+    hocwp.wcPriceSliderAuto = function () {
+        $body.bind('price_slider_change', function () {
             var $price_slider = $('.widget .price_slider'),
                 $form = $price_slider.closest('form');
             $form.submit();
         });
     };
 
-    hocwp.addParamToUrl = function(param, value, url) {
+    hocwp.addParamToUrl = function (param, value, url) {
         var result = new RegExp(param + "=([^&]*)", "i").exec(window.location.search),
             loc = window.location;
         result = result && result[1] || "";
         url = url || loc.protocol + '//' + loc.host + loc.pathname + loc.search;
-        if(result == '') {
-            if(loc.search == '') {
+        if (result == '') {
+            if (loc.search == '') {
                 url += "?" + param + '=' + value;
             } else {
                 url += "&" + param + '=' + value;
@@ -66,55 +66,55 @@ jQuery(document).ready(function($) {
         return url + loc.hash;
     };
 
-    hocwp.updateUrlParam = function(param, value, url) {
+    hocwp.updateUrlParam = function (param, value, url) {
         var pattern = new RegExp('\\b(' + param + '=).*?(&|$)');
-        if(url.search(pattern) >= 0) {
+        if (url.search(pattern) >= 0) {
             return url.replace(pattern, '$1' + value + '$2');
         }
         return url + (url.indexOf('?') > 0 ? '&' : '?') + param + '=' + value;
     };
 
-    hocwp.isImageUrl = function(url) {
-        if(!$.trim(url)) {
+    hocwp.isImageUrl = function (url) {
+        if (!$.trim(url)) {
             return false;
         }
         var result = true,
             extension = url.slice(-4);
-        if(extension != '.png' && extension != '.jpg' && extension != '.gif' && extension != '.bmp' && extension != 'jpeg') {
-            if(extension != '.ico') {
+        if (extension != '.png' && extension != '.jpg' && extension != '.gif' && extension != '.bmp' && extension != 'jpeg') {
+            if (extension != '.ico') {
                 result = false;
             }
         }
         return result;
     };
 
-    hocwp.getTagName = function($tag) {
-        if($tag.length) {
+    hocwp.getTagName = function ($tag) {
+        if ($tag.length) {
             return $tag.get(0).tagName;
         }
         return '';
     };
 
-    hocwp.isUrl = function(text) {
+    hocwp.isUrl = function (text) {
         var url_regex = new RegExp('^(http:\/\/www.|https:\/\/www.|ftp:\/\/www.|www.){1}([0-9A-Za-z]+\.)');
         return url_regex.test(text);
     };
 
-    hocwp.isArray = function(variable){
+    hocwp.isArray = function (variable) {
         return (Object.prototype.toString.call(variable) === '[object Array]');
     };
 
-    hocwp.getFirstMediaItemJSON = function(media_items) {
+    hocwp.getFirstMediaItemJSON = function (media_items) {
         return media_items.first().toJSON();
     };
 
-    hocwp.createImageHTML = function(args) {
+    hocwp.createImageHTML = function (args) {
         args = args || {};
         var alt = args.alt || '',
             id = args.id || 0,
             src = args.src || '',
             $element = args.element || null;
-        if($.isNumeric(id) && id > 0) {
+        if ($.isNumeric(id) && id > 0) {
             $.ajax({
                 type: 'POST',
                 dataType: 'json',
@@ -124,53 +124,60 @@ jQuery(document).ready(function($) {
                     url: src,
                     id: id
                 },
-                success: function(response){
-                    if(!response.is_image) {
+                success: function (response) {
+                    if (!response.is_image) {
                         src = response.type_icon;
                     }
-                    if($element.length) {
+                    if ($element.length) {
                         $element.html('<img src="' + src + '" alt="' + alt + '">');
                     }
                 }
             });
         } else {
-            if($.trim(src)) {
+            if ($.trim(src)) {
                 return '<img src="' + src + '" alt="' + alt + '">';
             }
         }
     };
 
-    hocwp.autoReloadPageNoActive = function(reload_time, delay_time) {
+    hocwp.is_function = function (object) {
+        return (typeof object == 'function') || false;
+    };
+
+    hocwp.autoReloadPageNoActive = function (reload_time, delay_time) {
         reload_time = reload_time || 60000;
         delay_time = delay_time || 10000;
         var time = new Date().getTime();
-        $(document.body).bind('mousemove keypress', function() {
+        $(document.body).bind('mousemove keypress', function () {
             time = new Date().getTime();
         });
         function refresh() {
-            if(new Date().getTime() - time >= reload_time) {
+            if (new Date().getTime() - time >= reload_time) {
                 window.location.reload(true);
             } else {
                 setTimeout(refresh, delay_time);
             }
         }
+
         setTimeout(refresh, delay_time);
     };
 
-    hocwp.autoReloadPage = function(delay_time) {
+    hocwp.autoReloadPage = function (delay_time) {
         delay_time = delay_time || 2000;
         var time = new Date().getTime();
+
         function refresh() {
-            if(new Date().getTime() - time >= delay_time) {
+            if (new Date().getTime() - time >= delay_time) {
                 window.location.reload(true);
             } else {
                 setTimeout(refresh, 1000);
             }
         }
+
         setTimeout(refresh, 1000);
     };
 
-    hocwp.debugLog = function(object) {
+    hocwp.debugLog = function (object) {
         var data = JSON.stringify(object);
         $.ajax({
             type: 'POST',
@@ -180,33 +187,33 @@ jQuery(document).ready(function($) {
                 action: 'hocwp_debug_log',
                 object: data
             },
-            success: function(response){
+            success: function (response) {
 
             }
         });
     };
 
-    hocwp.limitUploadFile = function($element) {
-        $element.on('change', function() {
+    hocwp.limitUploadFile = function ($element) {
+        $element.on('change', function () {
             var count_file = $element.get(0).files.length,
                 max_file = parseInt($element.attr('data-max')),
                 object = this,
                 $image_preview = $element.next();
-            if(!$.isNumeric(max_file)) {
+            if (!$.isNumeric(max_file)) {
                 max_file = -1;
             }
-            if(max_file > 0 && count_file > max_file) {
+            if (max_file > 0 && count_file > max_file) {
                 alert('Bạn không được chọn quá ' + max_file + ' tập tin.');
                 $element.val('');
                 return false;
             }
-            if($image_preview.length) {
+            if ($image_preview.length) {
                 $image_preview.empty();
-                if(typeof (FileReader) != "undefined") {
-                    for(var i = 0; i < count_file; i++) {
+                if (typeof (FileReader) != "undefined") {
+                    for (var i = 0; i < count_file; i++) {
                         var reader = new FileReader(),
                             file_name = object.files.item(i).name;
-                        reader.onload = function(e) {
+                        reader.onload = function (e) {
                             var $image = $('<img>', {
                                 src: e.target.result,
                                 class: 'thumb-image',
@@ -223,7 +230,7 @@ jQuery(document).ready(function($) {
         });
     };
 
-    hocwp.setCookie = function(cname, cvalue, exmin) {
+    hocwp.setCookie = function (cname, cvalue, exmin) {
         var d = new Date();
         d.setTime(d.getTime() + (exmin * 60 * 1000));
         var expires = "expires=" + d.toGMTString(),
@@ -232,28 +239,28 @@ jQuery(document).ready(function($) {
         document.cookie = my_cookies;
     };
 
-    hocwp.iconChangeCaptchaExecute = function() {
+    hocwp.iconChangeCaptchaExecute = function () {
         var $icon_refresh_captcha = $('img.hocwp-captcha-reload'),
             $captcha_image = $('img.hocwp-captcha-image');
-        if(!$captcha_image.length) {
+        if (!$captcha_image.length) {
             return false;
         }
-        $captcha_image.css({'cursor' : 'text'});
-        $icon_refresh_captcha.css({'opacity' : '0.75'});
-        $icon_refresh_captcha.on('mouseover', function(e) {
+        $captcha_image.css({'cursor': 'text'});
+        $icon_refresh_captcha.css({'opacity': '0.75'});
+        $icon_refresh_captcha.on('mouseover', function (e) {
             e.preventDefault();
-            $(this).css({'opacity' : '1'});
+            $(this).css({'opacity': '1'});
         });
-        $icon_refresh_captcha.on('mouseout mouseleave', function(e) {
+        $icon_refresh_captcha.on('mouseout mouseleave', function (e) {
             e.preventDefault();
-            $(this).css({'opacity' : '0.75'});
+            $(this).css({'opacity': '0.75'});
         });
-        $icon_refresh_captcha.on('click', function(e) {
+        $icon_refresh_captcha.on('click', function (e) {
             e.preventDefault();
             var $element = $(this),
                 $container = $element.parent(),
                 $image = $container.find('img.hocwp-captcha-image');
-            $element.css({'opacity' : '0.25', 'pointer-events' : 'none'});
+            $element.css({'opacity': '0.25', 'pointer-events': 'none'});
             $.ajax({
                 type: 'POST',
                 dataType: 'json',
@@ -261,21 +268,21 @@ jQuery(document).ready(function($) {
                 data: {
                     action: 'hocwp_change_captcha_image'
                 },
-                success: function(response){
-                    if(response.success) {
+                success: function (response) {
+                    if (response.success) {
                         $image.attr('src', response.captcha_image_url);
                     } else {
                         alert(response.message);
                     }
-                    $element.css({'opacity' : '0.75', 'pointer-events' : 'inherit'});
+                    $element.css({'opacity': '0.75', 'pointer-events': 'inherit'});
                 }
             });
         });
     };
 
-    hocwp.addDefaultQuicktagButton = function() {
+    hocwp.addDefaultQuicktagButton = function () {
         var $quicktags_toolbar = $body.find('.quicktags-toolbar');
-        if(!$body.hasClass('front-end') && $quicktags_toolbar.length && $quicktags_toolbar.attr('id') == 'ed_toolbar') {
+        if (!$body.hasClass('front-end') && $quicktags_toolbar.length && $quicktags_toolbar.attr('id') == 'ed_toolbar') {
             QTags.addButton('hr', 'hr', '\n<hr>\n', '', 'h', 'Horizontal rule line', 30);
             QTags.addButton('dl', 'dl', '<dl>\n', '</dl>\n\n', 'd', 'HTML Description List Element', 100);
             QTags.addButton('dt', 'dt', '\t<dt>', '</dt>\n', '', 'HTML Definition Term Element', 101);
@@ -283,40 +290,40 @@ jQuery(document).ready(function($) {
         }
     };
 
-    hocwp.formatNumber = function(number, separator, currency) {
+    hocwp.formatNumber = function (number, separator, currency) {
         currency = currency || ' ₫';
         separator = separator || ',';
         var number_string = number.toString(),
             decimal = '.',
             numbers = number_string.split('.'),
             result = '';
-        if(!hocwp.isArray(numbers)) {
+        if (!hocwp.isArray(numbers)) {
             numbers = number_string.split(',');
             decimal = ',';
         }
-        if(hocwp.isArray(numbers)) {
+        if (hocwp.isArray(numbers)) {
             number_string = numbers[0];
         }
         var number_len = parseInt(number_string.length);
         var last = number_string.slice(-3);
-        if(number_len > 3) {
+        if (number_len > 3) {
             result += separator + last;
         } else {
             result += last;
         }
 
-        while(number_len > 3) {
+        while (number_len > 3) {
             number_len -= 3;
             number_string = number_string.slice(0, number_len);
             last = number_string.slice(-3);
 
-            if(number_len <= 3) {
+            if (number_len <= 3) {
                 result = last + result;
             } else {
                 result = separator + last + result;
             }
         }
-        if(hocwp.isArray(numbers) && $.isNumeric(numbers[1])) {
+        if (hocwp.isArray(numbers) && $.isNumeric(numbers[1])) {
             result += decimal + numbers[1];
         }
         result += currency;
@@ -324,37 +331,37 @@ jQuery(document).ready(function($) {
         return result;
     };
 
-    hocwp.scrollToPosition = function(pos, time) {
+    hocwp.scrollToPosition = function (pos, time) {
         time = time || 1000;
         $('html, body').stop().animate({scrollTop: pos}, time);
     };
 
-    hocwp.goToTop = function() {
+    hocwp.goToTop = function () {
         hocwp.scrollToPosition(0);
         return false;
     };
 
-    hocwp.scrollToTop = function() {
+    hocwp.scrollToTop = function () {
         hocwp.goToTop();
     };
 
-    hocwp.isEmail = function(email) {
+    hocwp.isEmail = function (email) {
         return this.test(email, '^[-!#$%&\'*+\\./0-9=?A-Z^_`a-z{|}~]+@[-!#$%&\'*+\\/0-9=?A-Z^_`a-z{|}~]+\.[-!#$%&\'*+\\./0-9=?A-Z^_`a-z{|}~]+$');
     };
 
-    hocwp.isEmpty = function(text) {
+    hocwp.isEmpty = function (text) {
         return text.trim();
     };
 
-    hocwp.switcherAjax = function() {
-        $('.hocwp-switcher-ajax .icon-circle').on('click', function(e) {
+    hocwp.switcherAjax = function () {
+        $('.hocwp-switcher-ajax .icon-circle').on('click', function (e) {
             e.preventDefault();
             var $element = $(this),
                 opacity = '0.5';
-            if($element.hasClass('icon-circle-success')) {
+            if ($element.hasClass('icon-circle-success')) {
                 opacity = '0.25';
             }
-            $element.css({'opacity' : opacity});
+            $element.css({'opacity': opacity});
             $.ajax({
                 type: 'POST',
                 dataType: 'json',
@@ -365,22 +372,22 @@ jQuery(document).ready(function($) {
                     value: $element.attr('data-value'),
                     key: $element.attr('data-key')
                 },
-                success: function(response){
-                    if(response.success) {
+                success: function (response) {
+                    if (response.success) {
                         $element.toggleClass('icon-circle-success');
                     }
-                    $element.css({'opacity' : '1'});
+                    $element.css({'opacity': '1'});
                 }
             });
         });
     };
 
-    hocwp.chosenSelectUpdated = function(el) {
+    hocwp.chosenSelectUpdated = function (el) {
         var $element = el,
             values = $element.chosen().val();
         var $parent = $element.parent(),
             $result = $parent.find('.chosen-result');
-        if(null == values) {
+        if (null == values) {
             $result.val('');
             return;
         }
@@ -390,12 +397,12 @@ jQuery(document).ready(function($) {
             i = 0,
             count_value = values.length,
             is_term = false;
-        for(i; i <= count_value; i++) {
+        for (i; i <= count_value; i++) {
             var current_value = values[i],
                 new_item = {value: current_value};
             $option = $parent.find('option[value="' + current_value + '"]');
             taxonomy = $option.attr('data-taxonomy');
-            if($.trim(taxonomy)) {
+            if ($.trim(taxonomy)) {
                 new_item.taxonomy = taxonomy;
                 is_term = true;
             }
@@ -404,7 +411,7 @@ jQuery(document).ready(function($) {
         $result.val(JSON.stringify(new_value));
     };
 
-    hocwp.mediaRemove = function(upload, remove, preview, url, id) {
+    hocwp.mediaRemove = function (upload, remove, preview, url, id) {
         preview.html('');
         url.val('');
         id.val('');
@@ -412,8 +419,8 @@ jQuery(document).ready(function($) {
         upload.removeClass('hidden');
     };
 
-    hocwp.mediaChange = function(upload, remove, preview, url, id) {
-        if(hocwp.isImageUrl(url.val())) {
+    hocwp.mediaChange = function (upload, remove, preview, url, id) {
+        if (hocwp.isImageUrl(url.val())) {
             preview.html(hocwp.createImageHTML({src: url.val(), id: id.val(), element: preview}));
         } else {
             preview.html('');
@@ -421,7 +428,7 @@ jQuery(document).ready(function($) {
         id.val('');
     };
 
-    hocwp.mediaUpload = function(button, options) {
+    hocwp.mediaUpload = function (button, options) {
         var defaults = {
             title: hocwp.i18n.insert_media_title,
             button_text: null,
@@ -437,19 +444,19 @@ jQuery(document).ready(function($) {
             $remove = $container.find('.btn-remove'),
             $preview = $container.find('.media-preview'),
             media_frame = null;
-        if(!options.remove && !options.change) {
-            if(button.hasClass('selecting')) {
+        if (!options.remove && !options.change) {
+            if (button.hasClass('selecting')) {
                 return;
             }
-            if(!options.button_text) {
-                if(options.multiple) {
+            if (!options.button_text) {
+                if (options.multiple) {
                     options.button_text = hocwp.i18n.insert_media_button_texts;
                 } else {
                     options.button_text = hocwp.i18n.insert_media_button_text;
                 }
             }
             button.addClass('selecting');
-            if(media_frame) {
+            if (media_frame) {
                 media_frame.open();
                 return;
             }
@@ -460,52 +467,56 @@ jQuery(document).ready(function($) {
                 },
                 multiple: options.multiple
             });
-            media_frame.on('select', function() {
+            media_frame.on('select', function () {
                 var media_items = hocwp.receiveSelectedMediaItems(media_frame);
-                if(!options.multiple) {
+                if (!options.multiple) {
                     var media_item = hocwp.getFirstMediaItemJSON(media_items);
-                    if(media_item.id) {
+                    if (media_item.id) {
                         $id.val(media_item.id);
                     }
-                    if(media_item.url) {
+                    if (media_item.url) {
                         $url.val(media_item.url);
-                        $preview.html(hocwp.createImageHTML({src: media_item.url, id: media_item.id, element: $preview}));
+                        $preview.html(hocwp.createImageHTML({
+                            src: media_item.url,
+                            id: media_item.id,
+                            element: $preview
+                        }));
                         button.addClass('hidden');
                         $remove.removeClass('hidden');
                     }
                 }
                 button.removeClass('selecting');
             });
-            media_frame.on('escape', function() {
+            media_frame.on('escape', function () {
                 button.removeClass('selecting');
             });
             media_frame.open();
         } else {
-            if(options.remove) {
+            if (options.remove) {
                 hocwp.mediaRemove(button, $remove, $preview, $url, $id);
             }
         }
 
-        if(options.change) {
+        if (options.change) {
             hocwp.mediaChange(button, $remove, $preview, $url, $id);
         }
 
-        $url.on('change input', function(e) {
+        $url.on('change input', function (e) {
             e.preventDefault();
             hocwp.mediaChange(button, $remove, $preview, $url, $id);
         });
 
-        $remove.on('click', function(e) {
+        $remove.on('click', function (e) {
             e.preventDefault();
             hocwp.mediaRemove(button, $remove, $preview, $url, $id);
         });
     };
 
-    hocwp.sortableTermStop = function(container) {
+    hocwp.sortableTermStop = function (container) {
         var $input_result = container.find('.input-result'),
             $sortable_result = container.find('.connected-result'),
             value = [];
-        $sortable_result.find('li').each(function(index, el) {
+        $sortable_result.find('li').each(function (index, el) {
             var $element = $(el),
                 item = {
                     id: $element.attr('data-id'),
@@ -518,11 +529,11 @@ jQuery(document).ready(function($) {
         return value;
     };
 
-    hocwp.sortablePostTypeStop = function(container) {
+    hocwp.sortablePostTypeStop = function (container) {
         var $input_result = container.find('.input-result'),
             $sortable_result = container.find('.connected-result'),
             value = [];
-        $sortable_result.find('li').each(function(index, el) {
+        $sortable_result.find('li').each(function (index, el) {
             var $element = $(el),
                 item = {
                     id: $element.attr('data-id')
@@ -534,11 +545,11 @@ jQuery(document).ready(function($) {
         return value;
     };
 
-    hocwp.sortableTaxonomyStop = function(container) {
+    hocwp.sortableTaxonomyStop = function (container) {
         var $input_result = container.find('.input-result'),
             $sortable_result = container.find('.connected-result'),
             value = [];
-        $sortable_result.find('li').each(function(index, el) {
+        $sortable_result.find('li').each(function (index, el) {
             var $element = $(el),
                 item = {
                     id: $element.attr('data-id')
@@ -550,16 +561,16 @@ jQuery(document).ready(function($) {
         return value;
     };
 
-    hocwp.sortableStop = function($element, $container) {
+    hocwp.sortableStop = function ($element, $container) {
         var $input_result = $container.find('.input-result'),
             value = [];
-        $element.find('li').each(function(index, el) {
+        $element.find('li').each(function (index, el) {
             var $element = $(el),
                 taxonomy = $element.attr('data-taxonomy'),
                 item = {
                     id: $element.attr('data-id')
                 };
-            if(typeof taxonomy !== typeof undefined && taxonomy !== false) {
+            if (typeof taxonomy !== typeof undefined && taxonomy !== false) {
                 item.taxonomy = taxonomy;
             }
             value.push(item);
@@ -569,14 +580,14 @@ jQuery(document).ready(function($) {
         return value;
     };
 
-    hocwp.administrativeBoundaries = function($element, child_name, $container) {
+    hocwp.administrativeBoundaries = function ($element, child_name, $container) {
         $container = $container || $element.closest('form');
         var $form = $container,
             $child = $form.find('select[name=' + child_name + ']'),
             $default = $child.find('option[value=0]'),
             element_name = $element.attr('name');
-        if($child.length) {
-            if(!$default.length) {
+        if ($child.length) {
+            if (!$default.length) {
                 $default = $child.find('option[value=""]')
             }
             $.ajax({
@@ -590,7 +601,7 @@ jQuery(document).ready(function($) {
                     type: element_name,
                     default: $default.prop('outerHTML')
                 },
-                success: function(response){
+                success: function (response) {
                     $child.html(response.html_data);
                 }
             });
@@ -598,11 +609,11 @@ jQuery(document).ready(function($) {
     };
 });
 
-jQuery(document).ready(function($) {
+jQuery(document).ready(function ($) {
     function MediaUpload(element, options) {
         this.self = this;
         this.$element = $(element);
-        if(!this.$element.length) {
+        if (!this.$element.length) {
             return this;
         }
         this.element = element;
@@ -633,9 +644,9 @@ jQuery(document).ready(function($) {
         multiple: false
     };
 
-    MediaUpload.prototype.init = function() {
-        if(!this.options.button_text) {
-            if(this.options.multiple) {
+    MediaUpload.prototype.init = function () {
+        if (!this.options.button_text) {
+            if (this.options.multiple) {
                 this.options.button_text = hocwp.i18n.insert_media_button_texts;
             } else {
                 this.options.button_text = hocwp.i18n.insert_media_button_text;
@@ -643,16 +654,20 @@ jQuery(document).ready(function($) {
         }
     };
 
-    MediaUpload.prototype.selected = function() {
+    MediaUpload.prototype.selected = function () {
         this.items = hocwp.receiveSelectedMediaItems(this.frame);
-        if(!this.options.multiple) {
+        if (!this.options.multiple) {
             var media_item = hocwp.getFirstMediaItemJSON(this.items);
-            if(media_item.id) {
+            if (media_item.id) {
                 this.$id.val(media_item.id);
             }
-            if(media_item.url) {
+            if (media_item.url) {
                 this.$url.val(media_item.url);
-                this.$preview.html(hocwp.createImageHTML({src: media_item.url, id: media_item.id, element: this.$preview}));
+                this.$preview.html(hocwp.createImageHTML({
+                    src: media_item.url,
+                    id: media_item.id,
+                    element: this.$preview
+                }));
                 this.$element.addClass('hidden');
                 this.$remove.removeClass('hidden');
             }
@@ -660,7 +675,7 @@ jQuery(document).ready(function($) {
         this.$element.removeClass('selecting');
     };
 
-    MediaUpload.prototype.remove = function(e) {
+    MediaUpload.prototype.remove = function (e) {
         e.preventDefault();
         this.$preview.html('');
         this.$url.val('');
@@ -669,14 +684,14 @@ jQuery(document).ready(function($) {
         this.$element.removeClass('hidden');
     };
 
-    MediaUpload.prototype.add = function(e) {
+    MediaUpload.prototype.add = function (e) {
         e.preventDefault();
         var $element = this.$element;
-        if(this.$element.hasClass('selecting')) {
+        if (this.$element.hasClass('selecting')) {
             return;
         }
         this.$element.addClass('selecting');
-        if(this.frame) {
+        if (this.frame) {
             this.frame.open();
             return;
         }
@@ -688,38 +703,42 @@ jQuery(document).ready(function($) {
             multiple: this.options.multiple
         });
         this.frame.on('select', $.proxy(this.selected, this));
-        this.frame.on('escape', function() {
+        this.frame.on('escape', function () {
             $element.removeClass('selecting');
         });
         this.frame.open();
     };
 
-    MediaUpload.prototype.change = function(e) {
+    MediaUpload.prototype.change = function (e) {
         e.preventDefault();
-        if(hocwp.isImageUrl(this.$url.val())) {
-            this.$preview.html(hocwp.createImageHTML({src: this.$url.val(), id: this.$id.val(), element: this.$preview}));
+        if (hocwp.isImageUrl(this.$url.val())) {
+            this.$preview.html(hocwp.createImageHTML({
+                src: this.$url.val(),
+                id: this.$id.val(),
+                element: this.$preview
+            }));
         } else {
             this.$preview.html('');
         }
         this.$id.val('');
     };
 
-    $.fn.hocwpMediaUpload = function(options) {
-        return this.each(function() {
-            if(!$.data(this, MediaUpload.NAME)) {
+    $.fn.hocwpMediaUpload = function (options) {
+        return this.each(function () {
+            if (!$.data(this, MediaUpload.NAME)) {
                 $.data(this, MediaUpload.NAME, new MediaUpload(this, options));
             }
         });
     };
 });
 
-jQuery(document).ready(function($) {
+jQuery(document).ready(function ($) {
     function ScrollTop(element, options) {
         var $window = $(window),
             current_pos = $window.scrollTop();
         this.self = this;
         this.$element = $(element);
-        if(!this.$element.length) {
+        if (!this.$element.length) {
             return this;
         }
         this.element = element;
@@ -732,12 +751,12 @@ jQuery(document).ready(function($) {
         var pos_to_show = this.options.posToShow,
             $element = this.$element;
 
-        if(current_pos >= pos_to_show) {
+        if (current_pos >= pos_to_show) {
             $element.fadeIn();
         }
 
-        $window.scroll(function() {
-            if($(this).scrollTop() >= pos_to_show) {
+        $window.scroll(function () {
+            if ($(this).scrollTop() >= pos_to_show) {
                 $element.fadeIn();
             } else {
                 $element.fadeOut();
@@ -753,36 +772,36 @@ jQuery(document).ready(function($) {
         posToShow: 100
     };
 
-    ScrollTop.prototype.init = function() {
+    ScrollTop.prototype.init = function () {
 
     };
 
-    ScrollTop.prototype.click = function(e) {
+    ScrollTop.prototype.click = function (e) {
         e.preventDefault();
         hocwp.scrollToTop();
     };
 
-    $.fn.hocwpScrollTop = function(options) {
-        return this.each(function() {
-            if(!$.data(this, ScrollTop.NAME)) {
+    $.fn.hocwpScrollTop = function (options) {
+        return this.each(function () {
+            if (!$.data(this, ScrollTop.NAME)) {
                 $.data(this, ScrollTop.NAME, new ScrollTop(this, options));
             }
         });
     };
 });
 
-jQuery(document).ready(function($) {
+jQuery(document).ready(function ($) {
     function SortableList(element, options) {
         this.self = this;
         this.$element = $(element);
-        if(!this.$element.length) {
+        if (!this.$element.length) {
             return this;
         }
         this.element = element;
         this.options = $.extend({}, SortableList.DEFAULTS, options);
         this._defaults = SortableList.DEFAULTS;
         this._name = SortableList.NAME;
-        if(this.$element.hasClass('manage-column')) {
+        if (this.$element.hasClass('manage-column')) {
             return;
         }
         this.init();
@@ -791,22 +810,22 @@ jQuery(document).ready(function($) {
             $sortable_result = $element.next(),
             sortable_options = {
                 placeholder: 'ui-state-highlight',
-                sort: function(event, ui) {
+                sort: function (event, ui) {
                     var that = $(this),
                         ui_state_highlight = that.find('.ui-state-highlight');
                     ui_state_highlight.css({'height': ui.item.height()});
-                    if(that.hasClass('display-inline')) {
+                    if (that.hasClass('display-inline')) {
                         ui_state_highlight.css({'width': ui.item.width()});
                     }
                 },
-                stop: function() {
+                stop: function () {
                     var $sortable_result = $container.find('.connected-result');
-                    if($sortable_result.length) {
-                        if($sortable_result.hasClass('term-sortable')) {
+                    if ($sortable_result.length) {
+                        if ($sortable_result.hasClass('term-sortable')) {
                             hocwp.sortableTermStop($container);
-                        } else if($sortable_result.hasClass('post-type-sortable')) {
+                        } else if ($sortable_result.hasClass('post-type-sortable')) {
                             hocwp.sortablePostTypeStop($container);
-                        } else if($sortable_result.hasClass('taxonomy-sortable')) {
+                        } else if ($sortable_result.hasClass('taxonomy-sortable')) {
                             hocwp.sortableTaxonomyStop($container);
                         }
                     } else {
@@ -814,14 +833,14 @@ jQuery(document).ready(function($) {
                     }
                 }
             };
-        if($sortable_result.length && $sortable_result.hasClass('sortable')) {
+        if ($sortable_result.length && $sortable_result.hasClass('sortable')) {
             var element_height = $element.height(),
                 sortable_result_height = $sortable_result.height();
-            if(element_height > sortable_result_height) {
+            if (element_height > sortable_result_height) {
                 $sortable_result.css({'height': element_height});
             }
         }
-        if($element.hasClass('connected-list')) {
+        if ($element.hasClass('connected-list')) {
             sortable_options.connectWith = '.connected-list';
         }
         $element.sortable(sortable_options).disableSelection();
@@ -831,27 +850,27 @@ jQuery(document).ready(function($) {
 
     SortableList.DEFAULTS = {};
 
-    SortableList.prototype.init = function() {
+    SortableList.prototype.init = function () {
 
     };
 
-    $.fn.hocwpSortable = function(options) {
-        return this.each(function() {
-            if(!$.data(this, SortableList.NAME)) {
+    $.fn.hocwpSortable = function (options) {
+        return this.each(function () {
+            if (!$.data(this, SortableList.NAME)) {
                 $.data(this, SortableList.NAME, new SortableList(this, options));
             }
         });
     };
 });
 
-jQuery(document).ready(function($) {
+jQuery(document).ready(function ($) {
     function MobileMenu(element, options) {
         var $window = $(window),
             $body = $('body'),
             current_width = $window.width();
         this.self = this;
         this.$element = $(element);
-        if(!this.$element.length) {
+        if (!this.$element.length) {
             return this;
         }
         this.element = element;
@@ -875,8 +894,9 @@ jQuery(document).ready(function($) {
             menu_class = this.element_class,
             position = this.options.position,
             window_resized = false;
+
         function hocwp_update_mobile_menu() {
-            if(fit_window_height) {
+            if (fit_window_height) {
                 body_height = $(window).height();
             }
             $element.removeClass('sf-menu sf-js-enabled');
@@ -885,57 +905,57 @@ jQuery(document).ready(function($) {
             $element.show();
             $element.addClass(position);
             $element.addClass('hocwp-mobile-menu');
-            if(!$mobile_menu_button.length) {
+            if (!$mobile_menu_button.length) {
                 $menu_parent.append(hocwp.mobile_menu_icon);
                 $mobile_menu_button = $menu_parent.find('.mobile-menu-button');
                 $mobile_menu_button.attr('aria-controls', $element.attr('id'))
             }
-            if(!search_form_added && (!$search_form.length || force_search_form)) {
-                if(!search_form_added && (!$element.find('li.search-item').length || force_search_form)) {
+            if (!search_form_added && (!$search_form.length || force_search_form)) {
+                if (!search_form_added && (!$element.find('li.search-item').length || force_search_form)) {
                     $element.prepend('<li class="search-item menu-item" style="overflow: hidden">' + hocwp.search_form + '</li>');
                     search_form_added = true;
                 }
             }
-            $mobile_menu_button.css({'line-height' : height + 'px'});
+            $mobile_menu_button.css({'line-height': height + 'px'});
             $mobile_menu_button.show();
 
-            $menu_parent.off('click', '.mobile-menu-button').on('click', '.mobile-menu-button', function(e) {
+            $menu_parent.off('click', '.mobile-menu-button').on('click', '.mobile-menu-button', function (e) {
                 e.stopPropagation();
                 $element.toggleClass('active');
             });
 
-            $body.on('click', function() {
+            $body.on('click', function () {
                 $element.removeClass('active');
             });
 
-            $menu_parent.off('click', '.hocwp-mobile-menu').on('click', '.hocwp-mobile-menu', function(e) {
+            $menu_parent.off('click', '.hocwp-mobile-menu').on('click', '.hocwp-mobile-menu', function (e) {
                 e.stopPropagation();
-                if(e.target == this) {
+                if (e.target == this) {
                     $element.toggleClass('active');
                 }
             });
 
-            $element.find('.search-field').on('click', function(e) {
+            $element.find('.search-field').on('click', function (e) {
                 e.preventDefault();
             });
 
-            if($body.hasClass('jquery-mobile')) {
-                $menu_parent.on('swipeleft', '.hocwp-mobile-menu', function(e) {
+            if ($body.hasClass('jquery-mobile')) {
+                $menu_parent.on('swipeleft', '.hocwp-mobile-menu', function (e) {
                     e.preventDefault();
                     $element.removeClass('active');
                 });
             }
 
-            $element.find('li.menu-item-has-children .fa').off('click').on('click', function(e) {
+            $element.find('li.menu-item-has-children .fa').off('click').on('click', function (e) {
                 e.preventDefault();
                 var $this = $(this),
                     $current_li = $this.parent(),
                     $sub_menu = $current_li.children('.sub-menu');
-                if($this.hasClass('active')) {
+                if ($this.hasClass('active')) {
                     $sub_menu.stop(true, false, true).slideUp();
                     $this.removeClass('fa-minus');
                     $this.addClass('fa-plus');
-                    $current_li.find('.fa-minus').each(function() {
+                    $current_li.find('.fa-minus').each(function () {
                         $(this).removeClass('fa-minus active').addClass('fa-plus');
                     });
                     $current_li.find('.sub-menu').not($sub_menu).hide();
@@ -947,30 +967,31 @@ jQuery(document).ready(function($) {
                 $this.toggleClass('active');
             });
 
-            $window.scroll(function() {
+            $window.scroll(function () {
                 var pos = $(this).scrollTop(),
                     $admin_bar = $('#wpadminbar'),
                     admin_bar_height = 0;
-                if($admin_bar.length) {
+                if ($admin_bar.length) {
                     admin_bar_height = $admin_bar.height();
                 }
-                if(pos < 100) {
+                if (pos < 100) {
                     pos = admin_bar_height;
                 }
-                if(pos == admin_bar_height) {
-                    $element.css({'top' : pos + 'px'});
+                if (pos == admin_bar_height) {
+                    $element.css({'top': pos + 'px'});
                 } else {
-                    $element.css({'top' : '-' + pos + 'px'});
+                    $element.css({'top': '-' + pos + 'px'});
                 }
             });
         }
-        if(current_width > display_width) {
-            if(!window_resized) {
-                $window.on('resize', function() {
+
+        if (current_width > display_width) {
+            if (!window_resized) {
+                $window.on('resize', function () {
                     window_resized = true;
                     current_width = $window.width();
-                    if(current_width > display_width) {
-                        if($element.hasClass('hocwp-mobile-menu')) {
+                    if (current_width > display_width) {
+                        if ($element.hasClass('hocwp-mobile-menu')) {
                             $element.attr('class', menu_class);
                             $element.attr('style', '');
                             $element.html(html);
@@ -984,16 +1005,16 @@ jQuery(document).ready(function($) {
             return this;
         }
 
-        if(current_width <= display_width) {
+        if (current_width <= display_width) {
             hocwp_update_mobile_menu();
         }
 
-        if(!window_resized) {
-            $window.on('resize', function() {
+        if (!window_resized) {
+            $window.on('resize', function () {
                 window_resized = true;
                 current_width = $window.width();
-                if(current_width > display_width) {
-                    if($element.hasClass('hocwp-mobile-menu')) {
+                if (current_width > display_width) {
+                    if ($element.hasClass('hocwp-mobile-menu')) {
                         $element.attr('class', menu_class);
                         $element.attr('style', '');
                         $element.html(html);
@@ -1016,31 +1037,31 @@ jQuery(document).ready(function($) {
         fitWindowHeight: false
     };
 
-    MobileMenu.prototype.init = function() {
-        if(!this.$element.is('ul')) {
+    MobileMenu.prototype.init = function () {
+        if (!this.$element.is('ul')) {
             this.$element = this.$element.find('ul');
         }
     };
 
-    MobileMenu.prototype.click = function(e) {
+    MobileMenu.prototype.click = function (e) {
         e.preventDefault();
         hocwp.scrollToTop();
     };
 
-    $.fn.hocwpMobileMenu = function(options) {
-        return this.each(function() {
-            if(!$.data(this, MobileMenu.NAME)) {
+    $.fn.hocwpMobileMenu = function (options) {
+        return this.each(function () {
+            if (!$.data(this, MobileMenu.NAME)) {
                 $.data(this, MobileMenu.NAME, new MobileMenu(this, options));
             }
         });
     };
 });
 
-jQuery(document).ready(function($) {
+jQuery(document).ready(function ($) {
     function ChosenSelect(element, options) {
         this.self = this;
         this.$element = $(element);
-        if(!this.$element.length) {
+        if (!this.$element.length) {
             return this;
         }
         this.element = element;
@@ -1053,12 +1074,12 @@ jQuery(document).ready(function($) {
             loaded = parseInt(this.$element.attr('data-loaded')),
             chosen_params = {
                 width: this.options.width || '100%'
-        };
-        if(1 == loaded) {
+            };
+        if (1 == loaded) {
             this.$element.parent().find('.chosen-container').remove();
         }
-        if('multiple' == this.multiple) {
-            this.$element.chosen(chosen_params).on('change', function() {
+        if ('multiple' == this.multiple) {
+            this.$element.chosen(chosen_params).on('change', function () {
                 hocwp.chosenSelectUpdated($element);
             });
         } else {
@@ -1074,30 +1095,30 @@ jQuery(document).ready(function($) {
         position: 'left'
     };
 
-    ChosenSelect.prototype.init = function() {
+    ChosenSelect.prototype.init = function () {
         var $element_parent = this.$element.parent(),
             $next_element = $element_parent.next();
-        if($next_element.hasClass('chosen-container')) {
+        if ($next_element.hasClass('chosen-container')) {
             $next_element.remove();
         }
         this.$element.addClass('hocwp-chosen-select');
         this.$element.attr('data-loaded', 1);
     };
 
-    $.fn.hocwpChosenSelect = function(options) {
-        return this.each(function() {
-            if(!$.data(this, ChosenSelect.NAME)) {
+    $.fn.hocwpChosenSelect = function (options) {
+        return this.each(function () {
+            if (!$.data(this, ChosenSelect.NAME)) {
                 $.data(this, ChosenSelect.NAME, new ChosenSelect(this, options));
             }
         });
     };
 });
 
-jQuery(document).ready(function($) {
+jQuery(document).ready(function ($) {
     function PostRating(element, options) {
         this.self = this;
         this.$element = $(element);
-        if(!this.$element.length) {
+        if (!this.$element.length) {
             return this;
         }
         this.element = element;
@@ -1113,19 +1134,19 @@ jQuery(document).ready(function($) {
     PostRating.NAME = 'hocwp.postRating';
 
     PostRating.DEFAULTS = {
-        score: function() {
+        score: function () {
             return $(this).attr('data-score');
         },
-        path: function() {
+        path: function () {
             return this.getAttribute('data-path');
         },
         number: parseInt($(this).attr('data-number')),
         numberMax: parseInt($(this).attr('data-number-max')),
-        readOnly: function() {
+        readOnly: function () {
             var readonly = parseInt($(this).attr('data-readonly'));
             return readonly == 1;
         },
-        click: function(score, e) {
+        click: function (score, e) {
             var $element = $(this),
                 post_id = parseInt(this.getAttribute('data-id'));
             $.ajax({
@@ -1139,10 +1160,10 @@ jQuery(document).ready(function($) {
                     number: $element.attr('data-number'),
                     number_max: $element.attr('data-number-max')
                 },
-                success: function(response){
-                    if(response.success) {
+                success: function (response) {
+                    if (response.success) {
                         var refresh = parseInt($element.attr('data-refresh'));
-                        if(1 == refresh) {
+                        if (1 == refresh) {
                             $element.attr('data-score', response.score);
                         } else {
                             $element.attr('data-score', score);
@@ -1155,25 +1176,26 @@ jQuery(document).ready(function($) {
         }
     };
 
-    PostRating.prototype.init = function() {
+    PostRating.prototype.init = function () {
 
     };
 
-    $.fn.hocwpPostRating = function(options) {
-        return this.each(function() {
-            if(!$.data(this, PostRating.NAME)) {
+    $.fn.hocwpPostRating = function (options) {
+        return this.each(function () {
+            if (!$.data(this, PostRating.NAME)) {
                 $.data(this, PostRating.NAME, new PostRating(this, options));
             }
         });
     };
 });
 
-jQuery(document).ready(function($) {
+jQuery(document).ready(function ($) {
     var $body = $('body');
+
     function GoogleMaps(element, options) {
         this.self = this;
         this.$element = $(element);
-        if(!this.$element.length || !$body.hasClass('hocwp-google-maps')) {
+        if (!this.$element.length || !$body.hasClass('hocwp-google-maps')) {
             return this;
         }
         this.element = element;
@@ -1200,40 +1222,40 @@ jQuery(document).ready(function($) {
                 title: $element.attr('data-marker-title')
             }),
             point = marker.getPosition();
-        google.maps.event.addListener(marker, 'dragend', function(event) {
+        google.maps.event.addListener(marker, 'dragend', function (event) {
             point = marker.getPosition();
             map.panTo(point);
-            if($google_maps.length) {
+            if ($google_maps.length) {
                 $google_maps.val(JSON.stringify(point));
             }
             $element.attr('data-lat', point.lat);
             $element.attr('data-long', point.lng);
         });
         var geocoder = new google.maps.Geocoder();
-        if($geo_address.length) {
-            $geo_address.on('change', function(e) {
+        if ($geo_address.length) {
+            $geo_address.on('change', function (e) {
                 e.preventDefault();
-                if($.trim($geo_address.val())) {
-                    if(geocoder == null) {
+                if ($.trim($geo_address.val())) {
+                    if (geocoder == null) {
                         geocoder = new google.maps.Geocoder();
                     }
-                    geocoder.geocode({address: $geo_address.val()}, function(results, status) {
-                        if(status == google.maps.GeocoderStatus.OK) {
+                    geocoder.geocode({address: $geo_address.val()}, function (results, status) {
+                        if (status == google.maps.GeocoderStatus.OK) {
                             var bounds = results[0].geometry.bounds;
-                            if(bounds) {
+                            if (bounds) {
                                 map.fitBounds(bounds);
                                 map.setZoom(14);
                                 lat_long = new google.maps.LatLng(results[0].geometry.location.lat(), results[0].geometry.location.lng());
                                 marker.setPosition(lat_long);
                                 point = marker.getPosition();
-                                if($google_maps.length) {
+                                if ($google_maps.length) {
                                     $google_maps.val(JSON.stringify(point));
                                 }
                                 map.setCenter(point);
-                                google.maps.event.addListener(marker, 'dragend', function(event) {
+                                google.maps.event.addListener(marker, 'dragend', function (event) {
                                     point = marker.getPosition();
                                     map.panTo(point);
-                                    if($google_maps.length) {
+                                    if ($google_maps.length) {
                                         $google_maps.val(JSON.stringify(point));
                                     }
                                     $element.attr('data-lat', point.lat);
@@ -1245,15 +1267,15 @@ jQuery(document).ready(function($) {
                 }
             });
         }
-        if($category_list.length) {
-            $category_list.find('input[type="checkbox"]').on('change', function(e) {
+        if ($category_list.length) {
+            $category_list.find('input[type="checkbox"]').on('change', function (e) {
                 e.preventDefault();
                 var $input_category = $(this);
-                if($input_category.is(':checked')) {
-                    if(geocoder == null) {
+                if ($input_category.is(':checked')) {
+                    if (geocoder == null) {
                         geocoder = new google.maps.Geocoder();
                     }
-                    if(!$.trim($geo_address.val())) {
+                    if (!$.trim($geo_address.val())) {
                         $.ajax({
                             type: 'POST',
                             dataType: 'json',
@@ -1263,25 +1285,25 @@ jQuery(document).ready(function($) {
                                 term_id: $input_category.val(),
                                 taxonomy: 'category'
                             },
-                            success: function(response){
-                                if($.trim(response.address)) {
-                                    geocoder.geocode({address: response.address}, function(results, status) {
-                                        if(status == google.maps.GeocoderStatus.OK) {
+                            success: function (response) {
+                                if ($.trim(response.address)) {
+                                    geocoder.geocode({address: response.address}, function (results, status) {
+                                        if (status == google.maps.GeocoderStatus.OK) {
                                             var bounds = results[0].geometry.bounds;
-                                            if(bounds) {
+                                            if (bounds) {
                                                 map.fitBounds(bounds);
                                                 map.setZoom(14);
                                                 lat_long = new google.maps.LatLng(results[0].geometry.location.lat(), results[0].geometry.location.lng());
                                                 marker.setPosition(lat_long);
                                                 point = marker.getPosition();
-                                                if($google_maps.length) {
+                                                if ($google_maps.length) {
                                                     $google_maps.val(JSON.stringify(point));
                                                 }
                                                 map.setCenter(point);
-                                                google.maps.event.addListener(marker, 'dragend', function(event) {
+                                                google.maps.event.addListener(marker, 'dragend', function (event) {
                                                     point = marker.getPosition();
                                                     map.panTo(point);
-                                                    if($google_maps.length) {
+                                                    if ($google_maps.length) {
                                                         $google_maps.val(JSON.stringify(point));
                                                     }
                                                     $element.attr('data-lat', point.lat);
@@ -1297,18 +1319,18 @@ jQuery(document).ready(function($) {
                 }
             });
         }
-        if($province.length) {
+        if ($province.length) {
             var $district = $body.find('select[name=district]'),
                 $ward = $body.find('select[name=ward]'),
                 $street = $body.find('select[name=street]');
-            $province.add($district).add($ward).add($street).on('change', function(e) {
+            $province.add($district).add($ward).add($street).on('change', function (e) {
                 e.preventDefault();
                 var term_id = $(this).val();
-                if($.isNumeric(term_id) && term_id > 0) {
-                    if(geocoder == null) {
+                if ($.isNumeric(term_id) && term_id > 0) {
+                    if (geocoder == null) {
                         geocoder = new google.maps.Geocoder();
                     }
-                    if(!$.trim($geo_address.val())) {
+                    if (!$.trim($geo_address.val())) {
                         $.ajax({
                             type: 'POST',
                             dataType: 'json',
@@ -1318,25 +1340,25 @@ jQuery(document).ready(function($) {
                                 term_id: term_id,
                                 taxonomy: 'category'
                             },
-                            success: function(response){
-                                if($.trim(response.address)) {
-                                    geocoder.geocode({address: response.address}, function(results, status) {
-                                        if(status == google.maps.GeocoderStatus.OK) {
+                            success: function (response) {
+                                if ($.trim(response.address)) {
+                                    geocoder.geocode({address: response.address}, function (results, status) {
+                                        if (status == google.maps.GeocoderStatus.OK) {
                                             var bounds = results[0].geometry.bounds;
-                                            if(bounds) {
+                                            if (bounds) {
                                                 map.fitBounds(bounds);
                                                 map.setZoom(14);
                                                 lat_long = new google.maps.LatLng(results[0].geometry.location.lat(), results[0].geometry.location.lng());
                                                 marker.setPosition(lat_long);
                                                 point = marker.getPosition();
-                                                if($google_maps.length) {
+                                                if ($google_maps.length) {
                                                     $google_maps.val(JSON.stringify(point));
                                                 }
                                                 map.setCenter(point);
-                                                google.maps.event.addListener(marker, 'dragend', function(event) {
+                                                google.maps.event.addListener(marker, 'dragend', function (event) {
                                                     point = marker.getPosition();
                                                     map.panTo(point);
-                                                    if($google_maps.length) {
+                                                    if ($google_maps.length) {
                                                         $google_maps.val(JSON.stringify(point));
                                                     }
                                                     $element.attr('data-lat', point.lat);
@@ -1356,35 +1378,33 @@ jQuery(document).ready(function($) {
 
     GoogleMaps.NAME = 'hocwp.googleMaps';
 
-    GoogleMaps.DEFAULTS = {
+    GoogleMaps.DEFAULTS = {};
+
+    GoogleMaps.prototype.init = function () {
 
     };
 
-    GoogleMaps.prototype.init = function() {
-
-    };
-
-    $.fn.hocwpGoogleMaps = function(options) {
-        return this.each(function() {
-            if(!$.data(this, GoogleMaps.NAME)) {
+    $.fn.hocwpGoogleMaps = function (options) {
+        return this.each(function () {
+            if (!$.data(this, GoogleMaps.NAME)) {
                 $.data(this, GoogleMaps.NAME, new GoogleMaps(this, options));
             }
         });
     };
 });
 
-jQuery(document).ready(function($) {
-    $.fn.hocwpShow = function(show, fade) {
+jQuery(document).ready(function ($) {
+    $.fn.hocwpShow = function (show, fade) {
         var that = $(this);
         fade = fade || false;
-        if(show) {
-            if(fade) {
+        if (show) {
+            if (fade) {
                 that.addClass('active').fadeIn();
             } else {
                 that.addClass('active').show();
             }
         } else {
-            if(fade) {
+            if (fade) {
                 that.removeClass('active').fadeOut();
             } else {
                 that.removeClass('active').hide();
@@ -1392,21 +1412,21 @@ jQuery(document).ready(function($) {
         }
     };
 
-    $.fn.hocwpExternalLinkFilter = function() {
+    $.fn.hocwpExternalLinkFilter = function () {
         var that = $(this);
-        that.filter(function() {
+        that.filter(function () {
             return this.hostname && this.hostname !== location.hostname;
         }).addClass('external');
     };
 });
 
-jQuery(document).ready(function($) {
-    (function() {
+jQuery(document).ready(function ($) {
+    (function () {
         $('.btn-insert-media').hocwpMediaUpload();
     })();
 
-    (function() {
-        $('.hocwp-geo-address').on('input', function() {
+    (function () {
+        $('.hocwp-geo-address').on('input', function () {
             $(this).addClass('user-type-address');
             $(this).attr('data-user-type', 1);
         });

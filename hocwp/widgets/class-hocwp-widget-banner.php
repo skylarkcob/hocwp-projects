@@ -5,7 +5,9 @@ class HOCWP_Widget_Banner extends WP_Widget {
     public $admin_args;
 
     private function get_defaults() {
-        $defaults = array();
+        $defaults = array(
+            'nofollow' => 0
+        );
         $defaults = apply_filters('hocwp_widget_banner_defaults', $defaults);
         $args = apply_filters('hocwp_widget_banner_args', array());
         $args = wp_parse_args($args, $defaults);
@@ -56,6 +58,10 @@ class HOCWP_Widget_Banner extends WP_Widget {
                 $a->set_attribute('title', $title_text);
                 $a->set_href($banner_url);
                 $a->set_text($html);
+                $nofollow = hocwp_get_value_by_key($instance, 'nofollow', hocwp_get_value_by_key($this->args, 'nofollow'));
+                if((bool)$nofollow) {
+                    $a->set_attribute('rel', 'nofollow');
+                }
                 $html = $a->build();
             }
             $widget_html = apply_filters('hocwp_widget_banner_html', $html, $instance, $args, $this);
@@ -87,6 +93,15 @@ class HOCWP_Widget_Banner extends WP_Widget {
         );
         hocwp_widget_field('hocwp_field_input_text', $args);
 
+        $nofollow = hocwp_get_value_by_key($instance, 'nofollow', hocwp_get_value_by_key($this->args, 'nofollow'));
+        $args = array(
+            'id' => $this->get_field_id('nofollow'),
+            'name' => $this->get_field_name('nofollow'),
+            'value' => $nofollow,
+            'label' => __('Add rel nofollow for this link?', 'hocwp')
+        );
+        hocwp_widget_field('hocwp_field_input_checkbox', $args);
+
         hocwp_field_widget_after();
     }
 
@@ -95,6 +110,7 @@ class HOCWP_Widget_Banner extends WP_Widget {
         $instance['title'] = strip_tags(hocwp_get_value_by_key($new_instance, 'title'));
         $instance['banner_image'] = hocwp_get_value_by_key($new_instance, 'banner_image');
         $instance['banner_url'] = hocwp_get_value_by_key($new_instance, 'banner_url');
+        $instance['nofollow'] = hocwp_checkbox_post_data_value($new_instance, 'nofollow');
         return $instance;
     }
 }

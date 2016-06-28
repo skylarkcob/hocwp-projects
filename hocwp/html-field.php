@@ -250,6 +250,10 @@ function hocwp_field_sortable_term($args = array()) {
             'exclude' => $save_ids
         );
         $term_args = wp_parse_args($term_args, $defaults);
+        $only_parent = hocwp_get_value_by_key($term_args, 'only_parent');
+        if((bool)$only_parent) {
+            $term_args['parent'] = 0;
+        }
         $terms = hocwp_get_terms($taxonomy, $term_args);
         if(!$connect) {
             $results = $active_terms;

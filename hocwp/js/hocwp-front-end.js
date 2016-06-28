@@ -2,11 +2,11 @@
  * Last updated: 20/04/2016
  */
 
-jQuery(document).ready(function($) {
+jQuery(document).ready(function ($) {
     var $body = $('body');
 
-    (function() {
-        $('.sf-menu, .hocwp-superfish-menu > ul').each(function() {
+    (function () {
+        $('.sf-menu, .hocwp-superfish-menu > ul').each(function () {
             var $element = $(this),
                 options = {
                     hoverClass: 'sf-hover',
@@ -14,10 +14,10 @@ jQuery(document).ready(function($) {
                     cssArrows: false,
                     dropShadows: false
                 };
-            if(!$element.hasClass('sf-menu')) {
+            if (!$element.hasClass('sf-menu')) {
                 $element.addClass('sf-menu');
             }
-            if($element.hasClass('slide')) {
+            if ($element.hasClass('slide')) {
                 options.animation = {
                     height: 'show',
                     marginTop: 'show',
@@ -33,25 +33,25 @@ jQuery(document).ready(function($) {
                     paddingBottom: 'hide'
                 };
             }
-            if($element.hasClass('arrow')) {
+            if ($element.hasClass('arrow')) {
                 options.cssArrows = true;
             }
             $element.superfish(options);
         });
     })();
 
-    (function() {
+    (function () {
         $('.hocwp-go-top').hocwpScrollTop();
     })();
 
-    (function() {
-        $('input[type="file"].hocwp-field-upload').each(function() {
+    (function () {
+        $('input[type="file"].hocwp-field-upload').each(function () {
             hocwp.limitUploadFile($(this));
         });
     })();
 
-    (function() {
-        $('.hocwp .comment-tools .comment-likes').on('click', function(e) {
+    (function () {
+        $('.hocwp .comment-tools .comment-likes').on('click', function (e) {
             e.preventDefault();
             var $element = $(this),
                 $container = $element.closest('.comment'),
@@ -59,7 +59,7 @@ jQuery(document).ready(function($) {
                 comment_id = parseInt($container.attr('data-comment-id')),
                 likes = parseInt($element.attr('data-likes'));
             $element.addClass('disabled');
-            $element.css({'text-decoration' : 'none'});
+            $element.css({'text-decoration': 'none'});
             $.ajax({
                 type: 'POST',
                 dataType: 'json',
@@ -69,7 +69,7 @@ jQuery(document).ready(function($) {
                     comment_id: comment_id,
                     likes: likes
                 },
-                success: function(response){
+                success: function (response) {
                     likes++;
                     $element.attr('data-likes', likes);
                     $count.html(response.likes);
@@ -78,13 +78,13 @@ jQuery(document).ready(function($) {
             return false;
         });
 
-        $('.hocwp .comment-tools .comment-report').on('click', function(e) {
+        $('.hocwp .comment-tools .comment-report').on('click', function (e) {
             e.preventDefault();
             var $element = $(this),
                 $container = $element.closest('.comment'),
                 comment_id = parseInt($container.attr('data-comment-id'));
             $element.addClass('disabled');
-            $element.css({'text-decoration' : 'none'});
+            $element.css({'text-decoration': 'none'});
             $.ajax({
                 type: 'POST',
                 dataType: 'json',
@@ -93,39 +93,39 @@ jQuery(document).ready(function($) {
                     action: 'hocwp_comment_report',
                     comment_id: comment_id
                 },
-                success: function(response){
+                success: function (response) {
 
                 }
             });
             return false;
         });
 
-        $('.hocwp .comment-tools .comment-share').on('click', function(e) {
+        $('.hocwp .comment-tools .comment-share').on('click', function (e) {
             e.preventDefault();
             var $element = $(this);
-            $element.css({'text-decoration' : 'none'});
+            $element.css({'text-decoration': 'none'});
             $element.toggleClass('active');
             return false;
         });
 
-        $('.hocwp .comment-tools .comment-share .list-share .fa').on('click', function(e) {
+        $('.hocwp .comment-tools .comment-share .list-share .fa').on('click', function (e) {
             e.preventDefault();
             var $element = $(this);
-            $element.css({'text-decoration' : 'none'});
+            $element.css({'text-decoration': 'none'});
             window.open($element.attr('data-url'), 'ShareWindow', 'height=450, width=550, toolbar=0, location=0, menubar=0, directories=0, scrollbars=0');
         });
     })();
 
-    (function() {
+    (function () {
         hocwp.iconChangeCaptchaExecute();
     })();
 
-    (function() {
+    (function () {
         $('.hocwp.hocwp-google-maps .hocwp-field-maps').hocwpGoogleMaps();
     })();
 
-    (function() {
-        $('.vote .vote-post').on('click', function(e) {
+    (function () {
+        $('.vote .vote-post').on('click', function (e) {
             e.preventDefault();
             var $element = $(this),
                 $parent = $element.parent(),
@@ -142,8 +142,8 @@ jQuery(document).ready(function($) {
                     vote_type: vote_type,
                     value: $element.attr('data-vote')
                 },
-                success: function(response){
-                    if(response.success) {
+                success: function (response) {
+                    if (response.success) {
                         $element.attr('data-vote', response.value);
                         $parent.addClass('disabled');
                     }
@@ -152,10 +152,10 @@ jQuery(document).ready(function($) {
         });
     })();
 
-    (function() {
+    (function () {
         var $cart_preview = $('#hocwpCart');
-        if($cart_preview.length) {
-            $cart_preview.on('click', '.hocwp-post .fa-remove', function(e) {
+        if ($cart_preview.length) {
+            $cart_preview.on('click', '.hocwp-post .fa-remove', function (e) {
                 e.preventDefault();
                 var $element = $(this),
                     post_id = $element.attr('data-id'),
@@ -170,10 +170,10 @@ jQuery(document).ready(function($) {
                         action: 'hocwp_wc_remove_cart_item',
                         post_id: post_id
                     },
-                    success: function(response){
+                    success: function (response) {
                         $item.fadeOut();
                         $item.remove();
-                        if(response.updated) {
+                        if (response.updated) {
                             $cart_contents.html(response.cart_contents);
                         }
                     }
@@ -183,13 +183,13 @@ jQuery(document).ready(function($) {
     })();
 
     // Tab widget
-    (function() {
+    (function () {
         var $tabber_widgets = $('.hocwp-tabber-widget');
-        if($tabber_widgets.length) {
-            $tabber_widgets.each(function() {
+        if ($tabber_widgets.length) {
+            $tabber_widgets.each(function () {
                 var $element = $(this),
                     $list_tabs = $element.find('ul.nav-tabs');
-                $element.find('.tab-item').each(function() {
+                $element.find('.tab-item').each(function () {
                     var widget = $(this).attr('id');
                     $(this).find('a.tab-title').attr('href', '#' + widget).wrap('<li></li>').parent().detach().appendTo($list_tabs);
                 });
@@ -197,7 +197,7 @@ jQuery(document).ready(function($) {
                 $list_tabs.fadeIn();
                 $element.find('.tab-pane:first').addClass('active');
             });
-            $tabber_widgets.on('click', '.nav-tabs li a', function(e) {
+            $tabber_widgets.on('click', '.nav-tabs li a', function (e) {
                 e.preventDefault();
                 var $element = $(this),
                     id = $element.attr('href').replace('#', ''),
@@ -210,10 +210,10 @@ jQuery(document).ready(function($) {
     })();
 
     // Product fast buy
-    (function() {
+    (function () {
         var $modal = $('.single-product.woocommerce .modal.product-fast-buy');
-        if($modal.length) {
-            $modal.on('click', '.customer-info form button', function(e) {
+        if ($modal.length) {
+            $modal.on('click', '.customer-info form button', function (e) {
                 e.preventDefault();
                 var $element = $(this),
                     $modal_body = $element.closest('.modal-body'),
@@ -225,20 +225,20 @@ jQuery(document).ready(function($) {
                     $email = $form.find('.email'),
                     $address = $form.find('.address'),
                     $message = $form.find('.message');
-                if($full_name.prop('required') && !$.trim($full_name.val())) {
+                if ($full_name.prop('required') && !$.trim($full_name.val())) {
                     $full_name.focus();
-                } else if($phone.prop('required') && !$.trim($phone.val())) {
+                } else if ($phone.prop('required') && !$.trim($phone.val())) {
                     $phone.focus();
-                } else if($email.prop('required') && !$.trim($email.val())) {
+                } else if ($email.prop('required') && !$.trim($email.val())) {
                     $email.focus();
-                } else if($address.prop('required') && !$.trim($address.val())) {
+                } else if ($address.prop('required') && !$.trim($address.val())) {
                     $address.focus();
-                } else if($message.prop('required') && !$.trim($message.val())) {
+                } else if ($message.prop('required') && !$.trim($message.val())) {
                     $message.focus();
                 } else {
                     $element.addClass('disabled');
-                    if($attributes_form.length) {
-                        $attributes_form.find('select').each(function() {
+                    if ($attributes_form.length) {
+                        $attributes_form.find('select').each(function () {
                             var $select = $(this),
                                 attribute = {name: $select.attr('data-attribute_name'), value: $select.val()};
                             attributes.push(attribute);
@@ -258,8 +258,8 @@ jQuery(document).ready(function($) {
                             address: $address.val(),
                             attributes: attributes
                         },
-                        success: function(response){
-                            if($.trim(response.html_data)) {
+                        success: function (response) {
+                            if ($.trim(response.html_data)) {
                                 $modal_body.html(response.html_data);
                             }
                         }
@@ -270,10 +270,10 @@ jQuery(document).ready(function($) {
     })();
 
     // User subscribe widget
-    (function() {
+    (function () {
         var $hocwp_widget_subscribe = $('.hocwp-subscribe-widget');
-        if($hocwp_widget_subscribe.length) {
-            $hocwp_widget_subscribe.find('.hocwp-subscribe-form').on('submit', function(e) {
+        if ($hocwp_widget_subscribe.length) {
+            $hocwp_widget_subscribe.find('.hocwp-subscribe-form').on('submit', function (e) {
                 e.preventDefault();
                 var $element = $(this),
                     $messages = $element.find('.messages'),
@@ -285,16 +285,16 @@ jQuery(document).ready(function($) {
                     $phone = $element.find('.input-phone'),
                     $captcha = $element.find('.hocwp-captcha-code'),
                     captcha = '';
-                if($name.length && $name.prop('required') && !$.trim($name.val())) {
+                if ($name.length && $name.prop('required') && !$.trim($name.val())) {
                     $name.focus();
-                } else if($phone.length && $phone.prop('required') && !$.trim($phone.val())) {
+                } else if ($phone.length && $phone.prop('required') && !$.trim($phone.val())) {
                     $phone.focus();
-                } else if($email.length && $email.prop('required') && !$.trim($email.val())) {
+                } else if ($email.length && $email.prop('required') && !$.trim($email.val())) {
                     $email.focus();
-                } else if($captcha.length && $captcha.prop('required') && !$.trim($captcha.val())) {
+                } else if ($captcha.length && $captcha.prop('required') && !$.trim($captcha.val())) {
                     $captcha.focus();
                 } else {
-                    if($captcha.length) {
+                    if ($captcha.length) {
                         captcha = $captcha.val();
                     }
                     $submit.addClass('disabled');
@@ -312,11 +312,11 @@ jQuery(document).ready(function($) {
                             captcha: captcha,
                             register: register
                         },
-                        success: function(response){
+                        success: function (response) {
                             $element.find('.img-loading').hide();
                             $captcha.next().next().trigger('click');
                             $messages.html(response.message);
-                            if(response.success) {
+                            if (response.success) {
 
                             } else {
                                 $submit.removeClass('disabled');
@@ -328,9 +328,9 @@ jQuery(document).ready(function($) {
         }
     })();
 
-    (function() {
-        if($body.hasClass('hocwp-shop-site')) {
-            $body.on('click', '.number-up, .number-down', function(e) {
+    (function () {
+        if ($body.hasClass('hocwp-shop-site')) {
+            $body.on('click', '.number-up, .number-down', function (e) {
                 e.preventDefault();
                 var $element = $(this),
                     $container = $element.parent(),
@@ -338,14 +338,14 @@ jQuery(document).ready(function($) {
                     value = $input_number.val(),
                     max = parseInt($input_number.attr('max')),
                     min = parseInt($input_number.attr('min'));
-                if($element.hasClass('number-up')) {
+                if ($element.hasClass('number-up')) {
                     value++;
                 } else {
                     value--;
                 }
-                if($.isNumeric(min) && value < min) {
+                if ($.isNumeric(min) && value < min) {
                     value = min;
-                } else if($.isNumeric(max) && value > max) {
+                } else if ($.isNumeric(max) && value > max) {
                     value = max;
                 }
                 $input_number.val(value);
@@ -353,10 +353,10 @@ jQuery(document).ready(function($) {
         }
     })();
 
-    (function() {
-        $('.hocwp').on('click', '.save-post, .favorite-post, .interest-post, .love-post, .btn-user-save-post', function(e) {
+    (function () {
+        $('.hocwp').on('click', '.save-post, .favorite-post, .interest-post, .love-post, .btn-user-save-post', function (e) {
             e.preventDefault();
-            if($body.hasClass('hocwp-user')) {
+            if ($body.hasClass('hocwp-user')) {
                 var $element = $(this),
                     post_id = $element.attr('data-post-id'),
                     action = $element.attr('data-action'),
@@ -372,20 +372,20 @@ jQuery(document).ready(function($) {
                         type: type,
                         data_action: action
                     },
-                    success: function(response){
-                        if(response.success) {
-                            if($.trim(response.html_data)) {
+                    success: function (response) {
+                        if (response.success) {
+                            if ($.trim(response.html_data)) {
                                 $element.html(response.html_data);
                             }
-                            if('do' == action) {
+                            if ('do' == action) {
                                 action = 'undo';
                             } else {
                                 action = 'do';
                             }
-                            if('undo' != action) {
+                            if ('undo' != action) {
                                 $element.removeClass('disabled');
                             }
-                            if(response.remove) {
+                            if (response.remove) {
                                 $body.trigger('hocwp_remove_favorite_post', $element);
                             }
                             $element.attr('data-action', action);
@@ -396,5 +396,14 @@ jQuery(document).ready(function($) {
                 window.location.href = hocwp.login_url;
             }
         });
+    })();
+
+    (function () {
+        var body_lazy_original = $body.attr('data-original');
+        if (typeof body_lazy_original != 'undefined' && $.trim(body_lazy_original)) {
+            $body.lazyload({
+                effect: 'fadeIn'
+            });
+        }
     })();
 });

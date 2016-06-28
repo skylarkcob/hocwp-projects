@@ -95,13 +95,13 @@ function hocwp_get_post_thumbnail_url($post_id = '', $size = 'full') {
         if(hocwp_object_valid($post)) {
             $result = hocwp_get_first_image_source($post->post_content);
         }
-        if(empty($result)) {
-            $thumbnail = hocwp_option_get_value('writing', 'default_post_thumbnail');
-            $thumbnail = hocwp_sanitize_media_value($thumbnail);
-            $result = $thumbnail['url'];
-        }
     }
     $result = apply_filters('hocwp_post_pre_post_thumbnail', $result, $post_id);
+    if(empty($result)) {
+        $thumbnail = hocwp_option_get_value('writing', 'default_post_thumbnail');
+        $thumbnail = hocwp_sanitize_media_value($thumbnail);
+        $result = $thumbnail['url'];
+    }
     if(empty($result)) {
         $no_thumbnail = HOCWP_URL . '/images/no-thumbnail.png';
         $no_thumbnail = apply_filters('hocwp_no_thumbnail_url', $no_thumbnail);

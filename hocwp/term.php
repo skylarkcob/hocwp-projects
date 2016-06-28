@@ -107,7 +107,11 @@ function hocwp_term_link_li_html($term) {
 }
 
 function hocwp_term_get_thumbnail_url($args = array()) {
-    $term_id = hocwp_get_value_by_key($args, 'term_id');
+    if(hocwp_id_number_valid($args)) {
+        $term_id = $args;
+    } else {
+        $term_id = hocwp_get_value_by_key($args, 'term_id');
+    }
     if(!hocwp_id_number_valid($term_id)) {
         $term = hocwp_get_value_by_key($args, 'term');
         if(is_a($term, 'WP_Term')) {
