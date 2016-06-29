@@ -41,6 +41,30 @@ function hocwp_debug_log( $message ) {
 	}
 }
 
+function hocwp_create_database_table( $table_name, $sql_column ) {
+	if ( false !== strpos( $sql_column, 'CREATE TABLE' ) || false !== strpos( $sql_column, 'create table' ) ) {
+		_doing_it_wrong( __FUNCTION__, __( 'The <strong>$sql_column</strong> argument just only contains MySQL query inside (), it isn\'t full MySQL query.', 'hocwp' ), HOCWP_VERSION );
+
+		return;
+	}
+	global $wpdb;
+	if ( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) != $table_name ) {
+		$charset_collate = '';
+		if ( ! empty( $wpdb->charset ) ) {
+			$charset_collate = "DEFAULT CHARACTER SET $wpdb->charset";
+		}
+		if ( ! empty( $wpdb->collate ) ) {
+			$charset_collate .= " COLLATE $wpdb->collate";
+		}
+		$sql = "CREATE TABLE $table_name ( $sql_column ) $charset_collate;\n";
+
+		if ( ! function_exists( 'dbDelta' ) ) {
+			require( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		}
+		dbDelta( $sql );
+	}
+}
+
 function hocwp_create_file( $path, $content = '' ) {
 	if ( $fh = fopen( $path, 'w' ) ) {
 		fwrite( $fh, $content, 1024 );
@@ -90,7 +114,7 @@ function hocwp_get_my_shortcodes() {
 
 function hocwp_get_timezone_string() {
 	$timezone_string = get_option( 'timezone_string' );
-	if ( empty( $timezone_string ) ) {
+	if ( empty( $timezone_string ) && 'vi' == hocwp_get_language() ) {
 		$timezone_string = 'Asia/Ho_Chi_Minh';
 	}
 
@@ -98,7 +122,10 @@ function hocwp_get_timezone_string() {
 }
 
 function hocwp_get_current_date( $format = 'Y-m-d' ) {
-	date_default_timezone_set( hocwp_get_timezone_string() );
+	$timezone = hocwp_get_timezone_string();
+	if ( ! empty( $timezone ) ) {
+		date_default_timezone_set( $timezone );
+	}
 	$result = date( $format );
 
 	return $result;
@@ -347,6 +374,24 @@ function hocwp_get_term_drop_down( $args = array() ) {
 	return $select;
 }
 
+function hocwp_in_array( $needle, $haystack ) {
+	if ( ! is_array( $haystack ) || is_array( $needle ) ) {
+		return false;
+	}
+	if ( in_array( $needle, $haystack ) ) {
+		return true;
+	}
+	foreach ( $haystack as $element ) {
+		if ( is_array( $element ) && hocwp_in_array( $needle, $element ) ) {
+			return true;
+		} elseif ( $element == $needle ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 function hocwp_is_login_page() {
 	return in_array( $GLOBALS['pagenow'], array( 'wp-login.php', 'wp-register.php' ) );
 }
@@ -435,6 +480,20 @@ function hocwp_can_redirect() {
 	}
 
 	return false;
+}
+
+function hocwp_get_href( $link ) {
+	if ( hocwp_string_contain( $link, '</a>' ) ) {
+		$a = new SimpleXMLElement( $link );
+		if ( isset( $a['href'] ) ) {
+			$href = (array) $a['href'];
+			$href = array_shift( $href );
+
+			return $href;
+		}
+	}
+
+	return '';
 }
 
 function hocwp_carousel_bootstrap( $args = array() ) {
@@ -1427,6 +1486,7 @@ function hocwp_url_exists( $url ) {
 }
 
 function hocwp_get_all_image_from_string( $data, $output = 'img' ) {
+	$output = trim( $output );
 	preg_match_all( '/<img[^>]+>/i', $data, $matches );
 	$matches = isset( $matches[0] ) ? $matches[0] : array();
 	if ( ! hocwp_array_has_value( $matches ) && ! empty( $data ) ) {
@@ -1436,7 +1496,7 @@ function hocwp_get_all_image_from_string( $data, $output = 'img' ) {
 				foreach ( $sources as $src ) {
 					if ( hocwp_is_image( $src ) ) {
 						if ( 'img' == $output ) {
-							$matches[] = '<img src="' . $src . '">';
+							$matches[] = '<img src="' . $src . '" alt="">';
 						} else {
 							$matches[] = $src;
 						}
@@ -1445,6 +1505,13 @@ function hocwp_get_all_image_from_string( $data, $output = 'img' ) {
 
 			}
 		}
+	} elseif ( 'img' != $output && hocwp_array_has_value( $matches ) ) {
+		$tmp = array();
+		foreach ( $matches as $img ) {
+			$src   = hocwp_get_first_image_source( $img );
+			$tmp[] = $src;
+		}
+		$matches = $tmp;
 	}
 
 	return $matches;
@@ -2536,7 +2603,8 @@ function hocwp_is_image( $url, $id = 0 ) {
 		$img_formats = array( 'png', 'jpg', 'jpeg', 'gif', 'tiff', 'bmp', 'ico' );
 		$path_info   = pathinfo( $url );
 		$extension   = isset( $path_info['extension'] ) ? $path_info['extension'] : '';
-		if ( in_array( strtolower( $extension ), $img_formats ) ) {
+		$extension   = trim( strtolower( $extension ) );
+		if ( in_array( $extension, $img_formats ) ) {
 			$result = true;
 		}
 	}
@@ -2698,6 +2766,14 @@ function hocwp_search_form( $args = array() ) {
 	}
 
 	return $form;
+}
+
+function hocwp_is_rss_feed_url( $url ) {
+	if ( false !== strpos( $url, '/feed' ) || false !== strpos( $url, '.rss' ) ) {
+		return true;
+	}
+
+	return false;
 }
 
 function hocwp_feedburner_form( $args = array() ) {

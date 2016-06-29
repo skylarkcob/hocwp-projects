@@ -51,7 +51,7 @@ body.hocwp {
 
 .hocwp div blockquote::after,
 .hocwp div blockquote::before {
-    font-family: "Open Sans",Arial,sans-serif;
+    font-family: "Open Sans", Arial, sans-serif;
 }
 
 .hocwp div blockquote {
@@ -67,13 +67,24 @@ body.hocwp {
 }
 
 .hocwp div blockquote {
-    font-family: "Open Sans",Arial,sans-serif;
+    font-family: "Open Sans", Arial, sans-serif;
 }
 
-.hocwp input:focus::-webkit-input-placeholder { color:transparent; }
-.hocwp input:focus:-moz-placeholder { color:transparent; }
-.hocwp input:focus::-moz-placeholder { color:transparent; }
-.hocwp input:focus:-ms-input-placeholder { color:transparent; }
+.hocwp input:focus::-webkit-input-placeholder {
+    color: transparent;
+}
+
+.hocwp input:focus:-moz-placeholder {
+    color: transparent;
+}
+
+.hocwp input:focus::-moz-placeholder {
+    color: transparent;
+}
+
+.hocwp input:focus:-ms-input-placeholder {
+    color: transparent;
+}
 
 .hocwp .hocwp-go-top {
     background-color: #e5e5e5;
@@ -971,6 +982,120 @@ body.hocwp {
     text-transform: uppercase;
 }
 
+.page-template-login form p.login-password label,
+.page-template-login form p.login-username label {
+    width: 150px;
+}
+
+.page-template-login form p.login-remember,
+.page-template-login form p.login-submit {
+    margin-left: 158px;
+}
+
+/**
+ * Temperature
+ */
+
+.temperature.temperature-1 {
+    color: #089de8;
+}
+
+.temperature.temperature-2 {
+    color: #1b98d7;
+}
+
+.temperature.temperature-3 {
+    color: #2d92c6;
+}
+
+.temperature.temperature-4 {
+    color: #3a8ebc;
+}
+
+.temperature.temperature-5 {
+    color: #4b88ac;
+}
+
+.temperature.temperature-6 {
+    color: #5c829c;
+}
+
+.temperature.temperature-7 {
+    color: #668094;
+}
+
+.temperature.temperature-8 {
+    color: #727c8a;
+}
+
+.temperature.temperature-9 {
+    color: #817c80;
+}
+
+.temperature.temperature-10 {
+    color: #92726d;
+}
+
+.temperature.temperature-11 {
+    color: #b06852;
+}
+
+.temperature.temperature-12 {
+    color: #c7613e;
+}
+
+.temperature.temperature-13 {
+    color: #d55d32;
+}
+
+.temperature.temperature-14 {
+    color: #e25825;
+}
+
+.temperature.temperature-15 {
+    color: #ec561c;
+}
+
+.temperature.temperature-16 {
+    color: #f65214;
+}
+
+.temperature.temperature-17 {
+    color: #fe520e;
+}
+
+.temperature.temperature-18 {
+    color: #fb501c;
+}
+
+.temperature.temperature-19 {
+    color: #f84f2c;
+}
+
+.temperature.temperature-20 {
+    color: #f54b3c;
+}
+
+.temperature.temperature-21 {
+    color: #f44643;
+}
+
+.temperature.temperature-22 {
+    color: #f53c3f;
+}
+
+.temperature.temperature-23 {
+    color: #f8272c;
+}
+
+.temperature.temperature-24 {
+    color: #fb1416;
+}
+
+.temperature.temperature-25 {
+    color: #ff0000;
+}
+
 /**
  * Widgets
  */
@@ -1036,15 +1161,32 @@ body.hocwp {
     padding-top: 0;
 }
 
-.hocwp #wp-calendar caption { margin-top: 10px; margin-bottom: 15px; }
+.hocwp #wp-calendar caption {
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
 .hocwp #wp-calendar thead th {
     padding-bottom: 10px;
 }
 
-.hocwp #wp-calendar tbody td { border: 1px solid transparent; padding: 8px;}
-.hocwp #wp-calendar tbody .pad { background: none; }
-.hocwp #wp-calendar tfoot #next { text-transform: uppercase; }
-.hocwp #wp-calendar tfoot #prev { text-transform: uppercase; padding-top: 10px; }
+.hocwp #wp-calendar tbody td {
+    border: 1px solid transparent;
+    padding: 8px;
+}
+
+.hocwp #wp-calendar tbody .pad {
+    background: none;
+}
+
+.hocwp #wp-calendar tfoot #next {
+    text-transform: uppercase;
+}
+
+.hocwp #wp-calendar tfoot #prev {
+    text-transform: uppercase;
+    padding-top: 10px;
+}
 
 .hocwp #wp-calendar tbody td:first-child {
     border-left: medium none;
@@ -1231,7 +1373,7 @@ body.hocwp {
 .hocwp .hocwp-widget-post .post-slider .list-posts li:first-child,
 .hocwp .hocwp-widget-post .post-slider .list-posts li:last-child,
 .hocwp .hocwp-widget-post .post-slider .list-posts li {
-    
+
 }
 
 .hocwp .hocwp-widget-post .post-slider .entry-title {
@@ -1852,7 +1994,6 @@ body.hocwp {
     transition: none 0s ease 0s;
 }
 
-
 .hocwp form button.btn-social-login [class*="flicon"] {
     fill: #f7f7f7;
 }
@@ -2400,7 +2541,7 @@ body.hocwp {
     color: #fff;
     cursor: pointer;
     display: block;
-    font-family: arial,"Helvetica Neue",sans-serif;
+    font-family: arial, "Helvetica Neue", sans-serif;
     font-size: 16px;
     font-weight: 700;
     padding: 15px 50px;
@@ -2573,7 +2714,6 @@ body.hocwp {
 .woocommerce-cart form .shop_table.cart .actions .coupon .input-text {
     min-width: 100px;
 }
-
 
 .hocwp .checkout_coupon .form-row .input-text,
 .woocommerce-cart form .shop_table.cart .actions .coupon .input-text,
@@ -3118,7 +3258,6 @@ body.hocwp {
         margin-bottom: 10px;
     }
 }
-
 
 @media screen and (max-width: 1024px) {
     .hocwp .site {

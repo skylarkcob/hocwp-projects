@@ -153,6 +153,7 @@ function hocwp_query_related_post($args = array()) {
     if($post_id < 1) {
         return new WP_Query();
     }
+    $keep_current = (bool)hocwp_get_value_by_key($args, 'keep_current');
     $posts_per_page = hocwp_get_value_by_key($args, 'posts_per_page', hocwp_get_posts_per_page());
     $transient_name = 'hocwp_post_' . $post_id . '_related_query_' . $posts_per_page;
     $cache = isset($args['cache']) ? $args['cache'] : true;
@@ -174,7 +175,9 @@ function hocwp_query_related_post($args = array()) {
                 $defaults = hocwp_query_sanitize_tax_query($tax_item, $defaults);
             }
         }
-        $defaults['post__not_in'] = array($post_id);
+        if(!$keep_current) {
+            $defaults['post__not_in'] = array($post_id);
+        }
         $defaults['tax_query']['relation'] = 'OR';
         $args = wp_parse_args($args, $defaults);
         $query = hocwp_query($args);
@@ -197,7 +200,9 @@ function hocwp_query_related_post($args = array()) {
                     $defaults = hocwp_query_sanitize_tax_query($tax_item, $defaults);
                 }
             }
-            $defaults['post__not_in'] = array($post_id);
+            if(!$keep_current) {
+                $defaults['post__not_in'] = array($post_id);
+            }
             $defaults['tax_query']['relation'] = 'OR';
             $defaults['posts_per_page'] = $missing;
             unset($args['tax_query']);
@@ -219,7 +224,7 @@ function hocwp_query_related_post($args = array()) {
         if(!$query->have_posts()) {
             $cache_days = 1;
         }
-        if($cache) {
+        if($cache && $query->have_posts()) {
             set_transient($transient_name, $query, $cache_days * DAY_IN_SECONDS);
         }
     }

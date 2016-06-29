@@ -406,4 +406,27 @@ jQuery(document).ready(function ($) {
             });
         }
     })();
+
+    (function () {
+        $('.temperature-up, .temperature-down').on('click', function (e) {
+            e.preventDefault();
+            var $element = $(this),
+                post_id = parseInt($element.attr('data-id')),
+                type = $element.attr('data-action');
+            $element.addClass('disabled');
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: hocwp.ajax_url,
+                data: {
+                    action: 'hocwp_update_post_temperature',
+                    post_id: post_id,
+                    type: type
+                },
+                success: function (response) {
+
+                }
+            });
+        });
+    })();
 });
