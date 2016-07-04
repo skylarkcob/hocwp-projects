@@ -120,6 +120,16 @@ body.hocwp {
     list-style: square outside none;
 }
 
+.hocwp.only-content .site-header,
+.hocwp.only-content .site-footer,
+.hocwp.only-content #wpadminbar {
+    display: none !important;
+}
+
+.hocwp.only-content .site-content {
+    margin: 0 !important;
+}
+
 /**
  * Logo
  */
@@ -987,8 +997,8 @@ body.hocwp {
     width: 150px;
 }
 
-.page-template-login form p.login-remember,
-.page-template-login form p.login-submit {
+.page-template-login .simple-login form p.login-remember,
+.page-template-login .simple-login form p.login-submit {
     margin-left: 158px;
 }
 
@@ -1394,6 +1404,57 @@ body.hocwp {
     overflow: hidden;
 }
 
+.hocwp .hocwp-widget-post .post-slider .item .coupon .store-logo {
+    border: 1px dashed #eee;
+    margin-bottom: 10px;
+    padding: 5px;
+}
+
+.hocwp .hocwp-widget-post .post-slider .item .coupon .store-logo img {
+    display: block;
+    margin: 0 auto;
+}
+
+.hocwp .hocwp-widget-post .entry-summary p {
+    line-height: 1.6;
+}
+
+.hocwp .hocwp-widget-post .post-slider .carousel {
+    padding: 0;
+}
+
+.hocwp .hocwp-widget-post .post-slider .carousel + ul {
+    border-top: 1px solid #e4e4e4;
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
+.hocwp .hocwp-widget-post ul .coupon .code-data {
+    float: left;
+    margin-right: 10px;
+    width: 30%;
+}
+
+.hocwp .hocwp-widget-post ul .coupon .code-data .txt {
+    border: 1px dashed #ddd;
+    border-bottom-width: 0;
+    font-size: 20px;
+    font-weight: 700;
+    padding: 5px;
+}
+
+.hocwp .hocwp-widget-post ul .coupon .code-data .type {
+    background-color: #ddd;
+    color: #fafafa;
+    line-height: 17px;
+    padding: 5px;
+}
+
+.hocwp .hocwp-widget-post ul .coupon .entry-title {
+    font-size: 13px;
+    margin-top: 0;
+}
+
 .hocwp .hocwp-widget-term .list-terms .term-item .wp-term-image {
     float: left;
     margin-right: 10px;
@@ -1463,6 +1524,10 @@ body.hocwp {
 
 .sidebar [class^="col-"] {
     width: 100%;
+}
+
+.hocwp .site-footer .widget-area li:not(:last-child) {
+    margin-bottom: 5px;
 }
 
 /**

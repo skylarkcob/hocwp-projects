@@ -124,14 +124,14 @@ class HOCWP_Widget_Post extends WP_Widget {
 				$post_types[] = $ptvalue;
 			}
 		}
-		$number                     = isset( $instance['number'] ) ? $instance['number'] : $this->args['number'];
-		$by                         = isset( $instance['by'] ) ? $instance['by'] : $this->args['by'];
-		$category                   = isset( $instance['category'] ) ? $instance['category'] : json_encode( $this->args['category'] );
-		$category                   = hocwp_json_string_to_array( $category );
-		$excerpt_length             = isset( $instance['excerpt_length'] ) ? $instance['excerpt_length'] : $this->args['excerpt_length'];
-		$thumbnail_size             = isset( $instance['thumbnail_size'] ) ? $instance['thumbnail_size'] : $this->args['thumbnail_size'];
-		$thumbnail_size             = hocwp_sanitize_size( $thumbnail_size );
-		$full_width_post            = hocwp_get_value_by_key( $instance, 'full_width_post', $this->args['full_width_post'] );
+		$number         = isset( $instance['number'] ) ? $instance['number'] : $this->args['number'];
+		$by             = isset( $instance['by'] ) ? $instance['by'] : $this->args['by'];
+		$category       = isset( $instance['category'] ) ? $instance['category'] : json_encode( $this->args['category'] );
+		$category       = hocwp_json_string_to_array( $category );
+		$excerpt_length = isset( $instance['excerpt_length'] ) ? $instance['excerpt_length'] : $this->args['excerpt_length'];
+		//$thumbnail_size             = isset( $instance['thumbnail_size'] ) ? $instance['thumbnail_size'] : $this->args['thumbnail_size'];
+		//$thumbnail_size             = hocwp_sanitize_size( $thumbnail_size );
+		//$full_width_post            = hocwp_get_value_by_key( $instance, 'full_width_post', $this->args['full_width_post'] );
 		$content_class              = 'widget-content';
 		$slider                     = hocwp_get_value_by_key( $instance, 'slider', hocwp_get_value_by_key( $this->args, 'slider' ) );
 		$title_length               = hocwp_get_value_by_key( $instance, 'title_length', hocwp_get_value_by_key( $this->args, 'title_length' ) );
@@ -162,8 +162,6 @@ class HOCWP_Widget_Post extends WP_Widget {
 				         . hocwp_get_value_by_key( $args, 'after_title' );
 			}
 		}
-		$widget_html = hocwp_get_value_by_key( $args, 'before_widget' ) . $title;
-		$widget_html .= '<div class="' . $content_class . '">';
 		$query_args = array(
 			'posts_per_page' => $number,
 			'post_type'      => $post_types
@@ -236,196 +234,222 @@ class HOCWP_Widget_Post extends WP_Widget {
 				$w_query = hocwp_query( $query_args );
 			}
 		}
-		if ( $w_query->have_posts() ) {
-			$list_class = 'list-unstyled';
-			foreach ( $post_types as $ptvalue ) {
-				hocwp_add_string_with_space_before( $list_class, 'list-' . $ptvalue . 's' );
-			}
-			$list_class = apply_filters( 'hocwp_widget_post_list_class', $list_class, $args, $instance, $this );
-
-			if ( (bool) $slider ) {
-				$four_posts     = array_slice( $w_query->posts, 0, 4 );
-				$next_posts     = array_slice( $w_query->posts, 4, absint( $w_query->post_count - 4 ) );
-				$widget_content = apply_filters( 'hocwp_widget_post_slider_html', '', $args, $instance, $this );
-				if ( empty( $widget_content ) ) {
-					$carousel_id = $this->id;
-					$carousel_id = hocwp_sanitize_id( $carousel_id );
-					$count       = 0;
-					ob_start();
-					?>
-					<div id="<?php echo $carousel_id; ?>" class="carousel slide" data-ride="carousel">
-						<div class="carousel-inner" role="listbox">
-							<?php
-							foreach ( $four_posts as $post ) {
-								setup_postdata( $post );
-								$class = 'item';
-								if ( 0 == $count ) {
-									hocwp_add_string_with_space_before( $class, 'active' );
-								}
-								?>
-								<div class="<?php echo $class; ?>">
-									<?php
-									hocwp_article_before();
-									do_action( 'hocwp_widget_post_before_post', $args, $instance, $this );
-									if ( ! (bool) $hide_thumbnail ) {
-										hocwp_post_thumbnail( array( 'width' => 300, 'height' => 200 ) );
-									}
-									do_action( 'hocwp_widget_post_before_post_title', $args, $instance, $this );
-									hocwp_post_title_link( array( 'title' => hocwp_substr( get_the_title(), $title_length ) ) );
-									do_action( 'hocwp_widget_post_after_post_title', $args, $instance, $this );
-									hocwp_entry_summary();
-									do_action( 'hocwp_widget_post_after_post', $args, $instance, $this );
-									hocwp_article_after();
-									?>
-								</div>
-								<?php
-								$count ++;
-							}
-							wp_reset_postdata();
-							?>
-						</div>
-						<ol class="carousel-indicators list-inline list-unstyled">
-							<?php
-							$count = count( $four_posts );
-							for ( $i = 0; $i < $count; $i ++ ) {
-								$indicator_class = 'indicator-item';
-								if ( 0 == $i ) {
-									hocwp_add_string_with_space_before( $indicator_class, 'active' );
-								}
-								?>
-								<li data-target="#<?php echo $carousel_id; ?>" data-slide-to="<?php echo $i; ?>"
-								    class="<?php echo $indicator_class; ?>">
-									<span><?php echo( $i + 1 ); ?></span>
-								</li>
-								<?php
-							}
-							?>
-						</ol>
-						<a class="left carousel-control" href="#<?php echo $carousel_id; ?>" role="button"
-						   data-slide="prev">
-							<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-							<span class="sr-only">Previous</span>
-						</a>
-						<a class="right carousel-control" href="#<?php echo $carousel_id; ?>" role="button"
-						   data-slide="next">
-							<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-							<span class="sr-only">Next</span>
-						</a>
-					</div>
-					<?php
-					$widget_content = ob_get_clean();
-					if ( hocwp_array_has_value( $next_posts ) ) {
+		$widget_html = hocwp_get_value_by_key( $args, 'before_widget' ) . $title;
+		$widget_html .= '<div class="' . $content_class . '">';
+		$widget_post_pre_html = apply_filters( 'hocwp_widget_post_pre_html', '', $args, $instance, $this );
+		if ( ! empty( $widget_post_pre_html ) ) {
+			$widget_html .= $widget_post_pre_html;
+		} else {
+			if ( $w_query->have_posts() ) {
+				$widget_html .= apply_filters( 'hocwp_widget_post_before_loop', '', $args, $instance, $this );
+				if ( (bool) $slider ) {
+					$four_posts     = array_slice( $w_query->posts, 0, 4 );
+					$next_posts     = array_slice( $w_query->posts, 4, absint( $w_query->post_count - 4 ) );
+					$widget_content = apply_filters( 'hocwp_widget_post_pre_slider_html', '', $args, $instance, $this );
+					if ( empty( $widget_content ) ) {
+						$carousel_id = $this->id;
+						$carousel_id = hocwp_sanitize_id( $carousel_id );
+						$count       = 0;
+						ob_start();
 						?>
-						<div class="more-posts">
-							<?php
-							$widget_content .= '<ul class="' . $list_class . '">';
-							$loop_html = apply_filters( 'hocwp_widget_post_loop_html', '', $args, $instance, $this );
-							if ( empty( $loop_html ) ) {
-								$count = 0;
-								ob_start();
-								foreach ( $next_posts as $post ) {
+						<div id="<?php echo $carousel_id; ?>" class="carousel slide" data-ride="carousel">
+							<div class="carousel-inner" role="listbox">
+								<?php
+								foreach ( $four_posts as $post ) {
 									setup_postdata( $post );
-									$class      = 'a-widget-post';
-									$full_width = hocwp_widget_item_full_width_result( $full_width_post, $w_query->post_count, $count );
-									if ( $full_width ) {
-										hocwp_add_string_with_space_before( $class, 'full-width' );
+									$class = 'item';
+									if ( 0 == $count ) {
+										hocwp_add_string_with_space_before( $class, 'active' );
 									}
 									?>
-									<li <?php post_class( $class ); ?>>
+									<div class="<?php echo $class; ?>">
 										<?php
-										do_action( 'hocwp_widget_post_before_post', $args, $instance, $this );
+										hocwp_article_before();
+										do_action( 'hocwp_widget_post_slider_before_post', $args, $instance, $this );
 										if ( ! (bool) $hide_thumbnail ) {
-											hocwp_post_thumbnail( array(
-												'width'  => $thumbnail_size[0],
-												'height' => $thumbnail_size[1]
-											) );
+											if ( 'coupon' == $post->post_type ) {
+												$store = hocwp_get_coupon_store( $post->ID );
+												echo '<div class="text-center store-logo">';
+												hocwp_term_the_thumbnail(
+													array(
+														'term'   => $store,
+														'width'  => 180,
+														'height' => 110
+													)
+												);
+												echo '</div>';
+											} else {
+												hocwp_post_thumbnail( array( 'width' => 300, 'height' => 200 ) );
+											}
 										}
-										do_action( 'hocwp_widget_post_before_post_title', $args, $instance, $this );
+										do_action( 'hocwp_widget_post_slider_before_post_title', $args, $instance, $this );
 										hocwp_post_title_link( array( 'title' => hocwp_substr( get_the_title(), $title_length ) ) );
-										do_action( 'hocwp_widget_post_after_post_title', $args, $instance, $this );
-										if ( $excerpt_length > 0 ) {
-											$excerpt = hocwp_substr( get_the_excerpt(), $excerpt_length );
-											echo $excerpt;
-										}
-										do_action( 'hocwp_widget_post_after_post', $args, $instance, $this );
+										do_action( 'hocwp_widget_post_slider_after_post_title', $args, $instance, $this );
+										hocwp_entry_summary( $excerpt_length );
+										do_action( 'hocwp_widget_post_slider_after_post', $args, $instance, $this );
+										hocwp_article_after();
 										?>
-									</li>
+									</div>
 									<?php
 									$count ++;
 								}
 								wp_reset_postdata();
-								$loop_html .= ob_get_clean();
-							}
-							$widget_content .= $loop_html;
-							$widget_content .= '</ul>';
-							?>
+								?>
+							</div>
+							<ol class="carousel-indicators list-inline list-unstyled">
+								<?php
+								$count = count( $four_posts );
+								for ( $i = 0; $i < $count; $i ++ ) {
+									$indicator_class = 'indicator-item';
+									if ( 0 == $i ) {
+										hocwp_add_string_with_space_before( $indicator_class, 'active' );
+									}
+									?>
+									<li data-target="#<?php echo $carousel_id; ?>" data-slide-to="<?php echo $i; ?>"
+									    class="<?php echo $indicator_class; ?>">
+										<span><?php echo( $i + 1 ); ?></span>
+									</li>
+									<?php
+								}
+								?>
+							</ol>
+							<a class="left carousel-control" href="#<?php echo $carousel_id; ?>" role="button"
+							   data-slide="prev">
+								<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+								<span class="sr-only"><?php hocwp_translate_text( 'Previous', true ); ?></span>
+							</a>
+							<a class="right carousel-control" href="#<?php echo $carousel_id; ?>" role="button"
+							   data-slide="next">
+								<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+								<span class="sr-only"><?php hocwp_translate_text( 'Next', true ); ?></span>
+							</a>
 						</div>
 						<?php
-					}
-				}
-				$widget_html .= $widget_content;
-			} else {
-				$widget_html .= '<ul class="' . $list_class . '">';
-				$loop_html = apply_filters( 'hocwp_widget_post_loop_html', '', $args, $instance, $this );
-				if ( empty( $loop_html ) ) {
-					$count = 0;
-					ob_start();
-					while ( $w_query->have_posts() ) {
-						$w_query->the_post();
-						$class      = 'a-widget-post';
-						$full_width = false;
-						if ( 'all' == $full_width_post ) {
-							$full_width = true;
-						} elseif ( 'first' == $full_width_post && 0 == $count ) {
-							$full_width = true;
-						} elseif ( 'last' == $full_width_post && $count == $w_query->post_count ) {
-							$full_width = true;
-						} elseif ( 'first_last' == $full_width_post && ( 0 == $count || $count == $w_query->post_count ) ) {
-							$full_width = true;
-						} elseif ( 'odd' == $full_width_post && ( $count % 2 ) != 0 ) {
-							$full_width = true;
-						} elseif ( 'even' == $full_width_post && ( $count % 2 ) == 0 ) {
-							$full_width = true;
-						}
-						if ( $full_width ) {
-							hocwp_add_string_with_space_before( $class, 'full-width' );
-						}
-						if ( $hide_thumbnail ) {
-							hocwp_add_string_with_space_before( $class, 'hide-thumbnail' );
-						}
-						?>
-						<li <?php post_class( $class ); ?>>
-							<?php
-							do_action( 'hocwp_widget_post_before_post', $args, $instance, $this );
-							if ( ! (bool) $hide_thumbnail ) {
-								hocwp_post_thumbnail( array(
-									'width'  => $thumbnail_size[0],
-									'height' => $thumbnail_size[1]
-								) );
-							}
-							do_action( 'hocwp_widget_post_before_post_title', $args, $instance, $this );
-							hocwp_post_title_link( array( 'title' => hocwp_substr( get_the_title(), $title_length ) ) );
-							do_action( 'hocwp_widget_post_after_post_title', $args, $instance, $this );
-							do_action( 'hocwp_widget_post_after_post', $args, $instance, $this );
+						$widget_content = ob_get_clean();
+						if ( hocwp_array_has_value( $next_posts ) ) {
+							$w_query->posts      = $next_posts;
+							$w_query->post_count = count( $next_posts );
 							?>
-						</li>
-						<?php
-						$count ++;
+							<div class="more-posts">
+								<?php $widget_content .= $this->list_post_html( $args, $instance, $w_query ); ?>
+							</div>
+							<?php
+						}
 					}
-					wp_reset_postdata();
-					$loop_html .= ob_get_clean();
+					$widget_content = apply_filters( 'hocwp_widget_post_slider_html', $widget_content, $args, $instance, $this );
+					$widget_html .= $widget_content;
+				} else {
+					$widget_html .= $this->list_post_html( $args, $instance, $w_query );
 				}
-				$widget_html .= $loop_html;
-				$widget_html .= '</ul>';
 				$widget_html .= apply_filters( 'hocwp_widget_post_after_loop', '', $args, $instance, $this );
+			} else {
+				$widget_html .= '<p class="nothing-found">' . hocwp_translate_text( 'Nothing found!' ) . '</p>';
 			}
-		} else {
-			$widget_html .= '<p class="nothing-found">' . __( 'Nothing found!', 'hocwp' ) . '</p>';
 		}
 		$widget_html = apply_filters( 'hocwp_widget_post_html', $widget_html, $args, $instance, $this );
 		$widget_html .= '</div>';
 		$widget_html .= hocwp_get_value_by_key( $args, 'after_widget' );
 		echo $widget_html;
+	}
+
+	public function list_post_html( $args, $instance, $query ) {
+		$post_type  = $this->get_post_type_from_instance( $instance );
+		$post_types = array();
+		foreach ( $post_type as $fvdata ) {
+			$ptvalue = isset( $fvdata['value'] ) ? $fvdata['value'] : '';
+			if ( ! empty( $ptvalue ) ) {
+				$post_types[] = $ptvalue;
+			}
+		}
+		$full_width_post = hocwp_get_value_by_key( $instance, 'full_width_post', $this->args['full_width_post'] );
+		$hide_thumbnail  = hocwp_get_value_by_key( $instance, 'hide_thumbnail', hocwp_get_value_by_key( $this->args, 'hide_thumbnail' ) );
+		$thumbnail_size  = isset( $instance['thumbnail_size'] ) ? $instance['thumbnail_size'] : $this->args['thumbnail_size'];
+		$thumbnail_size  = hocwp_sanitize_size( $thumbnail_size );
+		$title_length    = hocwp_get_value_by_key( $instance, 'title_length', hocwp_get_value_by_key( $this->args, 'title_length' ) );
+		$list_class      = 'list-unstyled';
+		foreach ( $post_types as $ptvalue ) {
+			hocwp_add_string_with_space_before( $list_class, 'list-' . $ptvalue . 's' );
+		}
+		$list_class  = apply_filters( 'hocwp_widget_post_list_class', $list_class, $args, $instance, $this );
+		$widget_html = '<ul class="' . $list_class . '">';
+		$loop_html   = apply_filters( 'hocwp_widget_post_loop_html', '', $args, $instance, $this );
+		if ( empty( $loop_html ) ) {
+			$count = 0;
+			ob_start();
+			while ( $query->have_posts() ) {
+				$query->the_post();
+				$post_id    = get_the_ID();
+				$post       = get_post( $post_id );
+				$class      = 'a-widget-post';
+				$full_width = false;
+				if ( 'all' == $full_width_post ) {
+					$full_width = true;
+				} elseif ( 'first' == $full_width_post && 0 == $count ) {
+					$full_width = true;
+				} elseif ( 'last' == $full_width_post && $count == $query->post_count ) {
+					$full_width = true;
+				} elseif ( 'first_last' == $full_width_post && ( 0 == $count || $count == $query->post_count ) ) {
+					$full_width = true;
+				} elseif ( 'odd' == $full_width_post && ( $count % 2 ) != 0 ) {
+					$full_width = true;
+				} elseif ( 'even' == $full_width_post && ( $count % 2 ) == 0 ) {
+					$full_width = true;
+				}
+				if ( $full_width ) {
+					hocwp_add_string_with_space_before( $class, 'full-width' );
+				}
+				if ( $hide_thumbnail ) {
+					hocwp_add_string_with_space_before( $class, 'hide-thumbnail' );
+				}
+				?>
+				<li <?php post_class( $class ); ?>>
+					<?php
+					do_action( 'hocwp_widget_post_before_post', $args, $instance, $this );
+					if ( ! (bool) $hide_thumbnail ) {
+						if ( 'coupon' == $post->post_type ) {
+							echo '<div class="text-center code-data">';
+							$percent = hocwp_get_coupon_percent_label($post_id);
+							$text = hocwp_get_coupon_text_label($post_id);
+							$type_text = 'Website Coupons';
+							$type_term = hocwp_get_coupon_type_term($post_id);
+							if(is_a($type_term, 'WP_Term')) {
+								$type_text = $type_term->name;
+							}
+							$tmp = hocwp_get_coupon_type($post_id);
+							if(is_array($tmp)) {
+								$tmp = array_shift($tmp);
+								if(!empty($tmp)) {
+									$type_text = $tmp;
+								}
+							}
+							?>
+							<div class="txt"><?php echo $percent . ' ' . $text; ?></div>
+							<div class="type"><?php echo $type_text; ?></div>
+							<?php
+							echo '</div>';
+						} else {
+							hocwp_post_thumbnail( array(
+								'width'  => $thumbnail_size[0],
+								'height' => $thumbnail_size[1]
+							) );
+						}
+					}
+					do_action( 'hocwp_widget_post_before_post_title', $args, $instance, $this );
+					hocwp_post_title_link( array( 'title' => hocwp_substr( get_the_title(), $title_length ) ) );
+					do_action( 'hocwp_widget_post_after_post_title', $args, $instance, $this );
+					do_action( 'hocwp_widget_post_after_post', $args, $instance, $this );
+					?>
+				</li>
+				<?php
+				$count ++;
+			}
+			wp_reset_postdata();
+			$loop_html .= ob_get_clean();
+		}
+		$widget_html .= $loop_html;
+		$widget_html .= '</ul>';
+
+		return $widget_html;
 	}
 
 	public function form( $instance ) {

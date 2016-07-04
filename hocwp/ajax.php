@@ -98,6 +98,7 @@ function hocwp_vote_post_ajax_callback() {
 			$value ++;
 			if ( 'up' == $type || 'like' == $type ) {
 				update_post_meta( $post_id, 'likes', $value );
+				do_action( 'hocwp_add_trending_post', $post_id, 'like' );
 			} elseif ( 'down' == $type || 'dislike' == $type ) {
 				update_post_meta( $post_id, 'dislikes', $value );
 			}
@@ -165,6 +166,8 @@ function hocwp_favorite_post_ajax_callback() {
 
 add_action( 'wp_ajax_hocwp_favorite_post', 'hocwp_favorite_post_ajax_callback' );
 add_action( 'wp_ajax_nopriv_hocwp_favorite_post', 'hocwp_favorite_post_ajax_callback' );
+add_action( 'wp_ajax_hocwp_save_post', 'hocwp_favorite_post_ajax_callback' );
+add_action( 'wp_ajax_nopriv_hocwp_save_post', 'hocwp_favorite_post_ajax_callback' );
 
 function hocwp_sanitize_media_value_ajax_callback() {
 	$id     = isset( $_POST['id'] ) ? $_POST['id'] : 0;

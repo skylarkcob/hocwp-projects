@@ -24,9 +24,12 @@ function hocwp_insert_trending( $args = array() ) {
 	$post_id = hocwp_get_value_by_key( $args, 'post_id' );
 	if ( hocwp_id_number_valid( $post_id ) ) {
 		global $wpdb;
-		$datetime     = hocwp_get_current_datetime_mysql();
-		$post         = get_post( $post_id );
-		$action       = hocwp_get_value_by_key( $args, 'action', 'view' );
+		$datetime = hocwp_get_current_datetime_mysql();
+		$post     = get_post( $post_id );
+		$action   = hocwp_get_value_by_key( $args, 'action', 'view' );
+		if ( empty( $action ) ) {
+			$action = 'view';
+		}
 		$table_name   = $wpdb->prefix . HOCWP_TRENDING_TABLE;
 		$trending_day = absint( apply_filters( 'hocwp_trending_interval', 7 ) );
 		$sql          = "DELETE FROM $table_name WHERE UNIX_TIMESTAMP(post_date) < UNIX_TIMESTAMP(DATE_SUB('$datetime', INTERVAL $trending_day DAY))";
@@ -148,6 +151,7 @@ function hocwp_update_post_temperature( $type, $post_id = null ) {
 		$step = absint( apply_filters( 'hocwp_temperature_step', rand( 1, $max ) ) );
 		if ( 'up' == $type ) {
 			$temperature += $step;
+			do_action( 'hocwp_add_trending_post', $post_id, 'temperature' );
 		} else {
 			$temperature -= $step;
 		}
@@ -221,6 +225,25 @@ function hocwp_post_thumbnail_large_if_not_default( $result, $post_id ) {
 }
 
 add_filter( 'hocwp_post_thumbnail_pre_from_content', 'hocwp_post_thumbnail_large_if_not_default', 10, 2 );
+
+function hocwp_post_trending_track( $post_id, $action ) {
+	if ( hocwp_id_number_valid( $post_id ) ) {
+		hocwp_insert_trending( array( 'post_id' => $post_id, 'action' => $action ) );
+	}
+}
+
+add_action( 'hocwp_add_trending_post', 'hocwp_post_trending_track', 10, 2 );
+
+function hocwp_post_pre_comment_approved( $approved, $commentdata ) {
+	$post_id = hocwp_get_value_by_key( $commentdata, 'comment_post_ID' );
+	if ( hocwp_id_number_valid( $post_id ) ) {
+		do_action( 'hocwp_add_trending_post', $post_id, 'comment' );
+	}
+
+	return $approved;
+}
+
+add_filter( 'pre_comment_approved', 'hocwp_post_pre_comment_approved', 10, 2 );
 
 function hocwp_post_thumbnail( $args = array() ) {
 	$post_id = isset( $args['post_id'] ) ? $args['post_id'] : '';

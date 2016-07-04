@@ -65,6 +65,12 @@ function hocwp_create_database_table( $table_name, $sql_column ) {
 	}
 }
 
+function hocwp_permutation( &$a, &$b ) {
+	$tmp = $a;
+	$a   = $b;
+	$b   = $tmp;
+}
+
 function hocwp_create_file( $path, $content = '' ) {
 	if ( $fh = fopen( $path, 'w' ) ) {
 		fwrite( $fh, $content, 1024 );
@@ -121,18 +127,119 @@ function hocwp_get_timezone_string() {
 	return $timezone_string;
 }
 
-function hocwp_get_current_date( $format = 'Y-m-d' ) {
+function hocwp_get_current_date( $format = 'Y-m-d', $timestamp = null ) {
 	$timezone = hocwp_get_timezone_string();
 	if ( ! empty( $timezone ) ) {
 		date_default_timezone_set( $timezone );
 	}
-	$result = date( $format );
+	if ( hocwp_id_number_valid( $timestamp ) ) {
+		$result = date( $format, $timestamp );
+	} else {
+		$result = date( $format );
+	}
 
 	return $result;
 }
 
-function hocwp_get_current_datetime_mysql() {
-	return hocwp_get_current_date( 'Y-m-d H:i:s' );
+function hocwp_get_current_datetime_mysql( $timestamp = null ) {
+	return hocwp_get_current_date( 'Y-m-d H:i:s', $timestamp );
+}
+
+function hocwp_seconds_to_time( $seconds ) {
+	if ( is_numeric( $seconds ) ) {
+		$value = array(
+			'years'   => 0,
+			'months'  => 0,
+			'weeks'   => 0,
+			'days'    => 0,
+			'hours'   => 0,
+			'minutes' => 0,
+			'seconds' => 0,
+		);
+		$tmp   = YEAR_IN_SECONDS;
+		if ( $seconds >= $tmp ) {
+			$value['years'] = floor( $seconds / $tmp );
+			$seconds        = ( $seconds % $tmp );
+		}
+		$tmp   = MONTH_IN_SECONDS;
+		if ( $seconds >= $tmp ) {
+			$value['months'] = floor( $seconds / $tmp );
+			$seconds        = ( $seconds % $tmp );
+		}
+		$tmp   = WEEK_IN_SECONDS;
+		if ( $seconds >= $tmp ) {
+			$value['weeks'] = floor( $seconds / $tmp );
+			$seconds        = ( $seconds % $tmp );
+		}
+		$tmp   = DAY_IN_SECONDS;
+		if ( $seconds >= $tmp ) {
+			$value['days'] = floor( $seconds / $tmp );
+			$seconds        = ( $seconds % $tmp );
+		}
+		$tmp   = HOUR_IN_SECONDS;
+		if ( $seconds >= $tmp ) {
+			$value['hours'] = floor( $seconds / $tmp );
+			$seconds        = ( $seconds % $tmp );
+		}
+		$tmp   = MINUTE_IN_SECONDS;
+		if ( $seconds >= $tmp ) {
+			$value['minutes'] = floor( $seconds / $tmp );
+			$seconds        = ( $seconds % $tmp );
+		}
+		$value['seconds'] = floor( $seconds );
+
+		return $value;
+	}
+
+	return false;
+}
+
+function hocwp_seconds_to_time_string( $seconds, $sep = ' ', $echo = false ) {
+	$result = hocwp_seconds_to_time( $seconds );
+	if ( hocwp_array_has_value( $result ) ) {
+		$tmp    = '';
+		$year   = $result['years'];
+		$month  = $result['months'];
+		$week   = $result['weeks'];
+		$day    = $result['days'];
+		$hour   = $result['hours'];
+		$minute = $result['minutes'];
+		$second = $result['seconds'];
+		$start  = false;
+		if ( $year > 0 ) {
+			$start = true;
+			$tmp .= $year . ' ' . _n( hocwp_translate_text( 'year' ), hocwp_translate_text( 'years' ), $year ) . $sep;
+		}
+		if ( $month > 0 || $start ) {
+			$start = true;
+			$tmp .= $month . ' ' . _n( hocwp_translate_text( 'month' ), hocwp_translate_text( 'months' ), $month ) . $sep;
+		}
+		if ( $week > 0 || $start ) {
+			$start = true;
+			$tmp .= $week . ' ' . _n( hocwp_translate_text( 'week' ), hocwp_translate_text( 'weeks' ), $week ) . $sep;
+		}
+		if ( $day > 0 || $start ) {
+			$start = true;
+			$tmp .= $day . ' ' . _n( hocwp_translate_text( 'day' ), hocwp_translate_text( 'days' ), $day ) . $sep;
+		}
+		if ( $hour > 0 || $start ) {
+			$start = true;
+			$tmp .= $hour . ' ' . _n( hocwp_translate_text( 'hour' ), hocwp_translate_text( 'hours' ), $hour ) . $sep;
+		}
+		if ( $minute > 0 || $start ) {
+			$tmp .= $minute . ' ' . _n( hocwp_translate_text( 'minute' ), hocwp_translate_text( 'minutes' ), $minute ) . $sep;
+		}
+		$tmp .= $second . ' ' . _n( hocwp_translate_text( 'second' ), hocwp_translate_text( 'seconds' ), $second );
+		$result = $tmp;
+		$result = apply_filters( 'hocwp_seconds_to_time_string', $result, $seconds );
+		if ( $echo ) {
+			echo $result;
+		}
+
+		return $result;
+	}
+
+	return '';
 }
 
 function hocwp_is_ip( $ip ) {
@@ -331,7 +438,11 @@ function hocwp_object_valid( $object ) {
 }
 
 function hocwp_id_number_valid( $id ) {
-	if ( is_numeric( $id ) && $id > 0 ) {
+	return hocwp_is_positive_number( $id );
+}
+
+function hocwp_is_positive_number( $number ) {
+	if ( is_numeric( $number ) && $number > 0 ) {
 		return true;
 	}
 
@@ -648,7 +759,7 @@ function hocwp_modal_bootstrap( $args = array() ) {
 	<div class="<?php echo $container_class; ?>" id="<?php echo $id; ?>" tabindex="-1" role="dialog"
 	     aria-labelledby="<?php echo $id; ?>" aria-hidden="true">
 		<div class="modal-dialog">
-			<div class="modal-content">
+			<div class="modal-content clearfix">
 				<div class="modal-header text-left">
 					<button type="button" class="close" data-dismiss="modal"><span
 							aria-hidden="true">&times;</span><span class="sr-only"><?php echo $close_text; ?></span>

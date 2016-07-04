@@ -354,12 +354,14 @@ jQuery(document).ready(function ($) {
     })();
 
     (function () {
-        $('.hocwp').on('click', '.save-post, .favorite-post, .interest-post, .love-post, .btn-user-save-post', function (e) {
+        $('.hocwp').on('click', '.save-post, .favorite-post, .interest-post, .love-post, .btn-user-save-post, .btn-save-post', function (e) {
             e.preventDefault();
             if ($body.hasClass('hocwp-user')) {
                 var $element = $(this),
                     post_id = $element.attr('data-post-id'),
                     action = $element.attr('data-action'),
+                    text = $element.text(),
+                    data_text = $element.attr('data-text'),
                     type = $element.attr('data-type');
                 $element.addClass('disabled');
                 $.ajax({
@@ -389,6 +391,10 @@ jQuery(document).ready(function ($) {
                                 $body.trigger('hocwp_remove_favorite_post', $element);
                             }
                             $element.attr('data-action', action);
+                            if ($.trim(data_text)) {
+                                $element.text(data_text);
+                                $element.attr('data-text', text);
+                            }
                         }
                     }
                 });
@@ -427,6 +433,12 @@ jQuery(document).ready(function ($) {
 
                 }
             });
+        });
+    })();
+
+    (function () {
+        $('.hocwp').on('click', 'input.select-all, textarea.select-all', function () {
+            $(this).select();
         });
     })();
 });

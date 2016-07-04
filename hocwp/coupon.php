@@ -283,23 +283,45 @@ function hocwp_get_event_coupons( $event_id, $args = array() ) {
 	return hocwp_query( $args );
 }
 
-function hocwp_get_expired_coupons( $args = array() ) {
-	$timestamp            = current_time( 'timestamp', 0 );
+function hocwp_coupon_build_expired_query_args( $args ) {
+	$timestamp            = strtotime( hocwp_get_current_datetime_mysql() );
 	$args['meta_key']     = 'expired_date';
 	$args['meta_value']   = $timestamp;
 	$args['meta_compare'] = '<';
 	$args['meta_type']    = 'numeric';
 	$meta_item            = array(
-		'key'     => 'expired_date',
-		'value'   => $timestamp,
-		'compare' => '<'
+		'realation' => 'AND',
+		array(
+			'key'     => 'expired_date',
+			'value'   => $timestamp,
+			'compare' => '<',
+			'type'    => 'numeric'
+		),
+		array(
+			'key'     => 'expired_date',
+			'compare' => 'EXISTS'
+		),
+		array(
+			'key'     => 'expired_date',
+			'compare' => '>',
+			'value'   => 0,
+			'type'    => 'numeric'
+		)
 	);
 	if ( isset( $args['meta_query'] ) ) {
 		foreach ( $args['meta_query'] as $i => $meta ) {
 			if ( hocwp_array_has_value( $meta ) ) {
 				foreach ( $meta as $j => $child_meta ) {
-					if ( 'key' == $j && 'expired_date' == $child_meta ) {
-						unset( $args['meta_query'][ $i ] );
+					if ( is_array( $child_meta ) ) {
+						foreach ( $child_meta as $k => $last ) {
+							if ( ! is_array( $last ) && 'key' == $k && 'expired_date' == $last ) {
+								unset( $args['meta_query'][ $i ] );
+							}
+						}
+					} else {
+						if ( 'key' == $j && 'expired_date' == $child_meta ) {
+							unset( $args['meta_query'][ $i ] );
+						}
 					}
 				}
 			}
@@ -313,6 +335,12 @@ function hocwp_get_expired_coupons( $args = array() ) {
 	$args                           = hocwp_query_sanitize_meta_query( $meta_item, $args );
 	$args['meta_query']['relation'] = 'AND';
 	$args['expired_coupon']         = true;
+
+	return $args;
+}
+
+function hocwp_get_expired_coupons( $args = array() ) {
+	$args = hocwp_coupon_build_expired_query_args( $args );
 
 	return hocwp_query( $args );
 }
@@ -414,7 +442,8 @@ function hocwp_coupon_button_code_html( $args = array() ) {
 	<div class="code clearfix">
 		<input class="<?php echo $input_class; ?>" type="text" value="<?php echo $code; ?>" readonly>
 		<a class="<?php echo $button_class; ?>" data-clipboard-text="<?php echo $code; ?>"
-		   data-out-url="<?php echo $out_url; ?>">Copy</a>
+		   data-out-url="<?php echo $out_url; ?>"
+		   data-copied-text="<?php hocwp_translate_text( 'Copied', true ); ?>"><?php hocwp_translate_text( 'Copy', true ); ?></a>
 	</div>
 	<?php
 }
@@ -447,14 +476,19 @@ function hocwp_coupon_vote_comment_html( $args = array() ) {
 	?>
 	<p class="vote-result" data-post-id="<?php the_ID(); ?>">
 		<i class="fa fa-thumbs-o-up"></i>
-		<span><?php printf( __( '%s Success', 'hocwp' ), $result ); ?></span>
+		<span><?php printf( hocwp_translate_text( '%s Success' ), $result ); ?></span>
 	</p>
 	<?php
 	if ( comments_open( $post_id ) || get_comments_number( $post_id ) ) {
+		$class      = 'add-comment';
+		$is_current = hocwp_get_value_by_key( $args, 'is_current' );
+		if ( $is_current ) {
+			hocwp_add_string_with_space_before( $class, 'current-post' );
+		}
 		?>
-		<p class="add-comment">
-			<a href="#add_comment_<?php the_ID(); ?>">
-				<i class="fa fa-comments-o"></i> <?php _e( 'Add a Comment', 'hocwp' ); ?>
+		<p class="<?php echo $class; ?>">
+			<a href="#respond">
+				<i class="fa fa-comments-o"></i> <?php hocwp_translate_text( 'Add a Comment', true ); ?>
 			</a>
 		</p>
 		<?php
@@ -560,6 +594,51 @@ function hocwp_build_coupon_trending_args( $args = array() ) {
 	return $args;
 }
 
+function hocwp_build_coupon_similar_args( $args = array(), $stores = array(), $categories = array(), $tags = array() ) {
+	$args['post_type'] = 'coupon';
+	if ( hocwp_array_has_value( $stores ) ) {
+		$ids = array();
+		foreach ( $stores as $child ) {
+			$ids[] = $child->term_id;
+		}
+		$tax_item = array(
+			'taxonomy' => 'store',
+			'field'    => 'id',
+			'terms'    => $ids
+		);
+		$args     = hocwp_query_sanitize_tax_query( $tax_item, $args );
+	}
+	if ( hocwp_array_has_value( $categories ) ) {
+		$ids = array();
+		foreach ( $categories as $child ) {
+			$ids[] = $child->term_id;
+		}
+		$tax_item = array(
+			'taxonomy' => 'coupon_cat',
+			'field'    => 'id',
+			'terms'    => $ids
+		);
+		$args     = hocwp_query_sanitize_tax_query( $tax_item, $args );
+	}
+	if ( hocwp_array_has_value( $tags ) ) {
+		$ids = array();
+		foreach ( $tags as $child ) {
+			$ids[] = $child->term_id;
+		}
+		$tax_item = array(
+			'taxonomy' => 'coupon_tag',
+			'field'    => 'id',
+			'terms'    => $ids
+		);
+		$args     = hocwp_query_sanitize_tax_query( $tax_item, $args );
+	}
+	unset( $args['term_id'] );
+	unset( $args['taxonomy'] );
+	$args['query_coupon'] = true;
+
+	return $args;
+}
+
 $hocwp_coupon_site = apply_filters( 'hocwp_coupon_site', false );
 
 if ( ! (bool) $hocwp_coupon_site ) {
@@ -583,18 +662,47 @@ if ( 'post-new.php' == $pagenow || 'post.php' == $pagenow ) {
 	$meta->set_post_types( array( 'coupon' ) );
 	$meta->set_id( 'hocwp_coupon_information' );
 	$meta->set_title( __( 'Coupon Information', 'hocwp' ) );
-	$meta->add_field( array( 'id' => 'percent_label', 'label' => __( 'Percent Label:', 'hocwp' ) ) );
-	$meta->add_field( array( 'id' => 'text_label', 'label' => __( 'Text Label:', 'hocwp' ) ) );
-	$meta->add_field( array( 'id' => 'coupon_code', 'label' => __( 'Code:', 'hocwp' ) ) );
-	$meta->add_field( array(
-		'id'             => 'expired_date',
-		'label'          => __( 'Expires:', 'hocwp' ),
-		'field_callback' => 'hocwp_field_datetime_picker',
-		'data_type'      => 'timestamp',
-		'min_date'       => 0,
-		'date_format'    => 'm/d/Y'
-	) );
-	$meta->add_field( array( 'id' => 'url', 'label' => __( 'URL:', 'hocwp' ) ) );
+	$meta->add_field(
+		array(
+			'id'    => 'percent_label',
+			'label' => __( 'Percent Label:', 'hocwp' )
+		)
+	);
+	$meta->add_field(
+		array(
+			'id'    => 'text_label',
+			'label' => __( 'Text Label:', 'hocwp' )
+		)
+	);
+	$meta->add_field(
+		array(
+			'id'    => 'coupon_code',
+			'label' => __( 'Code:', 'hocwp' )
+		)
+	);
+	$meta->add_field(
+		array(
+			'id'             => 'expired_date',
+			'label'          => __( 'Expires:', 'hocwp' ),
+			'field_callback' => 'hocwp_field_datetime_picker',
+			'data_type'      => 'timestamp',
+			'min_date'       => 0,
+			'date_format'    => 'm/d/Y'
+		)
+	);
+	$meta->add_field(
+		array(
+			'id'             => 'expiry_interval',
+			'label'          => __( 'Expiry interval (seconds):', 'hocwp' ),
+			'field_callback' => 'hocwp_field_input_number'
+		)
+	);
+	$meta->add_field(
+		array(
+			'id'    => 'url',
+			'label' => __( 'URL:', 'hocwp' )
+		)
+	);
 	$meta->init();
 }
 
@@ -609,6 +717,16 @@ function hocwp_coupon_on_save_post( $post_id ) {
 	if ( 'coupon' == $current_post->post_type ) {
 		$event = hocwp_get_method_value( 'event' );
 		update_post_meta( $post_id, 'event', $event );
+		$expiry_interval = hocwp_get_method_value( 'expiry_interval' );
+		if ( hocwp_id_number_valid( $expiry_interval ) ) {
+			$expiry_interval_saved     = hocwp_get_coupon_meta( 'expiry_interval', $post_id );
+			$expiry_interval_timestamp = hocwp_get_coupon_meta( 'expiry_interval_timestamp', $post_id );
+			if ( $expiry_interval != $expiry_interval_saved || empty( $expiry_interval_timestamp ) ) {
+				$datetime  = hocwp_get_current_datetime_mysql( strtotime( "+$expiry_interval sec" ) );
+				$timestamp = strtotime( $datetime );
+				update_post_meta( $post_id, 'expiry_interval_timestamp', $timestamp );
+			}
+		}
 	}
 }
 
@@ -673,6 +791,103 @@ function hocwp_coupon_on_wp_hook() {
 
 add_action( 'wp', 'hocwp_coupon_on_wp_hook' );
 
+function hocwp_coupon_build_ongoing_deal_args( $args = array() ) {
+	$meta_item                      = array(
+		'relation' => 'OR',
+		array(
+			'key'     => 'expired_date',
+			'compare' => 'NOT EXISTS'
+		),
+		array(
+			'key'     => 'expired_date',
+			'value'   => 0,
+			'type'    => 'numeric',
+			'compare' => '='
+		)
+	);
+	$args                           = hocwp_query_sanitize_meta_query( $meta_item, $args );
+	$args['post_type']              = 'coupon';
+	$args['meta_query']['relation'] = 'AND';
+
+	return $args;
+}
+
+function hocwp_coupon_build_daily_deal_args( $args = array() ) {
+	$current_date                   = strtotime( hocwp_get_current_datetime_mysql() );
+	$meta_item                      = array(
+		'relation' => 'AND',
+		array(
+			'key'     => 'expiry_interval_timestamp',
+			'compare' => 'EXISTS'
+		),
+		array(
+			'key'     => 'expiry_interval_timestamp',
+			'value'   => $current_date,
+			'type'    => 'numeric',
+			'compare' => '>'
+		)
+	);
+	$args                           = hocwp_query_sanitize_meta_query( $meta_item, $args );
+	$args['post_type']              = 'coupon';
+	$args['meta_query']['relation'] = 'AND';
+
+	return $args;
+}
+
+function hocwp_coupon_build_not_expired_meta_query() {
+	$timestamp  = strtotime( hocwp_get_current_datetime_mysql() );
+	$meta_item  = array(
+		'relation' => 'OR',
+		array(
+			'key'     => 'expired_date',
+			'value'   => $timestamp,
+			'type'    => 'numeric',
+			'compare' => '>='
+		),
+		array(
+			'key'     => 'expired_date',
+			'compare' => 'NOT EXISTS'
+		),
+		array(
+			'key'     => 'expired_date',
+			'value'   => 0,
+			'type'    => 'numeric',
+			'compare' => '='
+		)
+	);
+	$meta_query = array(
+		$meta_item
+	);
+
+	return $meta_query;
+}
+
+function hocwp_coupon_is_expired_query( $query_vars ) {
+	$expired_coupon = (bool) hocwp_get_value_by_key( $query_vars, 'expired_coupon' );
+	if ( ! $expired_coupon ) {
+		$meta_query = hocwp_get_value_by_key( $query_vars, 'meta_query' );
+		if ( hocwp_array_has_value( $meta_query ) ) {
+			foreach ( $meta_query as $meta ) {
+				if ( hocwp_array_has_value( $meta ) ) {
+					foreach ( $meta as $child_meta ) {
+						if ( hocwp_array_has_value( $child_meta ) ) {
+							$key     = hocwp_get_value_by_key( $child_meta, 'key' );
+							$value   = hocwp_get_value_by_key( $child_meta, 'value' );
+							$compare = hocwp_get_value_by_key( $child_meta, 'compare' );
+							if ( 'expired_date' == $key && is_numeric( $value ) && '<' == $compare ) {
+								$expired_coupon = true;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return (bool) $expired_coupon;
+}
+
 function hocwp_coupon_pre_get_posts( WP_Query $query ) {
 	if ( $query->is_main_query() ) {
 		if ( is_tax( 'store' ) ) {
@@ -707,49 +922,40 @@ function hocwp_coupon_pre_get_posts( WP_Query $query ) {
 				$query->set( 'tax_query', $tax_query );
 			}
 		}
+		$coupon_list = false;
 		if ( is_post_type_archive( 'coupon' ) || is_search() || is_tax( 'store' ) || is_tax( 'coupon_cat' ) || is_tax( 'coupon_tag' ) ) {
+			$coupon_list = true;
+		} elseif ( is_home() ) {
+			$coupon_list = true;
+		}
+		if ( $coupon_list ) {
 			$exclude_expired = apply_filters( 'hocwp_exclude_expired_coupon', false );
 			if ( $exclude_expired ) {
 				$query_vars     = $query->query_vars;
-				$expired_coupon = (bool) hocwp_get_value_by_key( $query_vars, 'expired_coupon' );
+				$expired_coupon = hocwp_coupon_is_expired_query( $query_vars );
 				if ( ! $expired_coupon ) {
-					$meta_query = hocwp_get_value_by_key( $query_vars, 'meta_query' );
-					if ( hocwp_array_has_value( $meta_query ) ) {
-						foreach ( $meta_query as $meta ) {
-							if ( hocwp_array_has_value( $meta ) ) {
-								foreach ( $meta as $child_meta ) {
-									if ( hocwp_array_has_value( $child_meta ) ) {
-										$key     = hocwp_get_value_by_key( $child_meta, 'key' );
-										$value   = hocwp_get_value_by_key( $child_meta, 'value' );
-										$compare = hocwp_get_value_by_key( $child_meta, 'compare' );
-										if ( 'expired_date' == $key && is_numeric( $value ) && '<' == $compare ) {
-											$expired_coupon = true;
-											break;
-										}
-									}
-								}
-							}
-						}
+					$args           = hocwp_coupon_build_not_expired_meta_query();
+					$old_meta_query = $query->get( 'meta_query' );
+					if ( is_array( $old_meta_query ) ) {
+						$args = wp_parse_args( $args, $old_meta_query );
 					}
+					$query->set( 'meta_query', $args );
 				}
+			}
+		}
+	} else {
+		$query_coupon = $query->get( 'query_coupon' );
+		if ( (bool) $query_coupon ) {
+			$exclude_expired = apply_filters( 'hocwp_exclude_expired_coupon', false );
+			if ( $exclude_expired ) {
+				$query_vars     = $query->query_vars;
+				$expired_coupon = hocwp_coupon_is_expired_query( $query_vars );
 				if ( ! $expired_coupon ) {
-					$timestamp = current_time( 'timestamp', 0 );
-					$meta_item = array(
-						'relation' => 'OR',
-						array(
-							'key'     => 'expired_date',
-							'value'   => $timestamp,
-							'type'    => 'numeric',
-							'compare' => '>='
-						),
-						array(
-							'key'     => 'expired_date',
-							'compare' => 'NOT EXISTS'
-						)
-					);
-					$args      = array(
-						$meta_item
-					);
+					$args           = hocwp_coupon_build_not_expired_meta_query();
+					$old_meta_query = $query->get( 'meta_query' );
+					if ( is_array( $old_meta_query ) ) {
+						$args = wp_parse_args( $args, $old_meta_query );
+					}
 					$query->set( 'meta_query', $args );
 				}
 			}
@@ -1013,9 +1219,46 @@ function hocwp_coupon_wp_action() {
 		$trending = hocwp_get_value_by_key( $reading, 'trending' );
 		if ( (bool) $trending ) {
 			hocwp_insert_trending( get_the_ID() );
-			hocwp_get_all_trending();
 		}
+	}
+	if ( is_user_logged_in() ) {
+		global $hocwp_user_saved_posts;
+		$user                   = wp_get_current_user();
+		$hocwp_user_saved_posts = hocwp_get_user_saved_posts( $user->ID );
+		$hocwp_user_saved_posts = hocwp_sanitize_array( $hocwp_user_saved_posts );
+		$hocwp_user_saved_posts = array_filter( $hocwp_user_saved_posts );
 	}
 }
 
 add_action( 'wp', 'hocwp_coupon_wp_action' );
+
+function hocwp_load_more_coupon_ajax_callback() {
+	$result     = array( 'have_posts' => false, 'no_more' => false );
+	$query_vars = hocwp_get_method_value( 'query_vars' );
+	$query_vars = hocwp_json_string_to_array( $query_vars );
+	if ( hocwp_array_has_value( $query_vars ) ) {
+		$paged          = hocwp_get_value_by_key( $query_vars, 'paged' );
+		$posts_per_page = hocwp_get_value_by_key( $query_vars, 'posts_per_page', hocwp_get_posts_per_page() );
+		if ( ! is_numeric( $paged ) ) {
+			$paged = 1;
+		}
+		$paged ++;
+		$query_vars['paged']     = $paged;
+		$query_vars['post_type'] = 'coupon';
+		$query                   = hocwp_query( $query_vars );
+		if ( $query->have_posts() ) {
+			$result['have_posts'] = true;
+			$result['html_data']  = apply_filters( 'hocwp_load_more_coupon_loop', '', $query );
+		}
+		$result['query_vars'] = json_encode( $query->query_vars );
+		$no_more              = false;
+		if ( $query->post_count < $posts_per_page || $query->found_posts <= $posts_per_page ) {
+			$no_more = true;
+		}
+		$result['no_more'] = $no_more;
+	}
+	wp_send_json( $result );
+}
+
+add_action( 'wp_ajax_hocwp_load_more_coupon', 'hocwp_load_more_coupon_ajax_callback' );
+add_action( 'wp_ajax_nopriv_hocwp_load_more_coupon', 'hocwp_load_more_coupon_ajax_callback' );

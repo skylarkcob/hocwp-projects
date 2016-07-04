@@ -352,7 +352,7 @@ function hocwp_wc_single_product_fast_buy_button() {
         </button>
         <div id="productBuy<?php the_ID(); ?>" role="dialog" tabindex="-1"  class="modal fade product-fast-buy">
             <div class="modal-dialog">
-                <div class="modal-content">
+                <div class="modal-content clearfix">
                     <div class="modal-header">
                         <button aria-label="Close" data-dismiss="modal" class="close" type="button"><span aria-hidden="true">×</span></button>
                         <h4 class="modal-title">Đặt hàng nhanh</h4>
