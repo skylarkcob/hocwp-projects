@@ -84,10 +84,10 @@ function hocwp_term_meta_icon_field( $taxonomies = array() ) {
 		$meta->set_taxonomies( $taxonomies );
 		$meta->set_use_media_upload( true );
 		$meta->add_field( array( 'id'             => 'icon',
-		                         'label'          => __( 'Icon', 'hocwp' ),
+		                         'label'          => __( 'Icon', 'hocwp-theme' ),
 		                         'field_callback' => 'hocwp_field_media_upload'
 		) );
-		$meta->add_field( array( 'id' => 'icon_html', 'label' => __( 'Icon HTML', 'hocwp' ) ) );
+		$meta->add_field( array( 'id' => 'icon_html', 'label' => __( 'Icon HTML', 'hocwp-theme' ) ) );
 		$meta->init();
 	}
 }
@@ -106,7 +106,7 @@ function hocwp_term_meta_color_field( $taxonomies = array() ) {
 		$meta->set_taxonomies( $taxonomies );
 		$meta->set_use_color_picker( true );
 		$meta->add_field( array( 'id'             => 'color',
-		                         'label'          => __( 'Color', 'hocwp' ),
+		                         'label'          => __( 'Color', 'hocwp-theme' ),
 		                         'field_callback' => 'hocwp_field_color_picker'
 		) );
 		$meta->init();

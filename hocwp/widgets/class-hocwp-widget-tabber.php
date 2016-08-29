@@ -23,7 +23,7 @@ class HOCWP_Widget_Tabber extends WP_Widget {
 			'id'          => 'hocwp_widget_tabber',
 			'name'        => 'HOCWP Tabber',
 			'class'       => 'hocwp-tabber-widget',
-			'description' => __( 'Display widgets as tabber on sidebar.', 'hocwp' ),
+			'description' => __( 'Display widgets as tabber on sidebar.', 'hocwp-theme' ),
 			'width'       => 400
 		);
 		$this->admin_args = apply_filters( 'hocwp_widget_tabber_admin_args', $this->admin_args, $this );
@@ -55,7 +55,7 @@ class HOCWP_Widget_Tabber extends WP_Widget {
 		$sidebar = hocwp_get_value_by_key( $instance, 'sidebar' );
 		hocwp_widget_before( $args, $instance, false );
 		if ( empty( $sidebar ) ) {
-			echo '<p>' . __( 'Xin vui lòng chọn sidebar chứa các tab widget trước.', 'hocwp' ) . '</p>';
+			echo '<p>' . __( 'Xin vui lòng chọn sidebar chứa các tab widget trước.', 'hocwp-theme' ) . '</p>';
 		} elseif ( $args['id'] != $sidebar ) { ?>
 			<div class="hocwp-tab-content">
 				<ul class="nav nav-tabs list-tab hocwp-tabs"></ul>
@@ -70,7 +70,7 @@ class HOCWP_Widget_Tabber extends WP_Widget {
 							$sidebar_name = $sidebar_tmp['name'];
 						}
 						?>
-						<p><?php printf( __( 'Xin vui lòng kéo các widget cần hiển thị vào sidebar %s.', 'hocwp' ), $sidebar_name ); ?></p>
+						<p><?php printf( __( 'Xin vui lòng kéo các widget cần hiển thị vào sidebar %s.', 'hocwp-theme' ), $sidebar_name ); ?></p>
 						<?php
 					}
 					?>
@@ -92,7 +92,7 @@ class HOCWP_Widget_Tabber extends WP_Widget {
 			'id'    => $this->get_field_id( 'sidebar' ),
 			'name'  => $this->get_field_name( 'sidebar' ),
 			'value' => $sidebar,
-			'label' => __( 'Sidebar:', 'hocwp' )
+			'label' => __( 'Sidebar:', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_select_sidebar', $args );
 

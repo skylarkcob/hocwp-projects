@@ -6,7 +6,7 @@ function hocwp_qtranslate_x_installed() {
 }
 
 function hocwp_qtranslate_x_admin_sections($sections) {
-	$sections['hocwp_string_translation'] = __('String Translation', 'hocwp');
+	$sections['hocwp_string_translation'] = __('String Translation', 'hocwp-theme');
 	return $sections;
 }
 
@@ -15,7 +15,7 @@ function hocwp_qtranslate_x_admin_section_field() {
 	echo '<br>';
 	$table = new HOCWP_Table_String_Translation(hocwp_get_all_mo_posts());
 	$table->prepare_items();
-	$table->search_box(__('Search translations', 'hocwp'), 'translations');
+	$table->search_box(__('Search translations', 'hocwp-theme'), 'translations');
 	$table->display();
 	hocwp_field_input_hidden(array('id' => 'hocwp_action', 'value' => 'string_translation'));
 	qtranxf_admin_section_end('hocwp_string_translation');
@@ -63,7 +63,7 @@ function hocwp_get_active_registered_string_language() {
 
 function hocwp_register_string_language($args = array()) {
 	if(!did_action('init')) {
-		_doing_it_wrong(__FUNCTION__, __('Please call this function in <strong>hocwp_register_string_translation</strong> hook.', 'hocwp'), HOCWP_VERSION);
+		_doing_it_wrong(__FUNCTION__, __('Please call this function in <strong>hocwp_register_string_translation</strong> hook.', 'hocwp-theme'), HOCWP_VERSION);
 		return;
 	}
 	if(!is_array($args)) {

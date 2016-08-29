@@ -35,6 +35,10 @@
     table-layout: fixed;
 }
 
+.wp-admin.term-php .wp-editor-container textarea.wp-editor-area {
+    border-color: #fff;
+}
+
 /**
  * Widgets
  */
@@ -108,6 +112,10 @@
     max-width: 100%;
 }
 
+.hocwp-meta-box .meta-row select {
+    width: 25em;
+}
+
 .hocwp.server-information .postbox table {
     table-layout: fixed;
     width: 100%;
@@ -132,6 +140,10 @@
     margin-bottom: 20px;
     max-width: 215px;
     vertical-align: top;
+}
+
+.hocwp-meta-box .meta-row label + .media-preview {
+    margin-top: 10px;
 }
 
 /**
@@ -404,6 +416,12 @@
 .hocwp-meta-box .media-preview img,
 .hocwp-widget .media-preview img {
     max-height: 315px;
+}
+
+.media-preview img {
+    display: block;
+    margin-bottom: 5px;
+    max-width: 100%;
 }
 
 /**

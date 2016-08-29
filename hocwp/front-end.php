@@ -63,7 +63,7 @@ function hocwp_breadcrumb( $args = array() ) {
 	global $post;
 	$separator       = isset( $args['separator'] ) ? $args['separator'] : '/';
 	$breadcrums_id   = isset( $args['id'] ) ? $args['id'] : 'hocwp_breadcrumbs';
-	$home_title      = __( 'Home', 'hocwp' );
+	$home_title      = __( 'Home', 'hocwp-theme' );
 	$custom_taxonomy = 'product_cat';
 	$class           = isset( $args['class'] ) ? $args['class'] : '';
 	$class           = hocwp_add_string_with_space_before( $class, 'list-inline list-unstyled breadcrumbs' );
@@ -178,7 +178,7 @@ function hocwp_breadcrumb( $args = array() ) {
 		} elseif ( is_search() ) {
 			echo '<li class="item-current item-current-' . get_search_query() . '"><strong class="bread-current bread-current-' . get_search_query() . '" title="Search results for: ' . get_search_query() . '">Search results for: ' . get_search_query() . '</strong></li>';
 		} elseif ( is_404() ) {
-			echo '<li>' . __( 'Error 404', 'hocwp' ) . '</li>';
+			echo '<li>' . __( 'Error 404', 'hocwp-theme' ) . '</li>';
 		}
 		echo '</ul>';
 		echo '</div>';
@@ -198,9 +198,9 @@ function hocwp_facebook_login_button() {
         <span>
             <?php
             if ( 'register' == $action ) {
-	            hocwp_text( 'Đăng ký bằng Facebook', __( 'Register with Facebook', 'hocwp' ) );
+	            hocwp_text( 'Đăng ký bằng Facebook', __( 'Register with Facebook', 'hocwp-theme' ) );
             } else {
-	            hocwp_text( 'Đăng nhập bằng Facebook', __( 'Login with Facebook', 'hocwp' ) );
+	            hocwp_text( 'Đăng nhập bằng Facebook', __( 'Login with Facebook', 'hocwp-theme' ) );
             }
             ?>
         </span>
@@ -221,9 +221,9 @@ function hocwp_google_login_button() {
         <span>
             <?php
             if ( 'register' == $action ) {
-	            hocwp_text( 'Đăng ký bằng Google', __( 'Register with Google', 'hocwp' ) );
+	            hocwp_text( 'Đăng ký bằng Google', __( 'Register with Google', 'hocwp-theme' ) );
             } else {
-	            hocwp_text( 'Đăng nhập bằng Google', __( 'Login with Google', 'hocwp' ) );
+	            hocwp_text( 'Đăng nhập bằng Google', __( 'Login with Google', 'hocwp-theme' ) );
             }
             ?>
         </span>
@@ -243,7 +243,13 @@ function hocwp_entry_meta_terms( $args = array() ) {
 	$after     = hocwp_get_value_by_key( $args, 'after', '</span>' );
 	$post_id   = hocwp_get_value_by_key( $args, 'post_id', get_the_ID() );
 	$separator = hocwp_get_value_by_key( $args, 'separator', ', ' );
-	the_terms( $post_id, $taxonomy, $before . $icon, $separator, $after );
+	if ( is_array( $taxonomy ) ) {
+		foreach ( $taxonomy as $tax ) {
+			the_terms( $post_id, $tax, $before . $icon, $separator, $after );
+		}
+	} else {
+		the_terms( $post_id, $taxonomy, $before . $icon, $separator, $after );
+	}
 }
 
 function hocwp_the_date() {
@@ -427,9 +433,9 @@ function hocwp_rel_canonical() {
 
 function hocwp_posts_pagination( $args = array() ) {
 	$defaults = array(
-		'prev_text'          => __( 'Trước', 'hocwp' ),
-		'next_text'          => __( 'Tiếp theo', 'hocwp' ),
-		'screen_reader_text' => __( 'Phân trang', 'hocwp' )
+		'prev_text'          => __( 'Trước', 'hocwp-theme' ),
+		'next_text'          => __( 'Tiếp theo', 'hocwp-theme' ),
+		'screen_reader_text' => __( 'Phân trang', 'hocwp-theme' )
 	);
 	$args     = wp_parse_args( $args, $defaults );
 	the_posts_pagination( $args );

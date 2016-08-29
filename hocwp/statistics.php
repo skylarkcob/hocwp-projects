@@ -20,7 +20,13 @@ if ( ! file_exists( HOCWP_COUNTER_PATH ) ) {
 	wp_mkdir_p( HOCWP_COUNTER_PATH );
 }
 
-$use_statistics = apply_filters( 'hocwp_use_statistics', false );
+global $hocwp_reading_options;
+if ( ! is_array( $hocwp_reading_options ) ) {
+	$hocwp_reading_options = get_option( 'hocwp_reading' );
+}
+$statistics = (bool) hocwp_get_value_by_key( $hocwp_reading_options, 'statistics' );
+
+$use_statistics = apply_filters( 'hocwp_use_statistics', $statistics );
 
 function hocwp_statistics_table_init() {
 	global $wpdb;
@@ -78,30 +84,40 @@ function hocwp_statistics_add_row( $table, $user_id, $visited, $ip, $pc_ip, $bro
 }
 
 function hocwp_statistics_track() {
+	if ( hocwp_is_bots() ) {
+		return;
+	}
 	$hocwp_statistics_browser = isset( $_SESSION['hocwp_statistics_browser'] ) ? $_SESSION['hocwp_statistics_browser'] : '';
 	$user_agent               = $_SERVER['HTTP_USER_AGENT'];
 	$browser                  = hocwp_get_browser();
-	$online                   = hocwp_statistics_online_real();
-	if ( $hocwp_statistics_browser != $browser || 0 == $online ) {
-		$current_datetime = hocwp_get_current_datetime_mysql();
-		$user_id          = 0;
-		if ( is_user_logged_in() ) {
-			$user    = wp_get_current_user();
-			$user_id = $user->ID;
+	$ip                       = hocwp_get_user_isp_ip();
+	$pc_ip                    = hocwp_get_pc_ip();
+	$transient_name           = 'hocwp_statistics_' . md5( $pc_ip . $ip . $browser . $user_agent );
+	if ( false === get_transient( $transient_name ) ) {
+		$online = hocwp_statistics_online_real();
+		if ( $hocwp_statistics_browser != $browser || 0 == $online ) {
+			$current_datetime = hocwp_get_current_datetime_mysql();
+			$user_id          = 0;
+			if ( is_user_logged_in() ) {
+				$user    = wp_get_current_user();
+				$user_id = $user->ID;
+			}
+			$location                                 = hocwp_get_current_visitor_location();
+			$statistics_id                            = hocwp_statistics_add_row( HOCWP_COUNTER_TABLE_STATISTICS, $user_id, $current_datetime, $ip, $pc_ip, $browser, $location, $user_agent );
+			$online_id                                = hocwp_statistics_add_row( HOCWP_COUNTER_TABLE_ONLINE, $user_id, $current_datetime, $ip, $pc_ip, $browser, $location, $user_agent );
+			$_SESSION['hocwp_statistics_user_online'] = $online_id;
+			$_SESSION['hocwp_statistics_browser']     = $browser;
+			$minutes                                  = hocwp_statistics_get_online_refresh_minute();
+			set_transient( $transient_name, $statistics_id, $minutes * MINUTE_IN_SECONDS );
 		}
-		$ip                                       = hocwp_get_user_isp_ip();
-		$pc_ip                                    = hocwp_get_pc_ip();
-		$user_agent                               = $_SERVER['HTTP_USER_AGENT'];
-		$location                                 = hocwp_get_current_visitor_location();
-		$statistics_id                            = hocwp_statistics_add_row( HOCWP_COUNTER_TABLE_STATISTICS, $user_id, $current_datetime, $ip, $pc_ip, $browser, $location, $user_agent );
-		$online_id                                = hocwp_statistics_add_row( HOCWP_COUNTER_TABLE_ONLINE, $user_id, $current_datetime, $ip, $pc_ip, $browser, $location, $user_agent );
-		$_SESSION['hocwp_statistics_user_online'] = $online_id;
-		$_SESSION['hocwp_statistics_browser']     = $browser;
 	}
 }
 
-if ( $use_statistics && ! is_admin() ) {
-	add_action( 'init', 'hocwp_statistics_track' );
+if ( $use_statistics ) {
+	if ( ! is_admin() ) {
+		add_action( 'init', 'hocwp_statistics_track', 99 );
+	}
+	add_action( 'wp_loaded', 'hocwp_statistics_track' );
 }
 
 function hocwp_statistics_refresh_online_expire() {
@@ -167,8 +183,8 @@ function hocwp_statistics_online_detail() {
 	$count_user = 0;
 	$items      = array();
 	foreach ( $rows as $item ) {
-		$user_name     = __( 'Guest', 'hocwp' );
-		$last_activity = hocwp_human_time_diff_to_now( $item->visited_timestamp ) . ' ' . __( 'ago', 'hocwp' );
+		$user_name     = __( 'Guest', 'hocwp-theme' );
+		$last_activity = hocwp_human_time_diff_to_now( $item->visited_timestamp ) . ' ' . __( 'ago', 'hocwp-theme' );
 		if ( $item->user_id > 0 ) {
 			$count_user ++;
 			$user = get_user_by( 'id', $item->user_id );
@@ -328,7 +344,12 @@ function hocwp_statistics_total() {
 	$table = $wpdb->prefix . HOCWP_COUNTER_TABLE_STATISTICS;
 	$wpdb->get_results( "SELECT ID FROM $table" );
 
-	return $wpdb->num_rows;
+	$pre_count = apply_filters( 'hocwp_statistics_total_pre', 0 );
+	$pre_count = absint( $pre_count );
+	$count     = $wpdb->num_rows;
+	$count += $pre_count;
+
+	return $count;
 }
 
 function hocwp_statistics_avg() {

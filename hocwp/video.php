@@ -6,7 +6,7 @@ function hocwp_video_source_meta_box($post_types = array()) {
     }
     $meta = new HOCWP_Meta('post');
     $meta->set_post_types($post_types);
-    $meta->set_title(__('Video Source Information', 'hocwp'));
+    $meta->set_title(__('Video Source Information', 'hocwp-theme'));
     $meta->set_id('hocwp_theme_video_source_information');
     $meta->add_field(array('field_args' => array('id' => 'video_url', 'label' => 'Video URL:')));
     $meta->add_field(array('field_args' => array('id' => 'video_code', 'label' => 'Video code:'), 'field_callback' => 'hocwp_field_textarea'));

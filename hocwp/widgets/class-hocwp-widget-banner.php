@@ -25,7 +25,7 @@ class HOCWP_Widget_Banner extends WP_Widget {
 			'id'          => 'hocwp_widget_banner',
 			'name'        => 'HOCWP Banner',
 			'class'       => 'hocwp-banner-widget',
-			'description' => __( 'Display banner on sidebar.', 'hocwp' ),
+			'description' => __( 'Display banner on sidebar.', 'hocwp-theme' ),
 			'width'       => 400
 		);
 		$this->admin_args = apply_filters( 'hocwp_widget_banner_admin_args', $this->admin_args, $this );
@@ -88,7 +88,7 @@ class HOCWP_Widget_Banner extends WP_Widget {
 			'id'    => $this->get_field_id( 'banner_image' ),
 			'name'  => $this->get_field_name( 'banner_image' ),
 			'value' => $banner_image,
-			'label' => __( 'Image url:', 'hocwp' )
+			'label' => __( 'Image url:', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_media_upload', $args );
 
@@ -96,7 +96,7 @@ class HOCWP_Widget_Banner extends WP_Widget {
 			'id'    => $this->get_field_id( 'banner_url' ),
 			'name'  => $this->get_field_name( 'banner_url' ),
 			'value' => $banner_url,
-			'label' => __( 'Image link:', 'hocwp' )
+			'label' => __( 'Image link:', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_text', $args );
 
@@ -105,7 +105,7 @@ class HOCWP_Widget_Banner extends WP_Widget {
 			'id'    => $this->get_field_id( 'nofollow' ),
 			'name'  => $this->get_field_name( 'nofollow' ),
 			'value' => $nofollow,
-			'label' => __( 'Add rel nofollow for this link?', 'hocwp' )
+			'label' => __( 'Add rel nofollow for this link?', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_checkbox', $args );
 

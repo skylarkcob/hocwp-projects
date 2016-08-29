@@ -10,33 +10,33 @@ class HOCWP_Widget_Subscribe extends WP_Widget {
 
 	private function get_defaults() {
 		$defaults = array(
-			'button_text'         => __( 'Subscribe', 'hocwp' ),
+			'button_text'         => __( 'Subscribe', 'hocwp-theme' ),
 			'description'         => '',
 			'desc_position'       => 'before',
 			'desc_positions'      => array(
-				'before' => __( 'Before email field', 'hocwp' ),
-				'after'  => __( 'After email field', 'hocwp' )
+				'before' => __( 'Before email field', 'hocwp-theme' ),
+				'after'  => __( 'After email field', 'hocwp-theme' )
 			),
 			'fields'              => array(
 				'email' => array(
-					'label'       => __( 'Email', 'hocwp' ),
-					'placeholder' => __( 'Enter your email', 'hocwp' ),
+					'label'       => __( 'Email', 'hocwp-theme' ),
+					'placeholder' => __( 'Enter your email', 'hocwp-theme' ),
 					'required'    => true
 				),
 				'name'  => array(
-					'label'       => __( 'Name', 'hocwp' ),
-					'placeholder' => __( 'Enter your name', 'hocwp' ),
+					'label'       => __( 'Name', 'hocwp-theme' ),
+					'placeholder' => __( 'Enter your name', 'hocwp-theme' ),
 					'required'    => false
 				),
 				'phone' => array(
-					'label'       => __( 'Phone', 'hocwp' ),
-					'placeholder' => __( 'Enter your phone number', 'hocwp' ),
+					'label'       => __( 'Phone', 'hocwp-theme' ),
+					'placeholder' => __( 'Enter your phone number', 'hocwp-theme' ),
 					'required'    => false
 				)
 			),
 			'captcha'             => false,
-			'captcha_label'       => __( 'Captcha', 'hocwp' ),
-			'captcha_placeholder' => __( 'Enter captcha code', 'hocwp' ),
+			'captcha_label'       => __( 'Captcha', 'hocwp-theme' ),
+			'captcha_placeholder' => __( 'Enter captcha code', 'hocwp-theme' ),
 			'register'            => false
 		);
 		$defaults = apply_filters( 'hocwp_widget_subscribe_defaults', $defaults, $this );
@@ -52,7 +52,7 @@ class HOCWP_Widget_Subscribe extends WP_Widget {
 			'id'          => 'hocwp_widget_subscribe',
 			'name'        => 'HOCWP Subscribe',
 			'class'       => 'hocwp-subscribe-widget',
-			'description' => __( 'Allow subscribe as user.', 'hocwp' ),
+			'description' => __( 'Allow subscribe as user.', 'hocwp-theme' ),
 			'width'       => 400
 		);
 		$this->admin_args = apply_filters( 'hocwp_widget_subscribe_admin_args', $this->admin_args, $this );
@@ -267,7 +267,7 @@ class HOCWP_Widget_Subscribe extends WP_Widget {
 			'id'    => $this->get_field_id( 'fields' ),
 			'name'  => $this->get_field_name( 'fields' ),
 			'value' => $fields,
-			'label' => __( 'Fields:', 'hocwp' )
+			'label' => __( 'Fields:', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_text', $args );
 
@@ -300,7 +300,7 @@ class HOCWP_Widget_Subscribe extends WP_Widget {
 			'id'    => $this->get_field_id( 'button_text' ),
 			'name'  => $this->get_field_name( 'button_text' ),
 			'value' => $button_text,
-			'label' => __( 'Button text:', 'hocwp' )
+			'label' => __( 'Button text:', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_text', $args );
 
@@ -308,7 +308,7 @@ class HOCWP_Widget_Subscribe extends WP_Widget {
 			'id'    => $this->get_field_id( 'description' ),
 			'name'  => $this->get_field_name( 'description' ),
 			'value' => $description,
-			'label' => __( 'Description:', 'hocwp' )
+			'label' => __( 'Description:', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_textarea', $args );
 
@@ -325,7 +325,7 @@ class HOCWP_Widget_Subscribe extends WP_Widget {
 			'name'       => $this->get_field_name( 'desc_position' ),
 			'value'      => $desc_position,
 			'all_option' => $all_option,
-			'label'      => __( 'Description position:', 'hocwp' ),
+			'label'      => __( 'Description position:', 'hocwp-theme' ),
 			'class'      => 'desc-position'
 		);
 		hocwp_widget_field( 'hocwp_field_select', $args );
@@ -335,14 +335,14 @@ class HOCWP_Widget_Subscribe extends WP_Widget {
 				'id'    => $this->get_field_id( 'captcha_label' ),
 				'name'  => $this->get_field_name( 'captcha_label' ),
 				'value' => $captcha_label,
-				'label' => __( 'Captcha label:', 'hocwp' )
+				'label' => __( 'Captcha label:', 'hocwp-theme' )
 			);
 			hocwp_widget_field( 'hocwp_field_input_text', $args );
 			$args = array(
 				'id'    => $this->get_field_id( 'captcha_placeholder' ),
 				'name'  => $this->get_field_name( 'captcha_placeholder' ),
 				'value' => $captcha_placeholder,
-				'label' => __( 'Captcha placeholder:', 'hocwp' )
+				'label' => __( 'Captcha placeholder:', 'hocwp-theme' )
 			);
 			hocwp_widget_field( 'hocwp_field_input_text', $args );
 		}
@@ -351,7 +351,7 @@ class HOCWP_Widget_Subscribe extends WP_Widget {
 			'id'    => $this->get_field_id( 'captcha' ),
 			'name'  => $this->get_field_name( 'captcha' ),
 			'value' => $captcha,
-			'label' => __( 'Using captcha in form?', 'hocwp' )
+			'label' => __( 'Using captcha in form?', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_checkbox', $args );
 
@@ -359,7 +359,7 @@ class HOCWP_Widget_Subscribe extends WP_Widget {
 			'id'    => $this->get_field_id( 'register' ),
 			'name'  => $this->get_field_name( 'register' ),
 			'value' => $register,
-			'label' => __( 'Add suscriber as a user?', 'hocwp' )
+			'label' => __( 'Add suscriber as a user?', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_checkbox', $args );
 

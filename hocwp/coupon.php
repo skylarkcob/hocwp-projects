@@ -45,9 +45,9 @@ function hocwp_coupon_type_base() {
 
 function hocwp_coupon_install_post_type_and_taxonomy() {
 	$args = array(
-		'name'              => __( 'Coupons', 'hocwp' ),
-		'singular_name'     => __( 'Coupon', 'hocwp' ),
-		'supports'          => array( 'editor', 'comments', 'thumbnail' ),
+		'name'              => __( 'Coupons', 'hocwp-theme' ),
+		'singular_name'     => __( 'Coupon', 'hocwp-theme' ),
+		'supports'          => array( 'editor', 'comments', 'thumbnail', 'excerpt' ),
 		'slug'              => 'coupon',
 		'taxonomies'        => array( 'store', 'coupon_cat', 'coupon_tag', 'coupon_type' ),
 		'show_in_admin_bar' => true
@@ -55,8 +55,8 @@ function hocwp_coupon_install_post_type_and_taxonomy() {
 	hocwp_register_post_type( $args );
 
 	$args = array(
-		'name'              => __( 'Events', 'hocwp' ),
-		'singular_name'     => __( 'Event', 'hocwp' ),
+		'name'              => __( 'Events', 'hocwp-theme' ),
+		'singular_name'     => __( 'Event', 'hocwp-theme' ),
 		'supports'          => array( 'editor', 'comments', 'thumbnail' ),
 		'slug'              => 'event',
 		'show_in_admin_bar' => true
@@ -64,8 +64,8 @@ function hocwp_coupon_install_post_type_and_taxonomy() {
 	hocwp_register_post_type( $args );
 
 	$args = array(
-		'name'          => __( 'Stores', 'hocwp' ),
-		'singular_name' => __( 'Store', 'hocwp' ),
+		'name'          => __( 'Stores', 'hocwp-theme' ),
+		'singular_name' => __( 'Store', 'hocwp-theme' ),
 		'taxonomy'      => 'store',
 		'slug'          => hocwp_coupon_store_base(),
 		'post_types'    => array( 'coupon' )
@@ -73,9 +73,9 @@ function hocwp_coupon_install_post_type_and_taxonomy() {
 	hocwp_register_taxonomy( $args );
 
 	$args = array(
-		'name'          => __( 'Coupon Categories', 'hocwp' ),
-		'singular_name' => __( 'Coupon Category', 'hocwp' ),
-		'menu_name'     => __( 'Categories', 'hocwp' ),
+		'name'          => __( 'Coupon Categories', 'hocwp-theme' ),
+		'singular_name' => __( 'Coupon Category', 'hocwp-theme' ),
+		'menu_name'     => __( 'Categories', 'hocwp-theme' ),
 		'slug'          => hocwp_coupon_category_base(),
 		'taxonomy'      => 'coupon_cat',
 		'post_types'    => array( 'coupon' )
@@ -83,9 +83,9 @@ function hocwp_coupon_install_post_type_and_taxonomy() {
 	hocwp_register_taxonomy( $args );
 
 	$args = array(
-		'name'          => __( 'Coupon Tags', 'hocwp' ),
-		'singular_name' => __( 'Coupon Tag', 'hocwp' ),
-		'menu_name'     => __( 'Tags', 'hocwp' ),
+		'name'          => __( 'Coupon Tags', 'hocwp-theme' ),
+		'singular_name' => __( 'Coupon Tag', 'hocwp-theme' ),
+		'menu_name'     => __( 'Tags', 'hocwp-theme' ),
 		'slug'          => hocwp_coupon_tag_base(),
 		'taxonomy'      => 'coupon_tag',
 		'hierarchical'  => false,
@@ -94,9 +94,9 @@ function hocwp_coupon_install_post_type_and_taxonomy() {
 	hocwp_register_taxonomy( $args );
 
 	$args = array(
-		'name'          => __( 'Coupon Types', 'hocwp' ),
-		'singular_name' => __( 'Coupon Type', 'hocwp' ),
-		'menu_name'     => __( 'Types', 'hocwp' ),
+		'name'          => __( 'Coupon Types', 'hocwp-theme' ),
+		'singular_name' => __( 'Coupon Type', 'hocwp-theme' ),
+		'menu_name'     => __( 'Types', 'hocwp-theme' ),
 		'slug'          => hocwp_coupon_type_base(),
 		'taxonomy'      => 'coupon_type',
 		'post_types'    => array( 'coupon' )
@@ -283,7 +283,7 @@ function hocwp_get_event_coupons( $event_id, $args = array() ) {
 	return hocwp_query( $args );
 }
 
-function hocwp_coupon_build_expired_query_args( $args ) {
+function hocwp_coupon_build_expired_query_args( $args = array() ) {
 	$timestamp            = strtotime( hocwp_get_current_datetime_mysql() );
 	$args['meta_key']     = 'expired_date';
 	$args['meta_value']   = $timestamp;
@@ -335,6 +335,9 @@ function hocwp_coupon_build_expired_query_args( $args ) {
 	$args                           = hocwp_query_sanitize_meta_query( $meta_item, $args );
 	$args['meta_query']['relation'] = 'AND';
 	$args['expired_coupon']         = true;
+	if ( ! isset( $args['post_type'] ) ) {
+		$args['post_type'] = 'coupon';
+	}
 
 	return $args;
 }
@@ -375,17 +378,21 @@ function hocwp_get_coupon_type( $post_id = null ) {
 	return $result;
 }
 
-function hocwp_coupon_label_html( $percent, $text, $type ) {
+function hocwp_coupon_label_html( $percent, $text, $type = '' ) {
 	?>
 	<div class="coupon-label-context text-center">
 		<p class="percent"><?php echo $percent; ?></p>
 
 		<p class="text"><?php echo $text; ?></p>
 	</div>
-	<div class="coupon-type text-center">
-		<span><?php echo $type; ?></span>
-	</div>
 	<?php
+	if ( ! empty( $type ) ) {
+		?>
+		<div class="coupon-type text-center">
+			<span><?php echo $type; ?></span>
+		</div>
+		<?php
+	}
 }
 
 function hocwp_coupon_filter_bar_html( $args = array() ) {
@@ -410,16 +417,22 @@ function hocwp_coupon_filter_bar_html( $args = array() ) {
 }
 
 function hocwp_coupon_button_html( $args = array() ) {
-	$post_id   = hocwp_get_value_by_key( $args, 'post_id', get_the_ID() );
-	$type      = hocwp_get_value_by_key( $args, 'type' );
-	$code_hint = hocwp_get_value_by_key( $args, 'code_hint' );
-	$type_text = hocwp_get_value_by_key( $args, 'type_text' );
-	$out_url   = hocwp_get_value_by_key( $args, 'out_url', hocwp_get_coupon_out_url( $post_id ) );
+	$post_id      = hocwp_get_value_by_key( $args, 'post_id', get_the_ID() );
+	$type         = hocwp_get_value_by_key( $args, 'type', 'deal' );
+	$code_hint    = hocwp_get_value_by_key( $args, 'code_hint' );
+	$type_text    = hocwp_get_value_by_key( $args, 'type_text', $type );
+	$out_url      = hocwp_get_value_by_key( $args, 'out_url', hocwp_get_coupon_out_url( $post_id ) );
+	$cc_label     = sprintf( hocwp_translate_text( 'Get %s' ), $type_text );
+	$button_class = 'code type-' . $type;
+	if ( 'future' == get_post_status( $post_id ) ) {
+		$cc_label = hocwp_translate_text( 'Coming soon' );
+		hocwp_add_string_with_space_before( $button_class, 'disabled' );
+	}
 	?>
 	<a href="#coupon_box_<?php echo $post_id; ?>" data-post-id="<?php echo $post_id; ?>"
-	   class="code type-<?php echo $type; ?>" data-out-url="<?php echo $out_url; ?>" data-toggle="modal">
+	   class="<?php echo $button_class; ?>" data-out-url="<?php echo $out_url; ?>" data-toggle="modal">
 		<span class="cc"><?php echo $code_hint; ?></span>
-		<span class="cc-label"><?php printf( hocwp_translate_text( 'Get %s' ), $type_text ); ?></span>
+		<span class="cc-label"><?php echo $cc_label; ?></span>
 	</a>
 	<?php
 }
@@ -556,6 +569,31 @@ function hocwp_coupon_type_select( $taxonomy = 'coupon_type' ) {
 	<?php
 }
 
+function hocwp_query_upcoming_coupon( $args = array() ) {
+	$defaults = array(
+		'post_status' => 'future',
+		'post_type'   => 'coupon',
+		'order'       => 'asc'
+	);
+	$args     = wp_parse_args( $args, $defaults );
+	$query    = hocwp_query( $args );
+	if ( ! $query->have_posts() ) {
+		$meta_item = array(
+			array(
+				'key'     => 'upcoming',
+				'value'   => 1,
+				'type'    => 'numeric',
+				'compare' => '='
+			)
+		);
+		hocwp_query_sanitize_meta_query( $meta_item, $args );
+		$args['post_status'] = 'publish';
+		$query               = hocwp_query( $args );
+	}
+
+	return hocwp_query( $args );
+}
+
 function hocwp_coupon_store_select( $taxonomy = 'store' ) {
 	$stores = hocwp_get_terms( $taxonomy );
 	?>
@@ -589,6 +627,7 @@ function hocwp_build_coupon_trending_args( $args = array() ) {
 		}
 		$args['post__in'] = $post_ids;
 		$args['orderby']  = 'post__in';
+		$args['trending'] = true;
 	}
 
 	return $args;
@@ -652,7 +691,7 @@ if ( 'edit-tags.php' == $pagenow || 'term.php' == $pagenow ) {
 	hocwp_term_meta_thumbnail_field( array( 'store' ) );
 	$meta = new HOCWP_Meta( 'term' );
 	$meta->set_taxonomies( array( 'store' ) );
-	$meta->add_field( array( 'id' => 'site', 'label' => __( 'Store URL', 'hocwp' ) ) );
+	$meta->add_field( array( 'id' => 'site', 'label' => __( 'Store URL', 'hocwp-theme' ) ) );
 	$meta->init();
 }
 
@@ -661,46 +700,48 @@ if ( 'post-new.php' == $pagenow || 'post.php' == $pagenow ) {
 	$meta = new HOCWP_Meta( 'post' );
 	$meta->set_post_types( array( 'coupon' ) );
 	$meta->set_id( 'hocwp_coupon_information' );
-	$meta->set_title( __( 'Coupon Information', 'hocwp' ) );
+	$meta->set_title( __( 'Coupon Information', 'hocwp-theme' ) );
 	$meta->add_field(
 		array(
 			'id'    => 'percent_label',
-			'label' => __( 'Percent Label:', 'hocwp' )
+			'label' => __( 'Percent Label:', 'hocwp-theme' )
 		)
 	);
 	$meta->add_field(
 		array(
 			'id'    => 'text_label',
-			'label' => __( 'Text Label:', 'hocwp' )
+			'label' => __( 'Text Label:', 'hocwp-theme' )
 		)
 	);
 	$meta->add_field(
 		array(
 			'id'    => 'coupon_code',
-			'label' => __( 'Code:', 'hocwp' )
+			'label' => __( 'Code:', 'hocwp-theme' )
 		)
 	);
 	$meta->add_field(
 		array(
 			'id'             => 'expired_date',
-			'label'          => __( 'Expires:', 'hocwp' ),
+			'label'          => __( 'Expires:', 'hocwp-theme' ),
 			'field_callback' => 'hocwp_field_datetime_picker',
 			'data_type'      => 'timestamp',
 			'min_date'       => 0,
 			'date_format'    => 'm/d/Y'
 		)
 	);
+	/*
 	$meta->add_field(
 		array(
 			'id'             => 'expiry_interval',
-			'label'          => __( 'Expiry interval (seconds):', 'hocwp' ),
+			'label'          => __( 'Expiry interval (seconds):', 'hocwp-theme' ),
 			'field_callback' => 'hocwp_field_input_number'
 		)
 	);
+	*/
 	$meta->add_field(
 		array(
 			'id'    => 'url',
-			'label' => __( 'URL:', 'hocwp' )
+			'label' => __( 'URL:', 'hocwp-theme' )
 		)
 	);
 	$meta->init();
@@ -715,15 +756,22 @@ function hocwp_coupon_on_save_post( $post_id ) {
 		wp_set_object_terms( $post_id, 'Promo Codes', 'coupon_type' );
 	}
 	if ( 'coupon' == $current_post->post_type ) {
+		$timestamp = '';
+		if ( isset( $_POST['expired_date'] ) ) {
+			$timestamp = strtotime( $_POST['expired_date'] );
+			update_post_meta( $post_id, 'expired_date', $timestamp );
+		}
 		$event = hocwp_get_method_value( 'event' );
 		update_post_meta( $post_id, 'event', $event );
 		$expiry_interval = hocwp_get_method_value( 'expiry_interval' );
-		if ( hocwp_id_number_valid( $expiry_interval ) ) {
+		if ( hocwp_id_number_valid( $expiry_interval ) || ! empty( $timestamp ) ) {
 			$expiry_interval_saved     = hocwp_get_coupon_meta( 'expiry_interval', $post_id );
 			$expiry_interval_timestamp = hocwp_get_coupon_meta( 'expiry_interval_timestamp', $post_id );
-			if ( $expiry_interval != $expiry_interval_saved || empty( $expiry_interval_timestamp ) ) {
+			if ( ! empty( $timestamp ) ) {
 				$datetime  = hocwp_get_current_datetime_mysql( strtotime( "+$expiry_interval sec" ) );
 				$timestamp = strtotime( $datetime );
+			}
+			if ( $expiry_interval != $expiry_interval_saved || empty( $expiry_interval_timestamp ) || $timestamp != $expiry_interval_timestamp ) {
 				update_post_meta( $post_id, 'expiry_interval_timestamp', $timestamp );
 			}
 		}
@@ -921,6 +969,8 @@ function hocwp_coupon_pre_get_posts( WP_Query $query ) {
 				$tax_query[]           = $tax_item;
 				$query->set( 'tax_query', $tax_query );
 			}
+		} elseif ( is_home() ) {
+			$query->set( 'post_type', 'coupon' );
 		}
 		$coupon_list = false;
 		if ( is_post_type_archive( 'coupon' ) || is_search() || is_tax( 'store' ) || is_tax( 'coupon_cat' ) || is_tax( 'coupon_tag' ) ) {
@@ -1054,7 +1104,7 @@ function hocwp_coupon_attribute_meta_box_field( $meta ) {
 			'value'       => $selected,
 			'class'       => 'widefat',
 			'label'       => hocwp_uppercase_first_char_only( 'Event' ) . ':',
-			'placeholder' => __( 'Choose parent post', 'hocwp' )
+			'placeholder' => __( 'Choose parent post', 'hocwp-theme' )
 		);
 		hocwp_field_select_chosen( $args );
 	}
@@ -1074,28 +1124,28 @@ if ( 'options-permalink.php' == $pagenow || true ) {
 	$option->add_field( array(
 		'value'       => hocwp_get_value_by_key( $data, 'coupon_store_base' ),
 		'id'          => 'coupon_store_base',
-		'title'       => __( 'Coupon store base', 'hocwp' ),
+		'title'       => __( 'Coupon store base', 'hocwp-theme' ),
 		'section'     => 'optional',
 		'placeholder' => hocwp_coupon_store_base()
 	) );
 	$option->add_field( array(
 		'value'       => hocwp_get_value_by_key( $data, 'coupon_category_base' ),
 		'id'          => 'coupon_category_base',
-		'title'       => __( 'Coupon category base', 'hocwp' ),
+		'title'       => __( 'Coupon category base', 'hocwp-theme' ),
 		'section'     => 'optional',
 		'placeholder' => hocwp_coupon_category_base()
 	) );
 	$option->add_field( array(
 		'value'       => hocwp_get_value_by_key( $data, 'coupon_tag_base' ),
 		'id'          => 'coupon_tag_base',
-		'title'       => __( 'Coupon tag base', 'hocwp' ),
+		'title'       => __( 'Coupon tag base', 'hocwp-theme' ),
 		'section'     => 'optional',
 		'placeholder' => hocwp_coupon_tag_base()
 	) );
 	$option->add_field( array(
 		'value'       => hocwp_get_value_by_key( $data, 'coupon_type_base' ),
 		'id'          => 'coupon_type_base',
-		'title'       => __( 'Coupon type base', 'hocwp' ),
+		'title'       => __( 'Coupon type base', 'hocwp-theme' ),
 		'section'     => 'optional',
 		'placeholder' => hocwp_coupon_type_base()
 	) );
@@ -1125,7 +1175,7 @@ add_action( 'init', 'hocwp_coupon_init' );
 
 function hocwp_coupon_bulk_actions( $post_type ) {
 	if ( 'coupon' == $post_type ) {
-		hocwp_add_bulk_action( array( 'reset_rating' => __( 'Reset rating', 'hocwp' ) ) );
+		hocwp_add_bulk_action( array( 'reset_rating' => __( 'Reset rating', 'hocwp-theme' ) ) );
 	}
 }
 
@@ -1135,7 +1185,7 @@ function hocwp_coupon_load_edit_bulk_action( $action ) {
 	switch ( $action ) {
 		case 'reset_rating':
 			if ( ! current_user_can( 'edit_posts' ) ) {
-				wp_die( __( 'You are not allowed to reset rating of this post.', 'hocwp' ) );
+				wp_die( __( 'You are not allowed to reset rating of this post.', 'hocwp-theme' ) );
 			}
 			$reset_rating = 0;
 			$post_ids     = hocwp_get_method_value( 'post', 'get' );
@@ -1152,7 +1202,7 @@ function hocwp_coupon_load_edit_bulk_action( $action ) {
 				wp_redirect( $sendback );
 				exit;
 			} else {
-				wp_die( __( 'Please select post first.', 'hocwp' ) );
+				wp_die( __( 'Please select post first.', 'hocwp-theme' ) );
 			}
 			break;
 	}
@@ -1165,7 +1215,7 @@ function hocwp_coupon_bulk_action_admin_notices() {
 	if ( 'edit.php' == $pagenow && 'coupon' == $post_type ) {
 		$reset_rating = hocwp_get_method_value( 'reset_rating', 'request' );
 		if ( hocwp_id_number_valid( $reset_rating ) ) {
-			$message = hocwp_get_text_base_on_number( __( 'Post rating reseted.', 'hocwp' ), __( '%s posts was reseted rating.', 'hocwp' ), $reset_rating );
+			$message = hocwp_get_text_base_on_number( __( 'Post rating reseted.', 'hocwp-theme' ), __( '%s posts was reseted rating.', 'hocwp-theme' ), $reset_rating );
 			hocwp_admin_notice( array( 'text' => $message ) );
 		}
 	}
@@ -1174,8 +1224,8 @@ function hocwp_coupon_bulk_action_admin_notices() {
 add_action( 'admin_notices', 'hocwp_coupon_bulk_action_admin_notices' );
 
 function hocwp_coupon_widget_post_bys( $bys ) {
-	$bys['best_deal']     = __( 'Best deals', 'hocwp' );
-	$bys['trending_deal'] = __( 'Trending deals', 'hocwp' );
+	$bys['best_deal']     = __( 'Best deals', 'hocwp-theme' );
+	$bys['trending_deal'] = __( 'Trending deals', 'hocwp-theme' );
 
 	return $bys;
 }
@@ -1215,7 +1265,8 @@ add_filter( 'hocwp_widget_post_query_args', 'hocwp_coupon_widget_post_query_args
 
 function hocwp_coupon_wp_action() {
 	if ( is_singular( 'coupon' ) ) {
-		$reading  = hocwp_option_reading();
+		global $hocwp_reading_options;
+		$reading  = $hocwp_reading_options;
 		$trending = hocwp_get_value_by_key( $reading, 'trending' );
 		if ( (bool) $trending ) {
 			hocwp_insert_trending( get_the_ID() );
@@ -1231,6 +1282,14 @@ function hocwp_coupon_wp_action() {
 }
 
 add_action( 'wp', 'hocwp_coupon_wp_action' );
+
+function hocwp_coupon_post_type_user_large_thumbnail( $types ) {
+	$types[] = 'coupon';
+
+	return $types;
+}
+
+add_filter( 'hocwp_post_type_user_large_thumbnail', 'hocwp_coupon_post_type_user_large_thumbnail' );
 
 function hocwp_load_more_coupon_ajax_callback() {
 	$result     = array( 'have_posts' => false, 'no_more' => false );

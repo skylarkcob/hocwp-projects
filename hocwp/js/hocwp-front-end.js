@@ -14,6 +14,9 @@ jQuery(document).ready(function ($) {
                     cssArrows: false,
                     dropShadows: false
                 };
+            if ($element.hasClass('hocwp-mobile-menu')) {
+                return;
+            }
             if (!$element.hasClass('sf-menu')) {
                 $element.addClass('sf-menu');
             }

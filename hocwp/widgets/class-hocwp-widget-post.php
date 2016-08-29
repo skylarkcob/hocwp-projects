@@ -11,17 +11,17 @@ class HOCWP_Widget_Post extends WP_Widget {
 	private function get_defaults() {
 		$defaults = array(
 			'bys'                        => array(
-				'recent'          => __( 'Recent posts', 'hocwp' ),
-				'recent_modified' => __( 'Recent modified posts', 'hocwp' ),
-				'random'          => __( 'Random posts', 'hocwp' ),
-				'comment'         => __( 'Most comment posts', 'hocwp' ),
-				'category'        => __( 'Posts by category', 'hocwp' ),
-				'featured'        => __( 'Featured posts', 'hocwp' ),
-				'related'         => __( 'Related posts', 'hocwp' ),
-				'like'            => __( 'Most likes posts', 'hocwp' ),
-				'view'            => __( 'Most views posts', 'hocwp' ),
-				'favorite'        => __( 'Most favorite posts', 'hocwp' ),
-				'rate'            => __( 'Most rate posts', 'hocwp' )
+				'recent'          => __( 'Recent posts', 'hocwp-theme' ),
+				'recent_modified' => __( 'Recent modified posts', 'hocwp-theme' ),
+				'random'          => __( 'Random posts', 'hocwp-theme' ),
+				'comment'         => __( 'Most comment posts', 'hocwp-theme' ),
+				'category'        => __( 'Posts by category', 'hocwp-theme' ),
+				'featured'        => __( 'Featured posts', 'hocwp-theme' ),
+				'related'         => __( 'Related posts', 'hocwp-theme' ),
+				'like'            => __( 'Most likes posts', 'hocwp-theme' ),
+				'view'            => __( 'Most views posts', 'hocwp-theme' ),
+				'favorite'        => __( 'Most favorite posts', 'hocwp-theme' ),
+				'rate'            => __( 'Most rate posts', 'hocwp-theme' )
 			),
 			'post_type'                  => array( array( 'value' => 'post' ) ),
 			'by'                         => 'recent',
@@ -38,31 +38,31 @@ class HOCWP_Widget_Post extends WP_Widget {
 			'widget_title_link_category' => 0,
 			'category_as_widget_title'   => 1,
 			'full_width_posts'           => array(
-				'none'       => __( 'None', 'hocwp' ),
-				'first'      => __( 'First post', 'hocwp' ),
-				'last'       => __( 'Last post', 'hocwp' ),
-				'first_last' => __( 'First post and last post', 'hocwp' ),
-				'odd'        => __( 'Odd posts', 'hocwp' ),
-				'even'       => __( 'Even posts', 'hocwp' ),
-				'all'        => __( 'All posts', 'hocwp' )
+				'none'       => __( 'None', 'hocwp-theme' ),
+				'first'      => __( 'First post', 'hocwp-theme' ),
+				'last'       => __( 'Last post', 'hocwp-theme' ),
+				'first_last' => __( 'First post and last post', 'hocwp-theme' ),
+				'odd'        => __( 'Odd posts', 'hocwp-theme' ),
+				'even'       => __( 'Even posts', 'hocwp-theme' ),
+				'all'        => __( 'All posts', 'hocwp-theme' )
 			),
 			'full_width_post'            => 'none',
 			'times'                      => array(
-				'all'     => __( 'All time', 'hocwp' ),
-				'daily'   => __( 'Daily', 'hocwp' ),
-				'weekly'  => __( 'Weekly', 'hocwp' ),
-				'monthly' => __( 'Monthly', 'hocwp' ),
-				'yearly'  => __( 'Yearly', 'hocwp' )
+				'all'     => __( 'All time', 'hocwp-theme' ),
+				'daily'   => __( 'Daily', 'hocwp-theme' ),
+				'weekly'  => __( 'Weekly', 'hocwp-theme' ),
+				'monthly' => __( 'Monthly', 'hocwp-theme' ),
+				'yearly'  => __( 'Yearly', 'hocwp-theme' )
 			),
 			'time'                       => 'all',
 			'orders'                     => array(
-				'desc' => __( 'DESC', 'hocwp' ),
-				'asc'  => __( 'ASC', 'hocwp' )
+				'desc' => __( 'DESC', 'hocwp-theme' ),
+				'asc'  => __( 'ASC', 'hocwp-theme' )
 			),
 			'order'                      => 'desc',
 			'orderbys'                   => array(
-				'title' => __( 'Title', 'hocwp' ),
-				'date'  => __( 'Post date', 'hocwp' )
+				'title' => __( 'Title', 'hocwp-theme' ),
+				'date'  => __( 'Post date', 'hocwp-theme' )
 			),
 			'orderby'                    => 'date',
 			'slider'                     => 0
@@ -83,7 +83,7 @@ class HOCWP_Widget_Post extends WP_Widget {
 			'id'          => 'hocwp_widget_post',
 			'name'        => 'HocWP Post',
 			'class'       => 'hocwp-widget-post',
-			'description' => __( 'Your site’s most recent Posts and more.', 'hocwp' ),
+			'description' => __( 'Your site’s most recent Posts and more.', 'hocwp-theme' ),
 			'width'       => 400
 		);
 		$this->admin_args  = apply_filters( 'hocwp_widget_post_admin_args', $this->admin_args, $this );
@@ -124,14 +124,11 @@ class HOCWP_Widget_Post extends WP_Widget {
 				$post_types[] = $ptvalue;
 			}
 		}
-		$number         = isset( $instance['number'] ) ? $instance['number'] : $this->args['number'];
-		$by             = isset( $instance['by'] ) ? $instance['by'] : $this->args['by'];
-		$category       = isset( $instance['category'] ) ? $instance['category'] : json_encode( $this->args['category'] );
-		$category       = hocwp_json_string_to_array( $category );
-		$excerpt_length = isset( $instance['excerpt_length'] ) ? $instance['excerpt_length'] : $this->args['excerpt_length'];
-		//$thumbnail_size             = isset( $instance['thumbnail_size'] ) ? $instance['thumbnail_size'] : $this->args['thumbnail_size'];
-		//$thumbnail_size             = hocwp_sanitize_size( $thumbnail_size );
-		//$full_width_post            = hocwp_get_value_by_key( $instance, 'full_width_post', $this->args['full_width_post'] );
+		$number                     = isset( $instance['number'] ) ? $instance['number'] : $this->args['number'];
+		$by                         = isset( $instance['by'] ) ? $instance['by'] : $this->args['by'];
+		$category                   = isset( $instance['category'] ) ? $instance['category'] : json_encode( $this->args['category'] );
+		$category                   = hocwp_json_string_to_array( $category );
+		$excerpt_length             = isset( $instance['excerpt_length'] ) ? $instance['excerpt_length'] : $this->args['excerpt_length'];
 		$content_class              = 'widget-content';
 		$slider                     = hocwp_get_value_by_key( $instance, 'slider', hocwp_get_value_by_key( $this->args, 'slider' ) );
 		$title_length               = hocwp_get_value_by_key( $instance, 'title_length', hocwp_get_value_by_key( $this->args, 'title_length' ) );
@@ -352,7 +349,7 @@ class HOCWP_Widget_Post extends WP_Widget {
 		echo $widget_html;
 	}
 
-	public function list_post_html( $args, $instance, $query ) {
+	public function list_post_html( $args, $instance, WP_Query $query ) {
 		$post_type  = $this->get_post_type_from_instance( $instance );
 		$post_types = array();
 		foreach ( $post_type as $fvdata ) {
@@ -365,6 +362,7 @@ class HOCWP_Widget_Post extends WP_Widget {
 		$hide_thumbnail  = hocwp_get_value_by_key( $instance, 'hide_thumbnail', hocwp_get_value_by_key( $this->args, 'hide_thumbnail' ) );
 		$thumbnail_size  = isset( $instance['thumbnail_size'] ) ? $instance['thumbnail_size'] : $this->args['thumbnail_size'];
 		$thumbnail_size  = hocwp_sanitize_size( $thumbnail_size );
+		$excerpt_length  = isset( $instance['excerpt_length'] ) ? $instance['excerpt_length'] : $this->args['excerpt_length'];
 		$title_length    = hocwp_get_value_by_key( $instance, 'title_length', hocwp_get_value_by_key( $this->args, 'title_length' ) );
 		$list_class      = 'list-unstyled';
 		foreach ( $post_types as $ptvalue ) {
@@ -408,17 +406,17 @@ class HOCWP_Widget_Post extends WP_Widget {
 					if ( ! (bool) $hide_thumbnail ) {
 						if ( 'coupon' == $post->post_type ) {
 							echo '<div class="text-center code-data">';
-							$percent = hocwp_get_coupon_percent_label($post_id);
-							$text = hocwp_get_coupon_text_label($post_id);
+							$percent   = hocwp_get_coupon_percent_label( $post_id );
+							$text      = hocwp_get_coupon_text_label( $post_id );
 							$type_text = 'Website Coupons';
-							$type_term = hocwp_get_coupon_type_term($post_id);
-							if(is_a($type_term, 'WP_Term')) {
+							$type_term = hocwp_get_coupon_type_term( $post_id );
+							if ( is_a( $type_term, 'WP_Term' ) ) {
 								$type_text = $type_term->name;
 							}
-							$tmp = hocwp_get_coupon_type($post_id);
-							if(is_array($tmp)) {
-								$tmp = array_shift($tmp);
-								if(!empty($tmp)) {
+							$tmp = hocwp_get_coupon_type( $post_id );
+							if ( is_array( $tmp ) ) {
+								$tmp = array_shift( $tmp );
+								if ( ! empty( $tmp ) ) {
 									$type_text = $tmp;
 								}
 							}
@@ -428,15 +426,28 @@ class HOCWP_Widget_Post extends WP_Widget {
 							<?php
 							echo '</div>';
 						} else {
-							hocwp_post_thumbnail( array(
+							$thumbnail_args = array(
 								'width'  => $thumbnail_size[0],
 								'height' => $thumbnail_size[1]
-							) );
+							);
+							if ( $full_width ) {
+								unset( $thumbnail_args['width'] );
+								unset( $thumbnail_args['height'] );
+							}
+							hocwp_post_thumbnail( $thumbnail_args );
 						}
 					}
 					do_action( 'hocwp_widget_post_before_post_title', $args, $instance, $this );
 					hocwp_post_title_link( array( 'title' => hocwp_substr( get_the_title(), $title_length ) ) );
 					do_action( 'hocwp_widget_post_after_post_title', $args, $instance, $this );
+					if ( 0 < $excerpt_length ) {
+						$post_type = get_post_type( $post_id );
+						if ( 'product' == $post_type && hocwp_wc_installed() ) {
+							hocwp_wc_product_price( null, true );
+						} else {
+							hocwp_entry_summary( $excerpt_length );
+						}
+					}
 					do_action( 'hocwp_widget_post_after_post', $args, $instance, $this );
 					?>
 				</li>
@@ -501,8 +512,8 @@ class HOCWP_Widget_Post extends WP_Widget {
 			'name'        => $this->get_field_name( 'post_type' ),
 			'all_option'  => $all_option,
 			'value'       => $post_type,
-			'label'       => __( 'Post type:', 'hocwp' ),
-			'placeholder' => __( 'Choose post types', 'hocwp' ),
+			'label'       => __( 'Post type:', 'hocwp-theme' ),
+			'placeholder' => __( 'Choose post types', 'hocwp-theme' ),
 			'multiple'    => true
 		);
 		hocwp_widget_field( 'hocwp_field_select_chosen', $args );
@@ -511,7 +522,7 @@ class HOCWP_Widget_Post extends WP_Widget {
 			'id'    => $this->get_field_id( 'number' ),
 			'name'  => $this->get_field_name( 'number' ),
 			'value' => $number,
-			'label' => __( 'Number posts:', 'hocwp' )
+			'label' => __( 'Number posts:', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_number', $args );
 
@@ -525,7 +536,7 @@ class HOCWP_Widget_Post extends WP_Widget {
 			'name'       => $this->get_field_name( 'by' ),
 			'value'      => $by,
 			'all_option' => $all_option,
-			'label'      => __( 'Get by:', 'hocwp' ),
+			'label'      => __( 'Get by:', 'hocwp-theme' ),
 			'class'      => 'get-by'
 		);
 		hocwp_widget_field( 'hocwp_field_select', $args );
@@ -562,8 +573,8 @@ class HOCWP_Widget_Post extends WP_Widget {
 			'name'        => $this->get_field_name( 'category' ),
 			'all_option'  => $all_option,
 			'value'       => $category,
-			'label'       => __( 'Category:', 'hocwp' ),
-			'placeholder' => __( 'Choose terms', 'hocwp' ),
+			'label'       => __( 'Category:', 'hocwp-theme' ),
+			'placeholder' => __( 'Choose terms', 'hocwp-theme' ),
 			'multiple'    => true,
 			'class'       => 'select-category'
 		);
@@ -578,7 +589,7 @@ class HOCWP_Widget_Post extends WP_Widget {
 			'id_height'   => $this->get_field_id( 'thumbnail_size_height' ),
 			'name_height' => $this->get_field_name( 'thumbnail_size_height' ),
 			'value'       => $thumbnail_size,
-			'label'       => __( 'Thumbnail size:', 'hocwp' )
+			'label'       => __( 'Thumbnail size:', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_size', $args );
 
@@ -596,7 +607,7 @@ class HOCWP_Widget_Post extends WP_Widget {
 			'name'       => $this->get_field_name( 'full_width_post' ),
 			'value'      => $full_width_post,
 			'all_option' => $all_option,
-			'label'      => __( 'Full width posts:', 'hocwp' ),
+			'label'      => __( 'Full width posts:', 'hocwp-theme' ),
 			'class'      => 'full-width-post'
 		);
 		hocwp_widget_field( 'hocwp_field_select', $args );
@@ -605,7 +616,7 @@ class HOCWP_Widget_Post extends WP_Widget {
 			'id'    => $this->get_field_id( 'title_length' ),
 			'name'  => $this->get_field_name( 'title_length' ),
 			'value' => $title_length,
-			'label' => __( 'Title length:', 'hocwp' )
+			'label' => __( 'Title length:', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_number', $args );
 
@@ -613,7 +624,7 @@ class HOCWP_Widget_Post extends WP_Widget {
 			'id'    => $this->get_field_id( 'excerpt_length' ),
 			'name'  => $this->get_field_name( 'excerpt_length' ),
 			'value' => $excerpt_length,
-			'label' => __( 'Excerpt length:', 'hocwp' )
+			'label' => __( 'Excerpt length:', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_number', $args );
 
@@ -622,7 +633,7 @@ class HOCWP_Widget_Post extends WP_Widget {
 			'id'    => $this->get_field_id( 'slider' ),
 			'name'  => $this->get_field_name( 'slider' ),
 			'value' => $slider,
-			'label' => __( 'Display post as slider?', 'hocwp' )
+			'label' => __( 'Display post as slider?', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_checkbox', $args );
 
@@ -630,7 +641,7 @@ class HOCWP_Widget_Post extends WP_Widget {
 			'id'    => $this->get_field_id( 'hide_thumbnail' ),
 			'name'  => $this->get_field_name( 'hide_thumbnail' ),
 			'value' => $hide_thumbnail,
-			'label' => __( 'Hide post thumbnail?', 'hocwp' )
+			'label' => __( 'Hide post thumbnail?', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_checkbox', $args );
 
@@ -638,7 +649,7 @@ class HOCWP_Widget_Post extends WP_Widget {
 			'id'    => $this->get_field_id( 'widget_title_link_category' ),
 			'name'  => $this->get_field_name( 'widget_title_link_category' ),
 			'value' => $widget_title_link_category,
-			'label' => __( 'Link widget title with category?', 'hocwp' )
+			'label' => __( 'Link widget title with category?', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_checkbox', $args );
 
@@ -646,7 +657,7 @@ class HOCWP_Widget_Post extends WP_Widget {
 			'id'    => $this->get_field_id( 'category_as_widget_title' ),
 			'name'  => $this->get_field_name( 'category_as_widget_title' ),
 			'value' => $category_as_widget_title,
-			'label' => __( 'Display category name as widget title?', 'hocwp' )
+			'label' => __( 'Display category name as widget title?', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_checkbox', $args );
 

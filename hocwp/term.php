@@ -22,9 +22,25 @@ function hocwp_the_terms( $args = array() ) {
 		echo $html;
 		echo $after;
 	} else {
-		$post_id  = hocwp_get_value_by_key( $args, 'post_id', get_the_ID() );
-		$taxonomy = hocwp_get_value_by_key( $args, 'taxonomy' );
-		the_terms( $post_id, $taxonomy, $before, $sep, $after );
+		$post_id    = hocwp_get_value_by_key( $args, 'post_id', get_the_ID() );
+		$taxonomy   = hocwp_get_value_by_key( $args, 'taxonomy' );
+		$taxonomies = hocwp_get_value_by_key( $args, 'taxonomies' );
+		if ( ! is_array( $taxonomies ) ) {
+			$taxonomies = array();
+		}
+		if ( ! empty( $taxonomy ) && ! in_array( $taxonomy, $taxonomies ) ) {
+			$taxonomies[] = $taxonomy;
+		}
+		echo $before;
+		ob_start();
+		foreach ( $taxonomies as $taxonomy ) {
+			the_terms( $post_id, $taxonomy, '', $sep, '' );
+			echo $sep;
+		}
+		$html = ob_get_clean();
+		$html = trim( $html, $sep );
+		echo $html;
+		echo $after;
 	}
 }
 
@@ -58,7 +74,7 @@ function hocwp_term_meta_thumbnail_field( $taxonomies = array() ) {
 		$meta->set_use_media_upload( true );
 		$meta->add_field( array(
 			'id'             => 'thumbnail',
-			'label'          => __( 'Thumbnail', 'hocwp' ),
+			'label'          => __( 'Thumbnail', 'hocwp-theme' ),
 			'field_callback' => 'hocwp_field_media_upload'
 		) );
 		$meta->init();
@@ -78,7 +94,7 @@ function hocwp_term_meta_different_name_field( $taxonomies = array() ) {
 		}
 		$meta = new HOCWP_Meta( 'term' );
 		$meta->set_taxonomies( $taxonomies );
-		$meta->add_field( array( 'id' => 'different_name', 'label' => __( 'Different Name', 'hocwp' ) ) );
+		$meta->add_field( array( 'id' => 'different_name', 'label' => __( 'Different Name', 'hocwp-theme' ) ) );
 		$meta->init();
 	}
 }
@@ -116,14 +132,43 @@ function hocwp_term_link_li_html( $term ) {
 	return $link . PHP_EOL;
 }
 
+function hocwp_term_get_thumbnail_url_helper( $term, $from_parent = false ) {
+	if ( ! is_a( $term, 'WP_Term' ) ) {
+		return '';
+	}
+	$term_id = $term->term_id;
+	$value   = get_term_meta( $term_id, 'thumbnail', true );
+	$value   = hocwp_sanitize_media_value( $value );
+	$value   = $value['url'];
+	if ( empty( $value ) && $from_parent ) {
+		$parent_id = $term->parent;
+		while ( empty( $value ) && $parent_id > 0 ) {
+			$parent    = get_term( $parent_id, $term->taxonomy );
+			$value     = hocwp_term_get_thumbnail_url_helper( $parent, $from_parent );
+			$parent_id = $parent->parent;
+		}
+	}
+
+	return $value;
+}
+
+function hocwp_term_has_thumbnail( $term, $from_parent = false ) {
+	$value = hocwp_term_get_thumbnail_url_helper( $term, $from_parent );
+	if ( empty( $value ) ) {
+		return false;
+	}
+
+	return true;
+}
+
 function hocwp_term_get_thumbnail_url( $args = array() ) {
 	if ( hocwp_id_number_valid( $args ) ) {
 		$term_id = $args;
 	} else {
 		$term_id = hocwp_get_value_by_key( $args, 'term_id' );
 	}
+	$term = hocwp_get_value_by_key( $args, 'term' );
 	if ( ! hocwp_id_number_valid( $term_id ) ) {
-		$term = hocwp_get_value_by_key( $args, 'term' );
 		if ( is_a( $term, 'WP_Term' ) ) {
 			$term_id = $term->term_id;
 		}
@@ -144,6 +189,12 @@ function hocwp_term_get_thumbnail_url( $args = array() ) {
 		}
 	}
 	if ( ! $icon ) {
+		if ( empty( $value ) ) {
+			$from_parent = hocwp_get_value_by_key( $args, 'from_parent' );
+			if ( (bool) $from_parent ) {
+				$value = hocwp_term_get_thumbnail_url_helper( $term, true );
+			}
+		}
 		if ( empty( $value ) && (bool) $use_default_term_thumbnail ) {
 			$value = hocwp_get_image_url( 'no-thumbnail.png' );
 		}
@@ -161,7 +212,9 @@ function hocwp_term_get_thumbnail_url( $args = array() ) {
 			}
 			$crop           = hocwp_get_value_by_key( $args, 'crop', true );
 			$params['crop'] = $crop;
-			$value          = bfi_thumb( $value, $params );
+			if ( $width > 0 || $height > 0 ) {
+				$value = bfi_thumb( $value, $params );
+			}
 		}
 	}
 
@@ -181,13 +234,18 @@ function hocwp_term_get_thumbnail_html( $args = array() ) {
 			}
 		}
 		if ( is_a( $term, 'WP_Term' ) ) {
+			$taxonomy  = $term->taxonomy;
 			$size      = hocwp_sanitize_size( $args );
 			$link      = hocwp_get_value_by_key( $args, 'link', true );
 			$show_name = hocwp_get_value_by_key( $args, 'show_name' );
 			$img       = new HOCWP_HTML( 'img' );
 			$img->set_image_src( $thumb_url );
-			$img->set_attribute( 'width', $size[0] );
-			$img->set_attribute( 'height', $size[1] );
+			if ( $size[0] > 0 ) {
+				$img->set_attribute( 'width', $size[0] );
+			}
+			if ( $size[1] > 0 ) {
+				$img->set_attribute( 'height', $size[1] );
+			}
 			$class = 'img-responsive wp-term-image';
 			$slug  = $term->taxonomy;
 			hocwp_add_string_with_space_before( $class, hocwp_sanitize_html_class( $slug ) . '-thumb' );
@@ -197,6 +255,7 @@ function hocwp_term_get_thumbnail_html( $args = array() ) {
 				$link_text .= '<span class="term-name">' . $term->name . '</span>';
 			}
 			$a = new HOCWP_HTML( 'a' );
+			$a->set_class( 'term-link ' . hocwp_sanitize_html_class( $taxonomy ) );
 			$a->set_text( $link_text );
 			$a->set_attribute( 'title', $term->name );
 			$a->set_href( get_term_link( $term ) );

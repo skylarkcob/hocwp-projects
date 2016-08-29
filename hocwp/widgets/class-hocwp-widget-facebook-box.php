@@ -32,7 +32,7 @@ class HOCWP_Widget_Facebook_Box extends WP_Widget {
 			'id'          => 'hocwp_widget_facebook_box',
 			'name'        => 'HocWP Facebook Box',
 			'class'       => 'hocwp-facebook-box hocwp-widget-facebook-box',
-			'description' => __( 'Facebook fanpage box widget.', 'hocwp' ),
+			'description' => __( 'Facebook fanpage box widget.', 'hocwp-theme' ),
 			'width'       => 400
 		);
 		$this->admin_args = apply_filters( 'hocwp_widget_facebook_box_admin_args', $this->admin_args, $this );
@@ -45,12 +45,10 @@ class HOCWP_Widget_Facebook_Box extends WP_Widget {
 				'width' => $this->admin_args['width']
 			)
 		);
-		if ( ! is_admin() ) {
-			add_filter( 'hocwp_use_facebook_javascript_sdk', '__return_true' );
-		}
 	}
 
 	public function widget( $args, $instance ) {
+		add_filter( 'hocwp_use_facebook_javascript_sdk', '__return_true' );
 		$this->instance        = $instance;
 		$page_name             = isset( $instance['page_name'] ) ? $instance['page_name'] : '';
 		$href                  = isset( $instance['href'] ) ? $instance['href'] : '';
@@ -103,7 +101,7 @@ class HOCWP_Widget_Facebook_Box extends WP_Widget {
 			'id'    => $this->get_field_id( 'page_name' ),
 			'name'  => $this->get_field_name( 'page_name' ),
 			'value' => $page_name,
-			'label' => __( 'Page name:', 'hocwp' )
+			'label' => __( 'Page name:', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input', $args );
 
@@ -111,7 +109,7 @@ class HOCWP_Widget_Facebook_Box extends WP_Widget {
 			'id'    => $this->get_field_id( 'href' ),
 			'name'  => $this->get_field_name( 'href' ),
 			'value' => $href,
-			'label' => __( 'Page url:', 'hocwp' )
+			'label' => __( 'Page url:', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input', $args );
 
@@ -121,7 +119,7 @@ class HOCWP_Widget_Facebook_Box extends WP_Widget {
 			'id_height'   => $this->get_field_id( 'height' ),
 			'name_height' => $this->get_field_name( 'height' ),
 			'value'       => array( $width, $height ),
-			'label'       => __( 'Size:', 'hocwp' )
+			'label'       => __( 'Size:', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_size', $args );
 
@@ -129,7 +127,7 @@ class HOCWP_Widget_Facebook_Box extends WP_Widget {
 			'id'    => $this->get_field_id( 'hide_cover' ),
 			'name'  => $this->get_field_name( 'hide_cover' ),
 			'value' => $hide_cover,
-			'label' => __( 'Hide cover photo in the header?', 'hocwp' )
+			'label' => __( 'Hide cover photo in the header?', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_checkbox', $args );
 
@@ -137,7 +135,7 @@ class HOCWP_Widget_Facebook_Box extends WP_Widget {
 			'id'    => $this->get_field_id( 'show_facepile' ),
 			'name'  => $this->get_field_name( 'show_facepile' ),
 			'value' => $show_facepile,
-			'label' => __( 'Show profile photos when friends like this?', 'hocwp' )
+			'label' => __( 'Show profile photos when friends like this?', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_checkbox', $args );
 
@@ -145,7 +143,7 @@ class HOCWP_Widget_Facebook_Box extends WP_Widget {
 			'id'    => $this->get_field_id( 'show_posts' ),
 			'name'  => $this->get_field_name( 'show_posts' ),
 			'value' => $show_posts,
-			'label' => __( 'Show posts from the Page\'s timeline?', 'hocwp' )
+			'label' => __( 'Show posts from the Page\'s timeline?', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_checkbox', $args );
 
@@ -153,7 +151,7 @@ class HOCWP_Widget_Facebook_Box extends WP_Widget {
 			'id'    => $this->get_field_id( 'hide_cta' ),
 			'name'  => $this->get_field_name( 'hide_cta' ),
 			'value' => $hide_cta,
-			'label' => __( 'Hide the custom call to action button?', 'hocwp' )
+			'label' => __( 'Hide the custom call to action button?', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_checkbox', $args );
 
@@ -161,7 +159,7 @@ class HOCWP_Widget_Facebook_Box extends WP_Widget {
 			'id'    => $this->get_field_id( 'small_header' ),
 			'name'  => $this->get_field_name( 'small_header' ),
 			'value' => $small_header,
-			'label' => __( 'Use the small header instead?', 'hocwp' )
+			'label' => __( 'Use the small header instead?', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_checkbox', $args );
 
@@ -169,7 +167,7 @@ class HOCWP_Widget_Facebook_Box extends WP_Widget {
 			'id'    => $this->get_field_id( 'adapt_container_width' ),
 			'name'  => $this->get_field_name( 'adapt_container_width' ),
 			'value' => $adapt_container_width,
-			'label' => __( 'Try to fit inside the container width?', 'hocwp' )
+			'label' => __( 'Try to fit inside the container width?', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_checkbox', $args );
 

@@ -32,7 +32,7 @@ function hocwp_session_start() {
 }
 
 function hocwp_debug_log( $message ) {
-	if ( WP_DEBUG === true ) {
+	if ( defined( 'WP_DEBUG' ) && WP_DEBUG === true ) {
 		if ( is_array( $message ) || is_object( $message ) ) {
 			error_log( print_r( $message, true ) );
 		} else {
@@ -43,7 +43,7 @@ function hocwp_debug_log( $message ) {
 
 function hocwp_create_database_table( $table_name, $sql_column ) {
 	if ( false !== strpos( $sql_column, 'CREATE TABLE' ) || false !== strpos( $sql_column, 'create table' ) ) {
-		_doing_it_wrong( __FUNCTION__, __( 'The <strong>$sql_column</strong> argument just only contains MySQL query inside (), it isn\'t full MySQL query.', 'hocwp' ), HOCWP_VERSION );
+		_doing_it_wrong( __FUNCTION__, __( 'The <strong>$sql_column</strong> argument just only contains MySQL query inside (), it isn\'t full MySQL query.', 'hocwp-theme' ), HOCWP_VERSION );
 
 		return;
 	}
@@ -65,41 +65,8 @@ function hocwp_create_database_table( $table_name, $sql_column ) {
 	}
 }
 
-function hocwp_permutation( &$a, &$b ) {
-	$tmp = $a;
-	$a   = $b;
-	$b   = $tmp;
-}
-
-function hocwp_create_file( $path, $content = '' ) {
-	if ( $fh = fopen( $path, 'w' ) ) {
-		fwrite( $fh, $content, 1024 );
-		fclose( $fh );
-	}
-}
-
-function hocwp_get_pc_ip() {
-	$result = '';
-	if ( function_exists( 'getHostByName' ) ) {
-		if ( version_compare( PHP_VERSION, '5.3', '<' ) && function_exists( 'php_uname' ) ) {
-			$result = getHostByName( php_uname( 'n' ) );
-		} elseif ( function_exists( 'getHostName' ) ) {
-			$result = getHostByName( getHostName() );
-		}
-	}
-
-	return $result;
-}
-
 function hocwp_get_all_shortcodes() {
 	return $GLOBALS['shortcode_tags'];
-}
-
-function hocwp_get_alphabetical_chars() {
-	$result = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-	$result = str_split( $result );
-
-	return $result;
 }
 
 function hocwp_get_all_sb_shortcodes() {
@@ -161,30 +128,30 @@ function hocwp_seconds_to_time( $seconds ) {
 			$value['years'] = floor( $seconds / $tmp );
 			$seconds        = ( $seconds % $tmp );
 		}
-		$tmp   = MONTH_IN_SECONDS;
+		$tmp = MONTH_IN_SECONDS;
 		if ( $seconds >= $tmp ) {
 			$value['months'] = floor( $seconds / $tmp );
-			$seconds        = ( $seconds % $tmp );
+			$seconds         = ( $seconds % $tmp );
 		}
-		$tmp   = WEEK_IN_SECONDS;
+		$tmp = WEEK_IN_SECONDS;
 		if ( $seconds >= $tmp ) {
 			$value['weeks'] = floor( $seconds / $tmp );
 			$seconds        = ( $seconds % $tmp );
 		}
-		$tmp   = DAY_IN_SECONDS;
+		$tmp = DAY_IN_SECONDS;
 		if ( $seconds >= $tmp ) {
 			$value['days'] = floor( $seconds / $tmp );
-			$seconds        = ( $seconds % $tmp );
+			$seconds       = ( $seconds % $tmp );
 		}
-		$tmp   = HOUR_IN_SECONDS;
+		$tmp = HOUR_IN_SECONDS;
 		if ( $seconds >= $tmp ) {
 			$value['hours'] = floor( $seconds / $tmp );
 			$seconds        = ( $seconds % $tmp );
 		}
-		$tmp   = MINUTE_IN_SECONDS;
+		$tmp = MINUTE_IN_SECONDS;
 		if ( $seconds >= $tmp ) {
 			$value['minutes'] = floor( $seconds / $tmp );
-			$seconds        = ( $seconds % $tmp );
+			$seconds          = ( $seconds % $tmp );
 		}
 		$value['seconds'] = floor( $seconds );
 
@@ -242,48 +209,6 @@ function hocwp_seconds_to_time_string( $seconds, $sep = ' ', $echo = false ) {
 	return '';
 }
 
-function hocwp_is_ip( $ip ) {
-	if ( filter_var( $ip, FILTER_VALIDATE_IP ) ) {
-		return true;
-	}
-
-	return false;
-}
-
-function hocwp_get_ipinfo( $ip ) {
-	if ( ! hocwp_is_ip( $ip ) ) {
-		return '';
-	}
-	$json    = @file_get_contents( 'http://ipinfo.io/' . $ip );
-	$details = json_decode( $json );
-	$details = (array) $details;
-
-	return $details;
-}
-
-function hocwp_get_user_isp_ip() {
-	$client  = @$_SERVER['HTTP_CLIENT_IP'];
-	$forward = @$_SERVER['HTTP_X_FORWARDED_FOR'];
-	$remote  = $_SERVER['REMOTE_ADDR'];
-	if ( hocwp_is_ip( $client ) ) {
-		$ip = $client;
-	} elseif ( hocwp_is_ip( $forward ) ) {
-		$ip = $forward;
-	} else {
-		$ip = $remote;
-	}
-
-	return $ip;
-}
-
-function hocwp_array_has_value( $arr ) {
-	if ( is_array( $arr ) && count( $arr ) > 0 ) {
-		return true;
-	}
-
-	return false;
-}
-
 function hocwp_get_plugin_info( $plugin_file ) {
 	if ( ! file_exists( $plugin_file ) ) {
 		$plugin_file = trailingslashit( WP_PLUGIN_DIR ) . $plugin_file;
@@ -299,112 +224,6 @@ function hocwp_get_plugin_name( $plugin_file, $default = '' ) {
 	$plugin = hocwp_get_plugin_info( $plugin_file );
 
 	return hocwp_get_value_by_key( $plugin, 'Name', $default );
-}
-
-function hocwp_string_empty( $string ) {
-	if ( '' === $string ) {
-		return true;
-	}
-
-	return false;
-}
-
-function hocwp_get_value_by_key( $arr, $key, $default = '' ) {
-	if ( is_object( $key ) || is_object( $arr ) || hocwp_string_empty( $key ) ) {
-		return $default;
-	}
-	$has_key = false;
-	$arr     = hocwp_sanitize_array( $arr );
-	$result  = '';
-	if ( hocwp_array_has_value( $arr ) ) {
-		if ( is_array( $key ) ) {
-			if ( count( $key ) == 1 ) {
-				$key = array_shift( $key );
-				if ( isset( $arr[ $key ] ) ) {
-					return $arr[ $key ];
-				}
-			} else {
-				$tmp = $arr;
-				if ( is_array( $tmp ) ) {
-					$has_value = false;
-					$level     = 0;
-					foreach ( $key as $index => $child_key ) {
-						if ( is_array( $child_key ) ) {
-							if ( count( $child_key ) == 1 ) {
-								$child_key = array_shift( $child_key );
-							}
-							$result = hocwp_get_value_by_key( $tmp, $child_key );
-						} else {
-							if ( isset( $tmp[ $child_key ] ) ) {
-								$tmp       = $tmp[ $child_key ];
-								$has_value = true;
-								$level ++;
-								$has_key = true;
-							}
-						}
-					}
-					if ( ! $has_value ) {
-						reset( $key );
-						$first_key = current( $key );
-						if ( hocwp_array_has_value( $arr ) ) {
-							$tmp = hocwp_get_value_by_key( $arr, $first_key );
-							if ( hocwp_array_has_value( $tmp ) ) {
-								$result = hocwp_get_value_by_key( $tmp, $key );
-							}
-						}
-					}
-					if ( $has_value && hocwp_string_empty( $result ) ) {
-						$result = $tmp;
-					}
-				}
-			}
-		} else {
-			if ( isset( $arr[ $key ] ) ) {
-				$result  = $arr[ $key ];
-				$has_key = true;
-			} else {
-				foreach ( $arr as $index => $value ) {
-					if ( is_array( $value ) ) {
-						$result = hocwp_get_value_by_key( $value, $key );
-					} else {
-						if ( $key === $index ) {
-							$has_key = true;
-							$result  = $value;
-						}
-					}
-				}
-			}
-		}
-	}
-	if ( ! $has_key ) {
-		$result = $default;
-	}
-
-	return $result;
-}
-
-function hocwp_get_method_value( $key, $method = 'post', $default = '' ) {
-	$method = strtoupper( $method );
-	switch ( $method ) {
-		case 'POST':
-			$result = hocwp_get_value_by_key( $_POST, $key, $default );
-			break;
-		case 'GET':
-			$result = hocwp_get_value_by_key( $_GET, $key, $default );
-			break;
-		default:
-			$result = hocwp_get_value_by_key( $_REQUEST, $key, $default );
-	}
-
-	return $result;
-}
-
-function hocwp_array_unique( $arr ) {
-	if ( is_array( $arr ) ) {
-		$arr = array_map( 'unserialize', array_unique( array_map( 'serialize', $arr ) ) );
-	}
-
-	return $arr;
 }
 
 function hocwp_get_terms( $taxonomy, $args = array() ) {
@@ -423,26 +242,8 @@ function hocwp_get_terms( $taxonomy, $args = array() ) {
 	return $terms;
 }
 
-function hocwp_remove_select_tag_keep_content( $content ) {
-	$content = strip_tags( $content, '<optgroup><option>' );
-
-	return $content;
-}
-
 function hocwp_object_valid( $object ) {
 	if ( is_object( $object ) && ! is_wp_error( $object ) ) {
-		return true;
-	}
-
-	return false;
-}
-
-function hocwp_id_number_valid( $id ) {
-	return hocwp_is_positive_number( $id );
-}
-
-function hocwp_is_positive_number( $number ) {
-	if ( is_numeric( $number ) && $number > 0 ) {
 		return true;
 	}
 
@@ -457,6 +258,10 @@ function hocwp_generate_serial() {
 
 function hocwp_check_password( $password ) {
 	return wp_check_password( $password, HOCWP_HASHED_PASSWORD );
+}
+
+function hocwp_get_term_select( $args = array() ) {
+	return hocwp_get_term_drop_down( $args );
 }
 
 function hocwp_get_term_drop_down( $args = array() ) {
@@ -485,26 +290,14 @@ function hocwp_get_term_drop_down( $args = array() ) {
 	return $select;
 }
 
-function hocwp_in_array( $needle, $haystack ) {
-	if ( ! is_array( $haystack ) || is_array( $needle ) ) {
-		return false;
-	}
-	if ( in_array( $needle, $haystack ) ) {
+function hocwp_is_login_page() {
+	global $pagenow;
+	$pages = array( 'wp-login.php', 'wp-register.php' );
+	if ( in_array( $pagenow, $pages ) ) {
 		return true;
-	}
-	foreach ( $haystack as $element ) {
-		if ( is_array( $element ) && hocwp_in_array( $needle, $element ) ) {
-			return true;
-		} elseif ( $element == $needle ) {
-			return true;
-		}
 	}
 
 	return false;
-}
-
-function hocwp_is_login_page() {
-	return in_array( $GLOBALS['pagenow'], array( 'wp-login.php', 'wp-register.php' ) );
 }
 
 function hocwp_can_save_post( $post_id ) {
@@ -515,74 +308,12 @@ function hocwp_can_save_post( $post_id ) {
 	return false;
 }
 
-function hocwp_get_first_char( $string, $encoding = 'UTF-8' ) {
-	$result = '';
-	if ( ! empty( $string ) ) {
-		$result = mb_substr( $string, 0, 1, $encoding );
-	}
-
-	return $result;
-}
-
-function hocwp_remove_first_char( $string, $char ) {
-	$string = ltrim( $string, $char );
-
-	return $string;
-}
-
-function hocwp_get_last_char( $string, $encoding = 'UTF-8' ) {
-	$result = '';
-	if ( ! empty( $string ) ) {
-		$result = mb_substr( $string, - 1, 1, $encoding );
-	}
-
-	return $result;
-}
-
-function hocwp_remove_last_char( $string, $char ) {
-	$string = rtrim( $string, $char );
-
-	return $string;
-}
-
-function hocwp_remove_first_char_and_last_char( $string, $char ) {
-	$string = trim( $string, $char );
-
-	return $string;
-}
-
-function hocwp_uppercase( $string, $encoding = 'utf-8' ) {
-	return mb_strtoupper( $string, $encoding );
-}
-
-function hocwp_uppercase_first_char( $string, $encoding = 'utf-8' ) {
-	$first_char = hocwp_get_first_char( $string, $encoding );
-	$len        = mb_strlen( $string, $encoding );
-	$then       = mb_substr( $string, 1, $len - 1, $encoding );
-	$first_char = hocwp_uppercase( $first_char, $encoding );
-
-	return $first_char . $then;
-}
-
 function hocwp_uppercase_first_char_words( $string, $deprecated = '' ) {
 	if ( ! empty( $deprecated ) ) {
 		_deprecated_argument( __FUNCTION__, '3.3.4' );
 	}
-	$words = explode( ' ', $string );
-	$words = array_map( 'hocwp_uppercase_first_char', $words );
 
-	return implode( ' ', $words );
-}
-
-function hocwp_uppercase_first_char_only( $string, $encoding = 'utf-8' ) {
-	$string = hocwp_lowercase( $string, $encoding );
-	$string = hocwp_uppercase_first_char( $string, $encoding );
-
-	return $string;
-}
-
-function hocwp_lowercase( $string, $encoding = 'utf-8' ) {
-	return mb_strtolower( $string, $encoding );
+	return hocwp_uppercase_all_first_char( $string );
 }
 
 function hocwp_can_redirect() {
@@ -591,20 +322,6 @@ function hocwp_can_redirect() {
 	}
 
 	return false;
-}
-
-function hocwp_get_href( $link ) {
-	if ( hocwp_string_contain( $link, '</a>' ) ) {
-		$a = new SimpleXMLElement( $link );
-		if ( isset( $a['href'] ) ) {
-			$href = (array) $a['href'];
-			$href = array_shift( $href );
-
-			return $href;
-		}
-	}
-
-	return '';
 }
 
 function hocwp_carousel_bootstrap( $args = array() ) {
@@ -658,7 +375,7 @@ function hocwp_carousel_bootstrap( $args = array() ) {
 		$control->set_href( '#' . $id );
 		$control->set_attribute( 'data-slide', 'prev' );
 		$control->set_attribute( 'role', 'button' );
-		$control->set_text( '<i class="fa fa-chevron-left"></i><span class="sr-only">' . __( 'Previous', 'hocwp' ) . '</span>' );
+		$control->set_text( '<i class="fa fa-chevron-left"></i><span class="sr-only">' . __( 'Previous', 'hocwp-theme' ) . '</span>' );
 		$li_items .= '<li class="prev">' . $control->build() . '</li>';
 	}
 	if ( $indicator_with_control ) {
@@ -670,7 +387,7 @@ function hocwp_carousel_bootstrap( $args = array() ) {
 		$control->set_href( '#' . $id );
 		$control->set_attribute( 'data-slide', 'next' );
 		$control->set_attribute( 'role', 'button' );
-		$control->set_text( '<i class="fa fa-chevron-right"></i><span class="sr-only">' . __( 'Next', 'hocwp' ) . '</span>' );
+		$control->set_text( '<i class="fa fa-chevron-right"></i><span class="sr-only">' . __( 'Next', 'hocwp-theme' ) . '</span>' );
 		$li_items .= '<li class="next">' . $control->build() . '</li>';
 	}
 	$ul->set_text( $li_items );
@@ -728,8 +445,9 @@ function hocwp_tab_content_bootstrap( $args = array() ) {
 						hocwp_add_string_with_space_before( $class, 'active' );
 					}
 					?>
-					<li class="<?php echo $class; ?>"><a href="#<?php echo $href; ?>"
-					                                     data-toggle="tab"><?php echo $text; ?></a></li>
+					<li class="<?php echo $class; ?>">
+						<a href="#<?php echo $href; ?>" data-toggle="tab"><?php echo $text; ?></a>
+					</li>
 					<?php
 					$count ++;
 				}
@@ -749,7 +467,7 @@ function hocwp_modal_bootstrap( $args = array() ) {
 	$container_class = hocwp_get_value_by_key( $args, 'container_class' );
 	$callback        = hocwp_get_value_by_key( $args, 'callback' );
 	$buttons         = hocwp_get_value_by_key( $args, 'buttons', array() );
-	$close_text      = hocwp_get_value_by_key( $args, 'close_text', hocwp_get_value_by_key( $args, 'close_button_text', __( 'Đóng', 'hocwp' ) ) );
+	$close_text      = hocwp_get_value_by_key( $args, 'close_text', hocwp_get_value_by_key( $args, 'close_button_text', __( 'Đóng', 'hocwp-theme' ) ) );
 	hocwp_add_string_with_space_before( $container_class, 'modal fade' );
 	$container_class = trim( $container_class );
 	if ( empty( $id ) || empty( $title ) || empty( $callback ) ) {
@@ -795,278 +513,6 @@ function hocwp_get_copyright_text() {
 	$text = '&copy; ' . date( 'Y' ) . ' ' . get_bloginfo( 'name' ) . '. All rights reserved.';
 
 	return apply_filters( 'hocwp_copyright_text', $text );
-}
-
-function hocwp_get_countries() {
-	$countries = array(
-		'AF' => array( 'name' => 'Afghanistan', 'nativetongue' => '‫افغانستان' ),
-		'AX' => array( 'name' => 'Åland Islands', 'nativetongue' => 'Åland' ),
-		'AL' => array( 'name' => 'Albania', 'nativetongue' => 'Shqipëri' ),
-		'DZ' => array( 'name' => 'Algeria', 'nativetongue' => '‫الجزائر' ),
-		'AS' => array( 'name' => 'American Samoa', 'nativetongue' => '' ),
-		'AD' => array( 'name' => 'Andorra', 'nativetongue' => '' ),
-		'AO' => array( 'name' => 'Angola', 'nativetongue' => '' ),
-		'AI' => array( 'name' => 'Anguilla', 'nativetongue' => '' ),
-		'AQ' => array( 'name' => 'Antarctica', 'nativetongue' => '' ),
-		'AG' => array( 'name' => 'Antigua and Barbuda', 'nativetongue' => '' ),
-		'AR' => array( 'name' => 'Argentina', 'nativetongue' => '' ),
-		'AM' => array( 'name' => 'Armenia', 'nativetongue' => 'Հայաստան' ),
-		'AW' => array( 'name' => 'Aruba', 'nativetongue' => '' ),
-		'AC' => array( 'name' => 'Ascension Island', 'nativetongue' => '' ),
-		'AU' => array( 'name' => 'Australia', 'nativetongue' => '' ),
-		'AT' => array( 'name' => 'Austria', 'nativetongue' => 'Österreich' ),
-		'AZ' => array( 'name' => 'Azerbaijan', 'nativetongue' => 'Azərbaycan' ),
-		'BS' => array( 'name' => 'Bahamas', 'nativetongue' => '' ),
-		'BH' => array( 'name' => 'Bahrain', 'nativetongue' => '‫البحرين' ),
-		'BD' => array( 'name' => 'Bangladesh', 'nativetongue' => 'বাংলাদেশ' ),
-		'BB' => array( 'name' => 'Barbados', 'nativetongue' => '' ),
-		'BY' => array( 'name' => 'Belarus', 'nativetongue' => 'Беларусь' ),
-		'BE' => array( 'name' => 'Belgium', 'nativetongue' => 'België' ),
-		'BZ' => array( 'name' => 'Belize', 'nativetongue' => '' ),
-		'BJ' => array( 'name' => 'Benin', 'nativetongue' => 'Bénin' ),
-		'BM' => array( 'name' => 'Bermuda', 'nativetongue' => '' ),
-		'BT' => array( 'name' => 'Bhutan', 'nativetongue' => 'འབྲུག' ),
-		'BO' => array( 'name' => 'Bolivia', 'nativetongue' => '' ),
-		'BA' => array( 'name' => 'Bosnia and Herzegovina', 'nativetongue' => 'Босна и Херцеговина' ),
-		'BW' => array( 'name' => 'Botswana', 'nativetongue' => '' ),
-		'BV' => array( 'name' => 'Bouvet Island', 'nativetongue' => '' ),
-		'BR' => array( 'name' => 'Brazil', 'nativetongue' => 'Brasil' ),
-		'IO' => array( 'name' => 'British Indian Ocean Territory', 'nativetongue' => '' ),
-		'VG' => array( 'name' => 'British Virgin Islands', 'nativetongue' => '' ),
-		'BN' => array( 'name' => 'Brunei', 'nativetongue' => '' ),
-		'BG' => array( 'name' => 'Bulgaria', 'nativetongue' => 'България' ),
-		'BF' => array( 'name' => 'Burkina Faso', 'nativetongue' => '' ),
-		'BI' => array( 'name' => 'Burundi', 'nativetongue' => 'Uburundi' ),
-		'KH' => array( 'name' => 'Cambodia', 'nativetongue' => 'កម្ពុជា' ),
-		'CM' => array( 'name' => 'Cameroon', 'nativetongue' => 'Cameroun' ),
-		'CA' => array( 'name' => 'Canada', 'nativetongue' => '' ),
-		'IC' => array( 'name' => 'Canary Islands', 'nativetongue' => 'islas Canarias' ),
-		'CV' => array( 'name' => 'Cape Verde', 'nativetongue' => 'Kabu Verdi' ),
-		'BQ' => array( 'name' => 'Caribbean Netherlands', 'nativetongue' => '' ),
-		'KY' => array( 'name' => 'Cayman Islands', 'nativetongue' => '' ),
-		'CF' => array( 'name' => 'Central African Republic', 'nativetongue' => 'République centrafricaine' ),
-		'EA' => array( 'name' => 'Ceuta and Melilla', 'nativetongue' => 'Ceuta y Melilla' ),
-		'TD' => array( 'name' => 'Chad', 'nativetongue' => 'Tchad' ),
-		'CL' => array( 'name' => 'Chile', 'nativetongue' => '' ),
-		'CN' => array( 'name' => 'China', 'nativetongue' => '中国' ),
-		'CX' => array( 'name' => 'Christmas Island', 'nativetongue' => '' ),
-		'CP' => array( 'name' => 'Clipperton Island', 'nativetongue' => '' ),
-		'CC' => array( 'name' => 'Cocos (Keeling) Islands', 'nativetongue' => 'Kepulauan Cocos (Keeling)' ),
-		'CO' => array( 'name' => 'Colombia', 'nativetongue' => '' ),
-		'KM' => array( 'name' => 'Comoros', 'nativetongue' => '‫جزر القمر' ),
-		'CD' => array( 'name' => 'Congo (DRC)', 'nativetongue' => 'Jamhuri ya Kidemokrasia ya Kongo' ),
-		'CG' => array( 'name' => 'Congo (Republic)', 'nativetongue' => 'Congo-Brazzaville' ),
-		'CK' => array( 'name' => 'Cook Islands', 'nativetongue' => '' ),
-		'CR' => array( 'name' => 'Costa Rica', 'nativetongue' => '' ),
-		'CI' => array( 'name' => 'Côte d’Ivoire', 'nativetongue' => '' ),
-		'HR' => array( 'name' => 'Croatia', 'nativetongue' => 'Hrvatska' ),
-		'CU' => array( 'name' => 'Cuba', 'nativetongue' => '' ),
-		'CW' => array( 'name' => 'Curaçao', 'nativetongue' => '' ),
-		'CY' => array( 'name' => 'Cyprus', 'nativetongue' => 'Κύπρος' ),
-		'CZ' => array( 'name' => 'Czech Republic', 'nativetongue' => 'Česká republika' ),
-		'DK' => array( 'name' => 'Denmark', 'nativetongue' => 'Danmark' ),
-		'DG' => array( 'name' => 'Diego Garcia', 'nativetongue' => '' ),
-		'DJ' => array( 'name' => 'Djibouti', 'nativetongue' => '' ),
-		'DM' => array( 'name' => 'Dominica', 'nativetongue' => '' ),
-		'DO' => array( 'name' => 'Dominican Republic', 'nativetongue' => 'República Dominicana' ),
-		'EC' => array( 'name' => 'Ecuador', 'nativetongue' => '' ),
-		'EG' => array( 'name' => 'Egypt', 'nativetongue' => '‫مصر' ),
-		'SV' => array( 'name' => 'El Salvador', 'nativetongue' => '' ),
-		'GQ' => array( 'name' => 'Equatorial Guinea', 'nativetongue' => 'Guinea Ecuatorial' ),
-		'ER' => array( 'name' => 'Eritrea', 'nativetongue' => '' ),
-		'EE' => array( 'name' => 'Estonia', 'nativetongue' => 'Eesti' ),
-		'ET' => array( 'name' => 'Ethiopia', 'nativetongue' => '' ),
-		'FK' => array( 'name' => 'Falkland Islands', 'nativetongue' => 'Islas Malvinas' ),
-		'FO' => array( 'name' => 'Faroe Islands', 'nativetongue' => 'Føroyar' ),
-		'FJ' => array( 'name' => 'Fiji', 'nativetongue' => '' ),
-		'FI' => array( 'name' => 'Finland', 'nativetongue' => 'Suomi' ),
-		'FR' => array( 'name' => 'France', 'nativetongue' => '' ),
-		'GF' => array( 'name' => 'French Guiana', 'nativetongue' => 'Guyane française' ),
-		'PF' => array( 'name' => 'French Polynesia', 'nativetongue' => 'Polynésie française' ),
-		'TF' => array( 'name' => 'French Southern Territories', 'nativetongue' => 'Terres australes françaises' ),
-		'GA' => array( 'name' => 'Gabon', 'nativetongue' => '' ),
-		'GM' => array( 'name' => 'Gambia', 'nativetongue' => '' ),
-		'GE' => array( 'name' => 'Georgia', 'nativetongue' => 'საქართველო' ),
-		'DE' => array( 'name' => 'Germany', 'nativetongue' => 'Deutschland' ),
-		'GH' => array( 'name' => 'Ghana', 'nativetongue' => 'Gaana' ),
-		'GI' => array( 'name' => 'Gibraltar', 'nativetongue' => '' ),
-		'GR' => array( 'name' => 'Greece', 'nativetongue' => 'Ελλάδα' ),
-		'GL' => array( 'name' => 'Greenland', 'nativetongue' => 'Kalaallit Nunaat' ),
-		'GD' => array( 'name' => 'Grenada', 'nativetongue' => '' ),
-		'GP' => array( 'name' => 'Guadeloupe', 'nativetongue' => '' ),
-		'GU' => array( 'name' => 'Guam', 'nativetongue' => '' ),
-		'GT' => array( 'name' => 'Guatemala', 'nativetongue' => '' ),
-		'GG' => array( 'name' => 'Guernsey', 'nativetongue' => '' ),
-		'GN' => array( 'name' => 'Guinea', 'nativetongue' => 'Guinée' ),
-		'GW' => array( 'name' => 'Guinea-Bissau', 'nativetongue' => 'Guiné Bissau' ),
-		'GY' => array( 'name' => 'Guyana', 'nativetongue' => '' ),
-		'HT' => array( 'name' => 'Haiti', 'nativetongue' => '' ),
-		'HM' => array( 'name' => 'Heard & McDonald Islands', 'nativetongue' => '' ),
-		'HN' => array( 'name' => 'Honduras', 'nativetongue' => '' ),
-		'HK' => array( 'name' => 'Hong Kong', 'nativetongue' => '香港' ),
-		'HU' => array( 'name' => 'Hungary', 'nativetongue' => 'Magyarország' ),
-		'IS' => array( 'name' => 'Iceland', 'nativetongue' => 'Ísland' ),
-		'IN' => array( 'name' => 'India', 'nativetongue' => 'भारत' ),
-		'ID' => array( 'name' => 'Indonesia', 'nativetongue' => '' ),
-		'IR' => array( 'name' => 'Iran', 'nativetongue' => '‫ایران' ),
-		'IQ' => array( 'name' => 'Iraq', 'nativetongue' => '‫العراق' ),
-		'IE' => array( 'name' => 'Ireland', 'nativetongue' => '' ),
-		'IM' => array( 'name' => 'Isle of Man', 'nativetongue' => '' ),
-		'IL' => array( 'name' => 'Israel', 'nativetongue' => '‫ישראל' ),
-		'IT' => array( 'name' => 'Italy', 'nativetongue' => 'Italia' ),
-		'JM' => array( 'name' => 'Jamaica', 'nativetongue' => '' ),
-		'JP' => array( 'name' => 'Japan', 'nativetongue' => '日本' ),
-		'JE' => array( 'name' => 'Jersey', 'nativetongue' => '' ),
-		'JO' => array( 'name' => 'Jordan', 'nativetongue' => '‫الأردن' ),
-		'KZ' => array( 'name' => 'Kazakhstan', 'nativetongue' => 'Казахстан' ),
-		'KE' => array( 'name' => 'Kenya', 'nativetongue' => '' ),
-		'KI' => array( 'name' => 'Kiribati', 'nativetongue' => '' ),
-		'XK' => array( 'name' => 'Kosovo', 'nativetongue' => 'Kosovë' ),
-		'KW' => array( 'name' => 'Kuwait', 'nativetongue' => '‫الكويت' ),
-		'KG' => array( 'name' => 'Kyrgyzstan', 'nativetongue' => 'Кыргызстан' ),
-		'LA' => array( 'name' => 'Laos', 'nativetongue' => 'ລາວ' ),
-		'LV' => array( 'name' => 'Latvia', 'nativetongue' => 'Latvija' ),
-		'LB' => array( 'name' => 'Lebanon', 'nativetongue' => '‫لبنان' ),
-		'LS' => array( 'name' => 'Lesotho', 'nativetongue' => '' ),
-		'LR' => array( 'name' => 'Liberia', 'nativetongue' => '' ),
-		'LY' => array( 'name' => 'Libya', 'nativetongue' => '‫ليبيا' ),
-		'LI' => array( 'name' => 'Liechtenstein', 'nativetongue' => '' ),
-		'LT' => array( 'name' => 'Lithuania', 'nativetongue' => 'Lietuva' ),
-		'LU' => array( 'name' => 'Luxembourg', 'nativetongue' => '' ),
-		'MO' => array( 'name' => 'Macau', 'nativetongue' => '澳門' ),
-		'MK' => array( 'name' => 'Macedonia (FYROM)', 'nativetongue' => 'Македонија' ),
-		'MG' => array( 'name' => 'Madagascar', 'nativetongue' => 'Madagasikara' ),
-		'MW' => array( 'name' => 'Malawi', 'nativetongue' => '' ),
-		'MY' => array( 'name' => 'Malaysia', 'nativetongue' => '' ),
-		'MV' => array( 'name' => 'Maldives', 'nativetongue' => '' ),
-		'ML' => array( 'name' => 'Mali', 'nativetongue' => '' ),
-		'MT' => array( 'name' => 'Malta', 'nativetongue' => '' ),
-		'MH' => array( 'name' => 'Marshall Islands', 'nativetongue' => '' ),
-		'MQ' => array( 'name' => 'Martinique', 'nativetongue' => '' ),
-		'MR' => array( 'name' => 'Mauritania', 'nativetongue' => '‫موريتانيا' ),
-		'MU' => array( 'name' => 'Mauritius', 'nativetongue' => 'Moris' ),
-		'YT' => array( 'name' => 'Mayotte', 'nativetongue' => '' ),
-		'MX' => array( 'name' => 'Mexico', 'nativetongue' => '' ),
-		'FM' => array( 'name' => 'Micronesia', 'nativetongue' => '' ),
-		'MD' => array( 'name' => 'Moldova', 'nativetongue' => 'Republica Moldova' ),
-		'MC' => array( 'name' => 'Monaco', 'nativetongue' => '' ),
-		'MN' => array( 'name' => 'Mongolia', 'nativetongue' => 'Монгол' ),
-		'ME' => array( 'name' => 'Montenegro', 'nativetongue' => 'Crna Gora' ),
-		'MS' => array( 'name' => 'Montserrat', 'nativetongue' => '' ),
-		'MA' => array( 'name' => 'Morocco', 'nativetongue' => '‫المغرب' ),
-		'MZ' => array( 'name' => 'Mozambique', 'nativetongue' => 'Moçambique' ),
-		'MM' => array( 'name' => 'Myanmar (Burma)', 'nativetongue' => 'မြန်မာ' ),
-		'NA' => array( 'name' => 'Namibia', 'nativetongue' => 'Namibië' ),
-		'NR' => array( 'name' => 'Nauru', 'nativetongue' => '' ),
-		'NP' => array( 'name' => 'Nepal', 'nativetongue' => 'नेपाल' ),
-		'NL' => array( 'name' => 'Netherlands', 'nativetongue' => 'Nederland' ),
-		'NC' => array( 'name' => 'New Caledonia', 'nativetongue' => 'Nouvelle-Calédonie' ),
-		'NZ' => array( 'name' => 'New Zealand', 'nativetongue' => '' ),
-		'NI' => array( 'name' => 'Nicaragua', 'nativetongue' => '' ),
-		'NE' => array( 'name' => 'Niger', 'nativetongue' => 'Nijar' ),
-		'NG' => array( 'name' => 'Nigeria', 'nativetongue' => '' ),
-		'NU' => array( 'name' => 'Niue', 'nativetongue' => '' ),
-		'NF' => array( 'name' => 'Norfolk Island', 'nativetongue' => '' ),
-		'MP' => array( 'name' => 'Northern Mariana Islands', 'nativetongue' => '' ),
-		'KP' => array( 'name' => 'North Korea', 'nativetongue' => '조선 민주주의 인민 공화국' ),
-		'NO' => array( 'name' => 'Norway', 'nativetongue' => 'Norge' ),
-		'OM' => array( 'name' => 'Oman', 'nativetongue' => '‫عُمان' ),
-		'PK' => array( 'name' => 'Pakistan', 'nativetongue' => '‫پاکستان' ),
-		'PW' => array( 'name' => 'Palau', 'nativetongue' => '' ),
-		'PS' => array( 'name' => 'Palestine', 'nativetongue' => '‫فلسطين' ),
-		'PA' => array( 'name' => 'Panama', 'nativetongue' => '' ),
-		'PG' => array( 'name' => 'Papua New Guinea', 'nativetongue' => '' ),
-		'PY' => array( 'name' => 'Paraguay', 'nativetongue' => '' ),
-		'PE' => array( 'name' => 'Peru', 'nativetongue' => 'Perú' ),
-		'PH' => array( 'name' => 'Philippines', 'nativetongue' => '' ),
-		'PN' => array( 'name' => 'Pitcairn Islands', 'nativetongue' => '' ),
-		'PL' => array( 'name' => 'Poland', 'nativetongue' => 'Polska' ),
-		'PT' => array( 'name' => 'Portugal', 'nativetongue' => '' ),
-		'PR' => array( 'name' => 'Puerto Rico', 'nativetongue' => '' ),
-		'QA' => array( 'name' => 'Qatar', 'nativetongue' => '‫قطر' ),
-		'RE' => array( 'name' => 'Réunion', 'nativetongue' => 'La Réunion' ),
-		'RO' => array( 'name' => 'Romania', 'nativetongue' => 'România' ),
-		'RU' => array( 'name' => 'Russia', 'nativetongue' => 'Россия' ),
-		'RW' => array( 'name' => 'Rwanda', 'nativetongue' => '' ),
-		'BL' => array( 'name' => 'Saint Barthélemy', 'nativetongue' => 'Saint-Barthélemy' ),
-		'SH' => array( 'name' => 'Saint Helena', 'nativetongue' => '' ),
-		'KN' => array( 'name' => 'Saint Kitts and Nevis', 'nativetongue' => '' ),
-		'LC' => array( 'name' => 'Saint Lucia', 'nativetongue' => '' ),
-		'MF' => array( 'name' => 'Saint Martin', 'nativetongue' => '' ),
-		'PM' => array( 'name' => 'Saint Pierre and Miquelon', 'nativetongue' => 'Saint-Pierre-et-Miquelon' ),
-		'WS' => array( 'name' => 'Samoa', 'nativetongue' => '' ),
-		'SM' => array( 'name' => 'San Marino', 'nativetongue' => '' ),
-		'ST' => array( 'name' => 'São Tomé and Príncipe', 'nativetongue' => 'São Tomé e Príncipe' ),
-		'SA' => array( 'name' => 'Saudi Arabia', 'nativetongue' => '‫المملكة العربية السعودية' ),
-		'SN' => array( 'name' => 'Senegal', 'nativetongue' => 'Sénégal' ),
-		'RS' => array( 'name' => 'Serbia', 'nativetongue' => 'Србија' ),
-		'SC' => array( 'name' => 'Seychelles', 'nativetongue' => '' ),
-		'SL' => array( 'name' => 'Sierra Leone', 'nativetongue' => '' ),
-		'SG' => array( 'name' => 'Singapore', 'nativetongue' => '' ),
-		'SX' => array( 'name' => 'Sint Maarten', 'nativetongue' => '' ),
-		'SK' => array( 'name' => 'Slovakia', 'nativetongue' => 'Slovensko' ),
-		'SI' => array( 'name' => 'Slovenia', 'nativetongue' => 'Slovenija' ),
-		'SB' => array( 'name' => 'Solomon Islands', 'nativetongue' => '' ),
-		'SO' => array( 'name' => 'Somalia', 'nativetongue' => 'Soomaaliya' ),
-		'ZA' => array( 'name' => 'South Africa', 'nativetongue' => '' ),
-		'GS' => array( 'name' => 'South Georgia & South Sandwich Islands', 'nativetongue' => '' ),
-		'KR' => array( 'name' => 'South Korea', 'nativetongue' => '대한민국' ),
-		'SS' => array( 'name' => 'South Sudan', 'nativetongue' => '‫جنوب السودان' ),
-		'ES' => array( 'name' => 'Spain', 'nativetongue' => 'España' ),
-		'LK' => array( 'name' => 'Sri Lanka', 'nativetongue' => 'ශ්‍රී ලංකාව' ),
-		'VC' => array( 'name' => 'St. Vincent & Grenadines', 'nativetongue' => '' ),
-		'SD' => array( 'name' => 'Sudan', 'nativetongue' => '‫السودان' ),
-		'SR' => array( 'name' => 'Suriname', 'nativetongue' => '' ),
-		'SJ' => array( 'name' => 'Svalbard and Jan Mayen', 'nativetongue' => 'Svalbard og Jan Mayen' ),
-		'SZ' => array( 'name' => 'Swaziland', 'nativetongue' => '' ),
-		'SE' => array( 'name' => 'Sweden', 'nativetongue' => 'Sverige' ),
-		'CH' => array( 'name' => 'Switzerland', 'nativetongue' => 'Schweiz' ),
-		'SY' => array( 'name' => 'Syria', 'nativetongue' => '‫سوريا' ),
-		'TW' => array( 'name' => 'Taiwan', 'nativetongue' => '台灣' ),
-		'TJ' => array( 'name' => 'Tajikistan', 'nativetongue' => '' ),
-		'TZ' => array( 'name' => 'Tanzania', 'nativetongue' => '' ),
-		'TH' => array( 'name' => 'Thailand', 'nativetongue' => 'ไทย' ),
-		'TL' => array( 'name' => 'Timor-Leste', 'nativetongue' => '' ),
-		'TG' => array( 'name' => 'Togo', 'nativetongue' => '' ),
-		'TK' => array( 'name' => 'Tokelau', 'nativetongue' => '' ),
-		'TO' => array( 'name' => 'Tonga', 'nativetongue' => '' ),
-		'TT' => array( 'name' => 'Trinidad and Tobago', 'nativetongue' => '' ),
-		'TA' => array( 'name' => 'Tristan da Cunha', 'nativetongue' => '' ),
-		'TN' => array( 'name' => 'Tunisia', 'nativetongue' => '‫تونس' ),
-		'TR' => array( 'name' => 'Turkey', 'nativetongue' => 'Türkiye' ),
-		'TM' => array( 'name' => 'Turkmenistan', 'nativetongue' => '' ),
-		'TC' => array( 'name' => 'Turks and Caicos Islands', 'nativetongue' => '' ),
-		'TV' => array( 'name' => 'Tuvalu', 'nativetongue' => '' ),
-		'UM' => array( 'name' => 'U.S. Outlying Islands', 'nativetongue' => '' ),
-		'VI' => array( 'name' => 'U.S. Virgin Islands', 'nativetongue' => '' ),
-		'UG' => array( 'name' => 'Uganda', 'nativetongue' => '' ),
-		'UA' => array( 'name' => 'Ukraine', 'nativetongue' => 'Україна' ),
-		'AE' => array( 'name' => 'United Arab Emirates', 'nativetongue' => '‫الإمارات العربية المتحدة' ),
-		'GB' => array( 'name' => 'United Kingdom', 'nativetongue' => '' ),
-		'US' => array( 'name' => 'United States', 'nativetongue' => '' ),
-		'UY' => array( 'name' => 'Uruguay', 'nativetongue' => '' ),
-		'UZ' => array( 'name' => 'Uzbekistan', 'nativetongue' => 'Oʻzbekiston' ),
-		'VU' => array( 'name' => 'Vanuatu', 'nativetongue' => '' ),
-		'VA' => array( 'name' => 'Vatican City', 'nativetongue' => 'Città del Vaticano' ),
-		'VE' => array( 'name' => 'Venezuela', 'nativetongue' => '' ),
-		'VN' => array( 'name' => 'Vietnam', 'nativetongue' => 'Việt Nam' ),
-		'WF' => array( 'name' => 'Wallis and Futuna', 'nativetongue' => '' ),
-		'EH' => array( 'name' => 'Western Sahara', 'nativetongue' => '‫الصحراء الغربية' ),
-		'YE' => array( 'name' => 'Yemen', 'nativetongue' => '‫اليمن' ),
-		'ZM' => array( 'name' => 'Zambia', 'nativetongue' => '' ),
-		'ZW' => array( 'name' => 'Zimbabwe', 'nativetongue' => '' )
-	);
-
-	return $countries;
-}
-
-function hocwp_transmit_id_and_name( &$id, &$name ) {
-	if ( empty( $id ) && ! empty( $name ) ) {
-		$id = $name;
-	}
-	if ( empty( $name ) && ! empty( $id ) ) {
-		$name = $id;
-	}
 }
 
 function hocwp_sanitize( $data, $type ) {
@@ -1124,63 +570,6 @@ function hocwp_number_format_vietnamese_currency( $number ) {
 	return hocwp_number_format_vietnamese( $number ) . hocwp_vietnamese_currency();
 }
 
-function hocwp_number_format_vietnamese( $number ) {
-	$number = floatval( $number );
-
-	return number_format( $number, 0, '.', ',' );
-}
-
-function hocwp_to_array( $needle, $filter_and_unique = true ) {
-	$result = $needle;
-	if ( ! is_array( $result ) ) {
-		$result = (array) $result;
-	}
-	if ( $filter_and_unique ) {
-		$result = array_filter( $result );
-		$result = array_unique( $result );
-	}
-
-	return $result;
-}
-
-function hocwp_string_to_array( $delimiter, $text ) {
-	if ( is_array( $text ) ) {
-		return $text;
-	}
-	if ( empty( $text ) ) {
-		return array();
-	}
-	$result = explode( $delimiter, $text );
-	$result = array_filter( $result );
-
-	return $result;
-}
-
-function hocwp_paragraph_to_array( $list_paragraph ) {
-	$list_paragraph = str_replace( '</p>', '', $list_paragraph );
-	$list_paragraph = explode( '<p>', $list_paragraph );
-
-	return array_filter( $list_paragraph );
-}
-
-function hocwp_object_to_array( $object ) {
-	return json_decode( json_encode( $object ), true );
-}
-
-function hocwp_std_object_to_array( $object ) {
-	return hocwp_json_string_to_array( json_encode( $object ) );
-}
-
-function hocwp_json_string_to_array( $json_string ) {
-	if ( ! is_array( $json_string ) ) {
-		$json_string = stripslashes( $json_string );
-		$json_string = json_decode( $json_string, true );
-	}
-	$json_string = hocwp_sanitize_array( $json_string );
-
-	return $json_string;
-}
-
 function hocwp_sanitize_form_post( $key, $type = 'default' ) {
 	switch ( $type ) {
 		case 'checkbox':
@@ -1197,28 +586,6 @@ function hocwp_sanitize_form_post( $key, $type = 'default' ) {
 	}
 }
 
-function hocwp_trim_array_item( $item ) {
-	if ( is_string( $item ) ) {
-		$item = trim( $item );
-	}
-
-	return $item;
-}
-
-function hocwp_remove_empty_array_item( $arr ) {
-	if ( is_array( $arr ) ) {
-		foreach ( $arr as $key => $item ) {
-			if ( hocwp_string_empty( $item ) ) {
-				unset( $arr[ $key ] );
-			} elseif ( is_array( $item ) ) {
-				$arr[ $key ] = hocwp_remove_empty_array_item( $item );
-			}
-		}
-	}
-
-	return $arr;
-}
-
 function hocwp_sanitize_array( $arr, $unique = '', $filter = '' ) {
 	if ( is_bool( $unique ) || '' !== $unique ) {
 		_deprecated_argument( __FUNCTION__, '3.3.3' );
@@ -1226,9 +593,7 @@ function hocwp_sanitize_array( $arr, $unique = '', $filter = '' ) {
 	if ( is_bool( $filter ) || '' !== $filter ) {
 		_deprecated_argument( __FUNCTION__, '3.3.3' );
 	}
-	if ( ! is_array( $arr ) ) {
-		$arr = (array) $arr;
-	}
+	$arr = hocwp_to_array( $arr );
 
 	return $arr;
 }
@@ -1261,7 +626,7 @@ function hocwp_sanitize_size( $size ) {
 				break;
 		}
 	}
-	$width = intval( isset( $size[0] ) ? $size['0'] : 0 );
+	$width = intval( isset( $size[0] ) ? $size[0] : 0 );
 	if ( 0 == $width && isset( $size['width'] ) ) {
 		$width = $size['width'];
 	}
@@ -1365,18 +730,18 @@ function hocwp_get_current_url() {
 
 function hocwp_get_current_visitor_location() {
 	$result = array();
-	$title  = __( 'Unknown location', 'hocwp' );
+	$title  = __( 'Unknown location', 'hocwp-theme' );
 	$url    = hocwp_get_current_url();
 	if ( is_home() ) {
-		$title = __( 'Viewing index', 'hocwp' );
+		$title = __( 'Viewing index', 'hocwp-theme' );
 	} elseif ( is_archive() ) {
-		$title = sprintf( __( 'Viewing %s', 'hocwp' ), get_the_archive_title() );
+		$title = sprintf( __( 'Viewing %s', 'hocwp-theme' ), get_the_archive_title() );
 	} elseif ( is_singular() ) {
-		$title = sprintf( __( 'Viewing %s', 'hocwp' ), get_the_title() );
+		$title = sprintf( __( 'Viewing %s', 'hocwp-theme' ), get_the_title() );
 	} elseif ( is_search() ) {
-		$title = __( 'Viewing search result', 'hocwp' );
+		$title = __( 'Viewing search result', 'hocwp-theme' );
 	} elseif ( is_404() ) {
-		$title = __( 'Viewing 404 page not found', 'hocwp' );
+		$title = __( 'Viewing 404 page not found', 'hocwp-theme' );
 	}
 	$result['object'] = get_queried_object();
 	$result['url']    = $url;
@@ -1391,27 +756,6 @@ function hocwp_human_time_diff_to_now( $from ) {
 	}
 
 	return human_time_diff( $from, strtotime( hocwp_get_current_datetime_mysql() ) );
-}
-
-function hocwp_string_to_datetime( $string, $format = '' ) {
-	if ( empty( $format ) ) {
-		$format = 'Y-m-d H:i:s';
-	}
-	$string = str_replace( '/', '-', $string );
-	$string = trim( $string );
-
-	return date( $format, strtotime( $string ) );
-}
-
-function hocwp_get_safe_characters( $special_char = false ) {
-	$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-	if ( $special_char ) {
-		$characters .= '{}#,!_@^';
-		$characters .= '():.|`$';
-		$characters .= '[];?=+-*~%';
-	}
-
-	return $characters;
 }
 
 function hocwp_get_safe_captcha_characters() {
@@ -1444,116 +788,8 @@ function hocwp_get_safe_captcha_characters() {
 	return $characters;
 }
 
-function hocwp_random_string( $length = 10, $characters = '', $special_char = false ) {
-	if ( empty( $characters ) ) {
-		$characters = hocwp_get_safe_characters( $special_char );
-	}
-	$len    = strlen( $characters );
-	$result = '';
-	for ( $i = 0; $i < $length; $i ++ ) {
-		$random_char = $characters[ rand( 0, $len - 1 ) ];
-		$result .= $random_char;
-	}
-
-	return $result;
-}
-
-function hocwp_is_mobile_domain( $domain ) {
-	$domain = hocwp_get_domain_name( $domain );
-	$chars  = substr( $domain, 0, 2 );
-	if ( 'm.' == $chars ) {
-		return true;
-	}
-
-	return false;
-}
-
 function hocwp_is_mobile_domain_blog() {
 	return hocwp_is_mobile_domain( get_bloginfo( 'url' ) );
-}
-
-function hocwp_get_force_mobile() {
-	$mobile = isset( $_GET['mobile'] ) ? $_GET['mobile'] : '';
-
-	return $mobile;
-}
-
-function hocwp_is_force_mobile() {
-	$mobile = hocwp_get_force_mobile();
-	if ( 'true' == $mobile || 1 == absint( $mobile ) ) {
-		return true;
-	}
-
-	return false;
-}
-
-function hocwp_is_force_mobile_session( $session ) {
-	if ( isset( $_SESSION[ $session ] ) && 'mobile' == $_SESSION[ $session ] ) {
-		return true;
-	}
-
-	return false;
-}
-
-function hocwp_is_force_mobile_cookie( $cookie ) {
-	if ( isset( $_COOKIE[ $cookie ] ) && 'mobile' == $_COOKIE[ $cookie ] ) {
-		return true;
-	}
-
-	return false;
-}
-
-function hocwp_get_domain_name( $url ) {
-	if ( is_object( $url ) || is_array( $url ) ) {
-		return '';
-	}
-	$url    = strval( $url );
-	$parse  = parse_url( $url );
-	$result = isset( $parse['host'] ) ? $parse['host'] : '';
-
-	return $result;
-}
-
-function hocwp_get_domain_name_only( $url ) {
-	$root = hocwp_get_root_domain_name( $url );
-	if ( hocwp_is_ip( $root ) ) {
-		return $root;
-	}
-	$root = explode( '.', $root );
-
-	return array_shift( $root );
-}
-
-function hocwp_get_root_domain_name( $url ) {
-	$domain_name = hocwp_get_domain_name( $url );
-	if ( hocwp_is_ip( $domain_name ) ) {
-		return $domain_name;
-	}
-	$data     = explode( '.', $domain_name );
-	$parts    = $data;
-	$last     = array_pop( $parts );
-	$sub_last = array_pop( $parts );
-	$keep     = 2;
-	if ( 2 == strlen( $last ) ) {
-		switch ( $sub_last ) {
-			case 'net':
-			case 'info':
-			case 'org':
-			case 'com':
-				$keep = 3;
-				break;
-		}
-	}
-	while ( count( $data ) > $keep ) {
-		array_shift( $data );
-	}
-	$domain_name = implode( '.', $data );
-	$last        = array_pop( $data );
-	if ( 'localhost' == $last || strlen( $last ) > 6 ) {
-		$domain_name = $last;
-	}
-
-	return $domain_name;
 }
 
 function hocwp_is_site_domain( $domain ) {
@@ -1564,76 +800,6 @@ function hocwp_is_site_domain( $domain ) {
 	}
 
 	return false;
-}
-
-function hocwp_random_string_number( $length = 6 ) {
-	return hocwp_random_string( $length, '0123456789' );
-}
-
-function hocwp_url_valid( $url ) {
-	if ( hocwp_is_image( $url ) || ! filter_var( $url, FILTER_VALIDATE_URL ) === false ) {
-		return true;
-	}
-
-	return false;
-}
-
-function hocwp_color_valid( $color ) {
-	if ( preg_match( '/^#[a-f0-9]{6}$/i', $color ) ) {
-		return true;
-	}
-
-	return false;
-}
-
-function hocwp_url_exists( $url ) {
-	$file_headers = @get_headers( $url );
-	$result       = true;
-	if ( $file_headers[0] == 'HTTP/1.1 404 Not Found' ) {
-		$result = false;
-	}
-
-	return $result;
-}
-
-function hocwp_get_all_image_from_string( $data, $output = 'img' ) {
-	$output = trim( $output );
-	preg_match_all( '/<img[^>]+>/i', $data, $matches );
-	$matches = isset( $matches[0] ) ? $matches[0] : array();
-	if ( ! hocwp_array_has_value( $matches ) && ! empty( $data ) ) {
-		if ( false !== strpos( $data, '//' ) && ( false !== strpos( $data, '.jpg' ) || false !== strpos( $data, '.png' ) || false !== strpos( $data, '.gif' ) ) ) {
-			$sources = explode( PHP_EOL, $data );
-			if ( hocwp_array_has_value( $sources ) ) {
-				foreach ( $sources as $src ) {
-					if ( hocwp_is_image( $src ) ) {
-						if ( 'img' == $output ) {
-							$matches[] = '<img src="' . $src . '" alt="">';
-						} else {
-							$matches[] = $src;
-						}
-					}
-				}
-
-			}
-		}
-	} elseif ( 'img' != $output && hocwp_array_has_value( $matches ) ) {
-		$tmp = array();
-		foreach ( $matches as $img ) {
-			$src   = hocwp_get_first_image_source( $img );
-			$tmp[] = $src;
-		}
-		$matches = $tmp;
-	}
-
-	return $matches;
-}
-
-function hocwp_image_url_exists( $image_url ) {
-	if ( ! @file_get_contents( $image_url ) ) {
-		return false;
-	}
-
-	return true;
 }
 
 function hocwp_empty_database_table( $table ) {
@@ -1771,18 +937,18 @@ function hocwp_register_post_type( $args = array() ) {
 		'singular_name'      => $singular_name,
 		'menu_name'          => $menu_name,
 		'name_admin_bar'     => isset( $args['name_admin_bar'] ) ? $args['name_admin_bar'] : $singular_name,
-		'all_items'          => sprintf( __( 'All %s', 'hocwp' ), $name ),
-		'add_new'            => __( 'Add New', 'hocwp' ),
-		'add_new_item'       => sprintf( __( 'Add New %s', 'hocwp' ), $singular_name ),
-		'edit_item'          => sprintf( __( 'Edit %s', 'hocwp' ), $singular_name ),
-		'new_item'           => sprintf( __( 'New %s', 'hocwp' ), $singular_name ),
-		'view_item'          => sprintf( __( 'View %s', 'hocwp' ), $singular_name ),
-		'search_items'       => sprintf( __( 'Search %s', 'hocwp' ), $singular_name ),
-		'not_found'          => __( 'Not found', 'hocwp' ),
-		'not_found_in_trash' => __( 'Not found in Trash', 'hocwp' ),
-		'parent_item_colon'  => sprintf( __( 'Parent %s:', 'hocwp' ), $singular_name ),
-		'parent_item'        => sprintf( __( 'Parent %s', 'hocwp' ), $singular_name ),
-		'update_item'        => sprintf( __( 'Update %s', 'hocwp' ), $singular_name )
+		'all_items'          => sprintf( __( 'All %s', 'hocwp-theme' ), $name ),
+		'add_new'            => __( 'Add New', 'hocwp-theme' ),
+		'add_new_item'       => sprintf( __( 'Add New %s', 'hocwp-theme' ), $singular_name ),
+		'edit_item'          => sprintf( __( 'Edit %s', 'hocwp-theme' ), $singular_name ),
+		'new_item'           => sprintf( __( 'New %s', 'hocwp-theme' ), $singular_name ),
+		'view_item'          => sprintf( __( 'View %s', 'hocwp-theme' ), $singular_name ),
+		'search_items'       => sprintf( __( 'Search %s', 'hocwp-theme' ), $singular_name ),
+		'not_found'          => __( 'Not found', 'hocwp-theme' ),
+		'not_found_in_trash' => __( 'Not found in Trash', 'hocwp-theme' ),
+		'parent_item_colon'  => sprintf( __( 'Parent %s:', 'hocwp-theme' ), $singular_name ),
+		'parent_item'        => sprintf( __( 'Parent %s', 'hocwp-theme' ), $singular_name ),
+		'update_item'        => sprintf( __( 'Update %s', 'hocwp-theme' ), $singular_name )
 	);
 	$labels = wp_parse_args( $custom_labels, $labels );
 
@@ -1836,10 +1002,6 @@ function hocwp_register_post_type( $args = array() ) {
 	register_post_type( $post_type, $args );
 }
 
-function hocwp_strtolower( $str, $charset = 'UTF-8' ) {
-	return mb_strtolower( $str, $charset );
-}
-
 function hocwp_register_taxonomy( $args = array() ) {
 	$old_args          = $args;
 	$name              = isset( $args['name'] ) ? $args['name'] : '';
@@ -1872,20 +1034,20 @@ function hocwp_register_taxonomy( $args = array() ) {
 		'name'                       => $name,
 		'singular_name'              => $singular_name,
 		'menu_name'                  => $menu_name,
-		'all_items'                  => sprintf( __( 'All %s', 'hocwp' ), $name ),
-		'edit_item'                  => sprintf( __( 'Edit %s', 'hocwp' ), $singular_name ),
-		'view_item'                  => sprintf( __( 'View %s', 'hocwp' ), $singular_name ),
-		'update_item'                => sprintf( __( 'Update %s', 'hocwp' ), $singular_name ),
-		'add_new_item'               => sprintf( __( 'Add New %s', 'hocwp' ), $singular_name ),
-		'new_item_name'              => sprintf( __( 'New %s Name', 'hocwp' ), $singular_name ),
-		'parent_item'                => sprintf( __( 'Parent %s', 'hocwp' ), $singular_name ),
-		'parent_item_colon'          => sprintf( __( 'Parent %s:', 'hocwp' ), $singular_name ),
-		'search_items'               => sprintf( __( 'Search %s', 'hocwp' ), $name ),
-		'popular_items'              => sprintf( __( 'Popular %s', 'hocwp' ), $name ),
-		'separate_items_with_commas' => sprintf( __( 'Separate %s with commas', 'hocwp' ), hocwp_strtolower( $name ) ),
-		'add_or_remove_items'        => sprintf( __( 'Add or remove %s', 'hocwp' ), $name ),
-		'choose_from_most_used'      => sprintf( __( 'Choose from the most used %s', 'hocwp' ), $name ),
-		'not_found'                  => __( 'Not Found', 'hocwp' ),
+		'all_items'                  => sprintf( __( 'All %s', 'hocwp-theme' ), $name ),
+		'edit_item'                  => sprintf( __( 'Edit %s', 'hocwp-theme' ), $singular_name ),
+		'view_item'                  => sprintf( __( 'View %s', 'hocwp-theme' ), $singular_name ),
+		'update_item'                => sprintf( __( 'Update %s', 'hocwp-theme' ), $singular_name ),
+		'add_new_item'               => sprintf( __( 'Add New %s', 'hocwp-theme' ), $singular_name ),
+		'new_item_name'              => sprintf( __( 'New %s Name', 'hocwp-theme' ), $singular_name ),
+		'parent_item'                => sprintf( __( 'Parent %s', 'hocwp-theme' ), $singular_name ),
+		'parent_item_colon'          => sprintf( __( 'Parent %s:', 'hocwp-theme' ), $singular_name ),
+		'search_items'               => sprintf( __( 'Search %s', 'hocwp-theme' ), $name ),
+		'popular_items'              => sprintf( __( 'Popular %s', 'hocwp-theme' ), $name ),
+		'separate_items_with_commas' => sprintf( __( 'Separate %s with commas', 'hocwp-theme' ), hocwp_strtolower( $name ) ),
+		'add_or_remove_items'        => sprintf( __( 'Add or remove %s', 'hocwp-theme' ), $name ),
+		'choose_from_most_used'      => sprintf( __( 'Choose from the most used %s', 'hocwp-theme' ), $name ),
+		'not_found'                  => __( 'Not Found', 'hocwp-theme' ),
 	);
 	$rewrite         = isset( $args['rewrite'] ) ? $args['rewrite'] : array();
 	$rewrite_slug    = str_replace( '_', '-', $slug );
@@ -1958,214 +1120,105 @@ function hocwp_is_debugging() {
 	return ( defined( 'WP_DEBUG' ) && true === WP_DEBUG ) ? true : false;
 }
 
-function hocwp_is_localhost() {
-	$site_url    = get_bloginfo( 'url' );
-	$domain      = hocwp_get_domain_name( $site_url );
-	$root_domain = hocwp_get_domain_name_only( $domain );
-	if ( empty( $root_domain ) ) {
-		$root_domain = $domain;
-	}
-	$result = false;
-	$last   = substr( $domain, - 3 );
-	if ( 'localhost' == $root_domain || hocwp_is_ip( $root_domain ) || 'dev' == $last ) {
-		$result = true;
-	}
-
-	return apply_filters( 'hocwp_is_localhost', $result );
-}
-
-function hocwp_string_contain( $string, $needle ) {
-	if ( false !== mb_strpos( $string, $needle, null, 'UTF-8' ) ) {
-		return true;
-	}
-
-	return false;
-}
-
-function hocwp_build_css_rule( $elements, $properties ) {
-	$elements   = hocwp_sanitize_array( $elements );
-	$properties = hocwp_sanitize_array( $properties );
-	$before     = '';
-	foreach ( $elements as $element ) {
-		if ( empty( $element ) ) {
-			continue;
-		}
-		$first_char = hocwp_get_first_char( $element );
-		if ( '.' !== $first_char && strpos( $element, '.' ) === false ) {
-			$element = '.' . $element;
-		}
-		$before .= $element . ',';
-	}
-	$before = trim( $before, ',' );
-	$after  = '';
-	foreach ( $properties as $key => $property ) {
-		if ( empty( $key ) ) {
-			continue;
-		}
-		$after .= $key . ':' . $property . ';';
-	}
-	$after = trim( $after, ';' );
-
-	return $before . '{' . $after . '}';
-}
-
-function hocwp_shorten_hex_css( $content ) {
-	$content = preg_replace( '/(?<![\'"])#([0-9a-z])\\1([0-9a-z])\\2([0-9a-z])\\3(?![\'"])/i', '#$1$2$3', $content );
-
-	return $content;
-}
-
-function hocwp_shorten_zero_css( $content ) {
-	$before  = '(?<=[:(, ])';
-	$after   = '(?=[ ,);}])';
-	$units   = '(em|ex|%|px|cm|mm|in|pt|pc|ch|rem|vh|vw|vmin|vmax|vm)';
-	$content = preg_replace( '/' . $before . '(-?0*(\.0+)?)(?<=0)' . $units . $after . '/', '\\1', $content );
-	$content = preg_replace( '/' . $before . '\.0+' . $after . '/', '0', $content );
-	$content = preg_replace( '/' . $before . '(-?[0-9]+)\.0+' . $units . '?' . $after . '/', '\\1\\2', $content );
-	$content = preg_replace( '/' . $before . '-?0+' . $after . '/', '0', $content );
-
-	return $content;
-}
-
-function hocwp_strip_white_space_css( $content ) {
-	$content = preg_replace( '/^\s*/m', '', $content );
-	$content = preg_replace( '/\s*$/m', '', $content );
-	$content = preg_replace( '/\s+/', ' ', $content );
-	$content = preg_replace( '/\s*([\*$~^|]?+=|[{};,>~]|!important\b)\s*/', '$1', $content );
-	$content = preg_replace( '/([\[(:])\s+/', '$1', $content );
-	$content = preg_replace( '/\s+([\]\)])/', '$1', $content );
-	$content = preg_replace( '/\s+(:)(?![^\}]*\{)/', '$1', $content );
-	$content = preg_replace( '/\s*([+-])\s*(?=[^}]*{)/', '$1', $content );
-	$content = preg_replace( '/;}/', '}', $content );
-
-	return trim( $content );
-}
-
-function hocwp_minify_css( $css_content, $online = false ) {
-	if ( $online ) {
-		$buffer = hocwp_get_minified( 'https://cssminifier.com/raw', $css_content );
-	} else {
-		if ( file_exists( $css_content ) ) {
-			$css_content = @file_get_contents( $css_content );
-		}
-		$buffer = $css_content;
-		$buffer = preg_replace( '!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $buffer );
-		$buffer = str_replace( ': ', ':', $buffer );
-		$buffer = str_replace( array( "\r\n", "\r", "\n", "\t", '  ', '    ', '    ' ), '', $buffer );
-		$buffer = hocwp_shorten_hex_css( $buffer );
-		$buffer = hocwp_shorten_zero_css( $buffer );
-		$buffer = hocwp_strip_white_space_css( $buffer );
-	}
-
-	return $buffer;
-}
-
-function hocwp_minify_js( $js ) {
-	return hocwp_get_minified( 'https://javascript-minifier.com/raw', $js );
-}
-
-function hocwp_get_minified( $url, $content ) {
-	if ( file_exists( $content ) ) {
-		$content = @file_get_contents( $content );
-	}
-	$postdata = array(
-		'http' => array(
-			'method'  => 'POST',
-			'header'  => 'Content-type: application/x-www-form-urlencoded',
-			'content' => http_build_query(
-				array(
-					'input' => $content
-				)
-			)
-		)
-	);
-
-	return @file_get_contents( $url, false, stream_context_create( $postdata ) );
-}
-
 function hocwp_the_posts_navigation() {
 	the_posts_pagination( array(
-		'prev_text'          => esc_html__( 'Previous page', 'hocwp' ),
-		'next_text'          => esc_html__( 'Next page', 'hocwp' ),
-		'before_page_number' => '<span class="meta-nav screen-reader-text">' . esc_html__( 'Page', 'hocwp' ) . ' </span>'
+		'prev_text'          => esc_html__( 'Previous page', 'hocwp-theme' ),
+		'next_text'          => esc_html__( 'Next page', 'hocwp-theme' ),
+		'before_page_number' => '<span class="meta-nav screen-reader-text">' . esc_html__( 'Page', 'hocwp-theme' ) . ' </span>'
 	) );
 }
 
-function hocwp_wrap_class( $classes = array() ) {
-	$classes   = hocwp_sanitize_array( $classes );
-	$classes   = apply_filters( 'hocwp_wrap_class', $classes );
-	$classes[] = 'wrap';
-	$classes[] = 'container';
-	$classes[] = 'wrapper';
-	$class     = implode( ' ', $classes );
-	echo $class;
-}
-
-function hocwp_div_clear() {
-	echo '<div class="clear"></div>';
-}
-
-function hocwp_change_image_source( $img, $src ) {
-	$doc = new DOMDocument();
-	$doc->loadHTML( $img );
-	$tags = $doc->getElementsByTagName( 'img' );
-	foreach ( $tags as $tag ) {
-		$tag->setAttribute( 'src', $src );
-	}
-
-	return $doc->saveHTML();
-}
-
-function hocwp_get_tag_source( $tag_name, $html ) {
-	return hocwp_get_tag_attr( $tag_name, 'src', $html );
-}
-
-function hocwp_get_tag_attr( $tag_name, $attr, $html ) {
-	$doc = new DOMDocument();
-	$doc->loadHTML( $html );
-	$tags = $doc->getElementsByTagName( $tag_name );
-	foreach ( $tags as $tag ) {
-		return $tag->getAttribute( $attr );
-	}
-
-	return '';
-}
-
-function hocwp_get_first_image_source( $content ) {
-	$doc = new DOMDocument();
-	@$doc->loadHTML( $content );
-	$xpath = new DOMXPath( $doc );
-	$src   = $xpath->evaluate( 'string(//img/@src)' );
-
-	return $src;
-}
-
-function hocwp_comments_template() {
-	$post_id = get_the_ID();
+function hocwp_comments_template( $args = array() ) {
+	$post_id = hocwp_get_value_by_key( $args, 'post_id', get_the_ID() );
 	$cpost   = get_post( $post_id );
 	if ( ! is_a( $cpost, 'WP_Post' ) ) {
 		return;
 	}
 	if ( comments_open( $post_id ) || get_comments_number( $post_id ) ) {
 		$comment_system = hocwp_theme_get_option( 'comment_system', 'discussion' );
-		if ( 'facebook' == $comment_system ) {
-			hocwp_facebook_comment();
-		} else {
-			if ( 'default_and_facebook' == $comment_system ) {
-				hocwp_facebook_comment();
+		$tabs           = hocwp_get_value_by_key( $args, 'tabs' );
+		if ( 'tabs' == $comment_system || hocwp_array_has_value( $tabs ) ) {
+			if ( ! isset( $args['callback'] ) ) {
+				$args['callback'] = 'hocwp_comment_tabs_callback';
 			}
-			comments_template();
+			if ( 'tabs' == $comment_system && ! isset( $args['tabs'] ) ) {
+				$tabs         = array(
+					array(
+						'href' => 'facebook',
+						'text' => 'Facebook'
+					),
+					array(
+						'href' => 'google',
+						'text' => 'Google+'
+					),
+					array(
+						'href' => 'wordpress',
+						'text' => 'WordPress'
+					),
+					array(
+						'href' => 'disqus',
+						'text' => 'Disqus'
+					)
+				);
+				$tabs         = apply_filters( 'hocwp_comment_tabs', $tabs );
+				$args['tabs'] = $tabs;
+			}
+			hocwp_tab_content_bootstrap( $args );
+		} else {
+			if ( 'facebook' == $comment_system ) {
+				hocwp_facebook_comment();
+			} else {
+				if ( 'default_and_facebook' == $comment_system ) {
+					hocwp_facebook_comment();
+				}
+				comments_template();
+			}
+		}
+	}
+}
+
+function hocwp_comment_tabs_callback( $args ) {
+	$tabs = hocwp_get_value_by_key( $args, 'tabs' );
+	if ( hocwp_array_has_value( $tabs ) ) {
+		$count = 0;
+		foreach ( $tabs as $tab ) {
+			$class = 'tab-pane';
+			if ( 0 == $count ) {
+				hocwp_add_string_with_space_before( $class, 'active' );
+			}
+			$href = hocwp_get_value_by_key( $tab, 'href' );
+			if ( empty( $href ) ) {
+				continue;
+			}
+			echo '<div id="' . $href . '" class="' . $class . '">';
+			switch ( $href ) {
+				case 'facebook':
+					hocwp_facebook_comment();
+					break;
+				case 'google_plus':
+				case 'gplus':
+				case 'google':
+					hocwp_google_comment();
+					break;
+				case 'disqus':
+					hocwp_disqus_comment();
+					break;
+				default:
+					comments_template();
+			}
+			echo '</div>';
+			$count ++;
 		}
 	}
 }
 
 function hocwp_wp_link_pages() {
 	wp_link_pages( array(
-		'before'      => '<div class="page-links"><span class="page-links-title">' . esc_html__( 'Pages:', 'hocwp' ) . '</span>',
+		'before'      => '<div class="page-links"><span class="page-links-title">' . esc_html__( 'Pages:', 'hocwp-theme' ) . '</span>',
 		'after'       => '</div>',
 		'link_before' => '<span>',
 		'link_after'  => '</span>',
-		'pagelink'    => '<span class="screen-reader-text">' . esc_html__( 'Page', 'hocwp' ) . ' </span>%',
+		'pagelink'    => '<span class="screen-reader-text">' . esc_html__( 'Page', 'hocwp-theme' ) . ' </span>%',
 		'separator'   => '<span class="screen-reader-text">, </span>',
 	) );
 }
@@ -2174,14 +1227,14 @@ function hocwp_comment_nav() {
 	if ( get_comment_pages_count() > 1 && get_option( 'page_comments' ) ) :
 		?>
 		<nav class="navigation comment-navigation">
-			<h2 class="screen-reader-text"><?php echo apply_filters( 'hocwp_comment_navigation_text', __( 'Comment navigation', 'hocwp' ) ); ?></h2>
+			<h2 class="screen-reader-text"><?php echo apply_filters( 'hocwp_comment_navigation_text', __( 'Comment navigation', 'hocwp-theme' ) ); ?></h2>
 
 			<div class="nav-links">
 				<?php
-				if ( $prev_link = get_previous_comments_link( apply_filters( 'hocwp_comment_navigation_prev_text', esc_html__( 'Older Comments', 'hocwp' ) ) ) ) {
+				if ( $prev_link = get_previous_comments_link( apply_filters( 'hocwp_comment_navigation_prev_text', esc_html__( 'Older Comments', 'hocwp-theme' ) ) ) ) {
 					printf( '<div class="nav-previous">%s</div>', $prev_link );
 				}
-				if ( $next_link = get_next_comments_link( apply_filters( 'hocwp_comment_navigation_next_text', esc_html__( 'Newer Comments', 'hocwp' ) ) ) ) {
+				if ( $next_link = get_next_comments_link( apply_filters( 'hocwp_comment_navigation_next_text', esc_html__( 'Newer Comments', 'hocwp-theme' ) ) ) ) {
 					printf( '<div class="nav-next">%s</div>', $next_link );
 				}
 				?>
@@ -2190,114 +1243,6 @@ function hocwp_comment_nav() {
 		</nav><!-- .comment-navigation -->
 		<?php
 	endif;
-}
-
-function hocwp_get_current_day_of_week( $full = true ) {
-	$format = 'l';
-	if ( ! $full ) {
-		$format = 'D';
-	}
-
-	return date( $format );
-}
-
-function hocwp_convert_day_name_to_vietnamese( $day_name ) {
-	$weekday = $day_name;
-	switch ( $weekday ) {
-		case 'Mon':
-		case 'Monday':
-			$weekday = 'Thứ hai';
-			break;
-		case 'Tue':
-		case 'Tuesday':
-			$weekday = 'Thứ ba';
-			break;
-		case 'Wed':
-		case 'Wednesday':
-			$weekday = 'Thứ tư';
-			break;
-		case 'Thur':
-		case 'Thursday':
-			$weekday = 'Thứ năm';
-			break;
-		case 'Fri':
-		case 'Friday':
-			$weekday = 'Thứ sáu';
-			break;
-		case 'Sat':
-		case 'Saturday':
-			$weekday = 'Thứ bảy';
-			break;
-		case 'Sun':
-		case 'Sunday':
-			$weekday = 'Chủ nhật';
-			break;
-	}
-
-	return $weekday;
-}
-
-function hocwp_get_current_month_of_year( $full = true ) {
-	$format = 'F';
-	if ( ! $full ) {
-		$format = 'M';
-	}
-
-	return date( $format );
-}
-
-function hocwp_convert_month_name_to_vietnamese( $month_full_name ) {
-	switch ( $month_full_name ) {
-		case 'Jan':
-		case 'January':
-			$month_full_name = 'Tháng một';
-			break;
-		case 'Feb':
-		case 'February':
-			$month_full_name = 'Tháng hai';
-			break;
-		case 'Mar';
-		case 'March':
-			$month_full_name = 'Tháng ba';
-			break;
-		case 'Apr':
-		case 'April':
-			$month_full_name = 'Tháng tư';
-			break;
-		case 'May':
-			$month_full_name = 'Tháng năm';
-			break;
-		case 'Jun':
-		case 'June':
-			$month_full_name = 'Tháng sáu';
-			break;
-		case 'Jul':
-		case 'July':
-			$month_full_name = 'Tháng bảy';
-			break;
-		case 'Aug':
-		case 'August':
-			$month_full_name = 'Tháng tám';
-			break;
-		case 'Sep':
-		case 'September':
-			$month_full_name = 'Tháng chín';
-			break;
-		case 'Oct':
-		case 'October':
-			$month_full_name = 'Tháng mười';
-			break;
-		case 'Nov':
-		case 'November':
-			$month_full_name = 'Tháng mười một';
-			break;
-		case 'Dec':
-		case 'December':
-			$month_full_name = 'Tháng mười hai';
-			break;
-	}
-
-	return $month_full_name;
 }
 
 function hocwp_get_current_weekday( $format = 'd/m/Y H:i:s', $args = array() ) {
@@ -2310,34 +1255,6 @@ function hocwp_get_current_weekday( $format = 'd/m/Y H:i:s', $args = array() ) {
 
 function hocwp_current_weekday( $format = 'd/m/Y H:i:s', $args = array() ) {
 	echo hocwp_get_current_weekday( $format, $args );
-}
-
-function hocwp_color_hex_to_rgb( $color, $opacity = false ) {
-	$default = 'rgb(0,0,0)';
-	if ( empty( $color ) ) {
-		return $default;
-	}
-	if ( $color[0] == '#' ) {
-		$color = substr( $color, 1 );
-	}
-	if ( strlen( $color ) == 6 ) {
-		$hex = array( $color[0] . $color[1], $color[2] . $color[3], $color[4] . $color[5] );
-	} elseif ( strlen( $color ) == 3 ) {
-		$hex = array( $color[0] . $color[0], $color[1] . $color[1], $color[2] . $color[2] );
-	} else {
-		return $default;
-	}
-	$rgb = array_map( 'hexdec', $hex );
-	if ( $opacity ) {
-		if ( abs( $opacity ) > 1 ) {
-			$opacity = 1.0;
-		}
-		$output = 'rgba(' . implode( ',', $rgb ) . ',' . $opacity . ')';
-	} else {
-		$output = 'rgb(' . implode( ',', $rgb ) . ')';
-	}
-
-	return $output;
 }
 
 function hocwp_the_social_share_buttons( $args = array() ) {
@@ -2446,79 +1363,12 @@ function hocwp_get_social_share_url( $args = array() ) {
 	return $result;
 }
 
-function hocwp_remove_vietnamese( $string ) {
-	$characters = array(
-		'a' => 'á|à|ả|ã|ạ|ă|ắ|ặ|ằ|ẳ|ẵ|â|ấ|ầ|ẩ|ẫ|ậ',
-		'd' => 'đ',
-		'e' => 'é|è|ẻ|ẽ|ẹ|ê|ế|ề|ể|ễ|ệ',
-		'i' => 'í|ì|ỉ|ĩ|ị',
-		'o' => 'ó|ò|ỏ|õ|ọ|ô|ố|ồ|ổ|ỗ|ộ|ơ|ớ|ờ|ở|ỡ|ợ',
-		'u' => 'ú|ù|ủ|ũ|ụ|ư|ứ|ừ|ử|ữ|ự',
-		'y' => 'ý|ỳ|ỷ|ỹ|ỵ',
-		'A' => 'Á|À|Ả|Ã|Ạ|Ă|Ắ|Ặ|Ằ|Ẳ|Ẵ|Â|Ấ|Ầ|Ẩ|Ẫ|Ậ',
-		'D' => 'Đ',
-		'E' => 'É|È|Ẻ|Ẽ|Ẹ|Ê|Ế|Ề|Ể|Ễ|Ệ',
-		'I' => 'Í|Ì|Ỉ|Ĩ|Ị',
-		'O' => 'Ó|Ò|Ỏ|Õ|Ọ|Ô|Ố|Ồ|Ổ|Ỗ|Ộ|Ơ|Ớ|Ờ|Ở|Ỡ|Ợ',
-		'U' => 'Ú|Ù|Ủ|Ũ|Ụ|Ư|Ứ|Ừ|Ử|Ữ|Ự',
-		'Y' => 'Ý|Ỳ|Ỷ|Ỹ|Ỵ',
-	);
-	foreach ( $characters as $key => $value ) {
-		$string = preg_replace( "/($value)/i", $key, $string );
-	}
-
-	return $string;
-}
-
-function hocwp_sanitize_file_name( $name ) {
-	$name = hocwp_remove_vietnamese( $name );
-	$name = strtolower( $name );
-	$name = str_replace( '_', '-', $name );
-	$name = str_replace( ' ', '-', $name );
-	$name = sanitize_file_name( $name );
-
-	return $name;
-}
-
 function hocwp_menu_page_exists( $slug ) {
 	if ( empty( $GLOBALS['admin_page_hooks'][ $slug ] ) ) {
 		return false;
 	}
 
 	return true;
-}
-
-function hocwp_callback_exists( $callback ) {
-	if ( empty( $callback ) || ( ! is_array( $callback ) && ! function_exists( $callback ) ) || ( is_array( $callback ) && count( $callback ) != 2 ) || ( is_array( $callback ) && ! method_exists( $callback[0], $callback[1] ) ) ) {
-		return false;
-	}
-	if ( ! is_callable( $callback ) ) {
-		return false;
-	}
-
-	return true;
-}
-
-function hocwp_add_unique_string( &$string, $add, $tail = true ) {
-	if ( empty( $string ) ) {
-		$string = $add;
-	} elseif ( ! hocwp_string_contain( $string, $add ) ) {
-		if ( $tail ) {
-			$string .= $add;
-		} else {
-			$string = $add . $string;
-		}
-	}
-	$string = trim( $string );
-
-	return $string;
-}
-
-function hocwp_add_string_with_space_before( &$string, $add ) {
-	$add    = ' ' . $add;
-	$string = trim( hocwp_add_unique_string( $string, $add ) );
-
-	return $string;
 }
 
 function hocwp_get_current_admin_page() {
@@ -2570,7 +1420,7 @@ function hocwp_is_my_theme( $stylesheet = null, $theme_root = null ) {
 	$theme_uri   = $theme->get( 'ThemeURI' );
 	$text_domain = $theme->get( 'TextDomain' );
 	$author_uri  = $theme->get( 'AuthorURI' );
-	if ( ( hocwp_string_contain( $theme_uri, 'hocwp' ) && hocwp_string_contain( $author_uri, 'hocwp' ) ) || ( hocwp_string_contain( $text_domain, 'hocwp' ) && hocwp_string_contain( $theme_uri, 'hocwp' ) ) || ( hocwp_string_contain( $text_domain, 'hocwp' ) && hocwp_string_contain( $author_uri, 'hocwp' ) ) ) {
+	if ( ( hocwp_string_contain( $theme_uri, 'hocwp-theme' ) && hocwp_string_contain( $author_uri, 'hocwp-theme' ) ) || ( hocwp_string_contain( $text_domain, 'hocwp-theme' ) && hocwp_string_contain( $theme_uri, 'hocwp-theme' ) ) || ( hocwp_string_contain( $text_domain, 'hocwp-theme' ) && hocwp_string_contain( $author_uri, 'hocwp-theme' ) ) ) {
 		$result = true;
 	}
 
@@ -2594,7 +1444,7 @@ function hocwp_has_plugin_activated() {
 	$plugins = get_option( 'active_plugins' );
 	if ( hocwp_array_has_value( $plugins ) ) {
 		foreach ( $plugins as $base_name ) {
-			if ( hocwp_string_contain( $base_name, 'hocwp' ) ) {
+			if ( hocwp_string_contain( $base_name, 'hocwp-theme' ) ) {
 				return true;
 			}
 		}
@@ -2625,7 +1475,7 @@ function hocwp_admin_notice( $args = array() ) {
 	}
 	$title = isset( $args['title'] ) ? $args['title'] : '';
 	if ( $error && empty( $title ) ) {
-		$title = __( 'Error', 'hocwp' );
+		$title = __( 'Error', 'hocwp-theme' );
 	}
 	if ( ! empty( $title ) ) {
 		$text = '<strong>' . $title . ':</strong> ' . $text;
@@ -2637,28 +1487,8 @@ function hocwp_admin_notice( $args = array() ) {
 	<?php
 }
 
-function hocwp_sanitize_id( $id ) {
-	if ( is_array( $id ) ) {
-		$id = implode( '@', $id );
-	}
-	$id    = strtolower( $id );
-	$id    = str_replace( '][', '_', $id );
-	$chars = array(
-		'-',
-		' ',
-		'[',
-		']',
-		'@',
-		'.'
-	);
-	$id    = str_replace( $chars, '_', $id );
-	$id    = trim( $id, '_' );
-
-	return $id;
-}
-
 function hocwp_admin_notice_setting_saved() {
-	hocwp_admin_notice( array( 'text' => '<strong>' . __( 'Settings saved.', 'hocwp' ) . '</strong>' ) );
+	hocwp_admin_notice( array( 'text' => '<strong>' . __( 'Settings saved.', 'hocwp-theme' ) . '</strong>' ) );
 }
 
 function hocwp_sanitize_field_name( $base_name, $arr = array() ) {
@@ -2707,20 +1537,11 @@ function hocwp_sanitize_field_args( &$args ) {
 }
 
 function hocwp_is_image( $url, $id = 0 ) {
-	$result = false;
 	if ( hocwp_id_number_valid( $id ) ) {
-		$result = wp_attachment_is_image( $id );
-	} else {
-		$img_formats = array( 'png', 'jpg', 'jpeg', 'gif', 'tiff', 'bmp', 'ico' );
-		$path_info   = pathinfo( $url );
-		$extension   = isset( $path_info['extension'] ) ? $path_info['extension'] : '';
-		$extension   = trim( strtolower( $extension ) );
-		if ( in_array( $extension, $img_formats ) ) {
-			$result = true;
-		}
+		return wp_attachment_is_image( $id );
 	}
 
-	return $result;
+	return hocwp_is_image_url( $url );
 }
 
 function hocwp_sanitize_media_value( $value ) {
@@ -2813,40 +1634,6 @@ function hocwp_get_media_option_url( $value ) {
 	return $value['url'];
 }
 
-function hocwp_bool_to_int( $value ) {
-	if ( $value ) {
-		return 1;
-	}
-
-	return 0;
-}
-
-function hocwp_int_to_bool( $value ) {
-	$value = absint( $value );
-	if ( 0 < $value ) {
-		return true;
-	}
-
-	return false;
-}
-
-function hocwp_bool_to_string( $value ) {
-	if ( $value ) {
-		return 'true';
-	}
-
-	return 'false';
-}
-
-function hocwp_string_to_bool( $string ) {
-	$string = strtolower( $string );
-	if ( 'true' == $string ) {
-		return true;
-	}
-
-	return false;
-}
-
 function hocwp_search_form( $args = array() ) {
 	$echo  = isset( $args['echo'] ) ? (bool) $args['echo'] : true;
 	$class = isset( $args['class'] ) ? $args['class'] : '';
@@ -2879,14 +1666,6 @@ function hocwp_search_form( $args = array() ) {
 	return $form;
 }
 
-function hocwp_is_rss_feed_url( $url ) {
-	if ( false !== strpos( $url, '/feed' ) || false !== strpos( $url, '.rss' ) ) {
-		return true;
-	}
-
-	return false;
-}
-
 function hocwp_feedburner_form( $args = array() ) {
 	$name               = isset( $args['name'] ) ? $args['name'] : '';
 	$locale             = isset( $args['locale'] ) ? $args['locale'] : 'en_US';
@@ -2895,9 +1674,9 @@ function hocwp_feedburner_form( $args = array() ) {
 		$submit_button_text = $args['button_text'];
 	}
 	if ( empty( $submit_button_text ) ) {
-		$submit_button_text = __( 'Đăng ký', 'hocwp' );
+		$submit_button_text = __( 'Đăng ký', 'hocwp-theme' );
 	}
-	$placeholder = isset( $args['placeholder'] ) ? $args['placeholder'] : __( 'Nhập địa chỉ email của bạn...', 'hocwp' );
+	$placeholder = isset( $args['placeholder'] ) ? $args['placeholder'] : __( 'Nhập địa chỉ email của bạn...', 'hocwp-theme' );
 	?>
 	<form class="feedburner-form" action="https://feedburner.google.com/fb/a/mailverify" method="post"
 	      target="popupwindow"
@@ -2956,8 +1735,8 @@ function hocwp_get_sidebar_widgets( $sidebar ) {
 
 function hocwp_supported_languages() {
 	$languages = array(
-		'vi' => __( 'Vietnamese', 'hocwp' ),
-		'en' => __( 'English', 'hocwp' )
+		'vi' => __( 'Vietnamese', 'hocwp-theme' ),
+		'en' => __( 'English', 'hocwp-theme' )
 	);
 
 	return apply_filters( 'hocwp_supported_languages', $languages );
@@ -2986,13 +1765,13 @@ function hocwp_default_script_localize_object() {
 		'shortcodes'      => $shortcodes,
 		'logged_in'       => hocwp_bool_to_int( is_user_logged_in() ),
 		'i18n'            => array(
-			'jquery_undefined_error'     => __( 'HocWP\'s JavaScript requires jQuery', 'hocwp' ),
-			'jquery_version_error'       => sprintf( __( 'HocWP\'s JavaScript requires jQuery version %s or higher', 'hocwp' ), HOCWP_MINIMUM_JQUERY_VERSION ),
-			'insert_media_title'         => __( 'Insert media', 'hocwp' ),
-			'insert_media_button_text'   => __( 'Use this media', 'hocwp' ),
-			'insert_media_button_texts'  => __( 'Use these medias', 'hocwp' ),
-			'confirm_message'            => __( 'Are you sure?', 'hocwp' ),
-			'disconnect_confirm_message' => __( 'Are you sure you want to disconnect?', 'hocwp' )
+			'jquery_undefined_error'     => __( 'HocWP\'s JavaScript requires jQuery', 'hocwp-theme' ),
+			'jquery_version_error'       => sprintf( __( 'HocWP\'s JavaScript requires jQuery version %s or higher', 'hocwp-theme' ), HOCWP_MINIMUM_JQUERY_VERSION ),
+			'insert_media_title'         => __( 'Insert media', 'hocwp-theme' ),
+			'insert_media_button_text'   => __( 'Use this media', 'hocwp-theme' ),
+			'insert_media_button_texts'  => __( 'Use these medias', 'hocwp-theme' ),
+			'confirm_message'            => __( 'Are you sure?', 'hocwp-theme' ),
+			'disconnect_confirm_message' => __( 'Are you sure you want to disconnect?', 'hocwp-theme' )
 		),
 		'ajax_loading'    => '<p class="ajax-wrap"><img class="ajax-loading" src="' . hocwp_get_image_url( 'icon-loading-circle-light-full.gif' ) . '" alt=""></p>'
 	);
@@ -3057,8 +1836,12 @@ function hocwp_admin_enqueue_scripts() {
 		wp_enqueue_style( 'wp-color-picker' );
 	}
 	$use = apply_filters( 'hocwp_wp_enqueue_media', false );
-	if ( $use ) {
+	if ( $use || 'link.php' == $pagenow || 'link-add.php' == $pagenow ) {
 		wp_enqueue_media();
+	}
+	$datetime_picker = apply_filters( 'hocwp_admin_jquery_datetime_picker', false );
+	if ( $datetime_picker ) {
+		hocwp_enqueue_jquery_ui_datepicker();
 	}
 	hocwp_register_core_style_and_script();
 	wp_register_style( 'hocwp-admin-style', HOCWP_URL . '/css/hocwp-admin' . HOCWP_CSS_SUFFIX, array( 'hocwp-style' ), HOCWP_VERSION );
@@ -3068,7 +1851,7 @@ function hocwp_admin_enqueue_scripts() {
 	), HOCWP_VERSION, true );
 	wp_localize_script( 'hocwp', 'hocwp', hocwp_default_script_localize_object() );
 	$use = apply_filters( 'hocwp_use_admin_style_and_script', false );
-	if ( $use || 'post-new.php' == $pagenow || 'post.php' == $pagenow ) {
+	if ( $use || 'post-new.php' == $pagenow || 'post.php' == $pagenow || 'link.php' == $pagenow || 'link-add.php' == $pagenow ) {
 		wp_enqueue_style( 'hocwp-admin-style' );
 		wp_enqueue_script( 'hocwp-admin' );
 	} elseif ( 'wpsupercache' == $current_page ) {
@@ -3198,32 +1981,6 @@ function hocwp_the_footer_logo() {
 	}
 }
 
-function hocwp_remove_array_item_by_value( $value, $array ) {
-	if ( ( $key = array_search( $value, $array ) ) !== false ) {
-		unset( $array[ $key ] );
-	}
-
-	return $array;
-}
-
-function hocwp_find_valid_value_in_array( $arr, $key ) {
-	$result = '';
-	if ( is_array( $arr ) ) {
-		if ( isset( $arr[ $key ] ) ) {
-			$result = $arr[ $key ];
-		} else {
-			$index = absint( count( $arr ) / 2 );
-			if ( isset( $arr[ $index ] ) ) {
-				$result = $arr[ $index ];
-			} else {
-				$result = current( $arr );
-			}
-		}
-	}
-
-	return $result;
-}
-
 function hocwp_pretty_permalinks_enabled() {
 	$permalink_structure = get_option( 'permalink_structure' );
 
@@ -3239,30 +1996,6 @@ function hocwp_exclude_special_taxonomies( &$taxonomies ) {
 function hocwp_exclude_special_post_types( &$post_types ) {
 	unset( $post_types['attachment'] );
 	unset( $post_types['page'] );
-}
-
-function hocwp_get_last_part_in_url( $url ) {
-	return substr( parse_url( $url, PHP_URL_PATH ), 1 );
-}
-
-function hocwp_substr( $str, $len, $more = '...', $charset = 'UTF-8' ) {
-	$more = esc_html( $more );
-	$str  = html_entity_decode( $str, ENT_QUOTES, $charset );
-	if ( mb_strlen( $str, $charset ) > $len ) {
-		$arr       = explode( ' ', $str );
-		$str       = mb_substr( $str, 0, $len, $charset );
-		$arr_words = explode( ' ', $str );
-		$index     = count( $arr_words ) - 1;
-		$last      = $arr[ $index ];
-		unset( $arr );
-		if ( strcasecmp( $arr_words[ $index ], $last ) ) {
-			unset( $arr_words[ $index ] );
-		}
-
-		return implode( ' ', $arr_words ) . $more;
-	}
-
-	return $str;
 }
 
 function hocwp_icon_circle_ajax( $post_id, $meta_key ) {
@@ -3315,10 +2048,6 @@ function hocwp_get_wp_version() {
 	return $wp_version;
 }
 
-function hocwp_get_ip_address() {
-	return isset( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : null;
-}
-
 function hocwp_get_upload_folder_details() {
 	$upload = wp_upload_dir();
 	$dir    = isset( $upload['basedir'] ) ? $upload['basedir'] : '';
@@ -3331,25 +2060,6 @@ function hocwp_get_upload_folder_details() {
 	}
 
 	return array( 'path' => $dir, 'url' => $url );
-}
-
-function hocwp_is_phone_number( $number ) {
-	$regex  = "/^(\d[\s-]?)?[\(\[\s-]{0,2}?\d{3}[\)\]\s-]{0,2}?\d{3}[\s-]?\d{4}$/i";
-	$result = ( preg_match( $regex, $number ) ) ? true : false;
-	if ( $result ) {
-		$len = strlen( $number );
-		if ( $len < 7 || $len > 20 ) {
-			$result = false;
-		}
-	}
-
-	return $result;
-}
-
-function hocwp_image_base64( $file ) {
-	$image_data = @file_get_contents( $file );
-
-	return 'data:image/png;base64,' . base64_encode( $image_data );
 }
 
 function hocwp_upload( $args = array() ) {

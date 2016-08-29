@@ -74,7 +74,7 @@ function hocwp_change_captcha_image_ajax_callback() {
 		$result['success']           = true;
 		$result['captcha_image_url'] = $url;
 	} else {
-		$result['message'] = __( 'Sorry, cannot generate captcha image, please try again or contact administrator!', 'hocwp' );
+		$result['message'] = __( 'Sorry, cannot generate captcha image, please try again or contact administrator!', 'hocwp-theme' );
 	}
 	echo json_encode( $result );
 	die();
@@ -521,3 +521,96 @@ function hocwp_update_post_temperature_ajax_callback() {
 
 add_action( 'wp_ajax_hocwp_update_post_temperature', 'hocwp_update_post_temperature_ajax_callback' );
 add_action( 'wp_ajax_nopriv_hocwp_update_post_temperature', 'hocwp_update_post_temperature_ajax_callback' );
+
+function hocwp_notification_posts_ajax_callback() {
+	$lists = get_option( 'hocwp_notification_posts' );
+	$lists = hocwp_to_array( $lists );
+	if ( hocwp_array_has_value( $lists ) ) {
+		$query = hocwp_get_post_by_meta( 'subscriber_verified', 1, array( 'post_type' => 'hocwp_subscriber' ) );
+		if ( $query->have_posts() ) {
+			$subscribers    = $query->posts;
+			$date           = hocwp_get_current_date();
+			$transient_name = 'hocwp_notification_posts_table_' . md5( $date );
+			if ( true || false === ( $table_content = get_transient( $transient_name ) ) ) {
+				$table = new HOCWP_HTML( 'table' );
+				$table->set_attribute( 'align', 'center' );
+				$table->set_attribute( 'width', '100%' );
+				$table->set_attribute( 'cellspacing', 0 );
+				$table->set_attribute( 'border', 0 );
+				$table->set_attribute( 'cellpadding', 0 );
+				$table->set_attribute( 'bgcolor', '#ffffff' );
+				$table_content = '';
+				foreach ( $lists as $post_id ) {
+					$obj       = get_post( $post_id );
+					$post_type = get_post_type_object( $obj->post_type );
+					if ( ! is_object( $post_type ) || ! $post_type->public ) {
+						continue;
+					}
+					$notified = (bool) hocwp_get_post_meta( 'hocwp_notification_posts_sent', $post_id );
+					if ( $notified ) {
+						continue;
+					}
+					$inner_table = $table;
+					$tbody       = new HOCWP_HTML( 'tbody' );
+					$tr          = new HOCWP_HTML( 'tr' );
+					$td          = new HOCWP_HTML( 'td' );
+					$td->set_attribute( 'style', 'font-size:1px;line-height:1px' );
+					$tr->set_text( $td );
+					$tr2 = new HOCWP_HTML( 'tr' );
+					$td2 = new HOCWP_HTML( 'td' );
+					$td2->set_attribute( 'style', 'border-bottom:2px dotted #808285;padding-bottom:12px' );
+					$a = new HOCWP_HTML( 'a' );
+					$a->set_attribute( 'target', '_blank' );
+					$a->set_href( get_permalink( $obj ) );
+					$a->set_attribute( 'style', 'font-family: Helvetica,arial,sans-serif; font-size: 20px; color: rgb(22, 63, 144); text-align: left; font-weight: 500; text-decoration: none; line-height: 27px;' );
+					$a->set_text( get_the_title( $obj ) );
+					$p       = new HOCWP_HTML( 'p' );
+					$excerpt = get_the_excerpt( $obj );
+					if ( empty( $excerpt ) ) {
+						$excerpt = $obj->post_content;
+						$excerpt = strip_tags( $excerpt );
+						$excerpt = apply_filters( 'excerpt_length', $excerpt, 150 );
+					}
+					$p->set_text( $excerpt );
+					$td2->set_text( $a->build() . $p->build() );
+					$tr2->set_text( $td2 );
+					$tbody->set_text( $tr->build() . $tr2->build() );
+					$inner_table->set_text( $tbody );
+					$table_content .= $inner_table->build();
+					update_post_meta( $post_id, 'hocwp_notification_posts_sent', 1 );
+				}
+				if ( ! empty( $table_content ) ) {
+					$tbody = new HOCWP_HTML( 'tbody' );
+					$tr    = new HOCWP_HTML( 'tr' );
+					$td    = new HOCWP_HTML( 'td' );
+					$td->set_text( $table_content );
+					$tr->set_text( $td );
+					$tbody->set_text( $tr );
+					$table->set_text( $tbody );
+					$table_content = $table->build();
+				}
+			}
+			if ( ! empty( $table_content ) ) {
+				foreach ( $subscribers as $subscriber ) {
+					$email = hocwp_get_post_meta( 'subscriber_email', $subscriber->ID );
+					if ( is_email( $email ) ) {
+						$transient_name = 'hocwp_notification_posts_to_user_' . md5( $email ) . '_table_' . md5( $table_content );
+						if ( true || false === get_transient( $transient_name ) ) {
+							$subject = '[' . get_bloginfo( 'name' ) . '] New content updated on ' . hocwp_get_current_date( hocwp_get_date_format() );
+							$message = $table_content;
+							$message = hocwp_mail_unsubscribe_link_footer( $message, $email );
+							$sent    = hocwp_send_html_mail( $email, $subject, $message );
+							if ( $sent ) {
+								set_transient( $transient_name, 1, DAY_IN_SECONDS );
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	exit;
+}
+
+add_action( 'wp_ajax_hocwp_notification_posts', 'hocwp_notification_posts_ajax_callback' );
+add_action( 'wp_ajax_nopriv_hocwp_notification_posts', 'hocwp_notification_posts_ajax_callback' );

@@ -3,9 +3,17 @@ if ( ! function_exists( 'add_filter' ) ) {
 	exit;
 }
 
+function hocwp_get_current_language() {
+	if ( function_exists( 'qtranxf_getLanguage' ) ) {
+		return qtranxf_getLanguage();
+	}
+
+	return hocwp_get_language();
+}
+
 function hocwp_dashboard_widget_loading() {
-	$loading = '<p class="hocwp-widget-loading widget-loading hide-if-no-js">' . __( 'Loading&#8230;', 'hocwp' ) . '</p>';
-	$loading .= '<p class="hide-if-js">' . __( 'This widget requires JavaScript.', 'hocwp' ) . '</p>';
+	$loading = '<p class="hocwp-widget-loading widget-loading hide-if-no-js">' . __( 'Loading&#8230;', 'hocwp-theme' ) . '</p>';
+	$loading .= '<p class="hide-if-js">' . __( 'This widget requires JavaScript.', 'hocwp-theme' ) . '</p>';
 
 	return apply_filters( 'hocwp_dashboard_widget_loading', $loading );
 }
@@ -44,7 +52,7 @@ function hocwp_dashboard_widget_cache( $widget_id, $callback, $args = array() ) 
 			set_transient( $cache_key, $html_data, 12 * HOUR_IN_SECONDS );
 		}
 	} else {
-		echo hocwp_build_message( __( 'Please set a valid callback for this widget!', 'hocwp' ), '' );
+		echo hocwp_build_message( __( 'Please set a valid callback for this widget!', 'hocwp-theme' ), '' );
 	}
 
 	return true;
@@ -91,7 +99,7 @@ function hocwp_dashboard_widget_rss_cache( $args = array() ) {
 			echo '</ul>';
 		}
 	} else {
-		echo hocwp_build_message( __( 'Please set a valid feed url for this widget!', 'hocwp' ), '' );
+		echo hocwp_build_message( __( 'Please set a valid feed url for this widget!', 'hocwp-theme' ), '' );
 	}
 	echo '</div>';
 }
@@ -270,8 +278,54 @@ function hocwp_generate_verify_link( $key ) {
 	$a   = new HOCWP_HTML( 'a' );
 	$a->set_href( $url );
 	$a->set_text( $url );
+	$a->set_attribute( 'target', '_blank' );
 
 	return $a->build();
+}
+
+function hocwp_generate_unsubscribe_link( $email, $text = '' ) {
+	if ( ! is_email( $email ) ) {
+		return '';
+	}
+	$query = hocwp_get_post_by_meta( 'subscriber_email', $email, array( 'post_type' => 'hocwp_subscriber' ) );
+	$key   = '';
+	$post  = null;
+	if ( $query->have_posts() ) {
+		$post = array_shift( $query->posts );
+		$key  = hocwp_get_post_meta( 'subscriber_deactivate_key', $post->ID );
+	}
+	if ( empty( $key ) ) {
+		$key = hocwp_generate_reset_key();
+		if ( is_a( $post, 'WP_Post' ) ) {
+			update_post_meta( $post->ID, 'subscriber_deactivate_key', $key );
+		}
+	}
+	$url = home_url( '/' );
+	$url = add_query_arg( array( 'key' => $key, 'action' => 'unsubscribe', 'email' => $email ), $url );
+	$a   = new HOCWP_HTML( 'a' );
+	$a->set_href( $url );
+	if ( empty( $text ) ) {
+		$text = $url;
+	}
+	$a->set_text( $text );
+	$a->set_attribute( 'target', '_blank' );
+
+	return $a->build();
+}
+
+function hocwp_mail_unsubscribe_link_footer( $message, $email ) {
+	$unsubscribe_link = hocwp_generate_unsubscribe_link( $email, 'Click here to unsubscribe' );
+	if ( ! empty( $unsubscribe_link ) ) {
+		$message .= '<table cellpadding="0" cellspacing="0" border="0" style="margin-top: 20px;">';
+		$message .= '<tbody><tr><td style="';
+		$message .= 'font-family:Helvetica,arial,sans-serif;font-size:11px;color:#000000;text-align:center;line-height:15px;font-weight:500;font-style:italic';
+		$message .= '">This email was sent to <a target="_blank" href="';
+		$message .= $email . '">' . $email . '</a>. ';
+		$message .= $unsubscribe_link . '.';
+		$message .= '</td></tr></tbody></table>';
+	}
+
+	return $message;
 }
 
 function hocwp_loading_image( $args = array() ) {
@@ -351,114 +405,6 @@ function hocwp_get_sidebar_info( $post ) {
 	return $args;
 }
 
-function hocwp_print_r( $value ) {
-	echo '<pre>';
-	print_r( $value );
-	echo '</pre>';
-}
-
-function hocwp_parse_xml( $args = array() ) {
-	$result = null;
-	if ( function_exists( 'simplexml_load_file' ) ) {
-		if ( ! is_array( $args ) ) {
-			$url = $args;
-		} else {
-			$url = hocwp_get_value_by_key( $args, 'url' );
-		}
-		if ( ! empty( $url ) ) {
-			$result = simplexml_load_file( $url );
-		}
-	}
-
-	return $result;
-}
-
-function hocwp_parse_vietcombank_exchange_rate( $url = '' ) {
-	$result = null;
-	if ( empty( $url ) ) {
-		$url = 'https://www.vietcombank.com.vn/exchangerates/ExrateXML.aspx';
-	}
-	$transient_name = 'hocwp_exchange_rate_vietcombank';
-	if ( false === ( $result = get_transient( $transient_name ) ) ) {
-		$xml = hocwp_parse_xml( $url );
-		if ( is_object( $xml ) ) {
-			$updated = (array) $xml->DateTime;
-			$data    = array(
-				'datetime' => array_shift( $updated )
-			);
-			$exrates = $xml->Exrate;
-			foreach ( $exrates as $rate ) {
-				$currency_code                                                                     = (array) $rate['CurrencyCode'];
-				$currency_code                                                                     = array_shift( $currency_code );
-				$currency_name                                                                     = (array) $rate['CurrencyName'];
-				$buy                                                                               = (array) $rate['Buy'];
-				$sell                                                                              = (array) $rate['Sell'];
-				$transfer                                                                          = (array) $rate['Transfer'];
-				$data['exrate'][ hocwp_sanitize_id( hocwp_sanitize_file_name( $currency_code ) ) ] = array(
-					'currency_code' => $currency_code,
-					'currency_name' => array_shift( $currency_name ),
-					'buy'           => array_shift( $buy ),
-					'sell'          => array_shift( $sell ),
-					'transfer'      => array_shift( $transfer )
-				);
-			}
-			$result     = $data;
-			$expiration = apply_filters( 'hocwp_vietcombank_exchange_rate_expiration', 30 * MINUTE_IN_SECONDS );
-			set_transient( $transient_name, $result, $expiration );
-		}
-	}
-
-	return $result;
-}
-
-function hocwp_parse_sjc_exchange_rate( $url = '' ) {
-	$result = null;
-	if ( empty( $url ) ) {
-		$url = 'http://www.sjc.com.vn/xml/tygiavang.xml';
-	}
-	$transient_name = 'hocwp_exchange_rate_sjc';
-	if ( false === ( $result = get_transient( $transient_name ) ) ) {
-		$xml = hocwp_parse_xml( $url );
-		if ( is_object( $xml ) ) {
-			$updated = (array) $xml->ratelist['updated'];
-			$unit    = (array) $xml->ratelist['unit'];
-			$data    = array(
-				'updated' => array_shift( $updated ),
-				'unit'    => array_shift( $unit )
-			);
-			$cities  = $xml->ratelist->city;
-			$lists   = array();
-			foreach ( $cities as $city ) {
-				$name   = (array) $city['name'];
-				$name   = array_shift( $name );
-				$items  = $city->item;
-				$tmp    = array(
-					'name' => $name
-				);
-				$childs = array();
-				foreach ( $items as $item ) {
-					$buy      = (array) $item['buy'];
-					$sell     = (array) $item['sell'];
-					$type     = (array) $item['type'];
-					$childs[] = array(
-						'buy'  => array_shift( $buy ),
-						'sell' => array_shift( $sell ),
-						'type' => array_shift( $type )
-					);
-				}
-				$tmp['item']                                                     = $childs;
-				$lists[ hocwp_sanitize_id( hocwp_sanitize_file_name( $name ) ) ] = $tmp;
-			}
-			$data['city'] = $lists;
-			$result       = $data;
-			$expiration   = apply_filters( 'hocwp_sjc_exchange_rate_expiration', HOUR_IN_SECONDS );
-			set_transient( $transient_name, $result, $expiration );
-		}
-	}
-
-	return $result;
-}
-
 function hocwp_get_post_class( $post_id = null, $class = '' ) {
 	if ( ! hocwp_id_number_valid( $post_id ) ) {
 		$post_id = get_the_ID();
@@ -493,18 +439,6 @@ function hocwp_build_license_transient_name( $type, $use_for ) {
 	return 'hocwp_check_license_' . md5( $name );
 }
 
-function hocwp_change_tag_attribute( $tag, $attr, $value ) {
-	$tag = preg_replace( '/' . $attr . '="(.*?)"/i', $attr . '="' . $value . '"', $tag );
-
-	return $tag;
-}
-
-function hocwp_add_html_attribute( $tag, $html, $attribute ) {
-	$html = preg_replace( '^' . preg_quote( '<' . $tag . ' ' ) . '^', '<' . $tag . ' ' . $attribute . ' ', $html );
-
-	return $html;
-}
-
 function hocwp_replace_text_placeholder( $text ) {
 	remove_filter( 'hocwp_replace_text_placeholder', 'hocwp_replace_text_placeholder' );
 	$text = apply_filters( 'hocwp_replace_text_placeholder', $text );
@@ -533,17 +467,6 @@ function hocwp_replace_text_placeholder( $text ) {
 function hocwp_redirect_home() {
 	wp_redirect( home_url( '/' ) );
 	exit;
-}
-
-function hocwp_percentage( $val1, $val2, $precision = 0 ) {
-	$total = $val1 + $val2;
-	if ( 0 == $total ) {
-		return 0;
-	}
-	$val1 /= $total;
-	$val1 *= 100;
-
-	return round( $val1, $precision );
 }
 
 function hocwp_widget_item_full_width_result( $full_width_value, $total_item_count, $loop_count ) {
@@ -594,17 +517,37 @@ function hocwp_the_social_list( $args = array() ) {
 	$option_names   = $option_socials['option_names'];
 	$options        = hocwp_get_option( 'option_social' );
 	$icons          = $option_socials['icons'];
+	$list           = (bool) hocwp_get_value_by_key( $args, 'list' );
 	if ( hocwp_array_has_value( $orders ) ) {
-		foreach ( $orders as $social ) {
-			$option_name = hocwp_get_value_by_key( $option_names, $social );
-			$item        = hocwp_get_value_by_key( $options, $option_name );
-			if ( ! empty( $item ) ) {
-				$icon = '<i class="fa ' . $icons[ $social ] . '"></i>';
-				$a    = new HOCWP_HTML( 'a' );
-				$a->set_href( $item );
-				$a->set_class( 'social-item link-' . $social );
-				$a->set_text( $icon );
-				$a->output();
+		if ( $list ) {
+			echo '<ul class="list-socials list-unstyled list-inline">';
+			foreach ( $orders as $social ) {
+				$option_name = hocwp_get_value_by_key( $option_names, $social );
+				$item        = hocwp_get_value_by_key( $options, $option_name );
+				if ( ! empty( $item ) ) {
+					$icon = '<i class="fa ' . $icons[ $social ] . '"></i>';
+					$a    = new HOCWP_HTML( 'a' );
+					$a->set_href( $item );
+					$a->set_class( 'social-item link-' . $social );
+					$a->set_text( $icon );
+					$li = new HOCWP_HTML( 'li' );
+					$li->set_text( $a );
+					$li->output();
+				}
+			}
+			echo '</ul>';
+		} else {
+			foreach ( $orders as $social ) {
+				$option_name = hocwp_get_value_by_key( $option_names, $social );
+				$item        = hocwp_get_value_by_key( $options, $option_name );
+				if ( ! empty( $item ) ) {
+					$icon = '<i class="fa ' . $icons[ $social ] . '"></i>';
+					$a    = new HOCWP_HTML( 'a' );
+					$a->set_href( $item );
+					$a->set_class( 'social-item link-' . $social );
+					$a->set_text( $icon );
+					$a->output();
+				}
 			}
 		}
 	}
@@ -627,27 +570,11 @@ function hocwp_in_maintenance_mode_notice() {
 		$page = hocwp_get_current_admin_page();
 		if ( 'hocwp_maintenance' != $page ) {
 			$args = array(
-				'text' => sprintf( __( 'Your site is running in maintenance mode, so you can go to %s and turn it off when done.', 'hocwp' ), '<a href="' . admin_url( 'tools.php?page=hocwp_maintenance' ) . '">' . __( 'setting page', 'hocwp' ) . '</a>' )
+				'text' => sprintf( __( 'Your site is running in maintenance mode, so you can go to %s and turn it off when done.', 'hocwp-theme' ), '<a href="' . admin_url( 'tools.php?page=hocwp_maintenance' ) . '">' . __( 'setting page', 'hocwp-theme' ) . '</a>' )
 			);
 			hocwp_admin_notice( $args );
 		}
 	}
-}
-
-function hocwp_get_computer_info() {
-	$result = array(
-		'operating_system_name' => php_uname( 's' ),
-		'computer_name'         => php_uname( 'n' ),
-		'release_name'          => php_uname( 'r' ),
-		'version_information'   => php_uname( 'v' ),
-		'machine_type'          => php_uname( 'm' )
-	);
-
-	return $result;
-}
-
-function hocwp_get_web_server() {
-	return htmlspecialchars( $_SERVER['SERVER_SOFTWARE'] );
 }
 
 function hocwp_get_table_prefix() {
@@ -659,24 +586,12 @@ function hocwp_get_table_prefix() {
 	}
 }
 
-function hocwp_get_peak_memory_usage() {
-	return memory_get_peak_usage( true );
-}
-
-function hocwp_get_memory_usage() {
-	return memory_get_usage( true );
-}
-
-function hocwp_get_memory_limit() {
-	return ini_get( 'memory_limit' );
-}
-
 function hocwp_get_curl_version() {
 	if ( function_exists( 'curl_version' ) && function_exists( 'curl_exec' ) ) {
 		$cv  = curl_version();
 		$cvs = $cv['version'] . ' / SSL: ' . $cv['ssl_version'] . ' / libz: ' . $cv['libz_version'];
 	} else {
-		$cvs = __( 'Not installed', 'hocwp' ) . ' (' . __( 'required for some remote storage providers', 'hocwp' ) . ')';
+		$cvs = __( 'Not installed', 'hocwp-theme' ) . ' (' . __( 'required for some remote storage providers', 'hocwp-theme' ) . ')';
 	}
 
 	return htmlspecialchars( $cvs );
@@ -700,59 +615,6 @@ function hocwp_get_views_template( $slug, $name = '' ) {
 	if ( file_exists( $template ) ) {
 		include( $template );
 	}
-}
-
-function hocwp_convert_datetime_format_to_jquery( $php_format ) {
-	$matched_symbols = array(
-		// Day
-		'd' => 'dd',
-		'D' => 'D',
-		'j' => 'd',
-		'l' => 'DD',
-		'N' => '',
-		'S' => '',
-		'w' => '',
-		'z' => 'o',
-		// Week
-		'W' => '',
-		// Month
-		'F' => 'MM',
-		'm' => 'mm',
-		'M' => 'M',
-		'n' => 'm',
-		't' => '',
-		// Year
-		'L' => '',
-		'o' => '',
-		'Y' => 'yy',
-		'y' => 'y',
-		// Time
-		'a' => '',
-		'A' => '',
-		'B' => '',
-		'g' => '',
-		'G' => '',
-		'h' => '',
-		'H' => '',
-		'i' => '',
-		's' => '',
-		'u' => ''
-	);
-	$result          = '';
-	$escaping        = false;
-	for ( $i = 0; $i < strlen( $php_format ); $i ++ ) {
-		$char = $php_format[ $i ];
-		if ( isset( $matched_symbols[ $char ] ) ) {
-			$result .= $matched_symbols[ $char ];
-		} else {
-			$result .= $char;
-		}
-	}
-	if ( $escaping ) {
-		$result = esc_attr( $result );
-	}
-
-	return $result;
 }
 
 function hocwp_use_jquery_cdn( $value = null ) {
@@ -824,7 +686,7 @@ function hocwp_plugins_api( $action, $args = array() ) {
 function hocwp_plugins_api_get_information( $args = array() ) {
 	$slug = hocwp_get_value_by_key( $args, 'slug' );
 	if ( empty( $slug ) ) {
-		return new WP_Error( 'missing_slug', __( 'Please set slug for this plugin.', 'hocwp' ) );
+		return new WP_Error( 'missing_slug', __( 'Please set slug for this plugin.', 'hocwp-theme' ) );
 	}
 	$transient_name = 'hocwp_plugins_api_' . $slug . '_plugin_information';
 	$transient_name = hocwp_sanitize_id( $transient_name );
@@ -1133,7 +995,7 @@ function hocwp_loop_plugin_card( $plugin, $allow_tags = array(), $base_name = ''
 					?>
 				</div>
 			<?php else : ?>
-				<p><?php _e( 'This is a local plugin so there is no stats for it.', 'hocwp' ); ?></p>
+				<p><?php _e( 'This is a local plugin so there is no stats for it.', 'hocwp-theme' ); ?></p>
 			<?php endif; ?>
 		</div>
 	</div>

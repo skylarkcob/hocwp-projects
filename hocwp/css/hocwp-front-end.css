@@ -6,6 +6,10 @@
  * Global
  */
 
+html {
+    height: 100%;
+}
+
 body.hocwp {
     min-width: 250px;
 }
@@ -24,14 +28,18 @@ body.hocwp {
     margin: 5px auto;
 }
 
+.hocwp img[align="right"],
 .hocwp .alignright {
     margin-left: 10px;
 }
 
+.hocwp img[align="left"],
 .hocwp .alignleft {
     margin-right: 10px;
 }
 
+.hocwp img[align="right"],
+.hocwp img[align="left"],
 .hocwp .alignleft,
 .hocwp .alignright {
     margin-bottom: 10px;
@@ -112,10 +120,6 @@ body.hocwp {
     overflow: hidden;
 }
 
-.hocwp .site-content p *:not(.row):not(.owl-wrapper):not(.bxslider):not(.slider):not(.lSGallery):not(.pager):not(.carousel):not(.gm-bundled-control):not(.gmnoprint):not(.gm-svpc) {
-    max-width: 100%;
-}
-
 .hocwp .list-square li {
     list-style: square outside none;
 }
@@ -182,6 +186,10 @@ body.hocwp {
 
 .hocwp .hocwp-menu {
     margin: 0;
+}
+
+.hocwp .hocwp-menu:not(.hocwp-mobile-menu) {
+    width: 100%;
 }
 
 .hocwp .sf-arrows .sf-with-ul::after {
@@ -334,7 +342,7 @@ body.hocwp {
 }
 
 .hocwp .hocwp-mobile-menu .search-form .search-field {
-
+    width: 100%;
 }
 
 /**
@@ -809,7 +817,7 @@ body.hocwp {
 }
 
 .hocwp .entry-content p {
-    line-height: 19px;
+    line-height: 22px;
     margin-bottom: 20px;
 }
 
@@ -909,6 +917,10 @@ body.hocwp {
     font-weight: 700;
 }
 
+.hocwp .entry-content iframe {
+    max-width: 100%;
+}
+
 /**
  * Account
  */
@@ -1000,6 +1012,14 @@ body.hocwp {
 .page-template-login .simple-login form p.login-remember,
 .page-template-login .simple-login form p.login-submit {
     margin-left: 158px;
+}
+
+.page-template-full-width .site-content .sidebar {
+    display: none;
+}
+
+.page-template-full-width .site-content .content-area {
+    width: 100% !important;
 }
 
 /**
@@ -1223,21 +1243,6 @@ body.hocwp {
     width: 70%;
 }
 
-.hocwp form:not(.tinymce-form):not(.cart) button,
-.hocwp form:not(.tinymce-form):not(.cart) .button:not(#wp-link-submit),
-.hocwp form input[type="submit"]:not(#wp-link-submit) {
-    background: transparent none repeat scroll 0 0;
-    border: 1px solid transparent;
-    border-radius: 0;
-    cursor: pointer;
-}
-
-.hocwp form:not(.tinymce-form):not(.cart) button,
-.hocwp form:not(.tinymce-form):not(.cart) .button:not(#wp-link-submit),
-.hocwp form input[type="submit"]:not(#wp-link-submit) {
-    padding: 8px 20px;
-}
-
 .hocwp .hocwp-mobile-menu .menu-item form.search-form input.search-submit,
 .hocwp .hocwp-mobile-menu form.search-form input.search-submit {
     padding-left: 5px !important;
@@ -1289,7 +1294,7 @@ body.hocwp {
 }
 
 .hocwp-widget-post li {
-
+    overflow: hidden;
 }
 
 .hocwp-widget-post li .entry-title {
@@ -1530,6 +1535,14 @@ body.hocwp {
     margin-bottom: 5px;
 }
 
+.hocwp .search-form .search-submit {
+    border: 1px solid #e4e4e4;
+}
+
+.hocwp .search-form .search-submit:hover {
+    opacity: 0.75;
+}
+
 /**
  * Search form
  */
@@ -1563,6 +1576,10 @@ body.hocwp {
 
 .hocwp .search-form.icon-in .search-field {
     padding-right: 35px;
+}
+
+.hocwp .search-form .search-field {
+    width: 100%;
 }
 
 /**
@@ -1682,9 +1699,6 @@ body.hocwp {
  */
 
 .hocwp div blockquote,
-.hocwp form:not(.tinymce-form):not(.cart) button,
-.hocwp form:not(.tinymce-form):not(.cart) .button:not(#wp-link-submit),
-.hocwp form input[type="submit"]:not(#wp-link-submit),
 .hocwp .comments-area .comments-title .title-left {
     border-color: #9ed461;
 }
@@ -1730,18 +1744,12 @@ body.hocwp {
     border-color: #e4e4e4;
 }
 
-.hocwp form:not(.tinymce-form):not(.cart) button:hover,
-.hocwp form:not(.tinymce-form):not(.cart) .button:not(#wp-link-submit):hover,
-.hocwp form input[type="submit"]:not(#wp-link-submit):hover,
 .hocwp .hocwp-mobile-menu li:first-child {
     border-color: #222;
 }
 
 .hocwp .pagination .nav-links .page-numbers,
 .hocwp .hocwp-pagination .item,
-.hocwp form:not(.tinymce-form) button,
-.hocwp form:not(.tinymce-form) .button:not(#wp-link-submit),
-.hocwp form input[type="submit"]:not(#wp-link-submit),
 .hocwp .hocwp-mobile-menu li.menu-item-has-children > .fa,
 .hocwp .hocwp-mobile-menu li a {
     color: #fff;
@@ -1793,10 +1801,7 @@ body.hocwp {
 .hocwp .hocwp-widget-post .post-slider .carousel-indicators .indicator-item:hover span,
 .hocwp .hocwp-widget-post .post-slider .carousel-indicators .indicator-item.active span,
 .hocwp .pagination .nav-links .page-numbers,
-.hocwp .hocwp-pagination .item,
-.hocwp form:not(.tinymce-form):not(.cart) button,
-.hocwp form:not(.tinymce-form):not(.cart) .button:not(#wp-link-submit),
-.hocwp form input[type="submit"]:not(#wp-link-submit) {
+.hocwp .hocwp-pagination .item {
     background-color: #9ed461;
 }
 
@@ -1807,10 +1812,7 @@ body.hocwp {
 .hocwp .pagination .nav-links .page-numbers.current,
 .hocwp .hocwp-pagination .current-item,
 .hocwp .pagination .nav-links a.page-numbers:hover,
-.hocwp .hocwp-pagination .link-item:hover,
-.hocwp form:not(.tinymce-form):not(.cart) button:hover,
-.hocwp form:not(.tinymce-form):not(.cart) .button:not(#wp-link-submit):hover,
-.hocwp form input[type="submit"]:not(#wp-link-submit):hover {
+.hocwp .hocwp-pagination .link-item:hover {
     background-color: #222;
 }
 
@@ -1897,6 +1899,7 @@ body.hocwp {
     font-size: 40px;
 }
 
+.hocwp img[align="right"],
 .hocwp .fr,
 .hocwp .col-right,
 .hocwp .comment-list li .reply,
@@ -1907,6 +1910,7 @@ body.hocwp {
     float: right;
 }
 
+.hocwp img[align="left"],
 .hocwp .search-form label,
 .hocwp .fl,
 .hocwp .col-left,
@@ -1918,7 +1922,6 @@ body.hocwp {
 .hocwp .hocwp-feedburner-widget .email-field,
 .hocwp .widget-sb-subscribe .email-field,
 .hocwp .widget_search label,
-.hocwp .widget li,
 .hocwp .comment-list li .comment-author,
 .hocwp .comment-list .comment-body .comment-meta > div,
 .hocwp .alignleft {
@@ -2488,21 +2491,6 @@ body.hocwp {
     clear: both;
 }
 
-.hocwp input[type="search"],
-.hocwp .content-area .search-form .search-field,
-.hocwp .widget-sb-subscribe .email-field,
-.hocwp .widget_search .search-field,
-.hocwp #wp-calendar,
-.hocwp .widget li,
-.hocwp table,
-.hocwp .comment-list li .comment-respond .comment-form p textarea,
-.hocwp .hocwp-widget-facebook-box > div,
-.hocwp .hocwp-mobile-menu li,
-.hocwp div.post-thumbnail .wp-post-image,
-.fb-comments iframe {
-    width: 100%;
-}
-
 .hocwp .hocwp-hidden *,
 .hocwp .hocwp-hidden {
     height: 0;
@@ -2849,6 +2837,14 @@ body.hocwp {
 
 .hocwp.hocwp-custom-quantity.woocommerce-cart form .shop_table.cart .product-subtotal {
     width: 20%;
+}
+
+.woocommerce-EditAccountForm {
+    font-size: 13px;
+}
+
+.woocommerce-FormRow label {
+    font-size: 13px;
 }
 
 @media screen and (max-width: 768px) {

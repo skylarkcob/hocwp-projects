@@ -12,7 +12,7 @@ class HOCWP_MO extends MO {
 
 	public function register_post_type() {
 		$args = array(
-			'name' => __('String Translation', 'hocwp'),
+			'name' => __('String Translation', 'hocwp-theme'),
 			'slug' => 'hocwp_mo'
 		);
 		hocwp_register_post_type_private($args);

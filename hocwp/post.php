@@ -30,7 +30,10 @@ function hocwp_insert_trending( $args = array() ) {
 		if ( empty( $action ) ) {
 			$action = 'view';
 		}
-		$table_name   = $wpdb->prefix . HOCWP_TRENDING_TABLE;
+		$table_name = $wpdb->prefix . HOCWP_TRENDING_TABLE;
+		if ( ! hocwp_is_table_exists( $table_name ) ) {
+			return;
+		}
 		$trending_day = absint( apply_filters( 'hocwp_trending_interval', 7 ) );
 		$sql          = "DELETE FROM $table_name WHERE UNIX_TIMESTAMP(post_date) < UNIX_TIMESTAMP(DATE_SUB('$datetime', INTERVAL $trending_day DAY))";
 		$wpdb->query( $sql );
@@ -93,7 +96,7 @@ function hocwp_return_post( $post_or_id = null, $output = OBJECT ) {
 }
 
 function hocwp_excerpt_more( $more ) {
-	$read_more_text = apply_filters( 'hocwp_read_more_text', __( 'Continue reading', 'hocwp' ) );
+	$read_more_text = apply_filters( 'hocwp_read_more_text', __( 'Continue reading', 'hocwp-theme' ) );
 	$read_more_text = apply_filters( 'hocwp_excerpt_more_text', $read_more_text );
 	if ( ! empty( $read_more_text ) ) {
 		$link = sprintf( '<a href="%1$s" class="more-link">%2$s</a>',
@@ -219,6 +222,8 @@ function hocwp_get_post_thumbnail_url( $post_id = '', $size = 'full' ) {
 function hocwp_post_thumbnail_large_if_not_default( $result, $post_id ) {
 	if ( empty( $result ) ) {
 		$result = get_post_meta( $post_id, 'large_thumbnail', true );
+		$result = hocwp_sanitize_media_value( $result );
+		$result = $result['url'];
 	}
 
 	return $result;
@@ -295,7 +300,9 @@ function hocwp_post_thumbnail( $args = array() ) {
 		}
 		$bfi_url = apply_filters( 'hocwp_pre_bfi_thumb', '', $thumbnail_url, $params );
 		if ( empty( $bfi_url ) ) {
-			$bfi_url = bfi_thumb( $thumbnail_url, $params );
+			if ( $width > 0 || $height > 0 ) {
+				$bfi_url = bfi_thumb( $thumbnail_url, $params );
+			}
 		}
 		if ( ! empty( $bfi_url ) ) {
 			$thumbnail_url = $bfi_url;
@@ -491,7 +498,7 @@ function hocwp_article_footer( $args = array() ) {
 		<?php if ( $entry_meta ) : ?>
 			<div class="entry-meta">
 				<?php hocwp_entry_meta(); ?>
-				<?php edit_post_link( __( 'Edit', 'hocwp' ), '<span class="edit-link">', '</span>' ); ?>
+				<?php edit_post_link( __( 'Edit', 'hocwp-theme' ), '<span class="edit-link">', '</span>' ); ?>
 			</div>
 		<?php endif; ?>
 	</footer><!-- .entry-footer -->
@@ -629,8 +636,23 @@ function hocwp_get_post_permalink_by_slug( $slug, $default = 'home' ) {
 	return $default;
 }
 
-function hocwp_get_post_by_slug( $slug ) {
-	return hocwp_get_post_by_column( 'post_name', $slug );
+function hocwp_get_post_by_slug( $slug, $post_type = 'post' ) {
+	$args  = array(
+		'name'           => $slug,
+		'post_type'      => $post_type,
+		'posts_per_page' => 1
+	);
+	$query = hocwp_query( $args );
+
+	return array_shift( $query->posts );
+}
+
+function hocwp_get_page_by_slug( $slug ) {
+	return hocwp_get_post_by_slug( $slug, 'page' );
+}
+
+function hocwp_is_post( $post ) {
+	return is_a( $post, 'WP_Post' );
 }
 
 function hocwp_get_author_posts_url() {

@@ -5,19 +5,22 @@
  * Time: 10:23 AM
  * Email: hocwp.net@gmail.com
  */
-if(!function_exists('add_filter')) exit;
+if ( ! function_exists( 'add_filter' ) ) {
+	exit;
+}
+
 class HOCWP_Rewrite {
 	private $taxonomies = array();
 	private $tax_objects = array();
 
-	public function set_taxonomy_objects($tax_objects) {
+	public function set_taxonomy_objects( $tax_objects ) {
 		$this->tax_objects = $tax_objects;
 	}
 
-	public function add_taxonomy_object($tax_object) {
-		if(hocwp_object_valid($tax_object)) {
-			if(!isset($this->tax_objects[$tax_object->name])) {
-				$this->tax_objects[$tax_object->name] = $tax_object;
+	public function add_taxonomy_object( $tax_object ) {
+		if ( hocwp_object_valid( $tax_object ) ) {
+			if ( ! isset( $this->tax_objects[ $tax_object->name ] ) ) {
+				$this->tax_objects[ $tax_object->name ] = $tax_object;
 			}
 		}
 	}
@@ -26,17 +29,17 @@ class HOCWP_Rewrite {
 		return $this->tax_objects;
 	}
 
-	public function set_taxonomies($taxonomies) {
+	public function set_taxonomies( $taxonomies ) {
 		$this->taxonomies = $taxonomies;
-		foreach($taxonomies as $taxonomy) {
-			$this->add_taxonomy_object(get_taxonomy($taxonomy));
+		foreach ( $taxonomies as $taxonomy ) {
+			$this->add_taxonomy_object( get_taxonomy( $taxonomy ) );
 		}
 	}
 
-	public function add_taxonomy($taxonomy) {
-		if(!array_search($taxonomy, $this->get_taxonomies())) {
+	public function add_taxonomy( $taxonomy ) {
+		if ( ! array_search( $taxonomy, $this->get_taxonomies() ) ) {
 			$this->taxonomies[] = $taxonomy;
-			$this->add_taxonomy_object(get_taxonomy($taxonomy));
+			$this->add_taxonomy_object( get_taxonomy( $taxonomy ) );
 		}
 	}
 
@@ -50,14 +53,14 @@ class HOCWP_Rewrite {
 
 	public function remove_taxonomy_base() {
 		$taxonomies = $this->get_taxonomies();
-		foreach($taxonomies as $taxonomy) {
-			$remove_base = new HOCWP_Remove_Term_Base($taxonomy);
-			switch($taxonomy) {
+		foreach ( $taxonomies as $taxonomy ) {
+			$remove_base = new HOCWP_Remove_Term_Base( $taxonomy );
+			switch ( $taxonomy ) {
 				case 'category':
-					$remove_base->set_base('category');
+					$remove_base->set_base( 'category' );
 					break;
 				case 'post_tag':
-					$remove_base->set_base('tag');
+					$remove_base->set_base( 'tag' );
 					break;
 			}
 			$remove_base->init();

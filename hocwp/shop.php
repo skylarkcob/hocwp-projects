@@ -2,8 +2,8 @@
 if(!function_exists('add_filter')) exit;
 function hocwp_register_post_type_product() {
     $args = array(
-        'name' => __('Products', 'hocwp'),
-        'singular_name' => __('Product', 'hocwp'),
+        'name' => __('Products', 'hocwp-theme'),
+        'singular_name' => __('Product', 'hocwp-theme'),
         'slug' => 'product',
         'menu_icon' => 'dashicons-products'
     );
@@ -12,9 +12,9 @@ function hocwp_register_post_type_product() {
 
 function hocwp_register_taxonomy_product_cat() {
     $args = array(
-        'name' => __('Product Categories', 'hocwp'),
-        'singular_name' => __('Product Category', 'hocwp'),
-        'menu_name' => __('Categories', 'hocwp'),
+        'name' => __('Product Categories', 'hocwp-theme'),
+        'singular_name' => __('Product Category', 'hocwp-theme'),
+        'menu_name' => __('Categories', 'hocwp-theme'),
         'slug' => 'product_cat',
         'post_types' => 'product'
     );
@@ -23,9 +23,9 @@ function hocwp_register_taxonomy_product_cat() {
 
 function hocwp_register_taxonomy_product_tag() {
     $args = array(
-        'name' => __('Product Tags', 'hocwp'),
-        'singular_name' => __('Product Tag', 'hocwp'),
-        'menu_name' => __('Tags', 'hocwp'),
+        'name' => __('Product Tags', 'hocwp-theme'),
+        'singular_name' => __('Product Tag', 'hocwp-theme'),
+        'menu_name' => __('Tags', 'hocwp-theme'),
         'slug' => 'product_tag',
         'post_types' => 'product'
     );

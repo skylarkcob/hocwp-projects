@@ -5,74 +5,21 @@ if ( ! function_exists( 'add_filter' ) ) {
 
 function hocwp_maintenance_mode_default_settings() {
 	$defaults = array(
-		'title'   => __( 'Maintenance mode', 'hocwp' ),
-		'heading' => __( 'Maintenance mode', 'hocwp' ),
-		'text'    => __( '<p>Sorry for the inconvenience.<br />Our website is currently undergoing scheduled maintenance.<br />Thank you for your understanding.</p>', 'hocwp' )
+		'title'   => __( 'Maintenance mode', 'hocwp-theme' ),
+		'heading' => __( 'Maintenance mode', 'hocwp-theme' ),
+		'text'    => __( '<p>Sorry for the inconvenience.<br />Our website is currently undergoing scheduled maintenance.<br />Thank you for your understanding.</p>', 'hocwp-theme' )
 	);
 
 	return apply_filters( 'hocwp_maintenance_mode_default_settings', $defaults );
 }
 
-function hocwp_temperature_class( $temperature ) {
-	$class = 'temperature';
-	if ( is_numeric( $temperature ) ) {
-		$class .= '-';
-		$number = 1;
-		if ( $temperature >= 0 && $temperature < 6 ) {
-			$number += 0;
-		} elseif ( $temperature >= 6 && $temperature < 12 ) {
-			$number += 1;
-		} elseif ( $temperature >= 12 && $temperature < 18 ) {
-			$number += 2;
-		} elseif ( $temperature >= 18 && $temperature < 24 ) {
-			$number += 3;
-		} elseif ( $temperature >= 24 && $temperature < 30 ) {
-			$number += 4;
-		} elseif ( $temperature >= 30 && $temperature < 36 ) {
-			$number += 5;
-		} elseif ( $temperature >= 36 && $temperature < 42 ) {
-			$number += 6;
-		} elseif ( $temperature >= 42 && $temperature < 48 ) {
-			$number += 7;
-		} elseif ( $temperature >= 48 && $temperature < 54 ) {
-			$number += 8;
-		} elseif ( $temperature >= 54 && $temperature < 60 ) {
-			$number += 9;
-		} elseif ( $temperature >= 60 && $temperature < 66 ) {
-			$number += 10;
-		} elseif ( $temperature >= 66 && $temperature < 72 ) {
-			$number += 11;
-		} elseif ( $temperature >= 72 && $temperature < 78 ) {
-			$number += 12;
-		} elseif ( $temperature >= 78 && $temperature < 84 ) {
-			$number += 13;
-		} elseif ( $temperature >= 84 && $temperature < 90 ) {
-			$number += 14;
-		} elseif ( $temperature >= 90 && $temperature < 96 ) {
-			$number += 15;
-		} elseif ( $temperature >= 96 && $temperature < 102 ) {
-			$number += 16;
-		} elseif ( $temperature >= 102 && $temperature < 108 ) {
-			$number += 17;
-		} elseif ( $temperature >= 108 && $temperature < 114 ) {
-			$number += 18;
-		} elseif ( $temperature >= 114 && $temperature < 120 ) {
-			$number += 19;
-		} elseif ( $temperature >= 120 && $temperature < 126 ) {
-			$number += 20;
-		} elseif ( $temperature >= 126 && $temperature < 132 ) {
-			$number += 21;
-		} elseif ( $temperature >= 132 && $temperature < 138 ) {
-			$number += 22;
-		} elseif ( $temperature >= 138 && $temperature < 144 ) {
-			$number += 23;
-		} elseif ( $temperature >= 144 ) {
-			$number += 24;
-		}
-		$class .= $number;
+function hocwp_newsletter_time_range() {
+	$range = apply_filters( 'hocwp_newsletter_time_range', array( 17, 21 ) );
+	if ( ! is_array( $range ) || count( $range ) != 2 ) {
+		$range = array( 17, 21 );
 	}
 
-	return $class;
+	return $range;
 }
 
 function hocwp_prevent_author_see_another_post() {
@@ -93,6 +40,60 @@ function hocwp_delete_old_file( $path, $interval ) {
 				chmod( $file, 0777 );
 				@unlink( $file );
 			}
+		}
+	}
+}
+
+function hocwp_is_table_exists( $table_name ) {
+	global $wpdb;
+	if ( ! hocwp_string_contain( $table_name, $wpdb->prefix ) ) {
+		$table_name = $wpdb->prefix . $table_name;
+	}
+	$result = $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" );
+	if ( empty( $result ) ) {
+		return false;
+	}
+
+	return true;
+}
+
+function hocwp_get_url_params( $url = null ) {
+	$params = array();
+	if ( empty( $url ) ) {
+		$url = $_SERVER['REQUEST_URI'];
+	}
+	$current_url = basename( $url );
+	if ( ! empty( $current_url ) ) {
+		$parts = explode( '&', $current_url );
+		foreach ( $parts as $part ) {
+			$p = explode( '=', $part );
+			if ( isset( $p[0] ) && ! empty( $p[0] ) ) {
+				$param = $p[0];
+				$param = trim( $param, '?' );
+				if ( false !== strpos( $param, '?' ) ) {
+					$tmp   = explode( '?', $param );
+					$param = array_pop( $tmp );
+				}
+				$params[ $param ] = isset( $p[1] ) ? $p[1] : '';
+			}
+		}
+	}
+
+	return $params;
+}
+
+function hocwp_form_hidden_params( $params = null, $skip_params = array() ) {
+	if ( ! is_array( $params ) ) {
+		$params = hocwp_get_url_params();
+	}
+	if ( is_array( $params ) ) {
+		foreach ( $params as $key => $value ) {
+			if ( in_array( $key, $skip_params ) ) {
+				continue;
+			}
+			?>
+			<input type="hidden" name="<?php echo $key; ?>" value="<?php echo $value; ?>">
+			<?php
 		}
 	}
 }
@@ -120,7 +121,7 @@ function hocwp_google_login_script( $args = array() ) {
 	}
 	$clientid = hocwp_get_value_by_key( $args, 'clientid', hocwp_get_google_client_id() );
 	if ( empty( $clientid ) ) {
-		hocwp_debug_log( __( 'Please set your Google Client ID first.', 'hocwp' ) );
+		hocwp_debug_log( __( 'Please set your Google Client ID first.', 'hocwp-theme' ) );
 
 		return;
 	}
@@ -190,7 +191,7 @@ function hocwp_facebook_login_script( $args = array() ) {
 	}
 	$app_id = hocwp_get_wpseo_social_facebook_app_id();
 	if ( empty( $app_id ) ) {
-		hocwp_debug_log( __( 'Please set your Facebook APP ID first.', 'hocwp' ) );
+		hocwp_debug_log( __( 'Please set your Facebook APP ID first.', 'hocwp-theme' ) );
 
 		return;
 	}
@@ -258,6 +259,14 @@ function hocwp_facebook_login_script( $args = array() ) {
 	<?php
 }
 
+function hocwp_is_bots() {
+	if ( isset( $_SERVER['HTTP_USER_AGENT'] ) && preg_match( '/bot|crawl|slurp|spider/i', $_SERVER['HTTP_USER_AGENT'] ) ) {
+		return true;
+	}
+
+	return false;
+}
+
 function hocwp_get_default_lat_long() {
 	$lat_long = array(
 		'lat' => '37.42200662799378',
@@ -287,7 +296,7 @@ function hocwp_register_post_type_news( $args = array() ) {
 	}
 	$slug     = apply_filters( 'hocwp_post_type_news_base_slug', $slug );
 	$defaults = array(
-		'name'              => __( 'News', 'hocwp' ),
+		'name'              => __( 'News', 'hocwp-theme' ),
 		'slug'              => $slug,
 		'post_type'         => 'news',
 		'show_in_admin_bar' => true,
@@ -301,10 +310,10 @@ function hocwp_register_post_type_news( $args = array() ) {
 	}
 	$slug = apply_filters( 'hocwp_taxonomy_news_category_base_slug', $slug );
 	$args = array(
-		'name'          => __( 'News Categories', 'hocwp' ),
-		'singular_name' => __( 'News Category', 'hocwp' ),
+		'name'          => __( 'News Categories', 'hocwp-theme' ),
+		'singular_name' => __( 'News Category', 'hocwp-theme' ),
 		'post_types'    => 'news',
-		'menu_name'     => __( 'Categories', 'hocwp' ),
+		'menu_name'     => __( 'Categories', 'hocwp-theme' ),
 		'slug'          => $slug,
 		'taxonomy'      => 'news_cat'
 	);
@@ -317,10 +326,10 @@ function hocwp_register_post_type_news( $args = array() ) {
 		}
 		$slug = apply_filters( 'hocwp_taxonomy_news_tag_base_slug', $slug );
 		$args = array(
-			'name'          => __( 'News Tags', 'hocwp' ),
-			'singular_name' => __( 'News Tag', 'hocwp' ),
+			'name'          => __( 'News Tags', 'hocwp-theme' ),
+			'singular_name' => __( 'News Tag', 'hocwp-theme' ),
 			'post_types'    => 'news',
-			'menu_name'     => __( 'Tags', 'hocwp' ),
+			'menu_name'     => __( 'Tags', 'hocwp-theme' ),
 			'slug'          => $slug,
 			'hierarchical'  => false,
 			'taxonomy'      => 'news_tag'
@@ -449,7 +458,7 @@ function hocwp_generate_min_file( $file, $extension = 'js', $compress_min_file =
 					fclose( $handler );
 				}
 				set_transient( $transient_name, 1, 15 * MINUTE_IN_SECONDS );
-				hocwp_debug_log( sprintf( __( 'File %s is compressed successfully!', 'hocwp' ), $file ) );
+				hocwp_debug_log( sprintf( __( 'File %s is compressed successfully!', 'hocwp-theme' ), $file ) );
 			}
 		}
 	}

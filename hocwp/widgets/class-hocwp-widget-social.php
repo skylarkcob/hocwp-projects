@@ -29,7 +29,7 @@ class HOCWP_Widget_Social extends WP_Widget {
 			'id'          => 'hocwp_widget_social',
 			'name'        => 'HOCWP Social',
 			'class'       => 'hocwp-social-widget',
-			'description' => __( 'Display list social icons on sidebar.', 'hocwp' ),
+			'description' => __( 'Display list social icons on sidebar.', 'hocwp-theme' ),
 			'width'       => 400
 		);
 		$this->admin_args = apply_filters( 'hocwp_widget_social_admin_args', $this->admin_args, $this );
@@ -92,7 +92,7 @@ class HOCWP_Widget_Social extends WP_Widget {
 			'id'    => $this->get_field_id( 'order' ),
 			'name'  => $this->get_field_name( 'order' ),
 			'value' => $order,
-			'label' => __( 'Order:', 'hocwp' )
+			'label' => __( 'Order:', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_text', $args );
 
@@ -100,7 +100,7 @@ class HOCWP_Widget_Social extends WP_Widget {
 			'id'    => $this->get_field_id( 'description' ),
 			'name'  => $this->get_field_name( 'description' ),
 			'value' => $description,
-			'label' => __( 'Description:', 'hocwp' )
+			'label' => __( 'Description:', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_textarea', $args );
 

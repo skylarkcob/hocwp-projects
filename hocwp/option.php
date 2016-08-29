@@ -149,7 +149,7 @@ function hocwp_get_option($base_name) {
 
 function hocwp_add_option_page_smtp_email($parent_slug = null) {
     if(null != $parent_slug) {
-        _deprecated_argument(__FUNCTION__, '2.7.4', __('Please do not use $parent_slug argument since core version 2.7.4 or later.', 'hocwp'));
+        _deprecated_argument(__FUNCTION__, '2.7.4', __('Please do not use $parent_slug argument since core version 2.7.4 or later.', 'hocwp-theme'));
     }
     require(HOCWP_PATH . '/options/setting-smtp-email.php');
 }
@@ -178,12 +178,12 @@ function hocwp_option_defaults() {
         'theme_custom' => array(
             'background_music' => array(
                 'play_ons' => array(
-                    'home' => __('Homepage', 'hocwp'),
-                    'single' => __('Single', 'hocwp'),
-                    'page' => __('Page', 'hocwp'),
-                    'archive' => __('Archive', 'hocwp'),
-                    'search' => __('Search', 'hocwp'),
-                    'all' => __('Play on whole page', 'hocwp')
+                    'home' => __('Homepage', 'hocwp-theme'),
+                    'single' => __('Single', 'hocwp-theme'),
+                    'page' => __('Page', 'hocwp-theme'),
+                    'archive' => __('Archive', 'hocwp-theme'),
+                    'search' => __('Search', 'hocwp-theme'),
+                    'all' => __('Play on whole page', 'hocwp-theme')
                 ),
                 'play_on' => 'home'
             )
@@ -254,8 +254,8 @@ function hocwp_plugin_option_page_header() {
     $core_version = defined('HOCWP_PLUGIN_CORE_VERSION') ? HOCWP_PLUGIN_CORE_VERSION : HOCWP_VERSION;
     ?>
     <div class="page-header">
-        <h2 class="theme-name"><?php _e('Plugin Options', 'hocwp'); ?></h2>
-        <span class="theme-version hocwp-version"><?php printf(__('Core Version: %s', 'hocwp'), $core_version); ?></span>
+        <h2 class="theme-name"><?php _e('Plugin Options', 'hocwp-theme'); ?></h2>
+        <span class="theme-version hocwp-version"><?php printf(__('Core Version: %s', 'hocwp-theme'), $core_version); ?></span>
     </div>
     <?php
 }
@@ -296,7 +296,7 @@ function hocwp_theme_option_form_before() {
     $theme = wp_get_theme();
     $name = $theme->get('Name');
     if(empty($name)) {
-        $name = __('Unknown', 'hocwp');
+        $name = __('Unknown', 'hocwp-theme');
     }
     $version = $theme->get('Version');
     if(empty($version)) {
@@ -305,7 +305,7 @@ function hocwp_theme_option_form_before() {
     ?>
     <div class="page-header">
         <h2 class="theme-name"><?php echo $name; ?></h2>
-        <span class="theme-version"><?php printf(__('Version: %s', 'hocwp'), $version); ?></span>
+        <span class="theme-version"><?php printf(__('Version: %s', 'hocwp-theme'), $version); ?></span>
     </div>
     <?php
 }

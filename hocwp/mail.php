@@ -104,23 +104,23 @@ function hocwp_mail_test_smtp_setting( $to_email ) {
 		require( ABSPATH . WPINC . '/class-smtp.php' );
 		$phpmailer = new PHPMailer( true );
 	}
-	$subject              = __( 'SMTP Email', 'hocwp' ) . ': ' . sprintf( __( 'Test mail to %s', 'hocwp' ), $to_email );
-	$message              = __( 'Thank you for using HocWP, your SMTP mail settings work successfully.', 'hocwp' );
+	$subject              = __( 'SMTP Email', 'hocwp-theme' ) . ': ' . sprintf( __( 'Test mail to %s', 'hocwp-theme' ), $to_email );
+	$message              = __( 'Thank you for using HocWP, your SMTP mail settings work successfully.', 'hocwp-theme' );
 	$phpmailer->SMTPDebug = true;
 	ob_start();
 	$result       = wp_mail( $to_email, $subject, $message );
 	$smtp_debug   = ob_get_clean();
-	$test_message = '<p><strong>' . __( 'Test Message Sent', 'hocwp' ) . '</strong></p>';
+	$test_message = '<p><strong>' . __( 'Test Message Sent', 'hocwp-theme' ) . '</strong></p>';
 	ob_start();
 	var_dump( $result );
 	$result = ob_get_clean();
-	$test_message .= '<p>' . sprintf( __( 'The result was: %s', 'hocwp' ), $result ) . '</p>';
-	$test_message .= '<p>' . __( 'The full debugging output is shown below:', 'hocwp' ) . '</p>';
+	$test_message .= '<p>' . sprintf( __( 'The result was: %s', 'hocwp-theme' ), $result ) . '</p>';
+	$test_message .= '<p>' . __( 'The full debugging output is shown below:', 'hocwp-theme' ) . '</p>';
 	ob_start();
 	var_dump( $phpmailer );
 	$mailer_debug = ob_get_clean();
 	$test_message .= '<pre>' . $mailer_debug . '</pre>';
-	$test_message .= '<p>' . __( 'The SMTP debugging output is shown below:', 'hocwp' ) . '</p>';
+	$test_message .= '<p>' . __( 'The SMTP debugging output is shown below:', 'hocwp-theme' ) . '</p>';
 	$test_message .= '<pre>' . $smtp_debug . '</pre>';
 
 	return $test_message;

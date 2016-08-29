@@ -293,6 +293,10 @@ label.label-input-size {
     padding: 0;
 }
 
+.no-padding-left {
+    padding-left: 0 !important;
+}
+
 .padding-top-10 {
     padding-top: 10px;
 }

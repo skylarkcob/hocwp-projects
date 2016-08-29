@@ -1,6 +1,6 @@
 <?php
 /*
- * Last updated: 2016-06-29
+ * Last updated: 2016-08-28
  */
 if ( ! function_exists( 'add_filter' ) ) {
 	exit;
@@ -10,7 +10,7 @@ if ( defined( 'HOCWP_PATH' ) ) {
 	return;
 }
 
-define( 'HOCWP_VERSION', '3.4.2' );
+define( 'HOCWP_VERSION', '3.4.4' );
 
 define( 'HOCWP_PATH', dirname( __FILE__ ) );
 
@@ -38,18 +38,18 @@ define( 'HOCWP_DOING_AUTO_SAVE', ( ( defined( 'DOING_AUTOSAVE' ) && true === DOI
 
 define( 'HOCWP_MINIMUM_JQUERY_VERSION', '1.9.1' );
 
-define( 'HOCWP_JQUERY_LATEST_VERSION', '1.11.4' );
+define( 'HOCWP_JQUERY_LATEST_VERSION', '1.12.4' );
 
 define( 'HOCWP_TINYMCE_VERSION', '4' );
 
-define( 'HOCWP_BOOTSTRAP_LATEST_VERSION', '3.3.6' );
+define( 'HOCWP_BOOTSTRAP_LATEST_VERSION', '3.3.7' );
 
-define( 'HOCWP_FONTAWESOME_LATEST_VERSION', '4.6.1' );
+define( 'HOCWP_FONTAWESOME_LATEST_VERSION', '4.6.3' );
 
-define( 'HOCWP_SUPERFISH_LATEST_VERSION', '1.7.8' );
+define( 'HOCWP_SUPERFISH_LATEST_VERSION', '1.7.9' );
 
 if ( ! defined( 'HOCWP_MINIMUM_PHP_VERSION' ) ) {
-	define( 'HOCWP_MINIMUM_PHP_VERSION', '5.2.4' );
+	define( 'HOCWP_MINIMUM_PHP_VERSION', '5.4' );
 }
 
 if ( ! defined( 'HOCWP_RECOMMEND_PHP_VERSION' ) ) {
@@ -67,6 +67,8 @@ define( 'HOCWP_PLUGIN_LICENSE_ADMIN_URL', admin_url( 'admin.php?page=hocwp_plugi
 define( 'HOCWP_FACEBOOK_GRAPH_API_VERSION', '2.5' );
 
 require( HOCWP_PATH . '/lib/bfi-thumb/BFI_Thumb.php' );
+
+require( HOCWP_PATH . '/core-functions.php' );
 
 require( HOCWP_PATH . '/functions.php' );
 

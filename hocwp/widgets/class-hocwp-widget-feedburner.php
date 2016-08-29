@@ -10,13 +10,13 @@ class HOCWP_Widget_FeedBurner extends WP_Widget {
 
 	private function get_defaults() {
 		$defaults = array(
-			'button_text'    => __( 'Subscribe', 'hocwp' ),
-			'placeholder'    => __( 'Enter your email', 'hocwp' ),
+			'button_text'    => __( 'Subscribe', 'hocwp-theme' ),
+			'placeholder'    => __( 'Enter your email', 'hocwp-theme' ),
 			'description'    => '',
 			'desc_position'  => 'before',
 			'desc_positions' => array(
-				'before' => __( 'Before email field', 'hocwp' ),
-				'after'  => __( 'After email field', 'hocwp' )
+				'before' => __( 'Before email field', 'hocwp-theme' ),
+				'after'  => __( 'After email field', 'hocwp-theme' )
 			)
 		);
 		$defaults = apply_filters( 'hocwp_widget_feedburner_defaults', $defaults, $this );
@@ -32,7 +32,7 @@ class HOCWP_Widget_FeedBurner extends WP_Widget {
 			'id'          => 'hocwp_widget_feedburner',
 			'name'        => 'HOCWP FeedBurner',
 			'class'       => 'hocwp-feedburner-widget',
-			'description' => __( 'Display FeedBurner subscription box on sidebar.', 'hocwp' ),
+			'description' => __( 'Display FeedBurner subscription box on sidebar.', 'hocwp-theme' ),
 			'width'       => 400
 		);
 		$this->admin_args = apply_filters( 'hocwp_widget_feedburner_admin_args', $this->admin_args, $this );
@@ -91,7 +91,7 @@ class HOCWP_Widget_FeedBurner extends WP_Widget {
 			'id'    => $this->get_field_id( 'feedburner_name' ),
 			'name'  => $this->get_field_name( 'feedburner_name' ),
 			'value' => $feedburner_name,
-			'label' => __( 'Name:', 'hocwp' )
+			'label' => __( 'Name:', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_text', $args );
 
@@ -99,7 +99,7 @@ class HOCWP_Widget_FeedBurner extends WP_Widget {
 			'id'    => $this->get_field_id( 'button_text' ),
 			'name'  => $this->get_field_name( 'button_text' ),
 			'value' => $button_text,
-			'label' => __( 'Button text:', 'hocwp' )
+			'label' => __( 'Button text:', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_text', $args );
 
@@ -107,7 +107,7 @@ class HOCWP_Widget_FeedBurner extends WP_Widget {
 			'id'    => $this->get_field_id( 'placeholder' ),
 			'name'  => $this->get_field_name( 'placeholder' ),
 			'value' => $placeholder,
-			'label' => __( 'Placeholder:', 'hocwp' )
+			'label' => __( 'Placeholder:', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_text', $args );
 
@@ -115,7 +115,7 @@ class HOCWP_Widget_FeedBurner extends WP_Widget {
 			'id'    => $this->get_field_id( 'description' ),
 			'name'  => $this->get_field_name( 'description' ),
 			'value' => $description,
-			'label' => __( 'Description:', 'hocwp' )
+			'label' => __( 'Description:', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_textarea', $args );
 
@@ -133,7 +133,7 @@ class HOCWP_Widget_FeedBurner extends WP_Widget {
 			'name'       => $this->get_field_name( 'desc_position' ),
 			'value'      => $desc_position,
 			'all_option' => $all_option,
-			'label'      => __( 'Description position:', 'hocwp' ),
+			'label'      => __( 'Description position:', 'hocwp-theme' ),
 			'class'      => 'desc-position'
 		);
 		hocwp_widget_field( 'hocwp_field_select', $args );

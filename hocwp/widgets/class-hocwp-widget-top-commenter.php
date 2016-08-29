@@ -13,15 +13,15 @@ class HOCWP_Widget_Top_Commenter extends WP_Widget {
 			'number'           => 5,
 			'time'             => 'week',
 			'times'            => array(
-				'today' => __( 'Today', 'hocwp' ),
-				'week'  => __( 'This week', 'hocwp' ),
-				'month' => __( 'This month', 'hocwp' ),
-				'year'  => __( 'This year', 'hocwp' ),
-				'all'   => __( 'All time', 'hocwp' )
+				'today' => __( 'Today', 'hocwp-theme' ),
+				'week'  => __( 'This week', 'hocwp-theme' ),
+				'month' => __( 'This month', 'hocwp-theme' ),
+				'year'  => __( 'This year', 'hocwp-theme' ),
+				'all'   => __( 'All time', 'hocwp-theme' )
 			),
 			'show_count'       => true,
 			'link_author_name' => true,
-			'none_text'        => __( 'There is no commenter in this list.', 'hocwp' )
+			'none_text'        => __( 'There is no commenter in this list.', 'hocwp-theme' )
 		);
 		$defaults = apply_filters( 'hocwp_widget_top_commenter_defaults', $defaults, $this );
 		$args     = apply_filters( 'hocwp_widget_top_commenter_args', array(), $this );
@@ -36,7 +36,7 @@ class HOCWP_Widget_Top_Commenter extends WP_Widget {
 			'id'          => 'hocwp_widget_top_commenter',
 			'name'        => 'HOCWP Top Commenter',
 			'class'       => 'hocwp-top-commenter-widget',
-			'description' => __( 'Get top commenters on your site.', 'hocwp' ),
+			'description' => __( 'Get top commenters on your site.', 'hocwp-theme' ),
 			'width'       => 400
 		);
 		$this->admin_args = apply_filters( 'hocwp_widget_top_commenter_admin_args', $this->admin_args, $this );
@@ -132,7 +132,7 @@ class HOCWP_Widget_Top_Commenter extends WP_Widget {
 			'id'    => $this->get_field_id( 'number' ),
 			'name'  => $this->get_field_name( 'number' ),
 			'value' => $number,
-			'label' => __( 'Number:', 'hocwp' )
+			'label' => __( 'Number:', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_number', $args );
 
@@ -146,7 +146,7 @@ class HOCWP_Widget_Top_Commenter extends WP_Widget {
 			'name'       => $this->get_field_name( 'time' ),
 			'all_option' => $all_option,
 			'value'      => $time,
-			'label'      => __( 'Time:', 'hocwp' ),
+			'label'      => __( 'Time:', 'hocwp-theme' ),
 			'multiple'   => true
 		);
 		hocwp_widget_field( 'hocwp_field_select', $args );
@@ -161,9 +161,10 @@ class HOCWP_Widget_Top_Commenter extends WP_Widget {
 					$selected = $user_name;
 				}
 			}
-			$all_option .= hocwp_field_get_option( array( 'value'    => $lvalue->ID,
-			                                              'text'     => $lvalue->display_name,
-			                                              'selected' => $selected
+			$all_option .= hocwp_field_get_option( array(
+				'value'    => $lvalue->ID,
+				'text'     => $lvalue->display_name,
+				'selected' => $selected
 			) );
 		}
 		$args = array(
@@ -171,8 +172,8 @@ class HOCWP_Widget_Top_Commenter extends WP_Widget {
 			'name'        => $this->get_field_name( 'exclude_users' ),
 			'all_option'  => $all_option,
 			'value'       => $exclude_users,
-			'label'       => __( 'Exclude users:', 'hocwp' ),
-			'placeholder' => __( 'Choose user', 'hocwp' ),
+			'label'       => __( 'Exclude users:', 'hocwp-theme' ),
+			'placeholder' => __( 'Choose user', 'hocwp-theme' ),
 			'multiple'    => true
 		);
 		hocwp_widget_field( 'hocwp_field_select_chosen', $args );
@@ -181,7 +182,7 @@ class HOCWP_Widget_Top_Commenter extends WP_Widget {
 			'id'    => $this->get_field_id( 'show_count' ),
 			'name'  => $this->get_field_name( 'show_count' ),
 			'value' => $show_count,
-			'label' => __( 'Show count', 'hocwp' )
+			'label' => __( 'Show count', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_checkbox', $args );
 
@@ -189,7 +190,7 @@ class HOCWP_Widget_Top_Commenter extends WP_Widget {
 			'id'    => $this->get_field_id( 'link_author_name' ),
 			'name'  => $this->get_field_name( 'link_author_name' ),
 			'value' => $link_author_name,
-			'label' => __( 'Link author name', 'hocwp' )
+			'label' => __( 'Link author name', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input_checkbox', $args );
 
@@ -197,7 +198,7 @@ class HOCWP_Widget_Top_Commenter extends WP_Widget {
 			'id'    => $this->get_field_id( 'none_text' ),
 			'name'  => $this->get_field_name( 'none_text' ),
 			'value' => $none_text,
-			'label' => __( 'No commenter text:', 'hocwp' )
+			'label' => __( 'No commenter text:', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_input', $args );
 
