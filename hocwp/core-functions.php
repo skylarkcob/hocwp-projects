@@ -78,6 +78,20 @@ function hocwp_array_has_value( $arr ) {
 	return false;
 }
 
+function hocwp_array_insert( &$array, $position, $insert ) {
+	if ( is_int( $position ) ) {
+		if ( is_array( $insert ) ) {
+			$insert = array( $insert );
+		}
+		array_splice( $array, $position, 0, $insert );
+	} else {
+		$pos    = array_search( $position, array_keys( $array ) );
+		$firsts = array_slice( $array, 0, $pos );
+		$lasts  = array_slice( $array, $pos );
+		$array  = $firsts + $insert + $lasts;
+	}
+}
+
 function hocwp_string_empty( $string ) {
 	if ( '' === $string ) {
 		return true;
@@ -572,13 +586,19 @@ function hocwp_get_countries() {
 	return $countries;
 }
 
+function hocwp_transmit_value( &$value1, &$value2 ) {
+	if ( ! empty( $value1 ) || ! empty( $value2 ) ) {
+		if ( empty( $value1 ) && ! empty( $value2 ) ) {
+			$value1 = $value2;
+		}
+		if ( empty( $value2 ) && ! empty( $value1 ) ) {
+			$value2 = $value1;
+		}
+	}
+}
+
 function hocwp_transmit_id_and_name( &$id, &$name ) {
-	if ( empty( $id ) && ! empty( $name ) ) {
-		$id = $name;
-	}
-	if ( empty( $name ) && ! empty( $id ) ) {
-		$name = $id;
-	}
+	hocwp_transmit_value( $id, $name );
 }
 
 function hocwp_number_format_vietnamese( $number ) {
@@ -1443,6 +1463,23 @@ function hocwp_get_minified( $url, $content ) {
 	);
 
 	return @file_get_contents( $url, false, stream_context_create( $postdata ) );
+}
+
+function hocwp_get_max_number( $numbers = array() ) {
+	if ( is_numeric( $numbers ) ) {
+		return $numbers;
+	}
+	if ( ! is_array( $numbers ) ) {
+		return 0;
+	}
+	$max = array_shift( $numbers );
+	foreach ( $numbers as $number ) {
+		if ( $number > $max ) {
+			$max = $number;
+		}
+	}
+
+	return $max;
 }
 
 function hocwp_wrap_class( $classes = array() ) {

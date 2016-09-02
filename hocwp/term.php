@@ -340,6 +340,22 @@ function hocwp_get_term_icon( $term_id ) {
 	return $icon;
 }
 
+function hocwp_term_icon_html( $term_id, $default = '' ) {
+	$icon = hocwp_get_term_icon( $term_id );
+	$icon = hocwp_sanitize_media_value( $icon );
+	$icon = $icon['url'];
+	if ( empty( $icon ) ) {
+		$icon = $default;
+	}
+	if ( hocwp_string_contain( $icon, 'fa' ) ) {
+		echo $icon;
+	} else {
+		$img = new HOCWP_HTML( 'img' );
+		$img->set_image_src( $icon );
+		$img->output();
+	}
+}
+
 function hocwp_get_child_terms( $parent_id, $taxonomy, $args = array() ) {
 	$args['child_of'] = $parent_id;
 	$terms            = hocwp_get_terms( $taxonomy, $args );

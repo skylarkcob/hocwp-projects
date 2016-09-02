@@ -40,7 +40,9 @@ class HOCWP_Widget_Term extends WP_Widget {
 			'count_format'     => '(%TERM_COUNT%)',
 			'different_name'   => 0,
 			'in_current_post'  => 0,
-			'hide_empty'       => 0
+			'hide_empty'       => 0,
+			'only_parent'      => 0,
+			'child_of_current' => 0
 		);
 		$defaults = apply_filters( 'hocwp_widget_term_defaults', $defaults, $this );
 		$args     = apply_filters( 'hocwp_widget_term_args', array(), $this );
@@ -123,43 +125,54 @@ class HOCWP_Widget_Term extends WP_Widget {
 			$args['before_widget'] = $before_widget;
 		}
 
-		$number          = hocwp_get_value_by_key( $instance, 'number', hocwp_get_value_by_key( $this->args, 'number' ) );
-		$thumbnail_size  = hocwp_get_value_by_key( $instance, 'thumbnail_size', hocwp_get_value_by_key( $this->args, 'thumbnail_size' ) );
-		$thumbnail_size  = hocwp_sanitize_size( $thumbnail_size );
-		$full_width_item = hocwp_get_value_by_key( $instance, 'full_width_item', hocwp_get_value_by_key( $this->args, 'full_width_item' ) );
-		$show_count      = hocwp_get_value_by_key( $instance, 'show_count', hocwp_get_value_by_key( $this->args, 'show_count' ) );
-		$hide_thumbnail  = hocwp_get_value_by_key( $instance, 'hide_thumbnail', hocwp_get_value_by_key( $this->args, 'hide_thumbnail' ) );
-		$only_thumbnail  = hocwp_get_value_by_key( $instance, 'only_thumbnail', hocwp_get_value_by_key( $this->args, 'only_thumbnail' ) );
-		$order           = hocwp_get_value_by_key( $instance, 'order', hocwp_get_value_by_key( $this->args, 'order' ) );
-		$orderby         = hocwp_get_value_by_key( $instance, 'orderby', hocwp_get_value_by_key( $this->args, 'orderby' ) );
-		$count_format    = hocwp_get_value_by_key( $instance, 'count_format', hocwp_get_value_by_key( $this->args, 'count_format' ) );
-		$different_name  = (bool) hocwp_get_value_by_key( $instance, 'different_name', hocwp_get_value_by_key( $this->args, 'different_name' ) );
-		$hide_empty      = hocwp_get_value_by_key( $instance, 'hide_empty', hocwp_get_value_by_key( $this->args, 'hide_empty' ) );
+		$number = hocwp_get_value_by_key( $instance, 'number', hocwp_get_value_by_key( $this->args, 'number' ) );
+		if ( 0 > $number ) {
+			$number = 0;
+		}
+		$thumbnail_size   = hocwp_get_value_by_key( $instance, 'thumbnail_size', hocwp_get_value_by_key( $this->args, 'thumbnail_size' ) );
+		$thumbnail_size   = hocwp_sanitize_size( $thumbnail_size );
+		$full_width_item  = hocwp_get_value_by_key( $instance, 'full_width_item', hocwp_get_value_by_key( $this->args, 'full_width_item' ) );
+		$show_count       = hocwp_get_value_by_key( $instance, 'show_count', hocwp_get_value_by_key( $this->args, 'show_count' ) );
+		$hide_thumbnail   = hocwp_get_value_by_key( $instance, 'hide_thumbnail', hocwp_get_value_by_key( $this->args, 'hide_thumbnail' ) );
+		$only_thumbnail   = hocwp_get_value_by_key( $instance, 'only_thumbnail', hocwp_get_value_by_key( $this->args, 'only_thumbnail' ) );
+		$order            = hocwp_get_value_by_key( $instance, 'order', hocwp_get_value_by_key( $this->args, 'order' ) );
+		$orderby          = hocwp_get_value_by_key( $instance, 'orderby', hocwp_get_value_by_key( $this->args, 'orderby' ) );
+		$count_format     = hocwp_get_value_by_key( $instance, 'count_format', hocwp_get_value_by_key( $this->args, 'count_format' ) );
+		$different_name   = (bool) hocwp_get_value_by_key( $instance, 'different_name', hocwp_get_value_by_key( $this->args, 'different_name' ) );
+		$hide_empty       = hocwp_get_value_by_key( $instance, 'hide_empty', hocwp_get_value_by_key( $this->args, 'hide_empty' ) );
+		$only_parent      = hocwp_get_value_by_key( $instance, 'only_parent', hocwp_get_value_by_key( $this->args, 'only_parent' ) );
+		$child_of_current = hocwp_get_value_by_key( $instance, 'child_of_current', hocwp_get_value_by_key( $this->args, 'child_of_current' ) );
 
 		if ( $hide_thumbnail ) {
 			$only_thumbnail = false;
 		}
 
+		$defaults = array(
+			'order'   => $order,
+			'orderby' => $orderby,
+			'number'  => absint( $number )
+		);
+		if ( 0 == $hide_empty || ! (bool) $hide_empty ) {
+			$defaults['hide_empty'] = 0;
+		} else {
+			$defaults['hide_empty'] = 1;
+		}
+		if ( $only_parent ) {
+			$defaults['parent'] = 0;
+		}
 		if ( $in_current_post && is_singular() ) {
 			$terms = wp_get_post_terms( get_the_ID(), $taxonomies );
+		} elseif ( $child_of_current && is_tax() ) {
+			$current_term = hocwp_term_get_current();
+			$tax_args     = array( 'child_of' => $current_term->term_id );
+			$tax_args     = wp_parse_args( $tax_args, $defaults );
+			unset( $tax_args['parent'] );
+			$terms = hocwp_get_terms( $current_term->taxonomy, $tax_args );
 		} else {
-			if ( 0 > $number ) {
-				$number = 0;
-			}
-			$tax_args = array(
-				'order'   => $order,
-				'orderby' => $orderby,
-				'number'  => absint( $number )
-			);
-			if ( 0 == $hide_empty || ! (bool) $hide_empty ) {
-				$tax_args['hide_empty'] = false;
-			} else {
-				$tax_args['hide_empty'] = true;
-			}
-			$terms = hocwp_get_terms( $taxonomies, $tax_args );
+			$terms = hocwp_get_terms( $taxonomies, $defaults );
 		}
 
-		if ( $in_current_post && ! hocwp_array_has_value( $terms ) ) {
+		if ( ( $in_current_post || $child_of_current ) && ! hocwp_array_has_value( $terms ) ) {
 			return;
 		}
 
@@ -221,21 +234,23 @@ class HOCWP_Widget_Term extends WP_Widget {
 	}
 
 	public function form( $instance ) {
-		$this->instance  = $instance;
-		$title           = hocwp_get_value_by_key( $instance, 'title' );
-		$taxonomy        = $this->get_taxonomy_from_instance( $instance );
-		$number          = hocwp_get_value_by_key( $instance, 'number', hocwp_get_value_by_key( $this->args, 'number' ) );
-		$thumbnail_size  = hocwp_get_value_by_key( $instance, 'thumbnail_size', hocwp_get_value_by_key( $this->args, 'thumbnail_size' ) );
-		$full_width_item = hocwp_get_value_by_key( $instance, 'full_width_item', hocwp_get_value_by_key( $this->args, 'full_width_item' ) );
-		$count_format    = hocwp_get_value_by_key( $instance, 'count_format', hocwp_get_value_by_key( $this->args, 'count_format' ) );
-		$show_count      = hocwp_get_value_by_key( $instance, 'show_count', hocwp_get_value_by_key( $this->args, 'show_count' ) );
-		$hide_thumbnail  = hocwp_get_value_by_key( $instance, 'hide_thumbnail', hocwp_get_value_by_key( $this->args, 'hide_thumbnail' ) );
-		$only_thumbnail  = hocwp_get_value_by_key( $instance, 'only_thumbnail', hocwp_get_value_by_key( $this->args, 'only_thumbnail' ) );
-		$order           = hocwp_get_value_by_key( $instance, 'order', hocwp_get_value_by_key( $this->args, 'order' ) );
-		$orderby         = hocwp_get_value_by_key( $instance, 'orderby', hocwp_get_value_by_key( $this->args, 'orderby' ) );
-		$different_name  = (bool) hocwp_get_value_by_key( $instance, 'different_name', hocwp_get_value_by_key( $this->args, 'different_name' ) );
-		$in_current_post = (bool) hocwp_get_value_by_key( $instance, 'in_current_post', hocwp_get_value_by_key( $this->args, 'in_current_post' ) );
-		$hide_empty      = hocwp_get_value_by_key( $instance, 'hide_empty', hocwp_get_value_by_key( $this->args, 'hide_empty' ) );
+		$this->instance   = $instance;
+		$title            = hocwp_get_value_by_key( $instance, 'title' );
+		$taxonomy         = $this->get_taxonomy_from_instance( $instance );
+		$number           = hocwp_get_value_by_key( $instance, 'number', hocwp_get_value_by_key( $this->args, 'number' ) );
+		$thumbnail_size   = hocwp_get_value_by_key( $instance, 'thumbnail_size', hocwp_get_value_by_key( $this->args, 'thumbnail_size' ) );
+		$full_width_item  = hocwp_get_value_by_key( $instance, 'full_width_item', hocwp_get_value_by_key( $this->args, 'full_width_item' ) );
+		$count_format     = hocwp_get_value_by_key( $instance, 'count_format', hocwp_get_value_by_key( $this->args, 'count_format' ) );
+		$show_count       = hocwp_get_value_by_key( $instance, 'show_count', hocwp_get_value_by_key( $this->args, 'show_count' ) );
+		$hide_thumbnail   = hocwp_get_value_by_key( $instance, 'hide_thumbnail', hocwp_get_value_by_key( $this->args, 'hide_thumbnail' ) );
+		$only_thumbnail   = hocwp_get_value_by_key( $instance, 'only_thumbnail', hocwp_get_value_by_key( $this->args, 'only_thumbnail' ) );
+		$order            = hocwp_get_value_by_key( $instance, 'order', hocwp_get_value_by_key( $this->args, 'order' ) );
+		$orderby          = hocwp_get_value_by_key( $instance, 'orderby', hocwp_get_value_by_key( $this->args, 'orderby' ) );
+		$different_name   = (bool) hocwp_get_value_by_key( $instance, 'different_name', hocwp_get_value_by_key( $this->args, 'different_name' ) );
+		$in_current_post  = (bool) hocwp_get_value_by_key( $instance, 'in_current_post', hocwp_get_value_by_key( $this->args, 'in_current_post' ) );
+		$hide_empty       = hocwp_get_value_by_key( $instance, 'hide_empty', hocwp_get_value_by_key( $this->args, 'hide_empty' ) );
+		$only_parent      = hocwp_get_value_by_key( $instance, 'only_parent', hocwp_get_value_by_key( $this->args, 'only_parent' ) );
+		$child_of_current = hocwp_get_value_by_key( $instance, 'child_of_current', hocwp_get_value_by_key( $this->args, 'child_of_current' ) );
 
 		hocwp_field_widget_before( $this->admin_args['class'] );
 
@@ -404,6 +419,22 @@ class HOCWP_Widget_Term extends WP_Widget {
 		hocwp_widget_field( 'hocwp_field_input_checkbox', $args );
 
 		$args = array(
+			'id'    => $this->get_field_id( 'only_parent' ),
+			'name'  => $this->get_field_name( 'only_parent' ),
+			'value' => $only_parent,
+			'label' => __( 'Show terms have no parent only?', 'hocwp-theme' )
+		);
+		hocwp_widget_field( 'hocwp_field_input_checkbox', $args );
+
+		$args = array(
+			'id'    => $this->get_field_id( 'child_of_current' ),
+			'name'  => $this->get_field_name( 'child_of_current' ),
+			'value' => $child_of_current,
+			'label' => __( 'Get all childs of current term?', 'hocwp-theme' )
+		);
+		hocwp_widget_field( 'hocwp_field_input_checkbox', $args );
+
+		$args = array(
 			'id'    => $this->get_field_id( 'hide_empty' ),
 			'name'  => $this->get_field_name( 'hide_empty' ),
 			'value' => $hide_empty,
@@ -415,23 +446,25 @@ class HOCWP_Widget_Term extends WP_Widget {
 	}
 
 	public function update( $new_instance, $old_instance ) {
-		$instance                    = $old_instance;
-		$instance['title']           = strip_tags( hocwp_get_value_by_key( $new_instance, 'title' ) );
-		$instance['taxonomy']        = hocwp_get_value_by_key( $new_instance, 'taxonomy', json_encode( $this->args['taxonomy'] ) );
-		$instance['number']          = hocwp_get_value_by_key( $new_instance, 'number', $this->args['number'] );
-		$instance['order']           = hocwp_get_value_by_key( $new_instance, 'order', $this->args['order'] );
-		$instance['orderby']         = hocwp_get_value_by_key( $new_instance, 'orderby', $this->args['orderby'] );
-		$instance['full_width_item'] = hocwp_get_value_by_key( $new_instance, 'full_width_item', $this->args['full_width_item'] );
-		$instance['count_format']    = hocwp_get_value_by_key( $new_instance, 'count_format', $this->args['count_format'] );
-		$width                       = hocwp_get_value_by_key( $new_instance, 'thumbnail_size_width', $this->args['thumbnail_size'][0] );
-		$height                      = hocwp_get_value_by_key( $new_instance, 'thumbnail_size_height', $this->args['thumbnail_size'][1] );
-		$instance['thumbnail_size']  = array( $width, $height );
-		$instance['hide_thumbnail']  = hocwp_checkbox_post_data_value( $new_instance, 'hide_thumbnail' );
-		$instance['show_count']      = hocwp_checkbox_post_data_value( $new_instance, 'show_count' );
-		$instance['only_thumbnail']  = hocwp_checkbox_post_data_value( $new_instance, 'only_thumbnail' );
-		$instance['different_name']  = hocwp_checkbox_post_data_value( $new_instance, 'different_name' );
-		$instance['in_current_post'] = hocwp_checkbox_post_data_value( $new_instance, 'in_current_post' );
-		$instance['hide_empty']      = hocwp_checkbox_post_data_value( $new_instance, 'hide_empty' );
+		$instance                     = $old_instance;
+		$instance['title']            = strip_tags( hocwp_get_value_by_key( $new_instance, 'title' ) );
+		$instance['taxonomy']         = hocwp_get_value_by_key( $new_instance, 'taxonomy', json_encode( $this->args['taxonomy'] ) );
+		$instance['number']           = hocwp_get_value_by_key( $new_instance, 'number', $this->args['number'] );
+		$instance['order']            = hocwp_get_value_by_key( $new_instance, 'order', $this->args['order'] );
+		$instance['orderby']          = hocwp_get_value_by_key( $new_instance, 'orderby', $this->args['orderby'] );
+		$instance['full_width_item']  = hocwp_get_value_by_key( $new_instance, 'full_width_item', $this->args['full_width_item'] );
+		$instance['count_format']     = hocwp_get_value_by_key( $new_instance, 'count_format', $this->args['count_format'] );
+		$width                        = hocwp_get_value_by_key( $new_instance, 'thumbnail_size_width', $this->args['thumbnail_size'][0] );
+		$height                       = hocwp_get_value_by_key( $new_instance, 'thumbnail_size_height', $this->args['thumbnail_size'][1] );
+		$instance['thumbnail_size']   = array( $width, $height );
+		$instance['hide_thumbnail']   = hocwp_checkbox_post_data_value( $new_instance, 'hide_thumbnail' );
+		$instance['show_count']       = hocwp_checkbox_post_data_value( $new_instance, 'show_count' );
+		$instance['only_thumbnail']   = hocwp_checkbox_post_data_value( $new_instance, 'only_thumbnail' );
+		$instance['different_name']   = hocwp_checkbox_post_data_value( $new_instance, 'different_name' );
+		$instance['in_current_post']  = hocwp_checkbox_post_data_value( $new_instance, 'in_current_post' );
+		$instance['hide_empty']       = hocwp_checkbox_post_data_value( $new_instance, 'hide_empty' );
+		$instance['only_parent']      = hocwp_checkbox_post_data_value( $new_instance, 'only_parent' );
+		$instance['child_of_current'] = hocwp_checkbox_post_data_value( $new_instance, 'child_of_current' );
 
 		return $instance;
 	}

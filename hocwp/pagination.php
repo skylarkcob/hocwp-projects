@@ -212,6 +212,7 @@ function hocwp_pagination_after() {
 }
 
 function hocwp_show_pagination( $args = array() ) {
+	$args = apply_filters( 'hocwp_pagination_args', $args );
 	hocwp_pagination_before( $args );
 	echo hocwp_build_pagination( $args );
 	hocwp_pagination_after();

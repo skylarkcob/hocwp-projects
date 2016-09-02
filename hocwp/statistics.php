@@ -14,6 +14,8 @@ define( 'HOCWP_COUNTER_TABLE_ONLINE', 'hw_statistics_online' );
 
 define( 'HOCWP_TRENDING_TABLE', 'hw_trending' );
 
+define( 'HOCWP_SEARCH_TRACKING_TABLE', 'hw_search_tracking' );
+
 define( 'HOCWP_COUNTER_PATH', HOCWP_CONTENT_PATH . '/counter' );
 
 if ( ! file_exists( HOCWP_COUNTER_PATH ) ) {
@@ -27,6 +29,62 @@ if ( ! is_array( $hocwp_reading_options ) ) {
 $statistics = (bool) hocwp_get_value_by_key( $hocwp_reading_options, 'statistics' );
 
 $use_statistics = apply_filters( 'hocwp_use_statistics', $statistics );
+
+function hocwp_search_tracking_table_init() {
+	global $wpdb;
+	$table_name = $wpdb->prefix . HOCWP_SEARCH_TRACKING_TABLE;
+	$sql        = "ID bigint(20) unsigned NOT NULL auto_increment,
+        keyword text,
+        count double NOT NULL default 1,
+        PRIMARY KEY (ID)";
+
+	hocwp_create_database_table( $table_name, $sql );
+}
+
+function hocwp_insert_search_tracking_keyword( $keyword ) {
+	$keyword = trim( $keyword );
+	if ( ! empty( $keyword ) ) {
+		$keyword = strtolower( $keyword );
+		global $wpdb;
+		$table_name = $wpdb->prefix . HOCWP_SEARCH_TRACKING_TABLE;
+		if ( ! hocwp_is_table_exists( $table_name ) ) {
+			return;
+		}
+		$query  = "SELECT * FROM $table_name WHERE keyword = '$keyword'";
+		$result = $wpdb->get_row( $query );
+		if ( empty( $result ) ) {
+			$sql = "INSERT INTO $table_name (keyword, count)";
+			$sql .= " VALUES ('$keyword', 1)";
+			$wpdb->query( $sql );
+		} else {
+			$count = $result->count;
+			$count ++;
+			$sql = "UPDATE $table_name SET count = $count WHERE keyword = '$keyword'";
+			$wpdb->query( $sql );
+		}
+	}
+}
+
+function hocwp_get_search_tracking( $args = array() ) {
+	$defaults       = array(
+		'orderby'        => 'count',
+		'order'          => 'desc',
+		'offset'         => 0,
+		'posts_per_page' => hocwp_get_posts_per_page()
+	);
+	$args           = wp_parse_args( $args, $defaults );
+	$orderby        = $args['orderby'];
+	$order          = $args['order'];
+	$offset         = $args['offset'];
+	$posts_per_page = $args['posts_per_page'];
+	global $wpdb;
+	$table_name = $wpdb->prefix . HOCWP_SEARCH_TRACKING_TABLE;
+	$sql        = "SELECT * FROM $table_name";
+	$sql .= " GROUP BY $orderby ORDER BY $orderby $order LIMIT $posts_per_page OFFSET $offset";
+	$result = $wpdb->get_results( $sql );
+
+	return $result;
+}
 
 function hocwp_statistics_table_init() {
 	global $wpdb;
@@ -391,3 +449,20 @@ function hocwp_statistics_track_post_views() {
 if ( hocwp_post_statistics() && ! is_admin() ) {
 	add_action( 'hocwp_before_doctype', 'hocwp_statistics_track_post_views' );
 }
+
+function hocwp_search_query_tracking() {
+	$use = hocwp_option_get_value( 'reading', 'search_tracking' );
+	$use = apply_filters( 'hocwp_search_query_tracking', $use );
+
+	return (bool) $use;
+}
+
+function hocwp_tracking_search_query_hook() {
+	if ( is_search() ) {
+		if ( hocwp_search_query_tracking() ) {
+			hocwp_insert_search_tracking_keyword( get_search_query() );
+		}
+	}
+}
+
+add_action( 'wp', 'hocwp_tracking_search_query_hook' );

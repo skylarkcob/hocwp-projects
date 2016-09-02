@@ -484,6 +484,8 @@ jQuery(document).ready(function ($) {
                         button.addClass('hidden');
                         $remove.removeClass('hidden');
                     }
+                    $body.trigger('hocwp_media:selected', [media_item, button, options]);
+                    button.trigger('hocwp_media:selected', [media_item, options]);
                 }
                 button.removeClass('selecting');
             });
@@ -641,7 +643,8 @@ jQuery(document).ready(function ($) {
     MediaUpload.DEFAULTS = {
         title: hocwp.i18n.insert_media_title,
         button_text: null,
-        multiple: false
+        multiple: false,
+        hideAddButton: true
     };
 
     MediaUpload.prototype.init = function () {
@@ -668,9 +671,13 @@ jQuery(document).ready(function ($) {
                     id: media_item.id,
                     element: this.$preview
                 }));
-                this.$element.addClass('hidden');
+                if (this.$remove.length && this.options.hideAddButton) {
+                    this.$element.addClass('hidden');
+                }
                 this.$remove.removeClass('hidden');
             }
+            $('body').trigger('hocwp_media:selected', [media_item, this.$element, this.options]);
+            this.$element.trigger('hocwp_media:selected', [media_item, this.options]);
         }
         this.$element.removeClass('selecting');
     };
@@ -806,6 +813,7 @@ jQuery(document).ready(function ($) {
         }
         this.init();
         var $element = this.$element,
+            data_disable_selection = $element.attr('data-disable-selection'),
             $container = $element.parent(),
             $sortable_result = $element.next(),
             sortable_options = {
@@ -817,8 +825,9 @@ jQuery(document).ready(function ($) {
                     if (that.hasClass('display-inline')) {
                         ui_state_highlight.css({'width': ui.item.width()});
                     }
+                    $('body').trigger('hocwp_sortable:sort', [ui, $(this)]);
                 },
-                stop: function () {
+                stop: function (event, ui) {
                     var $sortable_result = $container.find('.connected-result');
                     if ($sortable_result.length) {
                         if ($sortable_result.hasClass('term-sortable')) {
@@ -831,6 +840,7 @@ jQuery(document).ready(function ($) {
                     } else {
                         hocwp.sortableStop($element, $container);
                     }
+                    $('body').trigger('hocwp_sortable:stop', [ui, $(this)]);
                 }
             };
         if ($sortable_result.length && $sortable_result.hasClass('sortable')) {
@@ -843,12 +853,27 @@ jQuery(document).ready(function ($) {
         if ($element.hasClass('connected-list')) {
             sortable_options.connectWith = '.connected-list';
         }
-        $element.sortable(sortable_options).disableSelection();
+        sortable_options = $.extend({}, sortable_options, this.options);
+        if ($.isNumeric(data_disable_selection)) {
+            if (0 == data_disable_selection) {
+                sortable_options.disableSelection = false;
+            } else {
+                sortable_options.disableSelection = true;
+            }
+        }
+        if (sortable_options.disableSelection) {
+            $element.sortable(sortable_options).disableSelection();
+        } else {
+            $element.sortable(sortable_options);
+        }
     }
 
     SortableList.NAME = 'hocwp.sortableList';
 
-    SortableList.DEFAULTS = {};
+    SortableList.DEFAULTS = {
+        cancel: ':input, .ui-state-disabled, .icon-delete',
+        disableSelection: true
+    };
 
     SortableList.prototype.init = function () {
 

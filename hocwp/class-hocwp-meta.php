@@ -6,6 +6,7 @@ if ( ! function_exists( 'add_filter' ) ) {
 class HOCWP_Meta {
 	private $type;
 	private $fields;
+	private $custom_fields;
 	private $callback;
 	private $id;
 	private $post_types;
@@ -182,6 +183,16 @@ class HOCWP_Meta {
 		return $this->fields;
 	}
 
+	public function register_field( $name, $data_type = 'default' ) {
+		if ( ! is_array( $this->custom_fields ) ) {
+			$this->custom_fields = array();
+		}
+		$this->custom_fields[] = array(
+			'name' => $name,
+			'type' => $data_type
+		);
+	}
+
 	public function add_field( $args ) {
 		$callback   = hocwp_get_value_by_key( $args, 'field_callback' );
 		$field_args = isset( $args['field_args'] ) ? $args['field_args'] : $args;
@@ -230,6 +241,13 @@ class HOCWP_Meta {
 		$this->set_priority( 'high' );
 	}
 
+	public function is_on_sidebar( $bool ) {
+		if ( $bool ) {
+			$this->set_context( 'side' );
+			$this->set_priority( 'default' );
+		}
+	}
+
 	public function init() {
 		global $pagenow;
 		if ( $this->is_term_meta() ) {
@@ -239,6 +257,12 @@ class HOCWP_Meta {
 		} elseif ( $this->is_menu_item_meta() ) {
 			$this->menu_item_meta_init();
 		} else {
+			if ( ! did_action( 'add_meta_boxes' ) ) {
+				$message = __( 'Please use this class in <strong>add_meta_boxes</strong> hook.', 'hocwp-theme' );
+				$message .= ' ';
+				$message .= sprintf( __( 'The fields for this object is: %s', 'hocwp-theme' ), json_encode( $this->get_fields() ) );
+				//_doing_it_wrong( __CLASS__, $message, '3.4.4' );
+			}
 			if ( 'post-new.php' == $pagenow || 'post.php' == $pagenow ) {
 				$this->post_meta_box_init();
 
@@ -528,7 +552,7 @@ class HOCWP_Meta {
 			add_filter( 'hocwp_use_admin_style_and_script', '__return_true' );
 		}
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
-		add_action( 'save_post', array( $this, 'save_post' ) );
+		add_action( 'save_post', array( $this, 'save_post' ), 99 );
 	}
 
 	public function add_meta_box() {
@@ -580,26 +604,40 @@ class HOCWP_Meta {
 		<?php
 	}
 
+	private function save_post_meta_helper( $post_id, $field ) {
+		$type = isset( $field['type'] ) ? $field['type'] : hocwp_get_value_by_key( $field, 'data_type', 'default' );
+		$name = isset( $field['field_args']['name'] ) ? $field['field_args']['name'] : '';
+		if ( empty( $name ) ) {
+			$name = hocwp_get_value_by_key( $field, 'name' );
+		}
+		if ( empty( $name ) ) {
+			return;
+		}
+		$value = hocwp_sanitize_form_post( $name, $type );
+		update_post_meta( $post_id, $name, $value );
+		$names = hocwp_get_value_by_key( $field, 'names' );
+		if ( hocwp_array_has_value( $names ) ) {
+			$names = array_combine( $names, $names );
+			foreach ( $names as $child_name => $child ) {
+				$type  = hocwp_get_value_by_key( $child, 'type', hocwp_get_value_by_key( $field, 'data_type', 'default' ) );
+				$value = hocwp_sanitize_form_post( $child_name, $type );
+				update_post_meta( $post_id, $child_name, $value );
+			}
+		}
+	}
+
 	public function save_post( $post_id ) {
 		if ( ! hocwp_can_save_post( $post_id ) ) {
 			return $post_id;
 		}
+
 		foreach ( $this->get_fields() as $field ) {
-			$type = isset( $field['type'] ) ? $field['type'] : hocwp_get_value_by_key( $field, 'data_type', 'default' );
-			$name = isset( $field['field_args']['name'] ) ? $field['field_args']['name'] : '';
-			if ( empty( $name ) ) {
-				continue;
-			}
-			$value = hocwp_sanitize_form_post( $name, $type );
-			update_post_meta( $post_id, $name, $value );
-			$names = hocwp_get_value_by_key( $field, 'names' );
-			if ( hocwp_array_has_value( $names ) ) {
-				$names = array_combine( $names, $names );
-				foreach ( $names as $child_name => $child ) {
-					$type  = hocwp_get_value_by_key( $child, 'type', hocwp_get_value_by_key( $field, 'data_type', 'default' ) );
-					$value = hocwp_sanitize_form_post( $child_name, $type );
-					update_post_meta( $post_id, $child_name, $value );
-				}
+			$this->save_post_meta_helper( $post_id, $field );
+		}
+
+		if ( is_array( $this->custom_fields ) ) {
+			foreach ( $this->custom_fields as $field ) {
+				$this->save_post_meta_helper( $post_id, $field );
 			}
 		}
 

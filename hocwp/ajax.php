@@ -614,3 +614,49 @@ function hocwp_notification_posts_ajax_callback() {
 
 add_action( 'wp_ajax_hocwp_notification_posts', 'hocwp_notification_posts_ajax_callback' );
 add_action( 'wp_ajax_nopriv_hocwp_notification_posts', 'hocwp_notification_posts_ajax_callback' );
+
+function hocwp_generate_slider_sortable_item_ajax_callback() {
+	$result      = array();
+	$max_item_id = hocwp_get_method_value( 'max_item_id' );
+	$max_item_id = absint( $max_item_id );
+	$media_url   = hocwp_get_method_value( 'media_url' );
+	$media_id    = hocwp_get_method_value( 'media_id' );
+	$media_id    = absint( $media_id );
+	$item_html   = '<li data-item="' . $max_item_id . '">';
+	$item_html .= '<img class="item-image" src="' . $media_url . '">';
+	$item_html .= '<div class="item-info">';
+	$item_html .= '<input type="text" placeholder="' . __( 'Title', 'hocwp-theme' ) . '" value="" class="item-title" name="slider_items[items][' . $max_item_id . '][title]">';
+	$item_html .= '<input type="url" placeholder="' . __( 'Link for this item', 'hocwp-theme' ) . '" value="" class="item-link" name="slider_items[items][' . $max_item_id . '][link]">';
+	$item_html .= '<textarea class="item-description" name="slider_items[items][' . $max_item_id . '][description]"></textarea>';
+	$item_html .= '</div>';
+	$item_html .= '<input type="hidden" class="item-image-url" name="slider_items[items][' . $max_item_id . '][image_url]" value="' . $media_url . '">';
+	$item_html .= '<input type="hidden" class="item-image-id" name="slider_items[items][' . $max_item_id . '][image_id]" value="' . $media_id . '">';
+	$item_html .= '<span class="item-icon icon-delete icon-sortable-ui"></span>';
+	$item_html .= '<span class="item-icon icon-drag icon-sortable-ui"></span>';
+	$item_html .= '</li>';
+	$result['html_data'] = $item_html;
+	wp_send_json( $result );
+}
+
+add_action( 'wp_ajax_hocwp_generate_slider_sortable_item', 'hocwp_generate_slider_sortable_item_ajax_callback' );
+
+function hocwp_remove_slider_item_ajax_callback() {
+	$result  = array();
+	$item_id = isset( $_POST['item_id'] ) ? $_POST['item_id'] : 0;
+	if ( $item_id > 0 ) {
+		$post_id = isset( $_POST['post_id'] ) ? $_POST['post_id'] : 0;
+		if ( $post_id > 0 ) {
+			$value      = hocwp_get_slider_items( $post_id, true );
+			$list_items = $value['items'];
+			$item_order = $value['order'];
+			unset( $list_items[ $item_id ] );
+			$value['items'] = $list_items;
+			$item_order     = hocwp_remove_array_item_by_value( $item_order, array( $item_id ) );
+			$value['order'] = $item_order;
+			update_post_meta( $post_id, 'slider_items', $value );
+		}
+	}
+	wp_send_json( $result );
+}
+
+add_action( 'wp_ajax_hocwp_remove_slider_item', 'hocwp_remove_slider_item_ajax_callback' );

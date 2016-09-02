@@ -146,6 +146,86 @@
     margin-top: 10px;
 }
 
+.hocwp-meta-box #list_slider_items {
+    background: transparent none repeat scroll 0 0;
+    border: medium none;
+    box-sizing: border-box;
+    float: none;
+    margin-right: 0;
+    min-height: 10px;
+    padding-left: 0;
+    padding-right: 0;
+    width: 100%;
+}
+
+.hocwp-meta-box .list-slider-items > li {
+    background-color: #f2f2f2;
+    border: 1px solid #eee;
+    overflow: hidden;
+    padding: 10px;
+}
+
+.hocwp-meta-box .list-slider-items > li > .item-image {
+    float: left;
+    margin-right: 10px;
+    width: 30%;
+}
+
+.hocwp-meta-box .list-slider-items .item-info > * {
+    display: block;
+    font-family: arial;
+    font-size: 13px;
+    margin: 0 0 10px;
+    width: 100%;
+}
+
+.hocwp-meta-box .list-slider-items .item-info > *:last-child {
+    margin-bottom: 0;
+}
+
+.hocwp-meta-box .list-slider-items .item-info {
+    float: right;
+    width: 68%;
+}
+
+.hocwp-meta-box .list-slider-items > li > .item-image {
+    cursor: pointer;
+    max-height: 126px;
+    opacity: 0.8;
+}
+
+.hocwp-meta-box .list-slider-items > li > .item-image:hover {
+    opacity: 1;
+}
+
+.hocwp-meta-box .list-slider-items > li {
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.hocwp-meta-box .list-slider-items > li:last-child {
+    margin-bottom: 0;
+}
+
+.icon-sortable-ui.icon-drag, .icon-sortable-ui.icon-delete {
+    height: 16px;
+    opacity: 1;
+    position: absolute;
+    top: 15px;
+    width: 16px;
+    z-index: 499;
+}
+.icon-sortable-ui.icon-delete {
+    background: rgba(0, 0, 0, 0) url("../images/icon-delete-16.png") no-repeat scroll 0 0;
+    cursor: pointer;
+    left: 15px;
+}
+.icon-sortable-ui.icon-drag {
+    background: rgba(0, 0, 0, 0) url("../images/icon-drag-16.png") no-repeat scroll 0 0;
+    cursor: move;
+    left: 40px;
+}
+
 /**
  * Option Page
  */

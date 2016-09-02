@@ -56,6 +56,16 @@ function hocwp_wc_get_product_total_sales( $post_id = null ) {
 	return absint( hocwp_get_post_meta( 'total_sales', $post_id ) );
 }
 
+function hocwp_wc_is_sale( $post_id = null ) {
+	$post_id = hocwp_return_post( $post_id, 'id' );
+	global $product;
+	if ( hocwp_id_number_valid( $post_id ) ) {
+		$product = new WC_Product( $post_id );
+	}
+
+	return $product->is_on_sale();
+}
+
 function hocwp_wc_get_shop_page() {
 	$id = get_option( 'woocommerce_shop_page_id' );
 
@@ -279,32 +289,42 @@ function hocwp_wc_get_cart( $args = array() ) {
 	$show_icon    = isset( $args['show_icon'] ) ? (bool) $args['show_icon'] : true;
 	$show_preview = isset( $args['show_preview'] ) ? (bool) $args['show_preview'] : true;
 	$cart         = '<div class="hocwp-cart-contents">';
+	$title        = apply_filters( 'hocwp_cart_title', $title, $args );
 	$cart .= '<a class="cart-content" href="' . hocwp_wc_get_cart_url() . '" title="' . $title . '">';
-	if ( $show_icon ) {
-		$cart .= '<i class="fa fa-shopping-cart icon-left"></i>';
-	}
-	if ( $show_item ) {
-		$count_cart = hocwp_wc_count_cart();
-		$item_text  = $count_cart . ' sp';
-		if ( 'vi' != $lang ) {
-			$item_text = sprintf( _n( '%d item', '%d items', $count_cart, 'hocwp-theme' ), $count_cart );
+	$format = hocwp_get_value_by_key( $args, 'format' );
+	if ( empty( $format ) ) {
+		if ( $show_icon ) {
+			$cart .= '<i class="fa fa-shopping-cart icon-left"></i>';
 		}
-		$cart .= '<span class="product-number">' . $item_text . '</span>';
-		if ( $show_price ) {
-			if ( isset( $args['separator'] ) ) {
-				if ( ! empty( $args['separator'] ) ) {
-					$cart .= '<span class="sep"> ' . $args['separator'] . ' </span>';
+		if ( $show_item ) {
+			$count_cart = hocwp_wc_count_cart();
+			$item_text  = $count_cart . ' sản phẩm';
+			if ( 'vi' != $lang ) {
+				$item_text = sprintf( _n( '%d item', '%d items', $count_cart, 'hocwp-theme' ), $count_cart );
+			}
+			$cart .= '<span class="product-number">' . $item_text . '</span>';
+			if ( $show_price ) {
+				if ( isset( $args['separator'] ) ) {
+					if ( ! empty( $args['separator'] ) ) {
+						$cart .= '<span class="sep"> ' . $args['separator'] . ' </span>';
+					}
+				} else {
+					$cart .= '<span class="sep"> - </span>';
 				}
-			} else {
-				$cart .= '<span class="sep"> - </span>';
 			}
 		}
-	}
-	if ( $show_price ) {
-		$cart .= hocwp_wc_get_cart_total_formatted();
-	}
-	if ( $show_preview ) {
-		$cart .= '<i class="fa fa-angle-down icon-right"></i>';
+		if ( $show_price ) {
+			$cart .= hocwp_wc_get_cart_total_formatted();
+		}
+		if ( $show_preview ) {
+			$cart .= '<i class="fa fa-angle-down icon-right"></i>';
+		}
+	} else {
+		$count_cart = hocwp_wc_count_cart();
+		$cart_total = hocwp_wc_get_cart_total_formatted();
+		$format     = str_replace( '%COUNT_CART%', $count_cart, $format );
+		$format     = str_replace( '%CART_TOTAL%', $cart_total, $format );
+		$cart .= $format;
 	}
 	$cart .= '</a>';
 	if ( $show_preview ) {
@@ -358,6 +378,12 @@ function hocwp_wc_after_single_product_title_hook() {
 }
 
 add_action( 'woocommerce_single_product_summary', 'hocwp_wc_after_single_product_title_hook', 6 );
+
+function hocwp_wc_after_single_product_short_description_hook() {
+	do_action( 'hocwp_wc_after_single_product_short_description' );
+}
+
+add_action( 'woocommerce_single_product_summary', 'hocwp_wc_after_single_product_short_description_hook', 21 );
 
 function hocwp_wc_after_single_product_add_to_cart_button() {
 	do_action( 'hocwp_wc_after_single_product_add_to_cart_button' );
@@ -886,3 +912,44 @@ function hocwp_wc_after_sidebar() {
 }
 
 add_action( 'woocommerce_sidebar', 'hocwp_wc_after_sidebar', 99 );
+
+function hocwp_wc_add_settings_field( &$settings, $item, $section = 'catalog_options' ) {
+	if ( is_array( $settings ) ) {
+		$count = 0;
+		foreach ( $settings as $key => $setting ) {
+			$type = hocwp_get_value_by_key( $setting, 'type' );
+			if ( 'sectionend' == $type ) {
+				$id = hocwp_get_value_by_key( $setting, 'id' );
+				if ( $section == $id ) {
+					break;
+				}
+			}
+			$count ++;
+		}
+		hocwp_array_insert( $settings, $count, $item );
+	}
+}
+
+function hocwp_wc_add_product_display_catalog_settings( &$settings, $item ) {
+	hocwp_wc_add_settings_field( $settings, $item );
+}
+
+function hocwp_wc_product_settings_page( $settings ) {
+	$item = array(
+		'title'             => __( 'Posts per page', 'hocwp-theme' ),
+		'id'                => 'hocwp_product_posts_per_page',
+		'type'              => 'number',
+		'custom_attributes' => array(
+			'min'  => 1,
+			'step' => 1
+		),
+		'css'               => 'width: 80px;',
+		'default'           => hocwp_get_posts_per_page(),
+		'autoload'          => false
+	);
+	hocwp_wc_add_product_display_catalog_settings( $settings, $item );
+
+	return $settings;
+}
+
+add_filter( 'woocommerce_product_settings', 'hocwp_wc_product_settings_page' );

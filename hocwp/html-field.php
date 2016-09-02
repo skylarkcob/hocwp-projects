@@ -717,12 +717,38 @@ function hocwp_field_input( $args ) {
 	hocwp_field_after( $args );
 }
 
+function hocwp_field_html_tag( $args = array() ) {
+	hocwp_sanitize_field_args( $args );
+	$tag = hocwp_get_value_by_key( $args, 'tag' );
+	if ( empty( $tag ) ) {
+		return;
+	}
+	$id   = hocwp_get_value_by_key( $args, 'id' );
+	$name = hocwp_get_value_by_key( $args, 'name' );
+	hocwp_transmit_id_and_name( $id, $name );
+	$html = new HOCWP_HTML( $tag );
+	$html->set_class( hocwp_get_value_by_key( $args, 'class' ) );
+	$html->set_attribute_array( hocwp_get_value_by_key( $args, 'attributes' ) );
+	$html->set_id( $id );
+	$html->set_text( hocwp_get_value_by_key( $args, 'html' ) );
+	$html->output();
+	echo hocwp_get_value_by_key( $args, 'after_html' );
+}
+
 function hocwp_field_button( $args = array() ) {
 	$class = hocwp_get_value_by_key( $args, 'class' );
 	hocwp_add_string_with_space_before( $class, 'button' );
 	$args['class']        = $class;
 	$args['type']         = 'button';
 	$args['regular_text'] = false;
+	if ( isset( $args['text'] ) ) {
+		$args['value'] = $args['text'];
+		unset( $args['text'] );
+		unset( $args['label'] );
+	} elseif ( isset( $args['label'] ) ) {
+		$args['value'] = $args['label'];
+		unset( $args['label'] );
+	}
 	hocwp_field_input( $args );
 }
 
@@ -785,6 +811,10 @@ function hocwp_field_input_number( $args = array() ) {
 	hocwp_field_input( $args );
 }
 
+function hocwp_field_number( $args = array() ) {
+	hocwp_field_input_number( $args );
+}
+
 function hocwp_field_input_hidden( $args = array() ) {
 	$args['type'] = 'hidden';
 	hocwp_field_input( $args );
@@ -832,8 +862,16 @@ function hocwp_field_input_radio( $args = array() ) {
 	hocwp_field_input_right_label( 'radio', $args );
 }
 
+function hocwp_field_radio( $args = array() ) {
+	hocwp_field_input_radio( $args );
+}
+
 function hocwp_field_input_checkbox( $args = array() ) {
 	hocwp_field_input_right_label( 'checkbox', $args );
+}
+
+function hocwp_field_checkbox( $args = array() ) {
+	hocwp_field_input_checkbox( $args );
 }
 
 function hocwp_field_publish_box( $callback, $args = array() ) {

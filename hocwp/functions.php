@@ -842,7 +842,9 @@ function hocwp_get_current_post_type() {
 }
 
 function hocwp_register_sidebar( $sidebar_id, $sidebar_name, $sidebar_description = '', $html_tag = 'aside' ) {
-	$before_widget = apply_filters( 'hocwp_before_widget', '<' . $html_tag . ' id="%1$s" class="widget %2$s">' );
+	$widget_class = apply_filters( 'hocwp_widget_class', '', $sidebar_id );
+	hocwp_add_string_with_space_before( $widget_class, 'widget' );
+	$before_widget = apply_filters( 'hocwp_before_widget', '<' . $html_tag . ' id="%1$s" class="' . $widget_class . ' %2$s">' );
 	$before_widget = apply_filters( 'hocwp_sidebar_' . $sidebar_id . '_before_widget', $before_widget );
 	$after_widget  = apply_filters( 'hocwp_after_widget', '</' . $html_tag . '>' );
 	$after_widget  = apply_filters( 'hocwp_sidebar_' . $sidebar_id . '_after_widget', $after_widget );
@@ -1544,6 +1546,14 @@ function hocwp_is_image( $url, $id = 0 ) {
 	return hocwp_is_image_url( $url );
 }
 
+function hocwp_return_media_url( $url, $media_id ) {
+	if ( hocwp_id_number_valid( $media_id ) && hocwp_media_file_exists( $media_id ) ) {
+		$url = hocwp_get_media_image_url( $media_id );
+	}
+
+	return $url;
+}
+
 function hocwp_sanitize_media_value( $value ) {
 	$url     = isset( $value['url'] ) ? $value['url'] : '';
 	$has_url = false;
@@ -1649,16 +1659,25 @@ function hocwp_search_form( $args = array() ) {
 	if ( (bool) $icon_in ) {
 		hocwp_add_string_with_space_before( $class, 'icon-in' );
 	}
-	$action = hocwp_get_value_by_key( $args, 'action', home_url( '/' ) );
-	$action = trailingslashit( $action );
-	$name   = hocwp_get_value_by_key( $args, 'name', 's' );
-	$form   = '<form method="get" class="' . $class . '" action="' . esc_url( $action ) . '">
+	$action     = hocwp_get_value_by_key( $args, 'action', home_url( '/' ) );
+	$action     = trailingslashit( $action );
+	$name       = hocwp_get_value_by_key( $args, 'name', 's' );
+	$form       = '<form method="get" class="' . $class . '" action="' . esc_url( $action ) . '">
 				<label>
 					<span class="screen-reader-text">' . _x( 'Search for:', 'label' ) . '</span>
 					<input type="search" class="search-field" placeholder="' . esc_attr( $placeholder ) . '" value="' . get_search_query() . '" name="' . $name . '" title="' . esc_attr_x( 'Search for:', 'label' ) . '" />
 				</label>
-				<input type="submit" class="search-submit" value="' . esc_attr( $submit_text ) . '" />
-			</form>';
+				<input type="submit" class="search-submit" value="' . esc_attr( $submit_text ) . '" />';
+	$post_types = hocwp_get_value_by_key( $args, 'post_type' );
+	if ( ! empty( $post_types ) && ! is_array( $post_types ) ) {
+		$post_types = array( $post_types );
+	}
+	if ( hocwp_array_has_value( $post_types ) ) {
+		foreach ( $post_types as $post_type ) {
+			$form .= '<input type="hidden" name="post_type[]" value="' . $post_type . '" />';
+		}
+	}
+	$form .= '</form>';
 	if ( $echo ) {
 		echo $form;
 	}
@@ -1771,7 +1790,8 @@ function hocwp_default_script_localize_object() {
 			'insert_media_button_text'   => __( 'Use this media', 'hocwp-theme' ),
 			'insert_media_button_texts'  => __( 'Use these medias', 'hocwp-theme' ),
 			'confirm_message'            => __( 'Are you sure?', 'hocwp-theme' ),
-			'disconnect_confirm_message' => __( 'Are you sure you want to disconnect?', 'hocwp-theme' )
+			'disconnect_confirm_message' => __( 'Are you sure you want to disconnect?', 'hocwp-theme' ),
+			'delete_confirm_message'     => __( 'Are you sure you want to delete this?', 'hocwp-theme' )
 		),
 		'ajax_loading'    => '<p class="ajax-wrap"><img class="ajax-loading" src="' . hocwp_get_image_url( 'icon-loading-circle-light-full.gif' ) . '" alt=""></p>'
 	);

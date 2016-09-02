@@ -108,6 +108,122 @@ jQuery(document).ready(function ($) {
         }
     })();
 
+    // Manage slider item
+    (function () {
+        var $add_slider_button = $('.hocwp-meta-box #add_slider');
+        if ($add_slider_button.length) {
+            $add_slider_button.hocwpMediaUpload({
+                hideAddButton: false
+            });
+            $body.on('hocwp_media:selected', function (e, media_data, $button) {
+                e.preventDefault();
+                $button = $($button) || $(this);
+                if ($button.length) {
+                    var media_url = media_data.url,
+                        media_id = parseInt(media_data.id);
+                    if ($button.hasClass('item-image')) {
+                        var $slider_item = $button.parent(),
+                            $item_image_url = $slider_item.find('.item-image-url'),
+                            $item_image_id = $slider_item.find('.item-image-id');
+                        if (media_id > 0) {
+                            $button.attr('src', media_url);
+                            $item_image_url.val(media_url);
+                            $item_image_id.val(media_id);
+                        }
+                    } else {
+                        var $slider_items_container = $button.closest('.hocwp-meta-box'),
+                            $list_slider_items = $slider_items_container.find('.list-slider-items'),
+                            count_item = parseInt($list_slider_items.attr('data-items')),
+                            max_item_id = parseInt($list_slider_items.attr('data-max-id')),
+                            $item_order = $slider_items_container.find('.item-order'),
+                            item_order_value = $item_order.val();
+                        if (media_id > 0) {
+                            count_item++;
+                            max_item_id++;
+                            $button.addClass('disabled');
+                            $.ajax({
+                                type: 'POST',
+                                dataType: 'json',
+                                url: hocwp.ajax_url,
+                                data: {
+                                    action: 'hocwp_generate_slider_sortable_item',
+                                    max_item_id: max_item_id,
+                                    media_url: media_url,
+                                    media_id: media_id
+                                },
+                                success: function (response) {
+                                    if ($.trim(response.html_data)) {
+                                        $list_slider_items.append(response.html_data);
+                                        $list_slider_items.attr('data-items', count_item);
+                                        $list_slider_items.attr('data-max-id', max_item_id);
+                                        if ($.trim(item_order_value)) {
+                                            item_order_value += ',';
+                                        }
+                                        item_order_value += max_item_id;
+                                        $item_order.val(item_order_value);
+                                    }
+                                    $button.removeClass('disabled');
+                                    $list_slider_items.find('.item-image').hocwpMediaUpload();
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+
+            $body.on('hocwp_sortable:stop', function (e, ui, $list) {
+                var $element = $($list);
+                if ($element.length && $element.hasClass('sortable')) {
+                    var $list_slider_items = $element,
+                        $slider_item_container = $list_slider_items.parent(),
+                        $item_order = $slider_item_container.find('.item-order'),
+                        item_order_value = '';
+                    $list_slider_items.find('li').each(function (index, el) {
+                        var $li_item = $(el);
+                        item_order_value += $li_item.attr('data-item');
+                        item_order_value += ',';
+                    });
+                    item_order_value = item_order_value.slice(0, -1);
+                    $item_order.val(item_order_value);
+                }
+            });
+
+            // Remove slider item
+            $('.hocwp-meta-box .list-slider-items').on('click', '.icon-delete', function (e) {
+                e.preventDefault();
+                var $element = $(this),
+                    $slider_item = $element.parent(),
+                    $list_slider_items = $slider_item.parent(),
+                    $slider_item_container = $list_slider_items.parent(),
+                    $item_order = $slider_item_container.find('.item-order'),
+                    item_order_value = '';
+                if (confirm(hocwp.i18n.delete_confirm_message)) {
+                    $element.addClass('disabled');
+                    $.ajax({
+                        type: 'POST',
+                        dataType: 'json',
+                        url: hocwp.ajax_url,
+                        data: {
+                            action: 'hocwp_remove_slider_item',
+                            item_id: parseInt($slider_item.attr('data-item')),
+                            post_id: parseInt($list_slider_items.attr('data-post'))
+                        },
+                        success: function (response) {
+                            $slider_item.remove();
+                            $list_slider_items.find('li').each(function (index, el) {
+                                var $li_item = $(el);
+                                item_order_value += $li_item.attr('data-item');
+                                item_order_value += ',';
+                            });
+                            item_order_value = item_order_value.slice(0, -1);
+                            $item_order.val(item_order_value);
+                        }
+                    });
+                }
+            });
+        }
+    })();
+
     (function () {
         $('.hocwp-widget-post .get-by').live('change', function (e) {
             e.preventDefault();

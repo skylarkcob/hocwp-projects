@@ -38,7 +38,7 @@ define( 'HOCWP_DOING_AUTO_SAVE', ( ( defined( 'DOING_AUTOSAVE' ) && true === DOI
 
 define( 'HOCWP_MINIMUM_JQUERY_VERSION', '1.9.1' );
 
-define( 'HOCWP_JQUERY_LATEST_VERSION', '1.12.4' );
+define( 'HOCWP_JQUERY_LATEST_VERSION', '1.12.0' );
 
 define( 'HOCWP_TINYMCE_VERSION', '4' );
 
@@ -133,6 +133,8 @@ require( HOCWP_PATH . '/term.php' );
 require( HOCWP_PATH . '/meta.php' );
 
 require( HOCWP_PATH . '/term-meta.php' );
+
+require( HOCWP_PATH . '/slider.php' );
 
 require( HOCWP_PATH . '/login.php' );
 

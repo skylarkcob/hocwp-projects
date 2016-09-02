@@ -60,6 +60,17 @@ function hocwp_breadcrumb( $args = array() ) {
 
 		return;
 	}
+	if ( hocwp_wc_installed() ) {
+		if ( empty( $before ) ) {
+			$before = '<div class="hocwp-breadcrumb breadcrumb">';
+			$after  = '</div>';
+		}
+		echo $before;
+		woocommerce_breadcrumb( $args );
+		echo $after;
+
+		return;
+	}
 	global $post;
 	$separator       = isset( $args['separator'] ) ? $args['separator'] : '/';
 	$breadcrums_id   = isset( $args['id'] ) ? $args['id'] : 'hocwp_breadcrumbs';
@@ -307,33 +318,37 @@ function hocwp_entry_meta( $args = array() ) {
 	$show_author  = hocwp_get_value_by_key( $args, 'show_author', true );
 	$show_term    = hocwp_get_value_by_key( $args, 'show_term', false );
 	$show_comment = hocwp_get_value_by_key( $args, 'show_comment', true );
+	$format       = hocwp_get_value_by_key( $args, 'format' );
 	?>
 	<p class="<?php echo $class; ?>">
-		<?php if ( $show_date ) : ?>
-			<?php hocwp_the_date(); ?>
-		<?php endif; ?>
-		<?php if ( $show_updated ) : ?>
-			<time datetime="<?php the_modified_time( 'c' ); ?>" itemprop="dateModified"
-			      class="entry-modified-time date modified post-date"><?php the_modified_date(); ?></time>
-		<?php endif; ?>
-		<?php if ( $show_author ) : ?>
-			<?php hocwp_the_author(); ?>
-		<?php endif; ?>
 		<?php
-		if ( $show_term ) {
-			$meta_term_args = $args;
-			$term_icon      = hocwp_get_value_by_key( $args, 'term_icon' );
-			if ( ! empty( $term_icon ) ) {
-				$meta_term_args['icon'] = $term_icon;
+		if ( ! empty( $format ) ) {
+			$format = str_replace( '%MODIFIED%', get_the_modified_date(), $format );
+			$format = str_replace( '%AUTHOR%', get_the_author(), $format );
+			echo $format;
+		} else {
+			if ( $show_date ) {
+				hocwp_the_date();
 			}
-			hocwp_entry_meta_terms( $meta_term_args );
+			if ( $show_updated ) {
+				?>
+				<time datetime="<?php the_modified_time( 'c' ); ?>" itemprop="dateModified"
+				      class="entry-modified-time date modified post-date updated"><?php the_modified_date(); ?></time>
+				<?php
+			}
+			if ( $show_term ) {
+				$meta_term_args = $args;
+				$term_icon      = hocwp_get_value_by_key( $args, 'term_icon' );
+				if ( ! empty( $term_icon ) ) {
+					$meta_term_args['icon'] = $term_icon;
+				}
+				hocwp_entry_meta_terms( $meta_term_args );
+			}
+			if ( $show_comment && comments_open( $post_id ) ) {
+				hocwp_the_comment_link();
+			}
 		}
-		?>
-		<?php if ( $show_comment && comments_open( $post_id ) ) : ?>
-			<?php hocwp_the_comment_link(); ?>
-		<?php endif; ?>
-		<?php if ( current_theme_supports( 'hocwp-schema' ) ) : ?>
-			<?php
+		if ( current_theme_supports( 'hocwp-schema' ) ) {
 			global $authordata;
 			$author_id     = 0;
 			$author_name   = '';
@@ -354,7 +369,9 @@ function hocwp_entry_meta( $args = array() ) {
                 </span>
                 <meta itemprop="name" content="<?php echo $author_name; ?>">
             </span>
-		<?php endif; ?>
+			<?php
+		}
+		?>
 	</p>
 	<?php
 }

@@ -662,6 +662,16 @@ body.hocwp {
     padding-right: 10px;
 }
 
+.row-no-padding {
+    margin: 0;
+}
+
+.row-no-padding [class*="col"],
+.row-no-padding [class^="col"] {
+    padding-left: 0;
+    padding-right: 0;
+}
+
 .hocwp .modal button.close {
     font-size: 20px;
 }
@@ -3079,6 +3089,31 @@ body.hocwp {
     line-height: 19px;
 }
 
+.hocwp.woocommerce div.product .woocommerce-tabs ul.tabs {
+    margin-bottom: 10px;
+}
+
+.hocwp.woocommerce div.product .woocommerce-tabs ul.tabs li::after,
+.hocwp.woocommerce div.product .woocommerce-tabs ul.tabs li::before {
+    display: none;
+}
+
+.hocwp.woocommerce div.product .woocommerce-tabs ul.tabs li {
+    border-radius: 0;
+    font-size: 13px;
+    margin: 0;
+}
+
+.hocwp.woocommerce .hocwp-post .panel table {
+    border-collapse: collapse;
+    border-color: rgba(0, 0, 0, 0.1);
+    font-size: 13px;
+}
+
+.hocwp.woocommerce table.shop_attributes td {
+    padding: 5px;
+}
+
 .hocwp .entry-summary form .variations td.label,
 .hocwp .variations td.label {
     color: #333;
@@ -3162,6 +3197,10 @@ body.hocwp {
     text-transform: none;
 }
 
+.hocwp .widget.woocommerce li.wc-layered-nav-term a {
+    font-size: 13px;
+}
+
 .hocwp .widget.woocommerce li del span.amount,
 .hocwp .widget.woocommerce li del {
     color: #666;
@@ -3188,6 +3227,10 @@ body.hocwp {
 
 .hocwp .widget.woocommerce li {
     padding: 8px 0;
+}
+
+.hocwp .widget.woocommerce li.chosen {
+    margin-right: 20px;
 }
 
 .hocwp .widget.woocommerce li .star-rating {

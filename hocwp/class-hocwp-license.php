@@ -346,10 +346,19 @@ class HOCWP_License {
 		if ( false === ( $valid = get_transient( $transient_name ) ) ) {
 			$from_data_param = false;
 			if ( hocwp_array_has_value( $data ) ) {
-				$data_hashed  = hocwp_get_value_by_key( $data, 'hashed' );
-				$data_key_map = hocwp_get_value_by_key( $data, 'key_map' );
-				if ( ! empty( $data_hashed ) && ! empty( $data_key_map ) ) {
-					$from_data_param = true;
+				if ( isset( $data['hashed'] ) && isset( $data['key_map'] ) ) {
+					$data_hashed  = hocwp_get_value_by_key( $data, 'hashed' );
+					$data_key_map = hocwp_get_value_by_key( $data, 'key_map' );
+					if ( ! empty( $data_hashed ) && ! empty( $data_key_map ) ) {
+						$from_data_param = true;
+					}
+				} else {
+					foreach ( $data as $per_data ) {
+						$valid = $this->check_valid( $per_data );
+						if ( $valid ) {
+							break;
+						}
+					}
 				}
 			}
 			if ( ! $from_data_param ) {
