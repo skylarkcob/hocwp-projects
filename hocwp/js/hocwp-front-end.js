@@ -440,6 +440,26 @@ jQuery(document).ready(function ($) {
     })();
 
     (function () {
+        if ($body.hasClass('hocwp')) {
+            if ($body.hasClass('page-template-login') || $body.hasClass('page-template-account') || $body.hasClass('page-template-register')) {
+                var $login_form = $('#loginform'),
+                    $lost_password_form = $('#lostpasswordform'),
+                    $register_form = $('#registerform'),
+                    submit_class = 'btn btn-' + hocwp.logins.button_style;
+                if ($login_form.length) {
+                    $login_form.find('input[type="submit"]').addClass(submit_class);
+                }
+                if ($lost_password_form.length) {
+                    $lost_password_form.find('input[type="submit"]').addClass(submit_class);
+                }
+                if ($register_form.length) {
+                    $register_form.find('input[type="submit"]').addClass(submit_class);
+                }
+            }
+        }
+    })();
+
+    (function () {
         $('.hocwp').on('click', 'input.select-all, textarea.select-all', function () {
             $(this).select();
         });

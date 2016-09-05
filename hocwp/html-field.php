@@ -1112,9 +1112,12 @@ function hocwp_field_select( $args = array() ) {
 	$name         = isset( $args['name'] ) ? $args['name'] : '';
 	$list_options = isset( $args['list_options'] ) ? $args['list_options'] : array();
 	$options      = isset( $args['options'] ) ? $args['options'] : array();
-	$load_item    = isset( $args['load_item'] ) ? $args['load_item'] : true;
-	$value        = isset( $args['value'] ) ? $args['value'] : '';
-	$field_class  = isset( $args['field_class'] ) ? $args['field_class'] : 'widefat';
+	if ( ! hocwp_array_has_value( $options ) ) {
+		$options = hocwp_get_value_by_key( $args, array( 'field_args', 'options' ) );
+	}
+	$load_item   = isset( $args['load_item'] ) ? $args['load_item'] : true;
+	$value       = isset( $args['value'] ) ? $args['value'] : '';
+	$field_class = isset( $args['field_class'] ) ? $args['field_class'] : 'widefat';
 	if ( ! is_array( $options ) || count( $options ) < 1 ) {
 		$options = $list_options;
 	}

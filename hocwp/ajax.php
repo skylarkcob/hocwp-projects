@@ -148,14 +148,31 @@ function hocwp_favorite_post_ajax_callback() {
 			$updated = update_user_meta( $user->ID, 'favorite_posts', $favorites );
 			if ( $updated ) {
 				$result['success'] = true;
-				if ( $result['remove'] ) {
-					$result['html_data'] = '<i class="fa fa-heart-o"></i> Lưu tin';
-				} else {
-					$result['html_data'] = '<i class="fa fa-heart"></i> Bỏ lưu';
+				$saved             = false;
+				if ( ! $result['remove'] ) {
+					$saved = true;
 				}
+				$params              = array(
+					'post_id' => $post_id,
+					'saved'   => $saved,
+					'echo'    => false
+				);
+				$text                = hocwp_favorite_post_button_text( $params );
+				$result['html_data'] = $text;
 			}
 		} elseif ( 'save' == $type ) {
 			$result['success'] = hocwp_update_user_saved_posts( $user->ID, $post_id );
+			$saved             = false;
+			if ( 'do' == $action ) {
+				$saved = true;
+			}
+			$params              = array(
+				'post_id' => $post_id,
+				'saved'   => $saved,
+				'echo'    => false
+			);
+			$text                = hocwp_save_post_button_text( $params );
+			$result['html_data'] = $text;
 		}
 		if ( 'undo' == $action ) {
 			$result['remove'] = true;

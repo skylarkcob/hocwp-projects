@@ -525,11 +525,11 @@ function hocwp_login_form( $args = array() ) {
 			<div class="text-center">
 				<p class="form-nav">
 					<?php
-					if ( ! isset( $_GET['checkemail'] ) || ! in_array( $_GET['checkemail'], array(
-							'confirm',
-							'newpass'
-						) )
-					) {
+					$mails = array(
+						'confirm',
+						'newpass'
+					);
+					if ( ! isset( $_GET['checkemail'] ) || ! in_array( $_GET['checkemail'], $mails ) ) {
 						if ( hocwp_users_can_register() ) {
 							$registration_url = sprintf( '<a href="%s">%s</a>', esc_url( wp_registration_url() ), $args['text_register_link'] );
 							echo apply_filters( 'register', $registration_url ) . '<span class="sep">|</span>';
@@ -569,7 +569,7 @@ function hocwp_execute_lostpassword() {
 		if ( 'lostpassword' === $action || 'retrievepassword' === $action ) {
 			$user_login     = hocwp_get_method_value( 'user_login' );
 			$transient_name = 'hocwp_lostpassword_user_' . md5( $user_login );
-			if ( false === ( $transient = get_transient( $transient_name ) ) ) {
+			if ( ( isset( $_POST['submit'] ) || isset( $_POST['wp-submit'] ) ) && false === ( $transient = get_transient( $transient_name ) ) ) {
 				if ( empty( $user_login ) ) {
 					$error   = true;
 					$message = hocwp_translate_text( 'Please enter your account name or email address.' );
@@ -676,13 +676,15 @@ function hocwp_lostpassword_form( $args = array() ) {
 			$slogan->set_class( 'slogan' );
 			$slogan->set_text( sprintf( $args['slogan'], hocwp_get_root_domain_name( home_url( '/' ) ) ) );
 			$slogan->output();
-			if ( isset( $_REQUEST['error'] ) || $error ) {
-				$message = hocwp_build_message( $message, 'danger' );
-				echo $message;
-			} else {
-				if ( ( ! empty( $message ) && ! $error ) || ( isset( $_POST['submit'] ) && ! empty( $message ) ) ) {
-					$message = hocwp_build_message( $message, 'success' );
+			if ( isset( $_POST['submit'] ) || isset( $_POST['wp-submit'] ) ) {
+				if ( isset( $_REQUEST['error'] ) || $error ) {
+					$message = hocwp_build_message( $message, 'danger' );
 					echo $message;
+				} else {
+					if ( ( ! empty( $message ) && ! $error ) || ( isset( $_POST['submit'] ) && ! empty( $message ) ) ) {
+						$message = hocwp_build_message( $message, 'success' );
+						echo $message;
+					}
 				}
 			}
 			?>

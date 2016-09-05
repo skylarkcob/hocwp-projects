@@ -726,6 +726,8 @@ class HOCWP_Option {
 			$result = hocwp_get_value_by_key( $options, $key, $default );
 		} elseif ( '' != $options ) {
 			$result = $options;
+		} elseif ( '' == $options ) {
+			$result = $default;
 		}
 
 		return $result;

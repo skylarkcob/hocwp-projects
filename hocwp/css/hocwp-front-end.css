@@ -98,12 +98,18 @@ body.hocwp {
     background-color: #e5e5e5;
     border: 1px solid #ddd;
     bottom: 50px;
+    left: auto;
     line-height: 1;
     opacity: 0.5;
     padding: 10px;
     position: fixed;
     right: 20px;
     z-index: 499;
+}
+
+.hocwp .hocwp-go-top.position-left {
+    left: 20px;
+    right: auto;
 }
 
 .hocwp .hocwp-go-top.icon-image {
@@ -343,6 +349,10 @@ body.hocwp {
 
 .hocwp .hocwp-mobile-menu .search-form .search-field {
     width: 100%;
+}
+
+.hocwp .mobile-navigation {
+    display: none;
 }
 
 /**
@@ -929,6 +939,32 @@ body.hocwp {
 
 .hocwp .entry-content iframe {
     max-width: 100%;
+}
+
+.hocwp .entry-content .newsletter table input {
+    max-width: 100%;
+    width: 100%;
+}
+
+.hocwp .entry-content .newsletter table input[type="submit"] {
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#4d90fe+0,4787ed+100 */
+    background: rgb(77,144,254); /* Old browsers */
+    background: -moz-linear-gradient(top,  rgba(77,144,254,1) 0%, rgba(71,135,237,1) 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top,  rgba(77,144,254,1) 0%,rgba(71,135,237,1) 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom,  rgba(77,144,254,1) 0%,rgba(71,135,237,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4d90fe', endColorstr='#4787ed',GradientType=0 ); /* IE6-9 */
+}
+
+.hocwp .entry-content .newsletter table input[type="submit"] {
+    border: 1px solid #3079ed;
+    color: #fff;
+    padding: 5px 20px;
+    text-shadow: 0 1px rgba(0, 0, 0, 0.1);
+    width: auto;
+}
+
+.hocwp .entry-content .newsletter table input[type="submit"]:hover {
+    opacity: 0.75;
 }
 
 /**
@@ -1551,6 +1587,11 @@ body.hocwp {
 
 .hocwp .search-form .search-submit:hover {
     opacity: 0.75;
+}
+
+.hocwp .hocwp-subscribe-widget .form-group + .img-loading {
+    display: block;
+    margin: 0 auto;
 }
 
 /**
@@ -2546,6 +2587,16 @@ body.hocwp {
 
 .single-product .hocwp-post .entry-summary .price del {
     margin-right: 10px;
+}
+
+.single-product .hocwp-post .entry-summary .price del,
+.single-product .hocwp-post .entry-summary .price ins,
+.single-product .hocwp-post .entry-summary .price {
+    vertical-align: bottom;
+}
+
+.single-product .hocwp-post .entry-summary .price > * {
+    vertical-align: bottom;
 }
 
 .single-product .hocwp-post .entry-summary .price del,

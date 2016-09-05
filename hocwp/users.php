@@ -210,6 +210,7 @@ function hocwp_update_user_saved_posts( $user_id = null, $post_id = null ) {
 			} else {
 				array_push( $saved, $post_id );
 			}
+			$saved = hocwp_remove_empty_array_item( $saved, true );
 
 			return update_user_meta( $user_id, 'saved_posts', $saved );
 		}

@@ -1066,6 +1066,8 @@ jQuery(document).ready(function ($) {
         if (!this.$element.is('ul')) {
             this.$element = this.$element.find('ul');
         }
+        //this.$element.closest('nav').show();
+        this.$element.css({position: 'fixed'});
     };
 
     MobileMenu.prototype.click = function (e) {

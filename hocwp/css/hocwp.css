@@ -117,6 +117,11 @@ body.hocwp {
     font-size: 1em;
 }
 
+/*
+ * Stop using since 05/09/2016
+ */
+
+/*
 .hocwp button,
 .hocwp input,
 .hocwp optgroup,
@@ -126,6 +131,7 @@ body.hocwp {
     font: inherit;
     margin: 0;
 }
+*/
 
 .hocwp button,
 .hocwp select {
@@ -311,6 +317,10 @@ label.label-input-size {
 
 .padding-bottom-15 {
     padding-bottom: 15px;
+}
+
+.no-padding-right {
+    padding-right: 0 !important;
 }
 
 .ajax-loading.full-page {

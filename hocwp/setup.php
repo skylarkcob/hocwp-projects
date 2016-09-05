@@ -217,3 +217,12 @@ function hocwp_setup_load_edit_bulk_action() {
 }
 
 add_action( 'load-edit.php', 'hocwp_setup_load_edit_bulk_action' );
+
+$embed = new WP_Embed();
+add_filter( 'hocwp_the_custom_content', array( $embed, 'run_shortcode' ), 8 );
+add_filter( 'hocwp_the_custom_content', array( $embed, 'autoembed' ), 8 );
+add_filter( 'hocwp_the_custom_content', 'wpautop' );
+add_filter( 'hocwp_the_custom_content', 'shortcode_unautop' );
+add_filter( 'hocwp_the_custom_content', 'prepend_attachment' );
+add_filter( 'hocwp_the_custom_content', 'wp_make_content_images_responsive' );
+add_filter( 'hocwp_the_custom_content', 'do_shortcode', 11 );

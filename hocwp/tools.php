@@ -98,6 +98,50 @@ function hocwp_form_hidden_params( $params = null, $skip_params = array() ) {
 	}
 }
 
+function hocwp_star_ratings( $post_id = null ) {
+	if ( function_exists( 'kk_star_ratings' ) ) {
+		$post_id = hocwp_return_post( $post_id, 'id' );
+		echo kk_star_ratings( $post_id );
+	}
+}
+
+function hocwp_newsletter_plugin_installed() {
+	if ( class_exists( 'Newsletter' ) || class_exists( 'NewsletterModule' ) ) {
+		return true;
+	}
+
+	return false;
+}
+
+function hocwp_add_to_newsletter_list( $args = array() ) {
+	if ( hocwp_newsletter_plugin_installed() ) {
+		global $newsletter;
+		if ( ! isset( $newsletter ) ) {
+			$newsletter = new Newsletter();
+		}
+		if ( isset( $newsletter->options['api_key'] ) && ! empty( $newsletter->options['api_key'] ) ) {
+			$api_key = hocwp_get_value_by_key( $args, 'api_key' );
+			if ( empty( $api_key ) ) {
+				$api_key = $newsletter->options['api_key'];
+			}
+			$email = hocwp_get_value_by_key( $args, 'email' );
+			if ( is_email( $email ) ) {
+				$base_url     = NEWSLETTER_URL . '/api/add.php';
+				$params       = array(
+					'ne' => $email,
+					'nk' => $api_key
+				);
+				$name         = hocwp_get_value_by_key( $args, 'name' );
+				$surname      = hocwp_get_method_value( $args, 'surname' );
+				$params['nn'] = $name;
+				$params['ns'] = $surname;
+				$base_url     = add_query_arg( $params, $base_url );
+				$result       = @file_get_contents( $base_url );
+			}
+		}
+	}
+}
+
 function hocwp_use_core_style() {
 	return apply_filters( 'hocwp_use_core_style', true );
 }
@@ -373,20 +417,87 @@ function hocwp_inline_script( $code ) {
 	$script->output();
 }
 
-function hocwp_favorite_post_button_text( $post_id = null ) {
+function hocwp_favorite_post_button_text( $args = array() ) {
+	if ( ! is_array( $args ) ) {
+		$post_id = $args;
+	} else {
+		$post_id = hocwp_get_value_by_key( $args, 'post_id' );
+	}
+	$lang      = hocwp_get_language();
+	$save_text = hocwp_get_value_by_key( $args, 'save_text', '' );
+	if ( empty( $save_text ) ) {
+		if ( 'vi' == $lang ) {
+			$save_text = __( 'Lưu tin', 'hocwp-theme' );
+		} else {
+			$save_text = __( 'Favorite', 'hocwp-theme' );
+		}
+	}
+	$unsave_text = hocwp_get_value_by_key( $args, 'unsave_text' );
+	if ( empty( $unsave_text ) ) {
+		if ( 'vi' == $lang ) {
+			$unsave_text = __( 'Bỏ lưu', 'hocwp-theme' );
+		} else {
+			$unsave_text = __( 'Favorited', 'hocwp-theme' );
+		}
+	}
 	if ( ! hocwp_id_number_valid( $post_id ) ) {
 		$post_id = get_the_ID();
 	}
-	$text = '<i class="fa fa-heart-o"></i> Lưu tin';
+	$text = '<i class="fa fa-heart-o"></i> ' . $save_text;
 	if ( is_user_logged_in() ) {
 		$user     = wp_get_current_user();
 		$favorite = hocwp_get_user_favorite_posts( $user->ID );
 		if ( in_array( $post_id, $favorite ) ) {
-			$text = '<i class="fa fa-heart"></i> Bỏ lưu';;
+			$text = '<i class="fa fa-heart"></i> ' . $unsave_text;
 		}
 	}
-	$text = apply_filters( 'hocwp_favorite_post_button_text', $text );
-	echo $text;
+	$text = apply_filters( 'hocwp_favorite_post_button_text', $text, $args );
+	$echo = hocwp_get_value_by_key( $args, 'echo', true );
+	if ( $echo ) {
+		echo $text;
+	}
+
+	return $text;
+}
+
+function hocwp_save_post_button_text( $args = array() ) {
+	if ( ! is_array( $args ) ) {
+		$post_id = $args;
+	} else {
+		$post_id = hocwp_get_value_by_key( $args, 'post_id' );
+	}
+	$lang      = hocwp_get_language();
+	$save_text = hocwp_get_value_by_key( $args, 'save_text', '' );
+	if ( empty( $save_text ) ) {
+		if ( 'vi' == $lang ) {
+			$save_text = __( 'Lưu tin', 'hocwp-theme' );
+		} else {
+			$save_text = __( 'Save', 'hocwp-theme' );
+		}
+	}
+	$unsave_text = hocwp_get_value_by_key( $args, 'unsave_text' );
+	if ( empty( $unsave_text ) ) {
+		if ( 'vi' == $lang ) {
+			$unsave_text = __( 'Bỏ lưu', 'hocwp-theme' );
+		} else {
+			$unsave_text = __( 'Saved', 'hocwp-theme' );
+		}
+	}
+	if ( ! hocwp_id_number_valid( $post_id ) ) {
+		$post_id = get_the_ID();
+	}
+	$text  = '<i class="fa fa-heart-o"></i> ' . $save_text;
+	$saved = hocwp_get_value_by_key( $args, 'saved' );
+	if ( (bool) $saved ) {
+		$text = '<i class="fa fa-heart"></i> ' . $unsave_text;
+	}
+	$text = apply_filters( 'hocwp_save_post_button_text', $text, $args );
+	$echo = hocwp_get_value_by_key( $args, 'echo', true );
+	if ( $echo ) {
+		echo $text;
+	}
+
+	return $text;
 }
 
 function hocwp_get_geo_code( $args = array() ) {
@@ -668,4 +779,9 @@ function hocwp_disable_emoji() {
 	remove_action( 'wp_print_styles', 'print_emoji_styles' );
 	remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
 	remove_action( 'admin_print_styles', 'print_emoji_styles' );
+}
+
+function hocwp_the_custom_content( $content ) {
+	$content = apply_filters( 'hocwp_the_custom_content', $content );
+	echo $content;
 }

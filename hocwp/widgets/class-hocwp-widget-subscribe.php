@@ -86,13 +86,25 @@ class HOCWP_Widget_Subscribe extends WP_Widget {
 			$captcha       = new HOCWP_Captcha();
 			$captcha_valid = $captcha->check( $captcha_code );
 		}
+		$re_verify = false;
+		$query     = hocwp_get_post_by_meta( 'subscriber_email', $email, array( 'post_type' => 'hocwp_subscriber' ) );
+		if ( $query->have_posts() ) {
+			$subscriber = array_shift( $query->posts );
+			$verified   = hocwp_get_post_meta( 'subscriber_verified', $subscriber->ID );
+			if ( 1 != $verified ) {
+				$re_verify = true;
+			}
+		}
 		if ( $captcha_valid ) {
 			if ( is_email( $email ) ) {
-				if ( $register && email_exists( $email ) ) {
-					$result['message'] = hocwp_build_message( hocwp_text_error_email_exists(), 'danger' );
+				$active_key  = hocwp_generate_reset_key();
+				$verify_link = hocwp_generate_verify_link( $active_key );
+				if ( $re_verify ) {
+					hocwp_send_mail_verify_email_subscription( hocwp_text_email_subject_verify_subscription(), $email, $verify_link );
+					$result['success'] = true;
+					$result['message'] = hocwp_build_message( hocwp_text_success_register_and_verify_email(), 'success' );
 				} else {
-					$query = hocwp_get_post_by_meta( 'subscriber_email', $email, array( 'post_type' => 'hocwp_subscriber' ) );
-					if ( $query->have_posts() ) {
+					if ( $query->have_posts() || ( $register && email_exists( $email ) ) ) {
 						$result['message'] = hocwp_build_message( hocwp_text_error_email_exists(), 'danger' );
 					} else {
 						$post_title = '';
@@ -115,7 +127,6 @@ class HOCWP_Widget_Subscribe extends WP_Widget {
 							update_post_meta( $post_id, 'subscriber_email', $email );
 							update_post_meta( $post_id, 'subscriber_phone', $phone );
 							update_post_meta( $post_id, 'subscriber_verified', 0 );
-							$active_key = hocwp_generate_reset_key();
 							update_post_meta( $post_id, 'subscriber_active_key', $active_key );
 							if ( $register ) {
 								$password  = wp_generate_password();
@@ -131,7 +142,6 @@ class HOCWP_Widget_Subscribe extends WP_Widget {
 									update_user_meta( $user_id, 'subscriber_id', $post_id );
 								}
 							}
-							$verify_link = hocwp_generate_verify_link( $active_key );
 							hocwp_send_mail_verify_email_subscription( hocwp_text_email_subject_verify_subscription(), $email, $verify_link );
 							$result['success'] = true;
 							$result['message'] = hocwp_build_message( hocwp_text_success_register_and_verify_email(), 'success' );
@@ -315,9 +325,10 @@ class HOCWP_Widget_Subscribe extends WP_Widget {
 		$lists      = $this->args['desc_positions'];
 		$all_option = '';
 		foreach ( $lists as $lkey => $lvalue ) {
-			$all_option .= hocwp_field_get_option( array( 'value'    => $lkey,
-			                                              'text'     => $lvalue,
-			                                              'selected' => $desc_position
+			$all_option .= hocwp_field_get_option( array(
+				'value'    => $lkey,
+				'text'     => $lvalue,
+				'selected' => $desc_position
 			) );
 		}
 		$args = array(
