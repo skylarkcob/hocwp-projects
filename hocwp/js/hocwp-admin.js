@@ -366,6 +366,7 @@ jQuery(document).ready(function ($) {
             var $compress_button = $('#hocwp_developers_compress_css_js'),
                 $compress_css = $('#hocwp_developers_compress_css'),
                 $compress_js = $('#hocwp_developers_compress_js'),
+                $compress_core = $('#hocwp_developers_compress_core'),
                 $recompress = $('#hocwp_developers_re_compress'),
                 $force_compress = $('#hocwp_developers_force_compress'),
                 force_compress = false;
@@ -394,7 +395,8 @@ jQuery(document).ready(function ($) {
                         data: {
                             action: 'hocwp_compress_style_and_script',
                             type: JSON.stringify(type),
-                            force_compress: force_compress
+                            force_compress: force_compress,
+                            compress_core: $compress_core.is(':checked')
                         },
                         success: function (response) {
                             $body.css({cursor: 'auto'});

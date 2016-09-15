@@ -399,6 +399,11 @@ class HOCWP_Widget_Post extends WP_Widget {
 				if ( $hide_thumbnail ) {
 					hocwp_add_string_with_space_before( $class, 'hide-thumbnail' );
 				}
+				if ( hocwp_is_positive_number( $excerpt_length ) ) {
+					hocwp_add_string_with_space_before( $class, 'show-excerpt' );
+				} else {
+					hocwp_add_string_with_space_before( $class, 'hide-excerpt' );
+				}
 				?>
 				<li <?php post_class( $class ); ?>>
 					<?php

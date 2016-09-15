@@ -43,12 +43,24 @@ class HOCWP_Widget_Statistics extends WP_Widget {
 	public function widget( $args, $instance ) {
 		$this->instance = $instance;
 		hocwp_widget_before( $args, $instance );
+		$total_text  = 'Tổng truy cập:';
+		$today_text  = 'Truy cập hôm nay:';
+		$online_text = 'Đang truy cập:';
+		$lang        = hocwp_get_language();
+		if ( 'vi' != $lang ) {
+			$total_text  = __( 'Total:', 'hocwp-theme' );
+			$today_text  = __( 'Visit Today:', 'hocwp-theme' );
+			$online_text = __( 'Online:', 'hocwp-theme' );
+		}
 		ob_start();
 		?>
 		<ul class="list-unstyled">
-			<li><p>Tổng truy cập: <span class="count"><?php echo hocwp_statistics_total(); ?></span></p></li>
-			<li><p>Truy cập hôm nay: <span class="count"><?php echo hocwp_statistics_today(); ?></span></p></li>
-			<li><p>Đang truy cập: <span class="count"><?php echo hocwp_statistics_online(); ?></span></p></li>
+			<li><p><?php echo $total_text; ?> <span class="count"><?php echo hocwp_statistics_total(); ?></span></p>
+			</li>
+			<li><p><?php echo $today_text; ?> <span class="count"><?php echo hocwp_statistics_today(); ?></span></p>
+			</li>
+			<li><p><?php echo $online_text; ?> <span class="count"><?php echo hocwp_statistics_online(); ?></span></p>
+			</li>
 		</ul>
 		<?php
 		$html        = ob_get_clean();

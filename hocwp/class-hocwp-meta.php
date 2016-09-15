@@ -183,6 +183,10 @@ class HOCWP_Meta {
 		return $this->fields;
 	}
 
+	public function get_custom_fields() {
+		return $this->custom_fields;
+	}
+
 	public function register_field( $name, $data_type = 'default' ) {
 		if ( ! is_array( $this->custom_fields ) ) {
 			$this->custom_fields = array();
@@ -249,7 +253,10 @@ class HOCWP_Meta {
 	}
 
 	public function init() {
-		global $pagenow;
+		global $pagenow, $hocwp_metas;
+		if ( ! is_array( $hocwp_metas ) ) {
+			$hocwp_metas = array();
+		}
 		if ( $this->is_term_meta() ) {
 			if ( 'edit-tags.php' == $pagenow || 'term.php' == $pagenow ) {
 				$this->term_meta_init();
@@ -257,17 +264,11 @@ class HOCWP_Meta {
 		} elseif ( $this->is_menu_item_meta() ) {
 			$this->menu_item_meta_init();
 		} else {
-			if ( ! did_action( 'add_meta_boxes' ) ) {
-				$message = __( 'Please use this class in <strong>add_meta_boxes</strong> hook.', 'hocwp-theme' );
-				$message .= ' ';
-				$message .= sprintf( __( 'The fields for this object is: %s', 'hocwp-theme' ), json_encode( $this->get_fields() ) );
-				//_doing_it_wrong( __CLASS__, $message, '3.4.4' );
-			}
 			if ( 'post-new.php' == $pagenow || 'post.php' == $pagenow ) {
 				$this->post_meta_box_init();
-
 			}
 		}
+		$hocwp_metas[] = $this;
 	}
 
 	public function add_custom_menu_item_meta_field( $item, $args, $depth ) {
@@ -551,12 +552,11 @@ class HOCWP_Meta {
 		if ( 'post-new.php' == $pagenow || 'post.php' == $pagenow || $this->get_use_media_upload() ) {
 			add_filter( 'hocwp_use_admin_style_and_script', '__return_true' );
 		}
-		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
+		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ), 2, 2 );
 		add_action( 'save_post', array( $this, 'save_post' ), 99 );
 	}
 
-	public function add_meta_box() {
-		$post_type = hocwp_get_current_post_type();
+	public function add_meta_box( $post_type, $post ) {
 		if ( in_array( $post_type, $this->get_post_types() ) ) {
 			add_meta_box( $this->get_id(), $this->get_title(), array(
 				$this,
@@ -604,7 +604,7 @@ class HOCWP_Meta {
 		<?php
 	}
 
-	private function save_post_meta_helper( $post_id, $field ) {
+	public function save_post_meta_helper( $post_id, $field ) {
 		$type = isset( $field['type'] ) ? $field['type'] : hocwp_get_value_by_key( $field, 'data_type', 'default' );
 		$name = isset( $field['field_args']['name'] ) ? $field['field_args']['name'] : '';
 		if ( empty( $name ) ) {

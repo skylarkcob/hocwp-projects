@@ -1195,7 +1195,8 @@ function hocwp_percentage( $val1, $val2, $precision = 0 ) {
 	if ( 0 == $total ) {
 		return 0;
 	}
-	$val1 /= $total;
+	$discount = abs( $val1 - $val2 );
+	$val1     = $discount / $total;
 	$val1 *= 100;
 
 	return round( $val1, $precision );

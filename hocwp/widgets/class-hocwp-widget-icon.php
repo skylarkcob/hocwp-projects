@@ -51,12 +51,19 @@ class HOCWP_Widget_Icon extends WP_Widget {
 		$icon_hover     = hocwp_get_value_by_key( $instance, 'icon_hover' );
 		$icon_hover     = hocwp_sanitize_media_value( $icon_hover );
 		$icon_hover_url = $icon_hover['url'];
+		$icon_html      = hocwp_get_value_by_key( $instance, 'icon_html' );
 		$link           = hocwp_get_value_by_key( $instance, 'link' );
-		$text           = hocwp_get_value_by_key( $instance, 'text' );
+		if ( empty( $link ) ) {
+			$link = 'javascript:';
+		}
+		$text = hocwp_get_value_by_key( $instance, 'text' );
 		hocwp_widget_before( $args, $instance, false );
 		$widget_html = '';
 		if ( ! empty( $icon_url ) ) {
-			$widget_html .= '<a href="' . $link . '" class="icon-link icon-url"><img class="icon" src="' . $icon_url . '" alt="" data-hover="' . $icon_hover_url . '"></a>';
+			$icon_html = $icon_html = '<img class="icon" src="' . $icon_url . '" alt="" data-hover="' . $icon_hover_url . '">';
+		}
+		if ( ! empty( $icon_html ) ) {
+			$widget_html .= '<a href="' . $link . '" class="icon-link icon-url">' . $icon_html . '</a>';
 		}
 		if ( (bool) $title_link ) {
 			$title        = hocwp_get_value_by_key( $instance, 'title' );
@@ -84,6 +91,7 @@ class HOCWP_Widget_Icon extends WP_Widget {
 		$icon           = hocwp_sanitize_media_value( $icon );
 		$icon_hover     = hocwp_get_value_by_key( $instance, 'icon_hover' );
 		$icon_hover     = hocwp_sanitize_media_value( $icon_hover );
+		$icon_html      = hocwp_get_value_by_key( $instance, 'icon_html' );
 		$link           = hocwp_get_value_by_key( $instance, 'link' );
 		$text           = hocwp_get_value_by_key( $instance, 'text' );
 		$title_link     = hocwp_get_value_by_key( $instance, 'title_link', hocwp_get_value_by_key( $this->args, 'title_link' ) );
@@ -105,6 +113,14 @@ class HOCWP_Widget_Icon extends WP_Widget {
 			'label' => __( 'Icon hover:', 'hocwp-theme' )
 		);
 		hocwp_widget_field( 'hocwp_field_media_upload', $args );
+
+		$args = array(
+			'id'    => $this->get_field_id( 'icon_html' ),
+			'name'  => $this->get_field_name( 'icon_html' ),
+			'value' => $icon_html,
+			'label' => __( 'Icon HTML:', 'hocwp-theme' )
+		);
+		hocwp_widget_field( 'hocwp_field_input_text', $args );
 
 		$args = array(
 			'id'    => $this->get_field_id( 'link' ),
@@ -138,6 +154,7 @@ class HOCWP_Widget_Icon extends WP_Widget {
 		$instance['title']      = strip_tags( hocwp_get_value_by_key( $new_instance, 'title' ) );
 		$instance['icon']       = hocwp_get_value_by_key( $new_instance, 'icon' );
 		$instance['icon_hover'] = hocwp_get_value_by_key( $new_instance, 'icon_hover' );
+		$instance['icon_html']  = hocwp_get_value_by_key( $new_instance, 'icon_html' );
 		$instance['link']       = esc_url( hocwp_get_value_by_key( $new_instance, 'link' ) );
 		$instance['title_link'] = hocwp_checkbox_post_data_value( $new_instance, 'title_link' );
 		$instance['text']       = hocwp_get_value_by_key( $new_instance, 'text' );

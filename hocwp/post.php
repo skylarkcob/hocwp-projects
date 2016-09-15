@@ -224,6 +224,12 @@ function hocwp_post_thumbnail_large_if_not_default( $result, $post_id ) {
 		$result = get_post_meta( $post_id, 'large_thumbnail', true );
 		$result = hocwp_sanitize_media_value( $result );
 		$result = $result['url'];
+		if ( empty( $result ) ) {
+			$gallery = get_post_gallery_images( $post_id );
+			if ( hocwp_array_has_value( $gallery ) ) {
+				$result = array_shift( $gallery );
+			}
+		}
 	}
 
 	return $result;

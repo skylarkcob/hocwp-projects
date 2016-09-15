@@ -90,6 +90,7 @@ class HOCWP_HTML {
 	}
 
 	public function set_href( $href ) {
+		$href = esc_url( $href );
 		$this->set_attribute( 'href', $href );
 	}
 

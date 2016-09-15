@@ -140,6 +140,11 @@ body.hocwp {
     margin: 0 !important;
 }
 
+.site-header .site-title {
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
 /**
  * Logo
  */
@@ -192,10 +197,6 @@ body.hocwp {
 
 .hocwp .hocwp-menu {
     margin: 0;
-}
-
-.hocwp .hocwp-menu:not(.hocwp-mobile-menu) {
-    width: 100%;
 }
 
 .hocwp .sf-arrows .sf-with-ul::after {
@@ -948,11 +949,11 @@ body.hocwp {
 
 .hocwp .entry-content .newsletter table input[type="submit"] {
     /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#4d90fe+0,4787ed+100 */
-    background: rgb(77,144,254); /* Old browsers */
-    background: -moz-linear-gradient(top,  rgba(77,144,254,1) 0%, rgba(71,135,237,1) 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(top,  rgba(77,144,254,1) 0%,rgba(71,135,237,1) 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(to bottom,  rgba(77,144,254,1) 0%,rgba(71,135,237,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4d90fe', endColorstr='#4787ed',GradientType=0 ); /* IE6-9 */
+    background: rgb(77, 144, 254); /* Old browsers */
+    background: -moz-linear-gradient(top, rgba(77, 144, 254, 1) 0%, rgba(71, 135, 237, 1) 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, rgba(77, 144, 254, 1) 0%, rgba(71, 135, 237, 1) 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom, rgba(77, 144, 254, 1) 0%, rgba(71, 135, 237, 1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#4d90fe', endColorstr='#4787ed', GradientType=0); /* IE6-9 */
 }
 
 .hocwp .entry-content .newsletter table input[type="submit"] {
@@ -1350,6 +1351,10 @@ body.hocwp {
     margin-top: 0;
 }
 
+.hocwp-widget-post li.hide-excerpt .entry-title {
+    font-weight: 400;
+}
+
 .hocwp-widget-post li .entry-title a {
 
 }
@@ -1707,6 +1712,21 @@ body.hocwp {
 .hocwp .wp-core-ui div label,
 .wp-core-ui div label input {
     font-weight: 400;
+}
+
+/**
+ * Rating
+ */
+
+.star-rating {
+    display: inline;
+}
+
+.star-rating + .num-ratings {
+    color: #444;
+    line-height: 23px;
+    margin-left: 5px;
+    word-wrap: break-word;
 }
 
 /**

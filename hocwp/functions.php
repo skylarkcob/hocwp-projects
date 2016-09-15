@@ -301,6 +301,9 @@ function hocwp_is_login_page() {
 }
 
 function hocwp_can_save_post( $post_id ) {
+	if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
+		return false;
+	}
 	if ( hocwp_id_number_valid( $post_id ) && ! HOCWP_DOING_AUTO_SAVE && current_user_can( 'edit_post', $post_id ) ) {
 		return true;
 	}

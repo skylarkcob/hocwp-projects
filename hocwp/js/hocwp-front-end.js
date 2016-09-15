@@ -456,6 +456,10 @@ jQuery(document).ready(function ($) {
                     $register_form.find('input[type="submit"]').addClass(submit_class);
                 }
             }
+            var $comment_form = $('#commentform');
+            if ($comment_form.length) {
+                $comment_form.find('input[type="submit"]').addClass('btn btn-' + hocwp.discussions.button_style);
+            }
         }
     })();
 

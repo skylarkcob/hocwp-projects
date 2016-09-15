@@ -451,21 +451,40 @@ if ( 'post.php' == $GLOBALS['pagenow'] || 'post-new.php' == $GLOBALS['pagenow'] 
 	$meta->add_post_type( 'post' );
 	$meta->set_title( __( 'General Information', 'hocwp-theme' ) );
 	$meta->set_id( 'classifieds_general_information' );
-	$meta->add_field( array( 'id'      => 'address',
-	                         'label'   => __( 'Address:', 'hocwp-theme' ),
-	                         'class'   => 'hocwp-geo-address',
-	                         'default' => get_user_meta( $current_user->ID, 'address', true )
-	) );
-	$meta->add_field( array( 'id' => 'price', 'label' => __( 'Price:', 'hocwp-theme' ) ) );
-	$meta->add_field( array( 'id'      => 'phone',
-	                         'label'   => __( 'Phone:', 'hocwp-theme' ),
-	                         'default' => get_user_meta( $current_user->ID, 'phone', true )
-	) );
-	$meta->add_field( array( 'id'      => 'email',
-	                         'label'   => __( 'Email:', 'hocwp-theme' ),
-	                         'default' => $current_user->user_email
-	) );
-	$meta->add_field( array( 'id' => 'acreage', 'label' => __( 'Acreage:', 'hocwp-theme' ) ) );
+	$meta->add_field(
+		array(
+			'id'      => 'address',
+			'label'   => __( 'Address:', 'hocwp-theme' ),
+			'class'   => 'hocwp-geo-address',
+			'default' => get_user_meta( $current_user->ID, 'address', true )
+		)
+	);
+	$meta->add_field(
+		array(
+			'id'    => 'price',
+			'label' => __( 'Price:', 'hocwp-theme' )
+		)
+	);
+	$meta->add_field(
+		array(
+			'id'      => 'phone',
+			'label'   => __( 'Phone:', 'hocwp-theme' ),
+			'default' => get_user_meta( $current_user->ID, 'phone', true )
+		)
+	);
+	$meta->add_field(
+		array(
+			'id'      => 'email',
+			'label'   => __( 'Email:', 'hocwp-theme' ),
+			'default' => $current_user->user_email
+		)
+	);
+	$meta->add_field(
+		array(
+			'id'    => 'acreage',
+			'label' => __( 'Acreage:', 'hocwp-theme' )
+		)
+	);
 	$meta->init();
 	hocwp_meta_box_editor_gallery( array( 'post_type' => 'post' ) );
 	hocwp_meta_box_google_maps();
