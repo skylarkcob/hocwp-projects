@@ -145,6 +145,15 @@ body.hocwp {
     margin-top: 10px;
 }
 
+img.centered {
+    bottom: 0;
+    left: 0;
+    margin: auto !important;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
 /**
  * Logo
  */
@@ -212,6 +221,7 @@ body.hocwp {
     line-height: 40px;
     padding: 0 10px;
     vertical-align: middle;
+    white-space: nowrap;
 }
 
 .hocwp .hocwp-mobile-menu.left + .mobile-menu-button {
@@ -604,6 +614,30 @@ body.hocwp {
 }
 
 /**
+ * Ads
+ */
+
+.hocwp-ads.float-left,
+.hocwp-ads.float-right {
+    position: fixed;
+    top: 0;
+    width: 160px;
+}
+
+.admin-bar .hocwp-ads.float-left,
+.admin-bar .hocwp-ads.float-right {
+    top: 32px;
+}
+
+.hocwp-ads.float-left {
+    margin-left: -180px;
+}
+
+.hocwp-ads.float-right {
+    margin-left: 20px;
+}
+
+/**
  * Bootstrap
  */
 
@@ -901,9 +935,7 @@ body.hocwp {
 }
 
 .hocwp .entry-content figure figcaption {
-    font-style: italic;
-    margin-top: 5px;
-    text-align: center;
+    text-align: left;
 }
 
 .hocwp .entry-content figure.gallery-item {
@@ -912,6 +944,20 @@ body.hocwp {
     text-align: center;
     vertical-align: top;
     width: 25%;
+}
+
+.hocwp .hocwp-post .entry-content figure {
+    max-width: 100%;
+}
+
+.hocwp .hocwp-post .entry-content figcaption {
+    background: #f5f5f5 none repeat scroll 0 0;
+    color: #333;
+    font-family: "Arial", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    margin: 0;
+    padding: 10px;
 }
 
 .hocwp .entry-content h1,
@@ -2008,6 +2054,7 @@ body.hocwp {
     overflow: hidden;
 }
 
+.hocwp .comments-title + .comment-respond > .comment-reply-title,
 .hocwp .hocwp-go-top,
 .hocwp-pagination.no-paged,
 .one-widget .widget,
@@ -3437,6 +3484,10 @@ body.hocwp {
 @media screen and (max-width: 1024px) {
     .hocwp .site {
         overflow: hidden;
+    }
+
+    .hocwp .float-ads .hocwp-ads {
+        display: none;
     }
 }
 

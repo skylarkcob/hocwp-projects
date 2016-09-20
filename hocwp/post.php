@@ -64,6 +64,18 @@ function hocwp_get_all_trending( $post_type = null ) {
 	return $result;
 }
 
+function hocwp_get_all_treding_post_ids( $post_type = null ) {
+	$trends   = hocwp_get_all_trending( $post_type );
+	$post_ids = array();
+	if ( hocwp_array_has_value( $trends ) ) {
+		foreach ( $trends as $trend ) {
+			$post_ids[] = $trend->post_id;
+		}
+	}
+
+	return $post_ids;
+}
+
 function hocwp_post_class( $classes ) {
 	$classes[] = 'hocwp-post';
 	$classes[] = 'hentry';
@@ -329,6 +341,10 @@ function hocwp_post_thumbnail( $args = array() ) {
 	$img->set_attribute( 'alt', get_the_title( $post_id ) );
 	$img->set_class( 'attachment-post-thumbnail wp-post-image img-responsive' );
 	$img->set_attribute( 'src', $thumbnail_url );
+	$centered = (bool) hocwp_get_value_by_key( $args, 'centered', false );
+	if ( $centered ) {
+		$img->add_class( 'centered' );
+	}
 	$bk_img = '';
 	if ( (bool) $lazyload ) {
 		$img->set_wrap_tag( 'noscript' );

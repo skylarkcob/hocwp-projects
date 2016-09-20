@@ -472,11 +472,13 @@ function hocwp_entry_content( $content = '' ) {
 	<?php
 }
 
-function hocwp_entry_summary( $length = null ) {
+function hocwp_entry_summary( $length = null, $class = '' ) {
 	if ( is_numeric( $length ) && 1 > $length ) {
 		return;
 	}
-	echo '<div class="entry-summary" itemprop="text">';
+	$class = hocwp_sanitize_html_class( $class );
+	hocwp_add_string_with_space_before( $class, 'entry-summary' );
+	echo '<div class="' . $class . '" itemprop="text">';
 	if ( is_numeric( $length ) ) {
 		echo wpautop( hocwp_substr( get_the_excerpt(), $length ) );
 	} else {

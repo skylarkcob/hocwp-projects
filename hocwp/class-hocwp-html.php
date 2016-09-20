@@ -75,6 +75,9 @@ class HOCWP_HTML {
 	}
 
 	public function set_class( $class ) {
+		if ( is_array( $class ) ) {
+			$class = implode( ' ', $class );
+		}
 		$this->set_attribute( 'class', $class );
 	}
 

@@ -808,6 +808,9 @@ function hocwp_field_input_number( $args = array() ) {
 	if ( hocwp_array_has_value( $atts ) ) {
 		$args['attributes'] = $atts;
 	}
+	if ( ! isset( $args['step'] ) && ! isset( $args['attributes']['step'] ) ) {
+		$args['attributes']['step'] = 'any';
+	}
 	hocwp_field_input( $args );
 }
 

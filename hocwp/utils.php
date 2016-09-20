@@ -231,6 +231,19 @@ function hocwp_get_feed_items( $args = array() ) {
 	return $result;
 }
 
+function hocwp_show_float_ads() {
+	?>
+	<div class="<?php hocwp_wrap_class('float-ads'); ?>">
+		<div class="pull-left">
+			<?php hocwp_show_ads( 'float_left' ); ?>
+		</div>
+		<div class="pull-right">
+			<?php hocwp_show_ads( 'float_right' ); ?>
+		</div>
+	</div>
+	<?php
+}
+
 function hocwp_rest_api_get( $base_url, $object = 'posts', $query = '' ) {
 	$base_url = trailingslashit( $base_url ) . 'wp-json/wp/v2/' . $object;
 	if ( ! empty( $query ) ) {

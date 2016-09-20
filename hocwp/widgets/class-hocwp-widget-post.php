@@ -425,6 +425,13 @@ class HOCWP_Widget_Post extends WP_Widget {
 									$type_text = $tmp;
 								}
 							}
+							$price      = hocwp_get_post_meta( 'price', $post_id );
+							$sale_price = hocwp_get_post_meta( 'sale_price', $post_id );
+							if ( ! empty( $price ) && ! empty( $sale_price ) || empty( $percent ) ) {
+								$percentage = hocwp_percentage( $price, $sale_price );
+								$percent    = $percentage . '%';
+								$text       = 'OFF';
+							}
 							?>
 							<div class="txt"><?php echo $percent . ' ' . $text; ?></div>
 							<div class="type"><?php echo $type_text; ?></div>

@@ -844,6 +844,27 @@ function hocwp_get_current_post_type() {
 	return $result;
 }
 
+function hocwp_get_current_new_post() {
+	global $pagenow;
+	$result = null;
+	if ( 'post-new.php' == $pagenow ) {
+		$query_args = array(
+			'post_status'    => 'auto-draft',
+			'orderby'        => 'date',
+			'order'          => 'desc',
+			'posts_per_page' => 1
+		);
+		$post_type  = hocwp_get_current_post_type();
+		if ( ! empty( $post_type ) ) {
+			$query_args['post_type'] = $post_type;
+		}
+		$query  = hocwp_query( $query_args );
+		$result = array_shift( $query->posts );
+	}
+
+	return $result;
+}
+
 function hocwp_register_sidebar( $sidebar_id, $sidebar_name, $sidebar_description = '', $html_tag = 'aside' ) {
 	$widget_class = apply_filters( 'hocwp_widget_class', '', $sidebar_id );
 	hocwp_add_string_with_space_before( $widget_class, 'widget' );

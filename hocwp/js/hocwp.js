@@ -902,10 +902,14 @@ jQuery(document).ready(function ($) {
         this.options = $.extend({}, MobileMenu.DEFAULTS, options);
         this._defaults = MobileMenu.DEFAULTS;
         this._name = MobileMenu.NAME;
+        if (this.options.displayWidth < $window.width()) {
+            return this;
+        }
         this.init();
         var $element = this.$element,
+            menu_options = this.options,
             $menu_parent = $element.parent(),
-            $mobile_menu_button = $menu_parent.find('.mobile-menu-button'),
+            $mobile_menu_button = this.options.mobileButton,
             $search_form = $menu_parent.find('.search-form'),
             display_width = parseFloat(this.options.displayWidth),
             height = parseInt(this.options.height),
@@ -913,6 +917,9 @@ jQuery(document).ready(function ($) {
             force_search_form = this.options.forceSearchForm,
             fit_window_height = this.options.fitWindowHeight,
             search_form_added = false;
+        if (!$mobile_menu_button.length) {
+            $mobile_menu_button = $menu_parent.find('.mobile-menu-button');
+        }
         this.element_class = $element.attr('class');
         this.html = $element.html();
         var html = this.html,
@@ -944,21 +951,53 @@ jQuery(document).ready(function ($) {
             $mobile_menu_button.css({'line-height': height + 'px'});
             $mobile_menu_button.show();
 
-            $menu_parent.off('click', '.mobile-menu-button').on('click', '.mobile-menu-button', function (e) {
-                e.stopPropagation();
-                $element.toggleClass('active');
-            });
+            var mobile_menu_button_left = parseInt($mobile_menu_button.css('left'));
+            if (!$.isNumeric(mobile_menu_button_left)) {
+                mobile_menu_button_left = 10;
+                $mobile_menu_button.css({'left': '10px', 'position': 'absolute'});
+            }
 
-            $body.on('click', function () {
-                $element.removeClass('active');
-            });
-
-            $menu_parent.off('click', '.hocwp-mobile-menu').on('click', '.hocwp-mobile-menu', function (e) {
-                e.stopPropagation();
-                if (e.target == this) {
+            if (menu_options.mobileButton.length) {
+                $mobile_menu_button.on('click', function (e) {
+                    e.stopPropagation();
                     $element.toggleClass('active');
-                }
-            });
+                    if ($element.hasClass('active')) {
+                        $mobile_menu_button.css({'left': 250 + 'px'});
+                    } else {
+                        $mobile_menu_button.css({'left': mobile_menu_button_left + 'px'});
+                    }
+                });
+                $body.on('click', function () {
+                    $element.removeClass('active');
+                    $mobile_menu_button.css({'left': mobile_menu_button_left + 'px'});
+                });
+
+                $menu_parent.on('click', function (e) {
+                    e.stopPropagation();
+                    if (e.target == this) {
+                        $element.toggleClass('active');
+                        if(!$element.hasClass('active')) {
+                            $mobile_menu_button.css({'left': mobile_menu_button_left + 'px'});
+                        }
+                    }
+                });
+            } else {
+                $menu_parent.off('click', '.mobile-menu-button').on('click', '.mobile-menu-button', function (e) {
+                    e.stopPropagation();
+                    $element.toggleClass('active');
+                });
+
+                $body.on('click', function () {
+                    $element.removeClass('active');
+                });
+
+                $menu_parent.off('click', '.hocwp-mobile-menu').on('click', '.hocwp-mobile-menu', function (e) {
+                    e.stopPropagation();
+                    if (e.target == this) {
+                        $element.toggleClass('active');
+                    }
+                });
+            }
 
             $element.find('.search-field').on('click', function (e) {
                 e.preventDefault();
@@ -973,6 +1012,7 @@ jQuery(document).ready(function ($) {
 
             $element.find('li.menu-item-has-children .fa').off('click').on('click', function (e) {
                 e.preventDefault();
+                e.stopPropagation();
                 var $this = $(this),
                     $current_li = $this.parent(),
                     $sub_menu = $current_li.children('.sub-menu');
