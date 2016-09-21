@@ -15,6 +15,8 @@ function hocwp_post_gallery( $args = array() ) {
 	if ( ! hocwp_array_has_value( $galleries ) ) {
 		if ( is_string( $args ) ) {
 			$galleries = hocwp_get_all_image_from_string( $args );
+		} elseif ( is_string( $galleries ) && ! empty( $galleries ) ) {
+			$galleries = hocwp_get_all_image_from_string( $galleries );
 		} else {
 			$galleries = $args;
 		}
@@ -22,15 +24,23 @@ function hocwp_post_gallery( $args = array() ) {
 	if ( hocwp_array_has_value( $galleries ) ) {
 		?>
 		<div<?php echo $id; ?> class="<?php echo $class; ?>">
-			<?php if ( ! empty( $title ) ) : ?>
+			<?php
+			if ( ! empty( $title ) ) {
+				?>
 				<div class="module-header">
 					<h4><?php echo $title; ?></h4>
 				</div>
-			<?php endif; ?>
+				<?php
+			}
+			?>
 			<div class="module-body">
 				<div class="galleries">
-					<ul class="gallery hocwp-gallery list-unstyled cS-hidden">
+					<ul class="gallery hocwp-gallery list-unstyled cS-hidden clearfix row">
 						<?php
+						$column = hocwp_get_value_by_key( $args, 'column' );
+						if ( ! hocwp_is_positive_number( $column ) ) {
+							$column = 2;
+						}
 						$pager = '';
 						$count = 0;
 						foreach ( $galleries as $img ) {
@@ -41,6 +51,7 @@ function hocwp_post_gallery( $args = array() ) {
 							$li = new HOCWP_HTML( 'li' );
 							$li->set_text( $img );
 							$li->set_attribute( 'data-thumb', $src );
+							$li->add_class( 'col-xs-' . $column );
 							$li->output();
 						}
 						?>

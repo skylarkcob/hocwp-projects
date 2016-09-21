@@ -448,6 +448,13 @@ function hocwp_coupon_button_html( $args = array() ) {
 		$cc_label = hocwp_translate_text( 'Coming soon' );
 		hocwp_add_string_with_space_before( $button_class, 'disabled' );
 	}
+	if ( isset( $args['expired'] ) ) {
+		$expired = (bool) $args['expired'];
+		if ( $expired ) {
+			$cc_label = __( 'Expired', 'hocwp-theme' );
+			hocwp_add_string_with_space_before( $button_class, 'disabled' );
+		}
+	}
 	?>
 	<a href="#coupon_box_<?php echo $post_id; ?>" data-post-id="<?php echo $post_id; ?>"
 	   class="<?php echo $button_class; ?>" data-out-url="<?php echo $out_url; ?>" data-toggle="modal">
@@ -772,6 +779,12 @@ function hocwp_coupon_meta_box_init( $post_type, $post ) {
 				'label' => __( 'URL:', 'hocwp-theme' )
 			)
 		);
+		$args = array(
+			'id'             => 'enable_countdown_timer',
+			'label'          => 'Enable the countdown timer?',
+			'field_callback' => 'hocwp_field_input_checkbox'
+		);
+		$meta->add_field( $args );
 		$meta->init();
 	}
 }

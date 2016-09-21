@@ -917,7 +917,7 @@ jQuery(document).ready(function ($) {
             force_search_form = this.options.forceSearchForm,
             fit_window_height = this.options.fitWindowHeight,
             search_form_added = false;
-        if (!$mobile_menu_button.length) {
+        if (null == $mobile_menu_button || !$mobile_menu_button.length) {
             $mobile_menu_button = $menu_parent.find('.mobile-menu-button');
         }
         this.element_class = $element.attr('class');
@@ -937,7 +937,7 @@ jQuery(document).ready(function ($) {
             $element.show();
             $element.addClass(position);
             $element.addClass('hocwp-mobile-menu');
-            if (!$mobile_menu_button.length) {
+            if (null == $mobile_menu_button || !$mobile_menu_button.length) {
                 $menu_parent.append(hocwp.mobile_menu_icon);
                 $mobile_menu_button = $menu_parent.find('.mobile-menu-button');
                 $mobile_menu_button.attr('aria-controls', $element.attr('id'))
@@ -957,7 +957,7 @@ jQuery(document).ready(function ($) {
                 $mobile_menu_button.css({'left': '10px', 'position': 'absolute'});
             }
 
-            if (menu_options.mobileButton.length) {
+            if (null != menu_options.mobileButton && menu_options.mobileButton.length) {
                 $mobile_menu_button.on('click', function (e) {
                     e.stopPropagation();
                     $element.toggleClass('active');
@@ -1099,7 +1099,8 @@ jQuery(document).ready(function ($) {
         position: 'left',
         height: 30,
         forceSearchForm: false,
-        fitWindowHeight: false
+        fitWindowHeight: false,
+        mobileButton: null
     };
 
     MobileMenu.prototype.init = function () {

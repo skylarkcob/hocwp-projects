@@ -391,27 +391,51 @@ function hocwp_wc_after_single_product_add_to_cart_button() {
 
 add_action( 'woocommerce_single_product_summary', 'hocwp_wc_after_single_product_add_to_cart_button', 31 );
 
-function hocwp_wc_single_product_fast_buy_button() {
+function hocwp_wc_after_product_thumbnails() {
+	do_action( 'hocwp_wc_after_product_thumbnails' );
+}
+
+add_action( 'woocommerce_product_thumbnails', 'hocwp_wc_after_product_thumbnails', 30 );
+
+function hocwp_wc_product_fast_buy_button( $args = array() ) {
+	$post_id            = hocwp_get_value_by_key( $args, 'post_id' );
+	$post_id            = hocwp_return_post( $post_id, 'id' );
+	$button_text        = hocwp_get_value_by_key( $args, 'button_text', __( 'Mua hàng nhanh', 'hocwp-theme' ) );
+	$button_text        = apply_filters( 'hocwp_wc_fast_buy_button_text', $button_text );
+	$button_description = hocwp_get_value_by_key( $args, 'button_description', __( 'Đặt hàng nhanh, không cần thêm sản phẩm vào giỏ hàng.', 'hocwp-theme' ) );
+	$button_description = apply_filters( 'hocwp_wc_fast_buy_button_description', $button_description );
+	?>
+	<button data-target="#productBuy<?php echo $post_id; ?>" data-toggle="modal"
+	        class="btn-clickable orange fast-buy"
+	        type="button">
+		<?php
+		echo $button_text;
+		if ( ! empty( $button_description ) ) {
+			$button_description = hocwp_wrap_tag( $button_description, 'span' );
+			echo $button_description;
+		}
+		?>
+	</button>
+	<?php
+}
+
+function hocwp_wc_single_product_fast_buy_button( $args = array() ) {
 	$use = hocwp_wc_use_fast_buy_button();
 	if ( $use ) {
 		global $product;
-		$tmp                = new WC_Product( $product );
-		$product            = $tmp;
-		$button_text        = apply_filters( 'hocwp_wc_fast_buy_button_text', __( 'Mua hàng nhanh', 'hocwp-theme' ) );
-		$button_description = apply_filters( 'hocwp_wc_fast_buy_button_description', __( 'Đặt hàng nhanh, không cần thêm sản phẩm vào giỏ hàng.', 'hocwp-theme' ) );
+		$post_id     = hocwp_get_value_by_key( $args, 'post_id' );
+		$post_id     = hocwp_return_post( $post_id, 'id' );
+		$tmp         = new WC_Product( $product );
+		$product     = $tmp;
+		$show_button = (bool) hocwp_get_value_by_key( $args, 'show_button', true );
+		hocwp_div_clear();
 		do_action( 'hocwp_wc_before_fast_buy_button' );
+		if ( $show_button ) {
+			$args['post_id'] = $post_id;
+			hocwp_wc_product_fast_buy_button( $args );
+		}
 		?>
-		<button data-target="#productBuy<?php the_ID(); ?>" data-toggle="modal" class="btn-clickable orange fast-buy"
-		        type="button">
-			<?php
-			echo $button_text;
-			if ( ! empty( $button_description ) ) {
-				$button_description = hocwp_wrap_tag( $button_description, 'span' );
-				echo $button_description;
-			}
-			?>
-		</button>
-		<div id="productBuy<?php the_ID(); ?>" role="dialog" tabindex="-1" class="modal fade product-fast-buy">
+		<div id="productBuy<?php echo $post_id; ?>" role="dialog" tabindex="-1" class="modal fade product-fast-buy">
 			<div class="modal-dialog">
 				<div class="modal-content clearfix">
 					<div class="modal-header">
@@ -420,7 +444,7 @@ function hocwp_wc_single_product_fast_buy_button() {
 						<h4 class="modal-title">Đặt hàng nhanh</h4>
 					</div>
 					<div class="modal-body">
-						<div class="row">
+						<div class="row row-medium">
 							<div class="col-xs-12 col-md-6 info-column">
 								<div class="product-info">
 									<?php
@@ -528,7 +552,8 @@ function hocwp_wc_single_product_fast_buy_button() {
 											          class="message form-control"></textarea>
 										</div>
 										<div class="form-group">
-											<button class="btn-clickable orange" data-id="<?php the_ID(); ?>">Đặt hàng
+											<button class="btn-clickable orange" data-id="<?php echo $post_id; ?>">
+												<span>Đặt hàng</span>
 											</button>
 										</div>
 									</form>

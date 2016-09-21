@@ -678,11 +678,91 @@ function hocwp_compress_script( $dir, $compress_min_file = false, $force_compres
 	}
 }
 
+function hocwp_theme_copy_style_to_min_file() {
+	if ( ! defined( 'HOCWP_THEME_PATH' ) ) {
+		return;
+	}
+	$hocwp_css_path = HOCWP_THEME_PATH . '/css';
+	$min_file       = $hocwp_css_path . '/hocwp-custom-front-end.min.css';
+	if ( ! file_exists( $min_file ) ) {
+		hocwp_create_file( $min_file );
+	}
+	$old_content = @file_get_contents( $min_file );
+	$old_content = trim( $old_content );
+	if ( empty( $old_content ) ) {
+		$tmp_file = $hocwp_css_path . '/hocwp-custom-front-end.css';
+		if ( file_exists( $tmp_file ) ) {
+			$old_content = @file_get_contents( $tmp_file );
+			$old_content = hocwp_minify_css( $old_content );
+			$old_content = trim( $old_content );
+		}
+	}
+	if ( ! empty( $old_content ) ) {
+		$temp_file = HOCWP_PATH . '/css/hocwp-front-end.min.css';
+		if ( file_exists( $temp_file ) ) {
+			$temp_content = @file_get_contents( $temp_file );
+			$temp_content = trim( $temp_content );
+			$old_content  = $temp_content . $old_content;
+		}
+		$temp_file = HOCWP_PATH . '/css/hocwp.min.css';
+		if ( file_exists( $temp_file ) ) {
+			$temp_content = @file_get_contents( $temp_file );
+			$temp_content = trim( $temp_content );
+			$old_content  = $temp_content . $old_content;
+		}
+		$temp_file = HOCWP_THEME_PATH . '/css/hocwp-custom-font.min.css';
+		if ( file_exists( $temp_file ) ) {
+			$temp_content = @file_get_contents( $temp_file );
+			$temp_content = trim( $temp_content );
+			$old_content  = $temp_content . $old_content;
+		}
+		$old_content = trim( $old_content );
+	}
+	@file_put_contents( $min_file, $old_content );
+}
+
+function hocwp_theme_copy_script_to_min_file() {
+	if ( ! defined( 'HOCWP_THEME_PATH' ) ) {
+		return;
+	}
+	$hocwp_js_path = HOCWP_THEME_PATH . '/js';
+	$min_file      = $hocwp_js_path . '/hocwp-custom-front-end.min.js';
+	if ( ! file_exists( $min_file ) ) {
+		hocwp_create_file( $min_file );
+	}
+	$old_content = @file_get_contents( $min_file );
+	$old_content = trim( $old_content );
+	if ( empty( $old_content ) ) {
+		$tmp_file = $hocwp_js_path . '/hocwp-custom-front-end.js';
+		if ( file_exists( $tmp_file ) ) {
+			$old_content = @file_get_contents( $tmp_file );
+			$old_content = hocwp_minify_js( $old_content );
+			$old_content = trim( $old_content );
+		}
+	}
+	if ( ! empty( $old_content ) ) {
+		$temp_file = HOCWP_PATH . '/js/hocwp-front-end.min.js';
+		if ( file_exists( $temp_file ) ) {
+			$temp_content = @file_get_contents( $temp_file );
+			$temp_content = trim( $temp_content );
+			$old_content  = $temp_content . $old_content;
+		}
+		$temp_file = HOCWP_PATH . '/js/hocwp.min.js';
+		if ( file_exists( $temp_file ) ) {
+			$temp_content = @file_get_contents( $temp_file );
+			$temp_content = trim( $temp_content );
+			$old_content  = $temp_content . $old_content;
+		}
+		$old_content = trim( $old_content );
+	}
+	@file_put_contents( $min_file, $old_content );
+}
+
 function hocwp_compress_style_and_script( $args = array() ) {
 	$type           = hocwp_get_value_by_key( $args, 'type' );
 	$force_compress = hocwp_get_value_by_key( $args, 'force_compress' );
 	$compress_core  = hocwp_get_value_by_key( $args, 'compress_core' );
-	$recompress = false;
+	$recompress     = false;
 	if ( hocwp_array_has_value( $type ) ) {
 		$compress_css = false;
 		if ( in_array( 'css', $type ) ) {
@@ -694,36 +774,7 @@ function hocwp_compress_style_and_script( $args = array() ) {
 			if ( defined( 'HOCWP_THEME_VERSION' ) ) {
 				$hocwp_css_path = HOCWP_THEME_PATH . '/css';
 				hocwp_compress_style( $hocwp_css_path, false, $force_compress );
-				$min_file = $hocwp_css_path . '/hocwp-custom-front-end.min.css';
-				if ( ! file_exists( $min_file ) ) {
-					hocwp_create_file( $min_file );
-				}
-				$old_content = @file_get_contents( $min_file );
-				$old_content = trim( $old_content );
-				if ( empty( $old_content ) ) {
-					$min_file = $hocwp_css_path . '/hocwp-custom-front-end.css';
-					if ( file_exists( $min_file ) ) {
-						$old_content = @file_get_contents( $min_file );
-						$old_content = hocwp_minify_css( $old_content );
-						$old_content = trim( $old_content );
-					}
-				}
-				if ( ! empty( $old_content ) ) {
-					$temp_file = HOCWP_PATH . '/css/hocwp-front-end.min.css';
-					if ( file_exists( $temp_file ) ) {
-						$temp_content = @file_get_contents( $temp_file );
-						$temp_content = trim( $temp_content );
-						$old_content  = $temp_content . $old_content;
-					}
-					$temp_file = HOCWP_PATH . '/css/hocwp.min.css';
-					if ( file_exists( $temp_file ) ) {
-						$temp_content = @file_get_contents( $temp_file );
-						$temp_content = trim( $temp_content );
-						$old_content  = $temp_content . $old_content;
-					}
-					$old_content = trim( $old_content );
-				}
-				@file_put_contents( $min_file, $old_content );
+				hocwp_theme_copy_style_to_min_file();
 			}
 		}
 		$compress_js = false;
@@ -736,36 +787,7 @@ function hocwp_compress_style_and_script( $args = array() ) {
 			if ( defined( 'HOCWP_THEME_VERSION' ) ) {
 				$hocwp_js_path = HOCWP_THEME_PATH . '/js';
 				hocwp_compress_script( $hocwp_js_path, false, $force_compress );
-				$min_file = $hocwp_js_path . '/hocwp-custom-front-end.min.js';
-				if ( ! file_exists( $min_file ) ) {
-					hocwp_create_file( $min_file );
-				}
-				$old_content = @file_get_contents( $min_file );
-				$old_content = trim( $old_content );
-				if ( empty( $old_content ) ) {
-					$min_file = $hocwp_js_path . '/hocwp-custom-front-end.js';
-					if ( file_exists( $min_file ) ) {
-						$old_content = @file_get_contents( $min_file );
-						$old_content = hocwp_minify_js( $old_content );
-						$old_content = trim( $old_content );
-					}
-				}
-				if ( ! empty( $old_content ) ) {
-					$temp_file = HOCWP_PATH . '/js/hocwp-front-end.min.js';
-					if ( file_exists( $temp_file ) ) {
-						$temp_content = @file_get_contents( $temp_file );
-						$temp_content = trim( $temp_content );
-						$old_content  = $temp_content . $old_content;
-					}
-					$temp_file = HOCWP_PATH . '/js/hocwp.min.js';
-					if ( file_exists( $temp_file ) ) {
-						$temp_content = @file_get_contents( $temp_file );
-						$temp_content = trim( $temp_content );
-						$old_content  = $temp_content . $old_content;
-					}
-					$old_content = trim( $old_content );
-				}
-				@file_put_contents( $min_file, $old_content );
+				hocwp_theme_copy_script_to_min_file();
 			}
 		}
 		if ( $compress_css || $compress_js ) {
