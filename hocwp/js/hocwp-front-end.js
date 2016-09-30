@@ -468,4 +468,67 @@ jQuery(document).ready(function ($) {
             $(this).select();
         });
     })();
+
+    (function () {
+        var $ajax_form = $('.hocwp .hocwp-form-ajax');
+        if ($ajax_form.length) {
+            $ajax_form.on('submit', function (e) {
+                e.preventDefault();
+                var $element = $(this),
+                    $submit = $element.find('input[type="submit"]');
+                if (!$submit.length) {
+                    $submit = $element.find('input[name="submit"]');
+                }
+                $element.addClass('processing');
+                $element.find('.messages .alert').fadeOut();
+                if ($submit.length) {
+                    $submit.addClass('disabled');
+                    $submit.attr('data-text', $submit.val());
+                    $submit.val(hocwp.i18n.processing_text);
+                }
+            });
+            $ajax_form.on('hocwp:ajax_complete', function (e, response) {
+                var $element = $(this),
+                    $submit = $element.find('input[type="submit"]'),
+                    $alert_message = null,
+                    data_text = '';
+                if (!$submit.length) {
+                    $submit = $element.find('input[name="submit"]');
+                }
+                $element.removeClass('processing');
+                if ($submit.length) {
+                    $submit.val($submit.attr('data-text'));
+                    $submit.removeClass('disabled');
+                }
+                if (response.success) {
+                    $alert_message = $element.find('.messages .alert-success');
+                    if ($alert_message.length && $.trim(response.message)) {
+                        data_text = $alert_message.attr('data-text');
+                        if (!$.trim(data_text)) {
+                            data_text = $alert_message.html();
+                            $alert_message.attr('data-text', data_text);
+                        }
+                        $alert_message.html(response.message);
+                    } else {
+                        $alert_message.html($alert_message.attr('data-text'));
+                    }
+                } else {
+                    $alert_message = $element.find('.messages .alert-danger');
+                    if ($alert_message.length && $.trim(response.message)) {
+                        data_text = $alert_message.attr('data-text');
+                        if (!$.trim(data_text)) {
+                            data_text = $alert_message.html();
+                            $alert_message.attr('data-text', data_text);
+                        }
+                        $alert_message.html(response.message);
+                    } else {
+                        $alert_message.html($alert_message.attr('data-text'));
+                    }
+                }
+                if ($alert_message.length) {
+                    $alert_message.fadeIn();
+                }
+            });
+        }
+    })();
 });

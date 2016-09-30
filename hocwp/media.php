@@ -228,3 +228,33 @@ function hocwp_media_mime_type_icon( $icon, $mime ) {
 }
 
 add_filter( 'wp_mime_type_icon', 'hocwp_media_mime_type_icon', 10, 2 );
+
+function hocwp_media_fix_upload_dir( $dir ) {
+	$subdir = hocwp_get_value_by_key( $dir, 'subdir' );
+	if ( ! empty( $subdir ) ) {
+		$month      = substr( $subdir, - 2 );
+		$time       = current_time( 'mysql' );
+		$time_stamp = strtotime( $time );
+		$m          = date( 'm', $time_stamp );
+		if ( $m !== $month ) {
+			$basedir = hocwp_get_value_by_key( $dir, 'basedir' );
+			$baseurl = hocwp_get_value_by_key( $dir, 'baseurl' );
+			if ( ! empty( $basedir ) && ! empty( $baseurl ) ) {
+				$use_folder = (bool) get_option( 'uploads_use_yearmonth_folders' );
+				if ( $use_folder ) {
+					$y      = date( 'Y', $time_stamp );
+					$subdir = "/$y/$m";
+					$basedir .= $subdir;
+					$baseurl .= $subdir;
+					$dir['subdir'] = $subdir;
+					$dir['path']   = $basedir;
+					$dir['url']    = $baseurl;
+				}
+			}
+		}
+	}
+
+	return $dir;
+}
+
+add_filter( 'upload_dir', 'hocwp_media_fix_upload_dir', 10 );

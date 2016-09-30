@@ -650,10 +650,36 @@ function hocwp_generate_slider_sortable_item_ajax_callback() {
 	$item_html .= '<input type="url" placeholder="' . __( 'Link for this item', 'hocwp-theme' ) . '" value="" class="item-link" name="slider_items[items][' . $max_item_id . '][link]">';
 	$item_html .= '<textarea class="item-description" name="slider_items[items][' . $max_item_id . '][description]"></textarea>';
 	$item_html .= '</div>';
+	ob_start();
+	?>
+	<div class="clear"></div>
+	<div class="advance">
+		<div class="dashicons dashicons-editor-expand"></div>
+		<div class="box-content">
+			<div class="settings">
+				<div class="col-left col50 hocwp-col">
+					<?php
+					$field_args = array(
+						'name'  => 'slider_items[items][' . $max_item_id . '][background_color]',
+						'label' => __( 'Background Color', 'hocwp-theme' ),
+						'value' => ''
+					);
+					hocwp_field_color_picker( $field_args );
+					?>
+				</div>
+				<div class="col-right col50 hocwp-col">
+
+				</div>
+			</div>
+		</div>
+	</div>
+	<?php
+	$item_html .= ob_get_clean();
 	$item_html .= '<input type="hidden" class="item-image-url" name="slider_items[items][' . $max_item_id . '][image_url]" value="' . $media_url . '">';
 	$item_html .= '<input type="hidden" class="item-image-id" name="slider_items[items][' . $max_item_id . '][image_id]" value="' . $media_id . '">';
-	$item_html .= '<span class="item-icon icon-delete icon-sortable-ui"></span>';
-	$item_html .= '<span class="item-icon icon-drag icon-sortable-ui"></span>';
+	$item_html .= '<span title="' . __( 'Delete this item', 'hocwp-theme' ) . '" class="item-icon icon-delete icon-sortable-ui"></span>';
+	$item_html .= '<span title="' . __( 'Re-order this item', 'hocwp-theme' ) . '" class="item-icon icon-drag icon-sortable-ui"></span>';
+	$item_html .= '<span title="' . __( 'Add child item', 'hocwp-theme' ) . '" class="item-icon icon-add icon-sortable-ui"></span>';
 	$item_html .= '</li>';
 	$result['html_data'] = $item_html;
 	wp_send_json( $result );

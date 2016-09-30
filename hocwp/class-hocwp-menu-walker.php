@@ -15,7 +15,11 @@ class HOCWP_Menu_Walker extends Walker_Nav_Menu {
 		$class_names     = $class_names ? ' class="' . esc_attr( $class_names ) . '"' : '';
 		$id              = apply_filters( 'nav_menu_item_id', 'menu-item-' . $item->ID, $item, $args, $depth );
 		$id              = $id ? ' id="' . esc_attr( $id ) . '"' : '';
-		$output .= $indent . '<li' . $id . $class_names . '>';
+		$output .= $indent . '<li' . $id . $class_names;
+		$atts = apply_filters( 'hocwp_menu_item_attributes', '', $item, $depth, $args );
+		$atts = hocwp_attribute_to_string( $atts );
+		hocwp_add_string_with_space_before( $output, $atts );
+		$output .= '>';
 		$atts           = array();
 		$atts['title']  = ! empty( $item->attr_title ) ? $item->attr_title : '';
 		$atts['target'] = ! empty( $item->target ) ? $item->target : '';
@@ -47,7 +51,22 @@ class HOCWP_Menu_Walker extends Walker_Nav_Menu {
 	}
 
 	public function start_lvl( &$output, $depth = 0, $args = array() ) {
-		$indent = str_repeat( "\t", $depth );
-		$output .= "\n$indent<ul class=\"sub-menu child-menu\">\n";
+		$indent     = str_repeat( "\t", $depth );
+		$menu_class = apply_filters( 'hocwp_submenu_class', '', $depth, $args );
+		hocwp_add_string_with_space_before( $menu_class, 'sub-menu child-menu' );
+		$ul   = '<ul class="' . $menu_class . '"';
+		$atts = apply_filters( 'hocwp_submenu_attributes', '', $depth, $args );
+		$atts = hocwp_attribute_to_string( $atts );
+		hocwp_add_string_with_space_before( $ul, $atts );
+		$ul .= '>';
+		$sub_menu_start = "\n$indent$ul\n";
+		$sub_menu_start = apply_filters( 'hocwp_submenu_start', $sub_menu_start, $depth, $args );
+		$output .= $sub_menu_start;
+	}
+
+	public function end_el( &$output, $item, $depth = 0, $args = array() ) {
+		$html = apply_filters( 'hocwp_menu_end_el_html', '', $item, $depth, $args );
+		hocwp_add_string_with_space_before( $html, "</li>\n" );
+		$output .= $html;
 	}
 }

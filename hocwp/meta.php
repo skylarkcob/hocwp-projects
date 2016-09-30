@@ -207,3 +207,62 @@ function hocwp_meta_box_save_link_featured_image( $link_id ) {
 
 add_action( 'edit_link', 'hocwp_meta_box_save_link_featured_image' );
 add_action( 'add_link', 'hocwp_meta_box_save_link_featured_image' );
+
+function hocwp_term_meta_edit_field( $args = array() ) {
+	$class    = hocwp_get_value_by_key( $args, 'class' );
+	$name     = hocwp_get_value_by_key( $args, 'name' );
+	$id       = hocwp_get_value_by_key( $args, 'id' );
+	$label    = hocwp_get_value_by_key( $args, 'label' );
+	$callback = hocwp_get_value_by_key( $args, 'callback' );
+	if ( ! hocwp_callback_exists( $callback ) ) {
+		$callback = hocwp_get_value_by_key( $args, 'field_callback' );
+	}
+	$field_args = hocwp_get_value_by_key( $args, 'field_args' );
+	$field_args = wp_parse_args( $field_args, $args );
+	hocwp_transmit_id_and_name( $id, $name );
+	$tmp = hocwp_sanitize_html_class( $name );
+	hocwp_add_string_with_space_before( $class, 'form-field term-' . $name . '-wrap hocwp' );
+	?>
+	<tr class="<?php echo $class; ?>">
+		<th scope="row">
+			<label for="<?php echo esc_attr( hocwp_sanitize_id( $id ) ); ?>"><?php echo $label; ?></label>
+		</th>
+		<td>
+			<?php
+			if ( hocwp_callback_exists( $callback ) ) {
+				unset( $field_args['label'] );
+				call_user_func( $callback, $field_args );
+			} else {
+				_e( 'Please set a valid callback for this field', 'hocwp-theme' );
+			}
+			?>
+		</td>
+	</tr>
+	<?php
+}
+
+function hocwp_term_meta_add_field( $args = array() ) {
+	$callback = hocwp_get_value_by_key( $args, 'callback' );
+	if ( ! hocwp_callback_exists( $callback ) ) {
+		$callback = hocwp_get_value_by_key( $args, 'field_callback' );
+	}
+	$field_args = hocwp_get_value_by_key( $args, 'field_args' );
+	$field_args = wp_parse_args( $field_args, $args );
+	$class      = hocwp_get_value_by_key( $args, 'class' );
+	$name       = hocwp_get_value_by_key( $args, 'name' );
+	$id         = hocwp_get_value_by_key( $args, 'id' );
+	hocwp_transmit_id_and_name( $id, $name );
+	$tmp = hocwp_sanitize_html_class( $name );
+	hocwp_add_string_with_space_before( $class, 'form-field term-' . $name . '-wrap hocwp' );
+	?>
+	<div class="<?php echo $class; ?>">
+		<?php
+		if ( hocwp_callback_exists( $callback ) ) {
+			call_user_func( $callback, $field_args );
+		} else {
+			_e( 'Please set a valid callback for this field', 'hocwp-theme' );
+		}
+		?>
+	</div>
+	<?php
+}

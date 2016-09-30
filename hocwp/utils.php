@@ -146,6 +146,22 @@ function hocwp_fetch_feed( $args = array() ) {
 	return $result;
 }
 
+function hocwp_sanitize_bookmark_link_image( $bookmarks ) {
+	if ( ! is_array( $bookmarks ) ) {
+		return $bookmarks;
+	}
+	foreach ( $bookmarks as $bookmark ) {
+		$thumbnail = hocwp_get_link_meta( $bookmark->link_id, 'thumbnail' );
+		$thumbnail = hocwp_sanitize_media_value( $thumbnail );
+		$thumbnail = $thumbnail['url'];
+		if ( ! empty( $thumbnail ) ) {
+			$bookmark->link_image = $thumbnail;
+		}
+	}
+
+	return $bookmarks;
+}
+
 function hocwp_dashboard_widget_script() {
 	?>
 	<script type="text/javascript">
@@ -233,7 +249,7 @@ function hocwp_get_feed_items( $args = array() ) {
 
 function hocwp_show_float_ads() {
 	?>
-	<div class="<?php hocwp_wrap_class('float-ads'); ?>">
+	<div class="<?php hocwp_wrap_class( 'float-ads' ); ?>">
 		<div class="pull-left">
 			<?php hocwp_show_ads( 'float_left' ); ?>
 		</div>
@@ -797,6 +813,9 @@ function hocwp_get_rich_text( $text ) {
 }
 
 function hocwp_widget_title( $args, $instance, $echo = true ) {
+	if ( ! isset( $instance['title'] ) ) {
+		$instance['title'] = '';
+	}
 	$id_base      = hocwp_get_value_by_key( $args, 'id_base' );
 	$title        = apply_filters( 'widget_title', $instance['title'], $instance, $id_base );
 	$before_title = hocwp_get_value_by_key( $args, 'before_title' );

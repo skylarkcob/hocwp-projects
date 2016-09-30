@@ -974,7 +974,29 @@ function hocwp_wc_product_settings_page( $settings ) {
 	);
 	hocwp_wc_add_product_display_catalog_settings( $settings, $item );
 
+	$item = array(
+		'title'   => __( 'Percentage sale flash', 'woocommerce' ),
+		'desc'    => __( 'Display product sale flash as percentage instead of text', 'woocommerce' ),
+		'id'      => 'hocwp_product_percentage_sale_flash',
+		'default' => 'no',
+		'type'    => 'checkbox'
+	);
+	hocwp_wc_add_product_display_catalog_settings( $settings, $item );
+
 	return $settings;
 }
 
 add_filter( 'woocommerce_product_settings', 'hocwp_wc_product_settings_page' );
+
+function hocwp_wc_sale_flash_filter( $html, $post, $product ) {
+	$use = (bool) get_option( 'hocwp_product_percentage_sale_flash' );
+	$use = apply_filters( 'hocwp_wc_product_percentage_sale_flash', $use, $post, $product );
+	if ( $use && hocwp_wc_is_sale( $product->id ) && hocwp_is_positive_number( $product->sale_price ) ) {
+		$html = '<span class="onsale">-' . hocwp_percentage( $product->regular_price, $product->sale_price ) . '%</span>';
+	}
+	$html = apply_filters( 'hocwp_wc_sale_flash', $html, $post, $product );
+
+	return $html;
+}
+
+add_filter( 'woocommerce_sale_flash', 'hocwp_wc_sale_flash_filter', 10, 3 );

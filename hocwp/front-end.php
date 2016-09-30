@@ -281,11 +281,15 @@ function hocwp_the_date() {
 	<?php
 }
 
-function hocwp_the_comment_link() {
-	$post_id = get_the_ID();
-	if ( comments_open( $post_id ) ) {
+function hocwp_the_comment_link( $args = array() ) {
+	$post_id = hocwp_get_value_by_key( $args, 'post_id', get_the_ID() );
+	if ( hocwp_id_number_valid( $post_id ) && comments_open( $post_id ) ) {
 		$comment_count = hocwp_get_post_comment_count( $post_id );
-		$comment_text  = $comment_count . ' Bình luận';
+		$format        = hocwp_get_value_by_key( $args, 'format' );
+		if ( empty( $format ) ) {
+			$format = '%COUNT% Bình luận';
+		}
+		$comment_text = str_replace( '%COUNT%', $comment_count, $format );
 		?>
 		<span class="entry-comments-link">
             <a href="<?php the_permalink(); ?>#comments"><?php echo $comment_text; ?></a>

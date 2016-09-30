@@ -1172,6 +1172,22 @@ function hocwp_add_html_attribute( $tag, $html, $attribute ) {
 	return $html;
 }
 
+function hocwp_attribute_to_string( $atts ) {
+	if ( is_array( $atts ) ) {
+		$temp = array();
+		foreach ( $atts as $key => $value ) {
+			$att    = $key . '="' . $value . '"';
+			$temp[] = $att;
+		}
+		$atts = implode( ' ', $temp );
+	}
+	if ( ! empty( $atts ) ) {
+		$atts = trim( $atts );
+	}
+
+	return $atts;
+}
+
 function hocwp_add_class_to_string( $tag = '', $html, $class ) {
 	$search = 'class="';
 	if ( empty( $tag ) ) {
@@ -1190,8 +1206,24 @@ function hocwp_add_class_to_string( $tag = '', $html, $class ) {
 	return $html;
 }
 
+function hocwp_add_more_class( $class, $add ) {
+	if ( ! is_array( $class ) ) {
+		$class = explode( ' ', $class );
+	}
+	if ( ! hocwp_in_array( $class, $add ) ) {
+		$class[] = $add;
+	}
+	$class = array_map( 'hocwp_sanitize_html_class', $class );
+	$class = implode( ' ', $class );
+
+	return $class;
+}
+
 function hocwp_percentage( $val1, $val2, $precision = 0 ) {
-	$total = $val1 + $val2;
+	$total = $val1;
+	if ( $total < $val2 ) {
+		$total = $val2;
+	}
 	if ( 0 == $total ) {
 		return 0;
 	}

@@ -63,42 +63,6 @@ function hocwp_get_hierarchical_taxonomies( $args = array() ) {
 	return hocwp_get_taxonomies( $args );
 }
 
-function hocwp_term_meta_thumbnail_field( $taxonomies = array() ) {
-	global $pagenow;
-	if ( 'edit-tags.php' == $pagenow || 'term.php' == $pagenow ) {
-		if ( ! hocwp_array_has_value( $taxonomies ) ) {
-			$taxonomies = array( 'category' );
-		}
-		$meta = new HOCWP_Meta( 'term' );
-		$meta->set_taxonomies( $taxonomies );
-		$meta->set_use_media_upload( true );
-		$meta->add_field( array(
-			'id'             => 'thumbnail',
-			'label'          => __( 'Thumbnail', 'hocwp-theme' ),
-			'field_callback' => 'hocwp_field_media_upload'
-		) );
-		$meta->init();
-	}
-}
-
-function hocwp_term_meta_different_name_field( $taxonomies = array() ) {
-	global $pagenow;
-	if ( 'edit-tags.php' == $pagenow || 'term.php' == $pagenow ) {
-		if ( ! hocwp_array_has_value( $taxonomies ) ) {
-			$taxonomies = get_taxonomies( array( 'public' => true ) );
-		}
-		$taxonomies = apply_filters( 'hocwp_term_different_name_field_taxonomies', $taxonomies );
-		hocwp_exclude_special_taxonomies( $taxonomies );
-		if ( ! hocwp_array_has_value( $taxonomies ) ) {
-			$taxonomies = array( 'category' );
-		}
-		$meta = new HOCWP_Meta( 'term' );
-		$meta->set_taxonomies( $taxonomies );
-		$meta->add_field( array( 'id' => 'different_name', 'label' => __( 'Different Name', 'hocwp-theme' ) ) );
-		$meta->init();
-	}
-}
-
 function hocwp_get_term_meta( $key, $term_id ) {
 	return get_term_meta( $term_id, $key, true );
 }
@@ -274,6 +238,26 @@ function hocwp_term_the_thumbnail( $args = array() ) {
 	echo hocwp_term_get_thumbnail_html( $args );
 }
 
+function hocwp_term_get_banner_url( $args = array() ) {
+	if ( hocwp_id_number_valid( $args ) ) {
+		$args = array( 'term_id' => $args );
+	}
+	$term_id = hocwp_get_value_by_key( $args, 'term_id' );
+	$key     = hocwp_get_value_by_key( $args, 'key', 'banner' );
+	$media   = hocwp_get_term_meta( 'banner', $term_id );
+	$media   = hocwp_sanitize_media_value( $media );
+	$url     = $media['url'];
+	if ( 'horizontal_banner' == $key || 'vertical_banner' == $key ) {
+		$banner = hocwp_get_term_meta( $key, $term_id );
+		$banner = hocwp_sanitize_media_value( $banner );
+		if ( ! empty( $banner['url'] ) ) {
+			$url = $banner['url'];
+		}
+	}
+
+	return apply_filters( 'hocwp_term_banner_url', $url, $term_id, $args );
+}
+
 function hocwp_term_get_current() {
 	return get_queried_object();
 }
@@ -347,12 +331,14 @@ function hocwp_term_icon_html( $term_id, $default = '' ) {
 	if ( empty( $icon ) ) {
 		$icon = $default;
 	}
-	if ( hocwp_string_contain( $icon, 'fa' ) ) {
+	if ( hocwp_string_contain( $icon, 'fa' ) || hocwp_string_contain( $icon, '</i>' ) ) {
 		echo $icon;
 	} else {
-		$img = new HOCWP_HTML( 'img' );
-		$img->set_image_src( $icon );
-		$img->output();
+		if ( ! empty( $icon ) ) {
+			$img = new HOCWP_HTML( 'img' );
+			$img->set_image_src( $icon );
+			$img->output();
+		}
 	}
 }
 

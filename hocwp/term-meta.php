@@ -83,11 +83,19 @@ function hocwp_term_meta_icon_field( $taxonomies = array() ) {
 		$meta = new HOCWP_Meta( 'term' );
 		$meta->set_taxonomies( $taxonomies );
 		$meta->set_use_media_upload( true );
-		$meta->add_field( array( 'id'             => 'icon',
-		                         'label'          => __( 'Icon', 'hocwp-theme' ),
-		                         'field_callback' => 'hocwp_field_media_upload'
-		) );
-		$meta->add_field( array( 'id' => 'icon_html', 'label' => __( 'Icon HTML', 'hocwp-theme' ) ) );
+		$meta->add_field(
+			array(
+				'id'             => 'icon',
+				'label'          => __( 'Icon', 'hocwp-theme' ),
+				'field_callback' => 'hocwp_field_media_upload'
+			)
+		);
+		$meta->add_field(
+			array(
+				'id'    => 'icon_html',
+				'label' => __( 'Icon HTML', 'hocwp-theme' )
+			)
+		);
 		$meta->init();
 	}
 }
@@ -105,10 +113,110 @@ function hocwp_term_meta_color_field( $taxonomies = array() ) {
 		$meta = new HOCWP_Meta( 'term' );
 		$meta->set_taxonomies( $taxonomies );
 		$meta->set_use_color_picker( true );
-		$meta->add_field( array( 'id'             => 'color',
-		                         'label'          => __( 'Color', 'hocwp-theme' ),
-		                         'field_callback' => 'hocwp_field_color_picker'
+		$meta->add_field( array(
+			'id'             => 'color',
+			'label'          => __( 'Color', 'hocwp-theme' ),
+			'field_callback' => 'hocwp_field_color_picker'
 		) );
+		$meta->init();
+	}
+}
+
+function hocwp_term_meta_long_description_field( $taxonomies = array() ) {
+	global $pagenow;
+	if ( 'edit-tags.php' == $pagenow || 'term.php' == $pagenow ) {
+		if ( ! hocwp_array_has_value( $taxonomies ) ) {
+			$taxonomies = array( 'category' );
+		}
+		$meta = new HOCWP_Meta( 'term' );
+		$meta->set_taxonomies( $taxonomies );
+		$meta->set_use_media_upload( true );
+		$meta->add_field(
+			array(
+				'id'             => 'long_description',
+				'label'          => __( 'Long description', 'hocwp-theme' ),
+				'field_callback' => 'hocwp_field_editor'
+			)
+		);
+		$meta->init();
+	}
+}
+
+function hocwp_term_meta_thumbnail_field( $taxonomies = array() ) {
+	global $pagenow;
+	if ( 'edit-tags.php' == $pagenow || 'term.php' == $pagenow ) {
+		if ( ! hocwp_array_has_value( $taxonomies ) ) {
+			$taxonomies = array( 'category' );
+		}
+		$meta = new HOCWP_Meta( 'term' );
+		$meta->set_taxonomies( $taxonomies );
+		$meta->set_use_media_upload( true );
+		$meta->add_field(
+			array(
+				'id'             => 'thumbnail',
+				'label'          => __( 'Thumbnail', 'hocwp-theme' ),
+				'field_callback' => 'hocwp_field_media_upload'
+			)
+		);
+		$meta->init();
+	}
+}
+
+function hocwp_term_meta_banner_field( $taxonomies = array(), $rotate = false ) {
+	global $pagenow;
+	if ( 'edit-tags.php' == $pagenow || 'term.php' == $pagenow ) {
+		if ( ! hocwp_array_has_value( $taxonomies ) ) {
+			$taxonomies = array( 'category' );
+		}
+		$meta = new HOCWP_Meta( 'term' );
+		$meta->set_taxonomies( $taxonomies );
+		$meta->set_use_media_upload( true );
+		$meta->add_field(
+			array(
+				'id'             => 'banner',
+				'label'          => __( 'Banner', 'hocwp-theme' ),
+				'field_callback' => 'hocwp_field_media_upload'
+			)
+		);
+		if ( $rotate ) {
+			$meta->add_field(
+				array(
+					'id'             => 'horizontal_banner',
+					'label'          => __( 'Horizontal Banner', 'hocwp-theme' ),
+					'field_callback' => 'hocwp_field_media_upload'
+				)
+			);
+			$meta->add_field(
+				array(
+					'id'             => 'vertical_banner',
+					'label'          => __( 'Vertical Banner', 'hocwp-theme' ),
+					'field_callback' => 'hocwp_field_media_upload'
+				)
+			);
+		}
+		$meta->init();
+	}
+}
+
+function hocwp_term_meta_different_name_field( $taxonomies = array() ) {
+	global $pagenow;
+	if ( 'edit-tags.php' == $pagenow || 'term.php' == $pagenow ) {
+		if ( ! hocwp_array_has_value( $taxonomies ) ) {
+			$taxonomies = get_taxonomies( array( 'public' => true ) );
+		}
+		$taxonomies = apply_filters( 'hocwp_term_different_name_field_taxonomies', $taxonomies );
+		hocwp_exclude_special_taxonomies( $taxonomies );
+		if ( ! hocwp_array_has_value( $taxonomies ) ) {
+			$taxonomies = array( 'category' );
+		}
+		$meta = new HOCWP_Meta( 'term' );
+		$meta->set_taxonomies( $taxonomies );
+		$meta->add_field(
+			array(
+				'id'    => 'different_name',
+				'label' => __( 'Different Name', 'hocwp-theme' )
+			)
+		);
 		$meta->init();
 	}
 }

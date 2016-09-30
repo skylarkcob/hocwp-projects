@@ -42,7 +42,9 @@ class HOCWP_Widget_Term extends WP_Widget {
 			'in_current_post'  => 0,
 			'hide_empty'       => 0,
 			'only_parent'      => 0,
-			'child_of_current' => 0
+			'child_of_current' => 0,
+			'child_of_parent'  => 0,
+			'parent_as_title'  => 0
 		);
 		$defaults = apply_filters( 'hocwp_widget_term_defaults', $defaults, $this );
 		$args     = apply_filters( 'hocwp_widget_term_args', array(), $this );
@@ -142,6 +144,8 @@ class HOCWP_Widget_Term extends WP_Widget {
 		$hide_empty       = hocwp_get_value_by_key( $instance, 'hide_empty', hocwp_get_value_by_key( $this->args, 'hide_empty' ) );
 		$only_parent      = hocwp_get_value_by_key( $instance, 'only_parent', hocwp_get_value_by_key( $this->args, 'only_parent' ) );
 		$child_of_current = hocwp_get_value_by_key( $instance, 'child_of_current', hocwp_get_value_by_key( $this->args, 'child_of_current' ) );
+		$child_of_parent  = hocwp_get_value_by_key( $instance, 'child_of_parent', hocwp_get_value_by_key( $this->args, 'child_of_parent' ) );
+		$parent_as_title  = hocwp_get_value_by_key( $instance, 'parent_as_title', hocwp_get_value_by_key( $this->args, 'parent_as_title' ) );
 
 		if ( $hide_thumbnail ) {
 			$only_thumbnail = false;
@@ -162,12 +166,19 @@ class HOCWP_Widget_Term extends WP_Widget {
 		}
 		if ( $in_current_post && is_singular() ) {
 			$terms = wp_get_post_terms( get_the_ID(), $taxonomies );
-		} elseif ( $child_of_current && is_tax() ) {
+		} elseif ( ( $child_of_current || $child_of_parent ) && is_tax() ) {
 			$current_term = hocwp_term_get_current();
 			$tax_args     = array( 'child_of' => $current_term->term_id );
 			$tax_args     = wp_parse_args( $tax_args, $defaults );
 			unset( $tax_args['parent'] );
 			$terms = hocwp_get_terms( $current_term->taxonomy, $tax_args );
+			if ( $child_of_parent ) {
+				if ( ! hocwp_array_has_value( $terms ) && hocwp_id_number_valid( $current_term->parent ) ) {
+					$parent               = hocwp_term_get_top_most_parent( $current_term );
+					$tax_args['child_of'] = $parent->term_id;
+					$terms                = hocwp_get_terms( $parent->taxonomy, $tax_args );
+				}
+			}
 		} else {
 			$terms = hocwp_get_terms( $taxonomies, $defaults );
 		}
@@ -175,7 +186,15 @@ class HOCWP_Widget_Term extends WP_Widget {
 		if ( ( $in_current_post || $child_of_current ) && ! hocwp_array_has_value( $terms ) ) {
 			return;
 		}
-
+		if ( $parent_as_title && is_tax() ) {
+			$current_term = hocwp_term_get_current();
+			if ( hocwp_id_number_valid( $current_term->parent ) ) {
+				$parent            = hocwp_term_get_top_most_parent( $current_term );
+				$instance['title'] = $parent->name;
+			} elseif ( $child_of_current ) {
+				$instance['title'] = $current_term->name;
+			}
+		}
 		hocwp_widget_before( $args, $instance );
 		ob_start();
 		if ( hocwp_array_has_value( $terms ) ) {
@@ -251,6 +270,8 @@ class HOCWP_Widget_Term extends WP_Widget {
 		$hide_empty       = hocwp_get_value_by_key( $instance, 'hide_empty', hocwp_get_value_by_key( $this->args, 'hide_empty' ) );
 		$only_parent      = hocwp_get_value_by_key( $instance, 'only_parent', hocwp_get_value_by_key( $this->args, 'only_parent' ) );
 		$child_of_current = hocwp_get_value_by_key( $instance, 'child_of_current', hocwp_get_value_by_key( $this->args, 'child_of_current' ) );
+		$child_of_parent  = hocwp_get_value_by_key( $instance, 'child_of_parent', hocwp_get_value_by_key( $this->args, 'child_of_parent' ) );
+		$parent_as_title  = hocwp_get_value_by_key( $instance, 'parent_as_title', hocwp_get_value_by_key( $this->args, 'parent_as_title' ) );
 
 		hocwp_field_widget_before( $this->admin_args['class'] );
 
@@ -435,6 +456,22 @@ class HOCWP_Widget_Term extends WP_Widget {
 		hocwp_widget_field( 'hocwp_field_input_checkbox', $args );
 
 		$args = array(
+			'id'    => $this->get_field_id( 'child_of_parent' ),
+			'name'  => $this->get_field_name( 'child_of_parent' ),
+			'value' => $child_of_parent,
+			'label' => __( 'Get all childs of parent if current term has no child?', 'hocwp-theme' )
+		);
+		hocwp_widget_field( 'hocwp_field_input_checkbox', $args );
+
+		$args = array(
+			'id'    => $this->get_field_id( 'parent_as_title' ),
+			'name'  => $this->get_field_name( 'parent_as_title' ),
+			'value' => $parent_as_title,
+			'label' => __( 'Display parent term as widget title?', 'hocwp-theme' )
+		);
+		hocwp_widget_field( 'hocwp_field_input_checkbox', $args );
+
+		$args = array(
 			'id'    => $this->get_field_id( 'hide_empty' ),
 			'name'  => $this->get_field_name( 'hide_empty' ),
 			'value' => $hide_empty,
@@ -465,6 +502,8 @@ class HOCWP_Widget_Term extends WP_Widget {
 		$instance['hide_empty']       = hocwp_checkbox_post_data_value( $new_instance, 'hide_empty' );
 		$instance['only_parent']      = hocwp_checkbox_post_data_value( $new_instance, 'only_parent' );
 		$instance['child_of_current'] = hocwp_checkbox_post_data_value( $new_instance, 'child_of_current' );
+		$instance['child_of_parent']  = hocwp_checkbox_post_data_value( $new_instance, 'child_of_parent' );
+		$instance['parent_as_title']  = hocwp_checkbox_post_data_value( $new_instance, 'parent_as_title' );
 
 		return $instance;
 	}

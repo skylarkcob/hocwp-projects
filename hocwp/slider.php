@@ -70,7 +70,8 @@ function hocwp_slider_meta_box_field( $post_type, $post ) {
 
 		$all_options  = '<option value="">-- ' . __( 'Choose position', 'hocwp-theme' ) . ' --</option>';
 		$slider_items = hocwp_get_slider_positions();
-		$position     = hocwp_get_post_meta( 'position', $post->ID );
+
+		$position = hocwp_get_post_meta( 'position', $post->ID );
 
 		foreach ( $slider_items as $slider ) {
 			$args = array(
@@ -149,12 +150,37 @@ function hocwp_slider_meta_box_field( $post_type, $post ) {
 						<textarea name="slider_items[items][<?php echo $item_id; ?>][description]"
 						          class="item-description"><?php echo $description; ?></textarea>
 				</div>
+				<div class="clear"></div>
+				<div class="advance">
+					<div class="dashicons dashicons-editor-expand"></div>
+					<div class="box-content">
+						<div class="settings">
+							<div class="col-left col50 hocwp-col">
+								<?php
+								$field_args = array(
+									'name'  => 'slider_items[items][' . $item_id . '][background_color]',
+									'label' => __( 'Background Color', 'hocwp-theme' ),
+									'value' => hocwp_get_value_by_key( $item, 'background_color' )
+								);
+								hocwp_field_color_picker( $field_args );
+								?>
+							</div>
+							<div class="col-right col50 hocwp-col">
+
+							</div>
+						</div>
+					</div>
+				</div>
 				<input type="hidden" class="item-image-url" value="<?php echo $image_url; ?>"
 				       name="slider_items[items][<?php echo $item_id; ?>][image_url]">
 				<input type="hidden" class="item-image-id" value="<?php echo $image_id; ?>"
 				       name="slider_items[items][<?php echo $item_id; ?>][image_id]">
-				<span class="item-icon icon-delete icon-sortable-ui"></span>
-				<span class="item-icon icon-drag icon-sortable-ui"></span>
+				<span title="<?php _e( 'Delete this item', 'hocwp-theme' ); ?>"
+				      class="item-icon icon-delete icon-sortable-ui"></span>
+				<span title="<?php _e( 'Re-order this item', 'hocwp-theme' ); ?>"
+				      class="item-icon icon-drag icon-sortable-ui"></span>
+				<span title="<?php _e( 'Add child item', 'hocwp-theme' ); ?>"
+				      class="item-icon icon-add icon-sortable-ui"></span>
 			</li>
 			<?php
 			$field_html .= ob_get_clean();
@@ -228,10 +254,12 @@ function hocwp_get_slider_item_html( $args = array() ) {
 	$item_html .= '<input type="url" placeholder="' . __( 'Link for this item', 'hocwp-theme' ) . '" value="" class="item-link" name="slider_items[items][' . $max_item_id . '][link]">';
 	$item_html .= '<textarea class="item-description" name="slider_items[items][' . $max_item_id . '][description]"></textarea>';
 	$item_html .= '</div>';
+
 	$item_html .= '<input type="hidden" class="item-image-url" name="slider_items[items][' . $max_item_id . '][image_url]" value="' . $media_url . '">';
 	$item_html .= '<input type="hidden" class="item-image-id" name="slider_items[items][' . $max_item_id . '][image_id]" value="' . $media_id . '">';
 	$item_html .= '<span class="item-icon icon-delete icon-sortable-ui"></span>';
 	$item_html .= '<span class="item-icon icon-drag icon-sortable-ui"></span>';
+	$item_html .= '<span class="item-icon icon-add icon-sortable-ui"></span>';
 	$item_html .= '</li>';
 
 	return $item_html;
@@ -261,7 +289,15 @@ function hocwp_slider_html( $args = array() ) {
 			$order        = explode( ',', $order );
 			$items        = hocwp_get_value_by_key( $items, 'items' );
 			$slider_class = 'hocwp-slider';
+			$thumbs       = (bool) hocwp_get_value_by_key( $args, 'thumbs', false );
+			if ( $thumbs ) {
+				hocwp_add_string_with_space_before( $slider_class, 'thumbs-paging' );
+			}
 			hocwp_add_string_with_space_before( $slider_class, hocwp_sanitize_html_class( $position ) );
+			$custom_arrow = hocwp_get_value_by_key( $args, 'custom_arrow' );
+			if ( $custom_arrow ) {
+				$slider_class = hocwp_add_more_class( $slider_class, 'custom-arrow' );
+			}
 			echo '<div class="' . $slider_class . '">';
 			echo '<ul class="list-unstyled list-items slickslide list-inline">';
 			$list_paging = '';
@@ -291,11 +327,13 @@ function hocwp_slider_html( $args = array() ) {
 				}
 			}
 			echo '</ul>';
-			echo '<div class="thumbs-paging slick-thumbs">';
-			echo '<ul class="list-unstyled list-paging">';
-			echo $list_paging;
-			echo '</ul>';
-			echo '</div>';
+			if ( $thumbs ) {
+				echo '<div class="thumbs-paging slick-thumbs">';
+				echo '<ul class="list-unstyled list-paging">';
+				echo $list_paging;
+				echo '</ul>';
+				echo '</div>';
+			}
 			echo '</div>';
 		}
 	}

@@ -444,8 +444,8 @@ function hocwp_get_page_by_template( $template_name ) {
 	return hocwp_get_pages_by_template( $template_name, array( 'output' => 'object' ) );
 }
 
-function hocwp_article_before( $post_class = '' ) {
-	$article = '<article ';
+function hocwp_article_before( $post_class = '', $tag = 'article' ) {
+	$article = '<' . $tag . ' ';
 	ob_start();
 	post_class( $post_class );
 	$article .= ob_get_clean();
@@ -460,8 +460,8 @@ function hocwp_article_before( $post_class = '' ) {
 	echo $article;
 }
 
-function hocwp_article_after() {
-	echo '</article><!-- #post-## -->';
+function hocwp_article_after( $tag = 'article' ) {
+	echo '</' . $tag . '>';
 }
 
 function hocwp_post_title_link( $args = array() ) {
@@ -472,6 +472,22 @@ function hocwp_post_title_link( $args = array() ) {
 	} else {
 		$title = sprintf( '<h2 class="entry-title post-title" itemprop="headline"><a href="%s" rel="bookmark">', esc_url( $permalink ) ) . $title . '</a></h2>';
 		echo $title;
+	}
+}
+
+function hocwp_post_link_only( WP_Post $post, $list = false ) {
+	if ( hocwp_is_post( $post ) ) {
+		$a = new HOCWP_HTML( 'a' );
+		$a->set_href( get_permalink( $post ) );
+		$a->set_text( $post->post_title );
+		if ( $list ) {
+			$li = new HOCWP_HTML( 'li' );
+			$li->set_class( get_post_class( '', $post->ID ) );
+			$li->set_text( $a );
+			$li->output();
+		} else {
+			$a->output();
+		}
 	}
 }
 

@@ -171,6 +171,28 @@ function hocwp_query_sanitize_meta_query( $item, &$args ) {
 	return $args;
 }
 
+function hocwp_query_post_by_binary_meta( $meta_key, $args = array() ) {
+	$defaults = array(
+		'meta_query' => array(
+			array(
+				'relation' => 'AND',
+				array(
+					'key'     => $meta_key,
+					'compare' => 'EXISTS'
+				),
+				array(
+					'key'   => $meta_key,
+					'value' => 1,
+					'type'  => 'NUMERIC'
+				),
+			)
+		)
+	);
+	$args     = wp_parse_args( $args, $defaults );
+
+	return hocwp_query( $args );
+}
+
 function hocwp_query_post_by_format( $format, $args = array() ) {
 	$meta_item = array(
 		'key'   => 'post_format',

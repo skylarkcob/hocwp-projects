@@ -429,11 +429,13 @@ class HOCWP_Meta {
 						$class = 'term-' . $name . '-wrap';
 						$class = hocwp_sanitize_file_name( $class );
 						hocwp_add_string_with_space_before( $class, 'form-field hocwp' );
-						?>
-						<div class="<?php echo $class; ?>">
-							<?php call_user_func( $callback, $field_args ); ?>
-						</div>
-						<?php
+						$data = array(
+							'id'       => $id,
+							'name'     => $name,
+							'class'    => $class,
+							'callback' => $callback
+						);
+						hocwp_term_meta_add_field( $data );
 					}
 				}
 			}
@@ -465,21 +467,14 @@ class HOCWP_Meta {
 				$class = 'term-' . $name . '-wrap';
 				$class = hocwp_sanitize_file_name( $class );
 				hocwp_add_string_with_space_before( $class, 'form-field hocwp' );
-				?>
-				<tr class="<?php echo $class; ?>">
-					<th scope="row"><label
-							for="<?php echo esc_attr( hocwp_sanitize_id( $id ) ); ?>"><?php echo $label; ?></label></th>
-					<td>
-						<?php
-						if ( hocwp_callback_exists( $callback ) ) {
-							call_user_func( $callback, $field_args );
-						} else {
-							_e( 'Please set a valid callback for this field', 'hocwp-theme' );
-						}
-						?>
-					</td>
-				</tr>
-				<?php
+				$data = array(
+					'id'         => $id,
+					'class'      => $class,
+					'label'      => $label,
+					'field_args' => $field_args,
+					'callback'   => $callback
+				);
+				hocwp_term_meta_edit_field( $data );
 			}
 		}
 	}
@@ -552,7 +547,7 @@ class HOCWP_Meta {
 		if ( 'post-new.php' == $pagenow || 'post.php' == $pagenow || $this->get_use_media_upload() ) {
 			add_filter( 'hocwp_use_admin_style_and_script', '__return_true' );
 		}
-		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ), 2, 2 );
+		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ), 99, 2 );
 		add_action( 'save_post', array( $this, 'save_post' ), 99 );
 	}
 

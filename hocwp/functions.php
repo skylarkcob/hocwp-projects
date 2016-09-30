@@ -457,6 +457,14 @@ function hocwp_tab_content_bootstrap( $args = array() ) {
 				?>
 			</ul>
 		<?php endif; ?>
+		<?php
+		$after_nav_tabs = hocwp_get_value_by_key( $args, 'after_nav_tabs' );
+		if ( ! empty( $after_nav_tabs ) ) {
+			echo '<div class="after-nav-tabs">';
+			hocwp_the_custom_content( $after_nav_tabs );
+			echo '</div>';
+		}
+		?>
 		<div class="tab-content">
 			<?php call_user_func( $callback, $args ); ?>
 		</div>
@@ -852,7 +860,8 @@ function hocwp_get_current_new_post() {
 			'post_status'    => 'auto-draft',
 			'orderby'        => 'date',
 			'order'          => 'desc',
-			'posts_per_page' => 1
+			'posts_per_page' => 1,
+			'cache'          => false
 		);
 		$post_type  = hocwp_get_current_post_type();
 		if ( ! empty( $post_type ) ) {
@@ -872,7 +881,7 @@ function hocwp_register_sidebar( $sidebar_id, $sidebar_name, $sidebar_descriptio
 	$before_widget = apply_filters( 'hocwp_sidebar_' . $sidebar_id . '_before_widget', $before_widget );
 	$after_widget  = apply_filters( 'hocwp_after_widget', '</' . $html_tag . '>' );
 	$after_widget  = apply_filters( 'hocwp_sidebar_' . $sidebar_id . '_after_widget', $after_widget );
-	$before_title  = apply_filters( 'hocwp_widget_before_title', '<h4 class="widget-title">' );
+	$before_title  = apply_filters( 'hocwp_widget_before_title', '<h4 class="widget-title widgettitle">' );
 	$before_title  = apply_filters( 'hocwp_sidebar_' . $sidebar_id . '_widget_before_title', $before_title );
 	$after_title   = apply_filters( 'hocwp_widget_after_title', '</h4>' );
 	$after_title   = apply_filters( 'hocwp_sidebar_' . $sidebar_id . '_widget_after_title', $after_title );
@@ -1397,6 +1406,79 @@ function hocwp_menu_page_exists( $slug ) {
 	return true;
 }
 
+function hocwp_get_menu_items_by_location( $location, $args = array() ) {
+	$result = array();
+	if ( $location && ( $locations = get_nav_menu_locations() ) && isset( $locations[ $location ] ) ) {
+		$menu   = wp_get_nav_menu_object( $locations[ $location ] );
+		$result = wp_get_nav_menu_items( $menu->term_id, $args );
+	}
+
+	return $result;
+}
+
+function hocwp_get_menu_items_by_type( $location, $type, $object, $object_id, $args = array() ) {
+	$items  = hocwp_get_menu_items_by_location( $location, $args );
+	$result = array();
+	if ( hocwp_array_has_value( $items ) ) {
+		foreach ( $items as $item ) {
+			if ( $item->type == $type && $item->object == $object ) {
+				if ( $object_id == $item->object_id ) {
+					$result[] = $item;
+				}
+			}
+		}
+	}
+
+	return $result;
+}
+
+function hocwp_get_menu_items_by_term( $location, $term, $args = array() ) {
+	$result = hocwp_get_menu_items_by_type( $location, 'taxonomy', $term->taxonomy, $term->term_id, $args );
+
+	return $result;
+}
+
+function hocwp_get_child_menu_items( $location, $parent, $args = array() ) {
+	$result = array();
+	if ( is_nav_menu_item( $parent ) ) {
+		$items = hocwp_get_menu_items_by_location( $location, $args );
+		if ( hocwp_array_has_value( $items ) ) {
+			foreach ( $items as $item ) {
+				if ( $item->menu_item_parent == $parent->ID ) {
+					$result[] = $item;
+				}
+			}
+		}
+	}
+
+	return $result;
+}
+
+function hocwp_get_parent_menu_item( $menu_item ) {
+	$result = null;
+	if ( hocwp_is_post( $menu_item ) && is_nav_menu_item( $menu_item->ID ) ) {
+		if ( $menu_item->menu_item_parent && hocwp_id_number_valid( $menu_item->menu_item_parent ) ) {
+			$parent = get_post( $menu_item->menu_item_parent );
+			if ( is_nav_menu_item( $parent ) ) {
+				$result = wp_setup_nav_menu_item( $parent );
+			}
+		}
+	}
+
+	return $result;
+}
+
+function hocwp_get_top_parent_menu_item( $menu_item ) {
+	$item = hocwp_get_parent_menu_item( $menu_item );
+	if ( is_nav_menu_item( $item ) ) {
+		while ( $item->menu_item_parent && hocwp_id_number_valid( $item->menu_item_parent ) ) {
+			$item = hocwp_get_parent_menu_item( $item );
+		}
+	}
+
+	return $item;
+}
+
 function hocwp_get_current_admin_page() {
 	return isset( $_REQUEST['page'] ) ? $_REQUEST['page'] : '';
 }
@@ -1815,7 +1897,8 @@ function hocwp_default_script_localize_object() {
 			'insert_media_button_texts'  => __( 'Use these medias', 'hocwp-theme' ),
 			'confirm_message'            => __( 'Are you sure?', 'hocwp-theme' ),
 			'disconnect_confirm_message' => __( 'Are you sure you want to disconnect?', 'hocwp-theme' ),
-			'delete_confirm_message'     => __( 'Are you sure you want to delete this?', 'hocwp-theme' )
+			'delete_confirm_message'     => __( 'Are you sure you want to delete this?', 'hocwp-theme' ),
+			'processing_text'            => __( 'Processing...', 'hocwp-theme' )
 		),
 		'ajax_loading'    => '<p class="ajax-wrap"><img class="ajax-loading" src="' . hocwp_get_image_url( 'icon-loading-circle-light-full.gif' ) . '" alt=""></p>'
 	);

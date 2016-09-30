@@ -91,8 +91,14 @@ jQuery(document).ready(function ($) {
                 if (settings.data.search('action=save-widget') != -1) {
                     if (settings.data.search('hocwp') != -1) {
                         var id_base = hocwp.getParamByName(settings.data, 'id_base'),
-                            $widget = $(this);
+                            $widget = $(this),
+                            using_chosen = false;
                         if ('hocwp_widget_post' == id_base || 'hocwp_widget_top_commenter' == id_base || 'hocwp_widget_term' == id_base) {
+                            using_chosen = true;
+                        } else if ('hocwp_widget_link' == id_base) {
+                            using_chosen = true;
+                        }
+                        if (using_chosen) {
                             $widget.find('.hocwp-widget .chosen-container').hide();
                             $widget.find('.hocwp-widget .chooseable').hocwpChosenSelect();
                             $widget.find('.hocwp-widget .chosen-container').show();
@@ -115,6 +121,7 @@ jQuery(document).ready(function ($) {
             $add_slider_button.hocwpMediaUpload({
                 hideAddButton: false
             });
+            $('.hocwp-meta-box .list-slider-items img.item-image').hocwpMediaUpload();
             $body.on('hocwp_media:selected', function (e, media_data, $button) {
                 e.preventDefault();
                 $button = $($button) || $(this);
@@ -164,6 +171,7 @@ jQuery(document).ready(function ($) {
                                     }
                                     $button.removeClass('disabled');
                                     $list_slider_items.find('.item-image').hocwpMediaUpload();
+                                    $list_slider_items.find('.hocwp-color-picker').wpColorPicker();
                                 }
                             });
                         }
@@ -220,6 +228,20 @@ jQuery(document).ready(function ($) {
                         }
                     });
                 }
+            });
+
+            $('.hocwp-meta-box .list-slider-items').on('click', '.advance .dashicons', function (e) {
+                e.preventDefault();
+                var $element = $(this),
+                    $advance = $element.parent(),
+                    $box_content = $element.next();
+                $advance.toggleClass('active');
+                if ($advance.hasClass('active')) {
+                    $box_content.slideDown();
+                } else {
+                    $box_content.slideUp();
+                }
+                $element.toggleClass('dashicons-editor-contract dashicons-editor-expand');
             });
         }
     })();
