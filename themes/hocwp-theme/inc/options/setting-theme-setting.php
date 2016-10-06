@@ -22,14 +22,14 @@ function hocwp_option_theme_setting() {
 global $hocwp_tos_tabs;
 $parent_slug = 'hocwp_theme_option';
 
-$option = new HOCWP_Option(__('General', 'hocwp'), 'hocwp_theme_setting');
+$option = new HOCWP_Option(__('General', 'hocwp-theme'), 'hocwp_theme_setting');
 $option->set_parent_slug($parent_slug);
 $option->set_use_style_and_script(true);
 $option->set_use_media_upload(true);
 
-$option->add_field(array('id' => 'language', 'title' => __('Language', 'hocwp'), 'field_callback' => 'hocwp_field_select_language'));
-$option->add_field(array('id' => 'favicon', 'title' => __('Favicon', 'hocwp'), 'field_callback' => 'hocwp_field_media_upload'));
-$option->add_field(array('id' => 'logo', 'title' => __('Logo', 'hocwp'), 'field_callback' => 'hocwp_field_media_upload'));
+$option->add_field(array('id' => 'language', 'title' => __('Language', 'hocwp-theme'), 'field_callback' => 'hocwp_field_select_language'));
+$option->add_field(array('id' => 'favicon', 'title' => __('Favicon', 'hocwp-theme'), 'field_callback' => 'hocwp_field_media_upload'));
+$option->add_field(array('id' => 'logo', 'title' => __('Logo', 'hocwp-theme'), 'field_callback' => 'hocwp_field_media_upload'));
 
 $option->add_option_tab($hocwp_tos_tabs);
 $option->set_page_header_callback('hocwp_theme_option_form_before');

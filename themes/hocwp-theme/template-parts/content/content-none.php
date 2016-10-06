@@ -1,2 +1,2 @@
 <?php
-get_template_part('inc/views/content', 'none');
+get_template_part( 'inc/views/content', 'none' );

@@ -1,2 +1,4 @@
 <?php
-if(!function_exists('add_filter')) exit;
+if ( ! function_exists( 'add_filter' ) ) {
+	exit;
+}

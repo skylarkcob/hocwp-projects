@@ -2,10 +2,12 @@
 /*
  * Template Name: Login
  */
-if(!function_exists('add_filter')) exit;
+if ( ! function_exists( 'add_filter' ) ) {
+	exit;
+}
 get_header();
-while(have_posts()) {
+while ( have_posts() ) {
 	the_post();
-	hocwp_theme_get_template_page('login');
+	hocwp_theme_get_template_page( 'login' );
 }
 get_footer();

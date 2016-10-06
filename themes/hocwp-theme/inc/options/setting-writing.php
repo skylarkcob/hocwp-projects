@@ -3,9 +3,10 @@ if(!function_exists('add_filter')) exit;
 
 global $hocwp_tos_tabs;
 
-$option = new HOCWP_Option(__('Writing', 'hocwp'), 'hocwp_writing');
+$option = new HOCWP_Option(__('Writing', 'hocwp-theme'), 'hocwp_writing');
 $option->set_parent_slug('hocwp_theme_option');
-$option->add_field(array('id' => 'default_post_thumbnail', 'title' => __('Default post thumbnail', 'hocwp'), 'field_callback' => 'hocwp_field_media_upload'));
+$option->set_use_media_upload(true);
+$option->add_field(array('id' => 'default_post_thumbnail', 'title' => __('Default post thumbnail', 'hocwp-theme'), 'field_callback' => 'hocwp_field_media_upload'));
 
 $option->add_option_tab($hocwp_tos_tabs);
 $option->set_page_header_callback('hocwp_theme_option_form_before');

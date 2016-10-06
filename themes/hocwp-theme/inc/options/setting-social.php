@@ -4,29 +4,29 @@ if(!function_exists('add_filter')) exit;
 global $hocwp_tos_tabs;
 $parent_slug = 'hocwp_theme_option';
 
-$option = new HOCWP_Option(__('Socials', 'hocwp'), 'hocwp_option_social');
+$option = new HOCWP_Option(__('Socials', 'hocwp-theme'), 'hocwp_option_social');
 $option->set_parent_slug($parent_slug);
 $option->set_use_style_and_script(true);
-$option->add_section(array('id' => 'account', 'title' => __('Account', 'hocwp'), 'description' => __('Your social accounts to config API on website.', 'hocwp')));
-$option->add_section(array('id' => 'facebook', 'title' => __('Facebook', 'hocwp'), 'description' => __('All information about Facebook account and Facebook Insights Admins.', 'hocwp')));
-$option->add_section(array('id' => 'google', 'title' => __('Google', 'hocwp'), 'description' => __('All information about Google account and Google console.', 'hocwp')));
-$option->add_field(array('id' => 'facebook_site', 'title' => __('Facebook page URL', 'hocwp'), 'value' => hocwp_get_wpseo_social_value('facebook_site')));
+$option->add_section(array('id' => 'account', 'title' => __('Account', 'hocwp-theme'), 'description' => __('Your social accounts to config API on website.', 'hocwp-theme')));
+$option->add_section(array('id' => 'facebook', 'title' => __('Facebook', 'hocwp-theme'), 'description' => __('All information about Facebook account and Facebook Insights Admins.', 'hocwp-theme')));
+$option->add_section(array('id' => 'google', 'title' => __('Google', 'hocwp-theme'), 'description' => __('All information about Google account and Google console.', 'hocwp-theme')));
+$option->add_field(array('id' => 'facebook_site', 'title' => __('Facebook page URL', 'hocwp-theme'), 'value' => hocwp_get_wpseo_social_value('facebook_site')));
 $twitter_account = hocwp_get_wpseo_social_value('twitter_site');
 if(!empty($twitter_account) && !hocwp_url_valid($twitter_account)) {
 	$twitter_account = 'http://twitter.com/' . $twitter_account;
 }
-$option->add_field(array('id' => 'twitter_site', 'title' => __('Twitter URL', 'hocwp'), 'value' => $twitter_account));
-$option->add_field(array('id' => 'instagram_url', 'title' => __('Instagram URL', 'hocwp'), 'value' => hocwp_get_wpseo_social_value('instagram_url')));
-$option->add_field(array('id' => 'linkedin_url', 'title' => __('LinkedIn URL', 'hocwp'), 'value' => hocwp_get_wpseo_social_value('linkedin_url')));
-$option->add_field(array('id' => 'myspace_url', 'title' => __('Myspace URL', 'hocwp'), 'value' => hocwp_get_wpseo_social_value('myspace_url')));
-$option->add_field(array('id' => 'pinterest_url', 'title' => __('Pinterest URL', 'hocwp'), 'value' => hocwp_get_wpseo_social_value('pinterest_url')));
-$option->add_field(array('id' => 'youtube_url', 'title' => __('YouTube URL', 'hocwp'), 'value' => hocwp_get_wpseo_social_value('youtube_url')));
-$option->add_field(array('id' => 'google_plus_url', 'title' => __('Google+ URL', 'hocwp'), 'value' => hocwp_get_wpseo_social_value('google_plus_url')));
-$option->add_field(array('id' => 'rss_url', 'title' => __('RSS URL', 'hocwp')));
-$option->add_field(array('id' => 'addthis_id', 'title' => __('AddThis ID', 'hocwp'), 'section' => 'account'));
-$option->add_field(array('id' => 'fbadminapp', 'title' => __('Facebook App ID', 'hocwp'), 'section' => 'facebook', 'value' => hocwp_get_wpseo_social_value('fbadminapp')));
-$option->add_field(array('id' => 'google_api_key', 'title' => __('Google API Key', 'hocwp'), 'section' => 'google'));
-$option->add_field(array('id' => 'google_client_id', 'title' => __('Google Client ID', 'hocwp'), 'section' => 'google'));
+$option->add_field(array('id' => 'twitter_site', 'title' => __('Twitter URL', 'hocwp-theme'), 'value' => $twitter_account));
+$option->add_field(array('id' => 'instagram_url', 'title' => __('Instagram URL', 'hocwp-theme'), 'value' => hocwp_get_wpseo_social_value('instagram_url')));
+$option->add_field(array('id' => 'linkedin_url', 'title' => __('LinkedIn URL', 'hocwp-theme'), 'value' => hocwp_get_wpseo_social_value('linkedin_url')));
+$option->add_field(array('id' => 'myspace_url', 'title' => __('Myspace URL', 'hocwp-theme'), 'value' => hocwp_get_wpseo_social_value('myspace_url')));
+$option->add_field(array('id' => 'pinterest_url', 'title' => __('Pinterest URL', 'hocwp-theme'), 'value' => hocwp_get_wpseo_social_value('pinterest_url')));
+$option->add_field(array('id' => 'youtube_url', 'title' => __('YouTube URL', 'hocwp-theme'), 'value' => hocwp_get_wpseo_social_value('youtube_url')));
+$option->add_field(array('id' => 'google_plus_url', 'title' => __('Google+ URL', 'hocwp-theme'), 'value' => hocwp_get_wpseo_social_value('google_plus_url')));
+$option->add_field(array('id' => 'rss_url', 'title' => __('RSS URL', 'hocwp-theme')));
+$option->add_field(array('id' => 'addthis_id', 'title' => __('AddThis ID', 'hocwp-theme'), 'section' => 'account'));
+$option->add_field(array('id' => 'fbadminapp', 'title' => __('Facebook App ID', 'hocwp-theme'), 'section' => 'facebook', 'value' => hocwp_get_wpseo_social_value('fbadminapp')));
+$option->add_field(array('id' => 'google_api_key', 'title' => __('Google API Key', 'hocwp-theme'), 'section' => 'google'));
+$option->add_field(array('id' => 'google_client_id', 'title' => __('Google Client ID', 'hocwp-theme'), 'section' => 'google'));
 
 $option->add_option_tab($hocwp_tos_tabs);
 $option->set_page_header_callback('hocwp_theme_option_form_before');

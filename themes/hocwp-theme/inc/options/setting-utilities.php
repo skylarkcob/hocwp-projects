@@ -30,13 +30,13 @@ $auto_update = hocwp_get_value_by_key($args, 'auto_update');
 global $hocwp_tos_tabs;
 $parent_slug = 'hocwp_theme_option';
 
-$option = new HOCWP_Option(__('Utilities', 'hocwp'), 'hocwp_utilities');
+$option = new HOCWP_Option(__('Utilities', 'hocwp-theme'), 'hocwp_utilities');
 $option->set_parent_slug($parent_slug);
 
-$option->add_field(array('id' => 'link_manager', 'title' => __('Link Manager', 'hocwp'), 'label' => __('Enable link manager on your site.', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox'));
-$option->add_field(array('id' => 'dashboard_widget', 'title' => __('Dashboard Widgets', 'hocwp'), 'default' => 1, 'value' => $dashboard_widget, 'label' => __('Display custom widget on Dashboard for Services News.', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox'));
-//$option->add_field(array('id' => 'force_admin_english', 'title' => __('Force Admin English', 'hocwp'), 'default' => 1, 'value' => $force_admin_english, 'label' => __('Force to use English language for backend.', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox'));
-$option->add_field(array('id' => 'auto_update', 'title' => __('Auto Update', 'hocwp'), 'value' => $auto_update, 'label' => __('Update WordPress theme, plugin, core and translation automatically.', 'hocwp'), 'field_callback' => 'hocwp_field_input_checkbox'));
+$option->add_field(array('id' => 'link_manager', 'title' => __('Link Manager', 'hocwp-theme'), 'label' => __('Enable link manager on your site.', 'hocwp-theme'), 'field_callback' => 'hocwp_field_input_checkbox'));
+$option->add_field(array('id' => 'dashboard_widget', 'title' => __('Dashboard Widgets', 'hocwp-theme'), 'default' => 1, 'value' => $dashboard_widget, 'label' => __('Display custom widget on Dashboard for Services News.', 'hocwp-theme'), 'field_callback' => 'hocwp_field_input_checkbox'));
+//$option->add_field(array('id' => 'force_admin_english', 'title' => __('Force Admin English', 'hocwp-theme'), 'default' => 1, 'value' => $force_admin_english, 'label' => __('Force to use English language for backend.', 'hocwp-theme'), 'field_callback' => 'hocwp_field_input_checkbox'));
+$option->add_field(array('id' => 'auto_update', 'title' => __('Auto Update', 'hocwp-theme'), 'value' => $auto_update, 'label' => __('Update WordPress theme, plugin, core and translation automatically.', 'hocwp-theme'), 'field_callback' => 'hocwp_field_input_checkbox'));
 
 $option->add_option_tab($hocwp_tos_tabs);
 $option->set_page_header_callback('hocwp_theme_option_form_before');

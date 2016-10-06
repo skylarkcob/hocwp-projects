@@ -3,11 +3,18 @@ if(!function_exists('add_filter')) exit;
 
 global $hocwp_theme_option, $hocwp_tos_tabs;
 
-$hocwp_theme_option = new HOCWP_Option(__('Theme Options', 'hocwp'), 'hocwp_theme_option');
+$hocwp_theme_option = new HOCWP_Option(__('Theme Options', 'hocwp-theme'), 'hocwp_theme_option');
 $hocwp_theme_option->set_parent_slug('');
 $hocwp_theme_option->set_icon_url('dashicons-admin-generic');
 $hocwp_theme_option->set_position(61);
 $hocwp_theme_option->set_use_style_and_script(true);
+$hocwp_theme_option->init();
+
+$hocwp_theme_option = new HOCWP_Option(__('Private Types', 'hocwp-theme'), 'hocwp_private_types');
+$hocwp_theme_option->set_parent_slug('');
+$hocwp_theme_option->set_icon_url('dashicons-admin-post');
+$hocwp_theme_option->set_position(90);
+$hocwp_theme_option->set_use_style_and_script(false);
 $hocwp_theme_option->init();
 
 require(HOCWP_THEME_INC_PATH . '/options/setting-theme-setting.php');

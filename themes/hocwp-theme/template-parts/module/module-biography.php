@@ -1,2 +1,2 @@
 <?php
-get_template_part('inc/views/biography');
+get_template_part( 'inc/views/biography' );

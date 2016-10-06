@@ -1,6 +1,6 @@
 /*
  * jQuery Superfish Menu Plugin - v1.7.8
- * Copyright (c) 2016 
+ * Copyright (c) 2016 Joel Birch
  *
  * Dual licensed under the MIT and GPL licenses:
  *	http://www.opensource.org/licenses/mit-license.php
@@ -33,12 +33,14 @@
 			unprefixedPointerEvents = (function () {
 				return (!!w.PointerEvent);
 			})(),
-			toggleMenuClasses = function ($menu, o) {
-				var classes = c.menuClass;
+			toggleMenuClasses = function ($menu, o, add) {
+				var classes = c.menuClass,
+					method;
 				if (o.cssArrows) {
 					classes += ' ' + c.menuArrowClass;
 				}
-				$menu.toggleClass(classes);
+				method = (add) ? 'addClass' : 'removeClass';
+				$menu[method](classes);
 			},
 			setPathToCurrent = function ($menu, o) {
 				return $menu.find('li.' + o.pathClass).slice(0, o.pathLevels)
@@ -47,8 +49,9 @@
 							return ($(this).children(o.popUpSelector).hide().show().length);
 						}).removeClass(o.pathClass);
 			},
-			toggleAnchorClass = function ($li) {
-				$li.children('a').toggleClass(c.anchorClass);
+			toggleAnchorClass = function ($li, add) {
+				var method = (add) ? 'addClass' : 'removeClass';
+				$li.children('a')[method](c.anchorClass);
 			},
 			toggleTouchAction = function ($menu) {
 				var msTouchAction = $menu.css('ms-touch-action');
@@ -64,7 +67,7 @@
 				return $el.closest('.' + c.menuClass);
 			},
 			getOptions = function ($el) {
-				return getMenu($el).data('sf-options');
+				return getMenu($el).data('sfOptions');
 			},
 			over = function () {
 				var $this = $(this),
@@ -188,7 +191,7 @@
 			destroy: function () {
 				return this.each(function () {
 					var $this = $(this),
-						o = $this.data('sf-options'),
+						o = $this.data('sfOptions'),
 						$hasPopUp;
 					if (!o) {
 						return false;
@@ -208,23 +211,23 @@
 					o.$path.removeClass(o.hoverClass + ' ' + c.bcClass).addClass(o.pathClass);
 					$this.find('.' + o.hoverClass).removeClass(o.hoverClass);
 					o.onDestroy.call($this);
-					$this.removeData('sf-options');
+					$this.removeData('sfOptions');
 				});
 			},
 			init: function (op) {
 				return this.each(function () {
 					var $this = $(this);
-					if ($this.data('sf-options')) {
+					if ($this.data('sfOptions')) {
 						return false;
 					}
 					var o = $.extend({}, $.fn.superfish.defaults, op),
 						$hasPopUp = $this.find(o.popUpSelector).parent('li');
 					o.$path = setPathToCurrent($this, o);
 
-					$this.data('sf-options', o);
+					$this.data('sfOptions', o);
 
-					toggleMenuClasses($this, o);
-					toggleAnchorClass($hasPopUp);
+					toggleMenuClasses($this, o, true);
+					toggleAnchorClass($hasPopUp, true);
 					toggleTouchAction($this);
 					applyHandlers($this, o);
 

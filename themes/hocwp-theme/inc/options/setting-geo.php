@@ -6,11 +6,11 @@ $parent_slug = 'hocwp_theme_option';
 
 $lat_lng = hocwp_get_default_lat_long();
 
-$option = new HOCWP_Option(__('Geo', 'hocwp'), 'hocwp_geo');
+$option = new HOCWP_Option(__('Geo', 'hocwp-theme'), 'hocwp_geo');
 $option->set_parent_slug($parent_slug);
 
-$option->add_field(array('id' => 'default_lat', 'title' => __('Default Latitude', 'hocwp'), 'default' => $lat_lng['lat']));
-$option->add_field(array('id' => 'default_lng', 'title' => __('Default Longitude', 'hocwp'), 'default' => $lat_lng['lng']));
+$option->add_field(array('id' => 'default_lat', 'title' => __('Default Latitude', 'hocwp-theme'), 'default' => $lat_lng['lat']));
+$option->add_field(array('id' => 'default_lng', 'title' => __('Default Longitude', 'hocwp-theme'), 'default' => $lat_lng['lng']));
 
 $option->add_option_tab($hocwp_tos_tabs);
 $option->set_page_header_callback('hocwp_theme_option_form_before');

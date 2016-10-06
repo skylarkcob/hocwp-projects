@@ -4,10 +4,10 @@ if(!function_exists('add_filter')) exit;
 global $hocwp_tos_tabs;
 $parent_slug = 'hocwp_theme_option';
 
-$option = new HOCWP_Option(__('Recommended Plugins', 'hocwp'), 'hocwp_recommended_plugin');
+$option = new HOCWP_Option(__('Recommended Plugins', 'hocwp-theme'), 'hocwp_recommended_plugin');
 $option->set_parent_slug($parent_slug);
 $option->set_is_option_page(false);
-$option->set_menu_title(__('Plugins', 'hocwp'));
+$option->set_menu_title(__('Plugins', 'hocwp-theme'));
 $option->set_use_style_and_script(true);
 $option->add_option_tab($hocwp_tos_tabs);
 $option->set_page_header_callback('hocwp_theme_option_form_before');
@@ -20,10 +20,10 @@ function hocwp_option_page_recommended_plugin_content() {
     $base_url = 'admin.php?page=hocwp_recommended_plugin';
     $current_tab = isset($_REQUEST['tab']) ? $_REQUEST['tab'] : 'installed';
     $tabs = array(
-        'installed' => __('Installed', 'hocwp'),
-        'activated' => __('Activated', 'hocwp'),
-        'required' => __('Required', 'hocwp'),
-        'recommended' => __('Recommended', 'hocwp')
+        'installed' => __('Installed', 'hocwp-theme'),
+        'activated' => __('Activated', 'hocwp-theme'),
+        'required' => __('Required', 'hocwp-theme'),
+        'recommended' => __('Recommended', 'hocwp-theme')
     );
     $plugins = array();
     switch($current_tab) {

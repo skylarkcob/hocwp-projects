@@ -1,2 +1,2 @@
 <?php
-get_template_part('inc/views/comments');
+get_template_part( 'inc/views/comments' );

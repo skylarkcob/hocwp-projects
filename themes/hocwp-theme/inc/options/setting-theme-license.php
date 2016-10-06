@@ -4,20 +4,20 @@ if(!function_exists('add_filter')) exit;
 global $hocwp_tos_tabs;
 $parent_slug = 'hocwp_theme_option';
 
-$option = new HOCWP_Option(__('Theme license', 'hocwp'), 'hocwp_theme_license');
+$option = new HOCWP_Option(__('Theme license', 'hocwp-theme'), 'hocwp_theme_license');
 $option->set_parent_slug($parent_slug);
-$option->add_field(array('id' => 'customer_email', 'title' => __('Customer email', 'hocwp')));
-$option->add_field(array('id' => 'license_code', 'title' => __('License code', 'hocwp')));
+$option->add_field(array('id' => 'customer_email', 'title' => __('Customer email', 'hocwp-theme')));
+$option->add_field(array('id' => 'license_code', 'title' => __('License code', 'hocwp-theme')));
 $option->add_help_tab(array(
 	'id' => 'overview',
-	'title' => __('Overview', 'hocwp'),
-	'content' => '<p>' . sprintf(__('Thank you for using WordPress theme by %s.', 'hocwp'), HOCWP_NAME) . '</p>' .
-	             '<p>' . __('With each theme, you will receive a license code to activate it. Please enter your theme license information into the form below, if you do not have one, please contact the author to get new code.', 'hocwp') . '</p>'
+	'title' => __('Overview', 'hocwp-theme'),
+	'content' => '<p>' . sprintf(__('Thank you for using WordPress theme by %s.', 'hocwp-theme'), HOCWP_NAME) . '</p>' .
+	             '<p>' . __('With each theme, you will receive a license code to activate it. Please enter your theme license information into the form below, if you do not have one, please contact the author to get new code.', 'hocwp-theme') . '</p>'
 ));
 $option->set_help_sidebar(
-	'<p><strong>' . __('For more information:', 'hocwp') . '</strong></p>' .
-	'<p><a href="http://hocwp.net/quy-dinh-su-dung-ban-quyen-giao-dien/" target="_blank">' . __('Rules of using license', 'hocwp') . '</a></p>' .
-	'<p><a href="http://hocwp.net/lien-he/" target="_blank">' . __('Contact Us', 'hocwp') . '</a></p>'
+	'<p><strong>' . __('For more information:', 'hocwp-theme') . '</strong></p>' .
+	'<p><a href="http://hocwp.net/quy-dinh-su-dung-ban-quyen-giao-dien/" target="_blank">' . __('Rules of using license', 'hocwp-theme') . '</a></p>' .
+	'<p><a href="http://hocwp.net/lien-he/" target="_blank">' . __('Contact Us', 'hocwp-theme') . '</a></p>'
 );
 $option->add_option_tab($hocwp_tos_tabs);
 $option->set_page_header_callback('hocwp_theme_option_form_before');

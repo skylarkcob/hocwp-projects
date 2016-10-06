@@ -4,7 +4,7 @@ if(!function_exists('add_filter')) exit;
 global $hocwp_tos_tabs;
 $parent_slug = 'hocwp_theme_option';
 
-$option = new HOCWP_Option(__('System Information', 'hocwp'), 'hocwp_about');
+$option = new HOCWP_Option(__('System Information', 'hocwp-theme'), 'hocwp_about');
 $option->set_parent_slug($parent_slug);
 $option->set_is_option_page(false);
 $option->set_use_style_and_script(true);
@@ -71,7 +71,7 @@ function hocwp_option_page_about_content() {
                 <?php
                 $content = ob_get_clean();
                 $args = array(
-                    'title' => __('Your Site', 'hocwp'),
+                    'title' => __('Your Site', 'hocwp-theme'),
                     'content' => $content
                 );
                 hocwp_field_admin_postbox($args);
@@ -95,12 +95,20 @@ function hocwp_option_page_about_content() {
                         <td class="label">Installed</td>
                         <td><?php echo count($themes); ?></td>
                     </tr>
+                    <tr>
+                        <td class="label">Core version</td>
+                        <td><?php echo HOCWP_VERSION; ?></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Theme core version</td>
+                        <td><?php echo HOCWP_THEME_CORE_VERSION; ?></td>
+                    </tr>
                     </tbody>
                 </table>
                 <?php
                 $content = ob_get_clean();
                 $args = array(
-                    'title' => __('Theme', 'hocwp'),
+                    'title' => __('Theme', 'hocwp-theme'),
                     'content' => $content
                 );
                 hocwp_field_admin_postbox($args);
@@ -135,7 +143,7 @@ function hocwp_option_page_about_content() {
                         <td><?php echo hocwp_size_converter(hocwp_get_memory_usage()); ?></td>
                     </tr>
                     <tr>
-                        <td class="label">Memory linit</td>
+                        <td class="label">Memory limit</td>
                         <td><?php echo hocwp_get_memory_limit(); ?></td>
                     </tr>
                     <tr>
@@ -149,7 +157,7 @@ function hocwp_option_page_about_content() {
                 <?php
                 $content = ob_get_clean();
                 $args = array(
-                    'title' => __('Server Info', 'hocwp'),
+                    'title' => __('Server Info', 'hocwp-theme'),
                     'content' => $content
                 );
                 hocwp_field_admin_postbox($args);
@@ -174,7 +182,7 @@ function hocwp_option_page_about_content() {
                 <?php
                 $content = ob_get_clean();
                 $args = array(
-                    'title' => __('Client Info', 'hocwp'),
+                    'title' => __('Client Info', 'hocwp-theme'),
                     'content' => $content
                 );
                 hocwp_field_admin_postbox($args);
