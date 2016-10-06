@@ -380,6 +380,7 @@ function hocwp_register_post_type_news( $args = array() ) {
 		$slug = 'tin-tuc';
 	}
 	$slug     = apply_filters( 'hocwp_post_type_news_base_slug', $slug );
+	$slug     = apply_filters( 'hocwp_post_type_news_slug', $slug );
 	$defaults = array(
 		'name'              => __( 'News', 'hocwp-theme' ),
 		'slug'              => $slug,

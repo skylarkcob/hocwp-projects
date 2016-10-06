@@ -394,10 +394,10 @@ class HOCWP_Widget_Subscribe extends WP_Widget {
 		$instance['button_text']         = hocwp_get_value_by_key( $new_instance, 'button_text', hocwp_get_value_by_key( $this->args, 'button_text' ) );
 		$instance['description']         = hocwp_get_value_by_key( $new_instance, 'description', hocwp_get_value_by_key( $this->args, 'description' ) );
 		$instance['desc_position']       = hocwp_get_value_by_key( $new_instance, 'desc_position', $this->args['desc_position'] );
-		$instance['captcha']             = hocwp_checkbox_post_data_value( $new_instance, 'captcha', hocwp_get_value_by_key( $this->args, 'captcha' ) );
+		$instance['captcha']             = hocwp_checkbox_post_data_value( $new_instance, 'captcha' );
 		$instance['captcha_label']       = hocwp_get_value_by_key( $new_instance, 'captcha_label', hocwp_get_value_by_key( $this->args, 'captcha_label' ) );
 		$instance['captcha_placeholder'] = hocwp_get_value_by_key( $new_instance, 'captcha_placeholder', hocwp_get_value_by_key( $this->args, 'captcha_placeholder' ) );
-		$instance['register']            = hocwp_checkbox_post_data_value( $new_instance, 'register', hocwp_get_value_by_key( $this->args, 'register' ) );
+		$instance['register']            = hocwp_checkbox_post_data_value( $new_instance, 'register' );
 
 		return $instance;
 	}

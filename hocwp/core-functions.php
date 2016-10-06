@@ -237,14 +237,23 @@ function hocwp_in_array( $needle, $haystack ) {
 function hocwp_get_first_char( $string, $encoding = 'UTF-8' ) {
 	$result = '';
 	if ( ! empty( $string ) ) {
-		$result = mb_substr( $string, 0, 1, $encoding );
+		if ( function_exists( 'mb_substr' ) ) {
+			$result = mb_substr( $string, 0, 1, $encoding );
+		} else {
+			$result = substr( $string, 0, 1 );
+		}
 	}
 
 	return $result;
 }
 
-function hocwp_remove_first_char( $string, $char ) {
-	$string = ltrim( $string, $char );
+function hocwp_remove_first_char( $string, $char = '' ) {
+	if ( ! empty( $char ) ) {
+		$string = ltrim( $string, $char );
+	} else {
+		$len    = strlen( $string );
+		$string = substr( $string, 1, $len - 1 );
+	}
 
 	return $string;
 }
@@ -252,32 +261,55 @@ function hocwp_remove_first_char( $string, $char ) {
 function hocwp_get_last_char( $string, $encoding = 'UTF-8' ) {
 	$result = '';
 	if ( ! empty( $string ) ) {
-		$result = mb_substr( $string, - 1, 1, $encoding );
+		if ( function_exists( 'mb_substr' ) ) {
+			$result = mb_substr( $string, - 1, 1, $encoding );
+		} else {
+			$result = substr( $string, - 1 );
+		}
 	}
 
 	return $result;
 }
 
-function hocwp_remove_last_char( $string, $char ) {
-	$string = rtrim( $string, $char );
+function hocwp_remove_last_char( $string, $char = '' ) {
+	if ( empty( $char ) ) {
+		$len    = strlen( $string );
+		$string = substr( $string, 0, $len - 1 );
+	} else {
+		$string = rtrim( $string, $char );
+	}
 
 	return $string;
 }
 
-function hocwp_remove_first_char_and_last_char( $string, $char ) {
-	$string = trim( $string, $char );
+function hocwp_remove_first_char_and_last_char( $string, $char = '' ) {
+	if ( empty( $char ) ) {
+		$string = hocwp_remove_first_char( $string );
+		$string = hocwp_remove_last_char( $string );
+	} else {
+		$string = trim( $string, $char );
+	}
 
 	return $string;
 }
 
 function hocwp_uppercase( $string, $encoding = 'utf-8' ) {
-	return mb_strtoupper( $string, $encoding );
+	if ( function_exists( 'mb_strtoupper' ) ) {
+		return mb_strtoupper( $string, $encoding );
+	}
+
+	return strtoupper( $string );
 }
 
 function hocwp_uppercase_first_char( $string, $encoding = 'utf-8' ) {
 	$first_char = hocwp_get_first_char( $string, $encoding );
-	$len        = mb_strlen( $string, $encoding );
-	$then       = mb_substr( $string, 1, $len - 1, $encoding );
+	if ( function_exists( 'mb_strlen' ) ) {
+		$len  = mb_strlen( $string, $encoding );
+		$then = mb_substr( $string, 1, $len - 1, $encoding );
+	} else {
+		$len  = strlen( $string );
+		$then = substr( $string, 1, $len - 1 );
+	}
 	$first_char = hocwp_uppercase( $first_char, $encoding );
 
 	return $first_char . $then;
@@ -298,12 +330,22 @@ function hocwp_uppercase_first_char_only( $string, $encoding = 'utf-8' ) {
 }
 
 function hocwp_lowercase( $string, $encoding = 'utf-8' ) {
-	return mb_strtolower( $string, $encoding );
+	if ( function_exists( 'mb_strtolower' ) ) {
+		return mb_strtolower( $string, $encoding );
+	}
+
+	return strtolower( $string );
 }
 
 function hocwp_string_contain( $string, $needle ) {
-	if ( false !== mb_strpos( $string, $needle, null, 'UTF-8' ) ) {
-		return true;
+	if ( function_exists( 'mb_strpos' ) ) {
+		if ( false !== mb_strpos( $string, $needle, null, 'UTF-8' ) ) {
+			return true;
+		}
+	} else {
+		if ( false !== strpos( $string, $needle ) ) {
+			return true;
+		}
 	}
 
 	return false;
@@ -828,11 +870,17 @@ function hocwp_is_image_url( $url ) {
 }
 
 function hocwp_url_valid( $url ) {
-	if ( hocwp_is_image_url( $url ) || filter_var( $url, FILTER_VALIDATE_URL ) !== false ) {
-		return true;
+	if ( ! empty( $url ) && is_string( $url ) ) {
+		if ( hocwp_is_image_url( $url ) || filter_var( $url, FILTER_VALIDATE_URL ) !== false ) {
+			return true;
+		}
 	}
 
 	return false;
+}
+
+function hocwp_is_url( $url ) {
+	return hocwp_url_valid( $url );
 }
 
 function hocwp_color_valid( $color ) {
@@ -965,15 +1013,24 @@ function hocwp_get_last_part_in_url( $url ) {
 	return substr( parse_url( $url, PHP_URL_PATH ), 1 );
 }
 
-function hocwp_substr( $str, $len, $more = '...', $charset = 'UTF-8' ) {
+function hocwp_substr( $str, $len, $more = '...', $charset = 'UTF-8', $offset = 0 ) {
 	if ( 1 > $len ) {
 		return $str;
 	}
 	$more = esc_html( $more );
 	$str  = html_entity_decode( $str, ENT_QUOTES, $charset );
-	if ( mb_strlen( $str, $charset ) > $len ) {
-		$arr       = explode( ' ', $str );
-		$str       = mb_substr( $str, 0, $len, $charset );
+	if ( function_exists( 'mb_strlen' ) ) {
+		$length = mb_strlen( $str, $charset );
+	} else {
+		$length = strlen( $str );
+	}
+	if ( $length > $len ) {
+		$arr = explode( ' ', $str );
+		if ( function_exists( 'mb_substr' ) ) {
+			$str = mb_substr( $str, $offset, $len, $charset );
+		} else {
+			$str = substr( $str, $offset, $len );
+		}
 		$arr_words = explode( ' ', $str );
 		$index     = count( $arr_words ) - 1;
 		$last      = $arr[ $index ];
@@ -1378,7 +1435,7 @@ function hocwp_temperature_class( $temperature ) {
 }
 
 function hocwp_strtolower( $str, $charset = 'UTF-8' ) {
-	return mb_strtolower( $str, $charset );
+	return hocwp_lowercase( $str, $charset );
 }
 
 function hocwp_is_localhost() {
@@ -1748,4 +1805,59 @@ function hocwp_color_hex_to_rgb( $color, $opacity = false ) {
 	}
 
 	return $output;
+}
+
+function hocwp_facebook_page_plugin( $args = array() ) {
+	$href = hocwp_get_value_by_key( $args, 'href', hocwp_get_value_by_key( $args, 'url' ) );
+	if ( empty( $href ) ) {
+		$page_id = isset( $args['page_id'] ) ? $args['page_id'] : 'hocwpnet';
+		if ( ! empty( $page_id ) ) {
+			$href = 'https://www.facebook.com/' . $page_id;
+		}
+	}
+	if ( ! hocwp_is_url( $href ) ) {
+		$href = 'https://www.facebook.com/' . $href;
+	}
+	if ( empty( $href ) ) {
+		return;
+	}
+	$page_name     = isset( $args['page_name'] ) ? $args['page_name'] : '';
+	$width         = isset( $args['width'] ) ? $args['width'] : 340;
+	$height        = isset( $args['height'] ) ? $args['height'] : 500;
+	$hide_cover    = (bool) ( isset( $args['hide_cover'] ) ? $args['hide_cover'] : false );
+	$hide_cover    = hocwp_bool_to_string( $hide_cover );
+	$show_facepile = (bool) ( isset( $args['show_facepile'] ) ? $args['show_facepile'] : true );
+	$show_facepile = hocwp_bool_to_string( $show_facepile );
+	$show_posts    = (bool) ( isset( $args['show_posts'] ) ? $args['show_posts'] : false );
+	$tabs          = hocwp_get_value_by_key( $args, 'tabs' );
+	if ( ! is_array( $tabs ) ) {
+		$tabs = explode( ',', $tabs );
+	}
+	$tabs = array_map( 'trim', $tabs );
+	if ( $show_posts && ! hocwp_in_array( 'timeline', $tabs ) ) {
+		$tabs[] = 'timeline';
+	}
+	$show_posts            = hocwp_bool_to_string( $show_posts );
+	$hide_cta              = (bool) ( isset( $args['hide_cta'] ) ? $args['hide_cta'] : false );
+	$hide_cta              = hocwp_bool_to_string( $hide_cta );
+	$small_header          = (bool) ( isset( $args['small_header'] ) ? $args['small_header'] : false );
+	$small_header          = hocwp_bool_to_string( $small_header );
+	$adapt_container_width = (bool) ( isset( $args['adapt_container_width'] ) ? $args['adapt_container_width'] : true );
+	$adapt_container_width = hocwp_bool_to_string( $adapt_container_width );
+	?>
+	<div class="fb-page" data-href="<?php echo $href; ?>" data-width="<?php echo $width; ?>"
+	     data-height="<?php echo $height; ?>" data-hide-cta="<?php echo $hide_cta; ?>"
+	     data-small-header="<?php echo $small_header; ?>"
+	     data-adapt-container-width="<?php echo $adapt_container_width; ?>" data-hide-cover="<?php echo $hide_cover; ?>"
+	     data-show-facepile="<?php echo $show_facepile; ?>" data-show-posts="<?php echo $show_posts; ?>"
+	     data-tabs="<?php echo implode( ',', $tabs ) ?>">
+		<div class="fb-xfbml-parse-ignore">
+			<?php if ( ! empty( $page_name ) ) : ?>
+				<blockquote cite="<?php echo $href; ?>">
+					<a href="<?php echo $href; ?>"><?php echo $page_name; ?></a>
+				</blockquote>
+			<?php endif; ?>
+		</div>
+	</div>
+	<?php
 }

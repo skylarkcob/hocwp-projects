@@ -141,7 +141,7 @@ jQuery(document).ready(function ($) {
     };
 
     hocwp.is_function = function (object) {
-        return (typeof object == 'function') || false;
+        return (typeof object !== 'undefined' && typeof object == 'function') || false;
     };
 
     hocwp.autoReloadPageNoActive = function (reload_time, delay_time) {
@@ -615,7 +615,7 @@ jQuery(document).ready(function ($) {
     function MediaUpload(element, options) {
         this.self = this;
         this.$element = $(element);
-        if (!this.$element.length) {
+        if (!this.$element.length || !hocwp.is_function(wp.media)) {
             return this;
         }
         this.element = element;
@@ -798,10 +798,12 @@ jQuery(document).ready(function ($) {
 });
 
 jQuery(document).ready(function ($) {
+    var $body = $('body');
+
     function SortableList(element, options) {
         this.self = this;
         this.$element = $(element);
-        if (!this.$element.length) {
+        if (!this.$element.length || !hocwp.is_function(jQuery().sortable)) {
             return this;
         }
         this.element = element;
@@ -828,7 +830,9 @@ jQuery(document).ready(function ($) {
                     $('body').trigger('hocwp_sortable:sort', [ui, $(this)]);
                 },
                 stop: function (event, ui) {
-                    var $sortable_result = $container.find('.connected-result');
+                    var $sortable_result = $container.find('.connected-result'),
+                        element_height = $element.height(),
+                        sortable_result_height = $sortable_result.height();
                     if ($sortable_result.length) {
                         if ($sortable_result.hasClass('term-sortable')) {
                             hocwp.sortableTermStop($container);
@@ -840,7 +844,13 @@ jQuery(document).ready(function ($) {
                     } else {
                         hocwp.sortableStop($element, $container);
                     }
-                    $('body').trigger('hocwp_sortable:stop', [ui, $(this)]);
+                    if (element_height > sortable_result_height) {
+                        $sortable_result.css({'height': element_height});
+                    } else {
+                        $sortable_result.css({'height': 'auto'});
+                    }
+                    $body.trigger('hocwp_sortable:stop', [ui, $(this)]);
+                    $body.trigger('hocwp:sortable_stop', [ui, $(this)]);
                 }
             };
         if ($sortable_result.length && $sortable_result.hasClass('sortable')) {
@@ -848,6 +858,8 @@ jQuery(document).ready(function ($) {
                 sortable_result_height = $sortable_result.height();
             if (element_height > sortable_result_height) {
                 $sortable_result.css({'height': element_height});
+            } else {
+                $sortable_result.css({'height': 'auto'});
             }
         }
         if ($element.hasClass('connected-list')) {
@@ -855,11 +867,7 @@ jQuery(document).ready(function ($) {
         }
         sortable_options = $.extend({}, sortable_options, this.options);
         if ($.isNumeric(data_disable_selection)) {
-            if (0 == data_disable_selection) {
-                sortable_options.disableSelection = false;
-            } else {
-                sortable_options.disableSelection = true;
-            }
+            sortable_options.disableSelection = (0 != data_disable_selection);
         }
         if (sortable_options.disableSelection) {
             $element.sortable(sortable_options).disableSelection();
@@ -889,6 +897,8 @@ jQuery(document).ready(function ($) {
 });
 
 jQuery(document).ready(function ($) {
+    var $body = $('body');
+
     function MobileMenu(element, options) {
         var $window = $(window),
             $body = $('body'),
@@ -976,7 +986,7 @@ jQuery(document).ready(function ($) {
                     e.stopPropagation();
                     if (e.target == this) {
                         $element.toggleClass('active');
-                        if(!$element.hasClass('active')) {
+                        if (!$element.hasClass('active')) {
                             $mobile_menu_button.css({'left': mobile_menu_button_left + 'px'});
                         }
                     }
@@ -1060,7 +1070,7 @@ jQuery(document).ready(function ($) {
                             $element.attr('class', menu_class);
                             $element.attr('style', '');
                             $element.html(html);
-                            window.location.href = window.location.href;
+                            location.reload();
                         }
                     } else {
                         hocwp_update_mobile_menu();
@@ -1083,7 +1093,7 @@ jQuery(document).ready(function ($) {
                         $element.attr('class', menu_class);
                         $element.attr('style', '');
                         $element.html(html);
-                        window.location.href = window.location.href;
+                        location.reload();
                     }
                 } else {
                     hocwp_update_mobile_menu();
@@ -1107,8 +1117,8 @@ jQuery(document).ready(function ($) {
         if (!this.$element.is('ul')) {
             this.$element = this.$element.find('ul');
         }
-        //this.$element.closest('nav').show();
         this.$element.css({position: 'fixed'});
+        $body.addClass('responsive');
     };
 
     MobileMenu.prototype.click = function (e) {
@@ -1129,7 +1139,7 @@ jQuery(document).ready(function ($) {
     function ChosenSelect(element, options) {
         this.self = this;
         this.$element = $(element);
-        if (!this.$element.length) {
+        if (!this.$element.length || !hocwp.is_function(jQuery().chosen)) {
             return this;
         }
         this.element = element;
@@ -1186,7 +1196,7 @@ jQuery(document).ready(function ($) {
     function PostRating(element, options) {
         this.self = this;
         this.$element = $(element);
-        if (!this.$element.length) {
+        if (!this.$element.length || !hocwp.is_function(jQuery().raty)) {
             return this;
         }
         this.element = element;
@@ -1485,6 +1495,80 @@ jQuery(document).ready(function ($) {
         that.filter(function () {
             return this.hostname && this.hostname !== location.hostname;
         }).addClass('external');
+    };
+});
+
+jQuery(document).ready(function ($) {
+    var $body = $('body');
+
+    function HocWPSlider(element, options) {
+        this.self = this;
+        this.$element = $(element);
+        if (!this.$element.length || !hocwp.is_function(jQuery().slick)) {
+            return this;
+        }
+        this.element = element;
+        this.options = $.extend({}, HocWPSlider.DEFAULTS, options);
+        this._defaults = HocWPSlider.DEFAULTS;
+        this._name = HocWPSlider.NAME;
+        this.init();
+        var $element = this.$element;
+        $element.addClass('hocwp-slider');
+        if (this.options.customArrow) {
+            $element.addClass('custom-arrow');
+        }
+        if (this.options.fontAwesome) {
+            $element.addClass('font-awesome');
+        }
+        if (this.options.thumbnailPager || $element.hasClass('thumbnail-pager')) {
+            this.options.dots = true;
+            $element.addClass('thumbs-paging thumbnail-pager');
+            this.options.customPaging = function (slider, i) {
+                var $slick_thumbs = $element.find('.slick-thumbs');
+                $slick_thumbs.hide();
+                return '<button class="tab">' + $('.slick-thumbs li:nth-child(' + (i + 1) + ')').html() + '</button>';
+            };
+        }
+        if (!this.options.autoplay) {
+            var data_autoplay = parseInt($element.attr('data-autoplay'));
+            if (1 === data_autoplay || $element.hasClass('autoplay')) {
+                this.options.autoplay = true;
+            }
+        }
+        $element.slick(this.options);
+        $element.show();
+        if (!this.options.useLazyLoad) {
+            var data_use_lazyload = parseInt($element.attr('data-use-lazyload'));
+            if (1 == data_use_lazyload || $element.hasClass('use-lazyload')) {
+                this.options.useLazyLoad = true;
+            }
+        }
+        if (this.options.useLazyLoad && hocwp.is_function(jQuery().lazyload)) {
+            $element.on('lazyload afterChange', function (event, slick, currentSlide, nextSlide) {
+                $element.find('.lazy').lazyload();
+            });
+        }
+    }
+
+    HocWPSlider.NAME = 'hocwp.slider';
+
+    HocWPSlider.DEFAULTS = {
+        thumbnailPager: 0,
+        useLazyLoad: 0,
+        customArrow: 0,
+        fontAwesome: 0
+    };
+
+    HocWPSlider.prototype.init = function () {
+        this.$element.hide();
+    };
+
+    $.fn.hocwpSlider = function (options) {
+        return this.each(function () {
+            if (!$.data(this, HocWPSlider.NAME)) {
+                $.data(this, HocWPSlider.NAME, new HocWPSlider(this, options));
+            }
+        });
     };
 });
 

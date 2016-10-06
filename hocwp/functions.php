@@ -988,6 +988,8 @@ function hocwp_register_post_type( $args = array() ) {
 	$labels = wp_parse_args( $custom_labels, $labels );
 
 	$rewrite_slug     = str_replace( '_', '-', $slug );
+	$rewrite_slug     = apply_filters( 'hocwp_post_type_slug', $rewrite_slug, $post_type );
+	$rewrite_slug     = apply_filters( 'hocwp_post_type_' . $post_type . '_slug', $rewrite_slug, $args );
 	$rewrite_defaults = array(
 		'slug'       => $rewrite_slug,
 		'with_front' => $with_front,
@@ -1086,6 +1088,8 @@ function hocwp_register_taxonomy( $args = array() ) {
 	);
 	$rewrite         = isset( $args['rewrite'] ) ? $args['rewrite'] : array();
 	$rewrite_slug    = str_replace( '_', '-', $slug );
+	$rewrite_slug    = apply_filters( 'hocwp_taxonomy_slug', $rewrite_slug, $taxonomy );
+	$rewrite_slug    = apply_filters( 'hocwp_taxonomy_' . $taxonomy . '_slug', $rewrite_slug, $args );
 	$rewrite['slug'] = $rewrite_slug;
 	if ( $private ) {
 		$public  = false;
@@ -1978,6 +1982,9 @@ function hocwp_admin_enqueue_scripts() {
 	), HOCWP_VERSION, true );
 	wp_localize_script( 'hocwp', 'hocwp', hocwp_default_script_localize_object() );
 	$use = apply_filters( 'hocwp_use_admin_style_and_script', false );
+	if ( 'link-manager.php' == $pagenow || 'link-add.php' == $pagenow ) {
+		$use = true;
+	}
 	if ( $use || 'post-new.php' == $pagenow || 'post.php' == $pagenow || 'link.php' == $pagenow || 'link-add.php' == $pagenow ) {
 		wp_enqueue_style( 'hocwp-admin-style' );
 		wp_enqueue_script( 'hocwp-admin' );
@@ -2037,47 +2044,6 @@ function hocwp_use_facebook_javascript_sdk() {
 	$result = apply_filters( 'hocwp_use_facebook_javascript_sdk', false );
 
 	return $result;
-}
-
-function hocwp_facebook_page_plugin( $args = array() ) {
-	$href = hocwp_get_value_by_key( $args, 'href', hocwp_get_value_by_key( $args, 'url' ) );
-	if ( empty( $href ) ) {
-		$page_id = isset( $args['page_id'] ) ? $args['page_id'] : 'hocwpnet';
-		$href    = 'https://www.facebook.com/' . $page_id;
-	}
-	if ( empty( $href ) ) {
-		return;
-	}
-	$page_name             = isset( $args['page_name'] ) ? $args['page_name'] : '';
-	$width                 = isset( $args['width'] ) ? $args['width'] : 340;
-	$height                = isset( $args['height'] ) ? $args['height'] : 500;
-	$hide_cover            = (bool) ( isset( $args['hide_cover'] ) ? $args['hide_cover'] : false );
-	$hide_cover            = hocwp_bool_to_string( $hide_cover );
-	$show_facepile         = (bool) ( isset( $args['show_facepile'] ) ? $args['show_facepile'] : true );
-	$show_facepile         = hocwp_bool_to_string( $show_facepile );
-	$show_posts            = (bool) ( isset( $args['show_posts'] ) ? $args['show_posts'] : false );
-	$show_posts            = hocwp_bool_to_string( $show_posts );
-	$hide_cta              = (bool) ( isset( $args['hide_cta'] ) ? $args['hide_cta'] : false );
-	$hide_cta              = hocwp_bool_to_string( $hide_cta );
-	$small_header          = (bool) ( isset( $args['small_header'] ) ? $args['small_header'] : false );
-	$small_header          = hocwp_bool_to_string( $small_header );
-	$adapt_container_width = (bool) ( isset( $args['adapt_container_width'] ) ? $args['adapt_container_width'] : true );
-	$adapt_container_width = hocwp_bool_to_string( $adapt_container_width );
-	?>
-	<div class="fb-page" data-href="<?php echo $href; ?>" data-width="<?php echo $width; ?>"
-	     data-height="<?php echo $height; ?>" data-hide-cta="<?php echo $hide_cta; ?>"
-	     data-small-header="<?php echo $small_header; ?>"
-	     data-adapt-container-width="<?php echo $adapt_container_width; ?>" data-hide-cover="<?php echo $hide_cover; ?>"
-	     data-show-facepile="<?php echo $show_facepile; ?>" data-show-posts="<?php echo $show_posts; ?>">
-		<div class="fb-xfbml-parse-ignore">
-			<?php if ( ! empty( $page_name ) ) : ?>
-				<blockquote cite="<?php echo $href; ?>">
-					<a href="<?php echo $href; ?>"><?php echo $page_name; ?></a>
-				</blockquote>
-			<?php endif; ?>
-		</div>
-	</div>
-	<?php
 }
 
 function hocwp_update_permalink_struct( $struct ) {

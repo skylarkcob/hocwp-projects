@@ -44,60 +44,68 @@ function hocwp_coupon_type_base() {
 }
 
 function hocwp_coupon_install_post_type_and_taxonomy() {
+	$slug = apply_filters( 'hocwp_post_type_coupon_slug', 'coupon' );
 	$args = array(
 		'name'              => __( 'Coupons', 'hocwp-theme' ),
 		'singular_name'     => __( 'Coupon', 'hocwp-theme' ),
 		'supports'          => array( 'editor', 'comments', 'thumbnail', 'excerpt' ),
-		'slug'              => 'coupon',
+		'post_type'         => 'coupon',
+		'slug'              => $slug,
 		'taxonomies'        => array( 'store', 'coupon_cat', 'coupon_tag', 'coupon_type' ),
 		'show_in_admin_bar' => true
 	);
 	hocwp_register_post_type( $args );
 
+	$slug = apply_filters( 'hocwp_post_type_event_slug', 'event' );
 	$args = array(
 		'name'              => __( 'Events', 'hocwp-theme' ),
 		'singular_name'     => __( 'Event', 'hocwp-theme' ),
 		'supports'          => array( 'editor', 'comments', 'thumbnail' ),
-		'slug'              => 'event',
+		'post_type'         => 'event',
+		'slug'              => $slug,
 		'show_in_admin_bar' => true
 	);
 	hocwp_register_post_type( $args );
 
+	$slug = apply_filters( 'hocwp_taxonomy_store_slug', hocwp_coupon_store_base() );
 	$args = array(
 		'name'          => __( 'Stores', 'hocwp-theme' ),
 		'singular_name' => __( 'Store', 'hocwp-theme' ),
 		'taxonomy'      => 'store',
-		'slug'          => hocwp_coupon_store_base(),
+		'slug'          => $slug,
 		'post_types'    => array( 'coupon' )
 	);
 	hocwp_register_taxonomy( $args );
 
+	$slug = apply_filters( 'hocwp_taxonomy_coupon_cat_slug', hocwp_coupon_category_base() );
 	$args = array(
 		'name'          => __( 'Coupon Categories', 'hocwp-theme' ),
 		'singular_name' => __( 'Coupon Category', 'hocwp-theme' ),
 		'menu_name'     => __( 'Categories', 'hocwp-theme' ),
-		'slug'          => hocwp_coupon_category_base(),
+		'slug'          => $slug,
 		'taxonomy'      => 'coupon_cat',
 		'post_types'    => array( 'coupon' )
 	);
 	hocwp_register_taxonomy( $args );
 
+	$slug = apply_filters( 'hocwp_taxonomy_coupon_tag_slug', hocwp_coupon_tag_base() );
 	$args = array(
 		'name'          => __( 'Coupon Tags', 'hocwp-theme' ),
 		'singular_name' => __( 'Coupon Tag', 'hocwp-theme' ),
 		'menu_name'     => __( 'Tags', 'hocwp-theme' ),
-		'slug'          => hocwp_coupon_tag_base(),
+		'slug'          => $slug,
 		'taxonomy'      => 'coupon_tag',
 		'hierarchical'  => false,
 		'post_types'    => array( 'coupon' )
 	);
 	hocwp_register_taxonomy( $args );
 
+	$slug = apply_filters( 'hocwp_taxonomy_coupon_type_slug', hocwp_coupon_type_base() );
 	$args = array(
 		'name'          => __( 'Coupon Types', 'hocwp-theme' ),
 		'singular_name' => __( 'Coupon Type', 'hocwp-theme' ),
 		'menu_name'     => __( 'Types', 'hocwp-theme' ),
-		'slug'          => hocwp_coupon_type_base(),
+		'slug'          => $slug,
 		'taxonomy'      => 'coupon_type',
 		'post_types'    => array( 'coupon' )
 	);
@@ -378,22 +386,23 @@ function hocwp_get_coupon_type( $post_id = null ) {
 	return $result;
 }
 
-function hocwp_coupon_label_html( $args = array(), $text, $type = '' ) {
+function hocwp_coupon_label_html( $args = array(), $text = '', $type = '' ) {
 	if ( ! is_array( $args ) ) {
 		$percent = $args;
 	} else {
-		$percent    = hocwp_get_value_by_key( $args, 'percent' );
-		$post_id    = hocwp_get_value_by_key( $args, 'post_id', get_the_ID() );
-		$price      = hocwp_get_post_meta( 'price', $post_id );
-		$sale_price = hocwp_get_post_meta( 'sale_price', $post_id );
-		if ( hocwp_is_positive_number( $price ) && hocwp_is_positive_number( $sale_price ) ) {
-			$percentage = hocwp_percentage( $price, $sale_price );
-			$percent    = $percentage . '%';
-		} else {
-			if ( isset( $args['percent'] ) ) {
-				$percentage = hocwp_get_value_by_key( $args, 'percent' );
-			} else {
-				$percent = hocwp_get_post_meta( 'percent_label', $post_id );
+		$calculate_percentage = (bool) hocwp_get_value_by_key( $args, 'calculate_percentage', true );
+		$calculate_percentage = apply_filters( 'hocwp_calculate_coupon_percentage', $calculate_percentage, $args );
+		if ( empty( $text ) ) {
+			$text = hocwp_get_value_by_key( $args, 'text' );
+		}
+		$post_id = hocwp_get_value_by_key( $args, 'post_id', get_the_ID() );
+		$percent = hocwp_get_value_by_key( $args, 'percent' );
+		if ( $calculate_percentage || empty( $percent ) ) {
+			$price      = hocwp_get_post_meta( 'price', $post_id );
+			$sale_price = hocwp_get_post_meta( 'sale_price', $post_id );
+			if ( hocwp_is_positive_number( $price ) && hocwp_is_positive_number( $sale_price ) ) {
+				$percentage = hocwp_percentage( $price, $sale_price );
+				$percent    = $percentage . '%';
 			}
 		}
 	}

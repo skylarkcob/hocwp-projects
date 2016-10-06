@@ -314,6 +314,7 @@ function hocwp_slider_html( $args = array() ) {
 					$img->set_image_src( $image_url );
 					$li = new HOCWP_HTML( 'li' );
 					$li->set_text( $img );
+					$li->add_class( 'slider-item' );
 					$list_paging .= $li->build();
 					if ( ! empty( $link ) ) {
 						$a = new HOCWP_HTML( 'a' );

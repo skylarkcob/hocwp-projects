@@ -629,6 +629,34 @@
     box-shadow: none;
 }
 
+.wp-list-table.bookmarks .column-icon img {
+    height: auto;
+    margin: 0;
+    max-height: 80px;
+    max-width: 80px;
+    vertical-align: middle;
+    width: auto;
+}
+
+.wp-list-table .hocwp-column.tips {
+    cursor: help;
+    text-decoration: none;
+}
+
+.wp-list-table .hocwp-column.dashicons {
+    display: block;
+    margin: 0 auto;
+}
+
+.wp-list-table td.column-thumbnail,
+.wp-list-table td.column-thumb,
+.wp-list-table td.column-banner,
+.wp-list-table td.column-image,
+.wp-list-table td.column-picture,
+.wp-list-table td.column-icon {
+    text-align: center;
+}
+
 /**
  * Menu item
  */
@@ -667,4 +695,12 @@
 
 .form-table .hocwp-disconnect-social:hover {
     opacity: 0.5;
+}
+
+/*
+ * Table Posts
+ */
+
+td.column-featured a:focus {
+    box-shadow: none;
 }

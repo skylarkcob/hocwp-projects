@@ -36,7 +36,7 @@ function hocwp_wc_product_price( $post_id = null, $show_full = false ) {
 		}
 		$product = new WC_Product( $post_id );
 		$html    = $product->get_price_html();
-		$html    = hocwp_wrap_tag( $html, 'p', 'prices' );
+		$html    = hocwp_wrap_tag( $html, 'p', 'prices price' );
 		echo $html;
 	} else {
 		$price = hocwp_wc_get_product_price( $post_id );
@@ -58,10 +58,12 @@ function hocwp_wc_get_product_total_sales( $post_id = null ) {
 
 function hocwp_wc_is_sale( $post_id = null ) {
 	$post_id = hocwp_return_post( $post_id, 'id' );
-	global $product;
 	if ( hocwp_id_number_valid( $post_id ) ) {
-		$product = new WC_Product( $post_id );
+		$pro = new WC_Product( $post_id );
+
+		return $pro->is_on_sale();
 	}
+	global $product;
 
 	return $product->is_on_sale();
 }
@@ -423,6 +425,7 @@ function hocwp_wc_single_product_fast_buy_button( $args = array() ) {
 	$use = hocwp_wc_use_fast_buy_button();
 	if ( $use ) {
 		global $product;
+		$backup      = $product;
 		$post_id     = hocwp_get_value_by_key( $args, 'post_id' );
 		$post_id     = hocwp_return_post( $post_id, 'id' );
 		$tmp         = new WC_Product( $product );
@@ -565,6 +568,7 @@ function hocwp_wc_single_product_fast_buy_button( $args = array() ) {
 			</div>
 		</div>
 		<?php
+		$product = $backup;
 	}
 }
 
@@ -1000,3 +1004,26 @@ function hocwp_wc_sale_flash_filter( $html, $post, $product ) {
 }
 
 add_filter( 'woocommerce_sale_flash', 'hocwp_wc_sale_flash_filter', 10, 3 );
+
+function hocwp_wc_on_wp_hook() {
+
+}
+
+add_action( 'woocommerce_before_single_product_summary', 'hocwp_wc_on_wp_hook', 10 );
+
+function hocwp_wc_review_order_before_submit() {
+
+}
+
+add_action( 'woocommerce_review_order_before_submit', 'hocwp_wc_review_order_before_submit' );
+
+function hocwp_wc_review_order_after_submit() {
+	$url = hocwp_wc_get_cart_url( );
+	$button   = new HOCWP_HTML( 'a' );
+	$button->set_href( $url );
+	$button->set_text( __( 'Back to cart page', 'hocwp-theme' ) );
+	$button->add_class( 'btn navigation-link pull-right' );
+	$button->output();
+}
+
+add_action( 'woocommerce_review_order_after_submit', 'hocwp_wc_review_order_after_submit' );

@@ -9,6 +9,11 @@ function hocwp_query( $args = array() ) {
 	if ( ! isset( $args['paged'] ) && isset( $_REQUEST['paged'] ) ) {
 		$args['paged'] = hocwp_get_paged();
 	}
+	$defaults = array(
+		'order'   => 'desc',
+		'orderby' => 'date'
+	);
+	$args     = wp_parse_args( $args, $defaults );
 
 	return new WP_Query( $args );
 }
@@ -171,24 +176,35 @@ function hocwp_query_sanitize_meta_query( $item, &$args ) {
 	return $args;
 }
 
-function hocwp_query_post_by_binary_meta( $meta_key, $args = array() ) {
-	$defaults = array(
-		'meta_query' => array(
-			array(
-				'relation' => 'AND',
-				array(
-					'key'     => $meta_key,
-					'compare' => 'EXISTS'
-				),
-				array(
-					'key'   => $meta_key,
-					'value' => 1,
-					'type'  => 'NUMERIC'
-				),
-			)
-		)
+function hocwp_query_build_binary_meta_args( $meta_key, $args = array() ) {
+	$meta_item = array(
+		'relation' => 'AND',
+		array(
+			'key'     => $meta_key,
+			'compare' => 'EXISTS'
+		),
+		array(
+			'key'   => $meta_key,
+			'value' => 1,
+			'type'  => 'NUMERIC'
+		),
 	);
-	$args     = wp_parse_args( $args, $defaults );
+	if ( isset( $args['meta_query'] ) ) {
+		hocwp_query_sanitize_meta_query( $meta_item, $args );
+	} else {
+		$defaults = array(
+			'meta_query' => array(
+				$meta_item
+			)
+		);
+		$args     = wp_parse_args( $args, $defaults );
+	}
+
+	return $args;
+}
+
+function hocwp_query_post_by_binary_meta( $meta_key, $args = array() ) {
+	$args = hocwp_query_build_binary_meta_args( $meta_key, $args );
 
 	return hocwp_query( $args );
 }

@@ -1,7 +1,4 @@
 <?php
-/*
- * Last updated: 2016-09-21
- */
 if ( ! function_exists( 'add_filter' ) ) {
 	exit;
 }
@@ -10,7 +7,7 @@ if ( defined( 'HOCWP_PATH' ) ) {
 	return;
 }
 
-define( 'HOCWP_VERSION', '3.4.4' );
+define( 'HOCWP_VERSION', '3.4.5' );
 
 define( 'HOCWP_PATH', dirname( __FILE__ ) );
 
@@ -64,7 +61,9 @@ define( 'HOCWP_PLUGIN_LICENSE_OPTION_NAME', 'hocwp_plugin_licenses' );
 
 define( 'HOCWP_PLUGIN_LICENSE_ADMIN_URL', admin_url( 'admin.php?page=hocwp_plugin_license' ) );
 
-define( 'HOCWP_FACEBOOK_GRAPH_API_VERSION', '2.5' );
+define( 'HOCWP_FACEBOOK_JAVASCRIPT_SDK_VERSION', 2.7 );
+
+define( 'HOCWP_FACEBOOK_GRAPH_API_VERSION', HOCWP_FACEBOOK_JAVASCRIPT_SDK_VERSION );
 
 require( HOCWP_PATH . '/lib/bfi-thumb/BFI_Thumb.php' );
 

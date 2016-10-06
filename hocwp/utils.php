@@ -831,8 +831,12 @@ function hocwp_widget_title( $args, $instance, $echo = true ) {
 	return $title;
 }
 
-function hocwp_checkbox_post_data_value( $data, $key, $default = 0 ) {
-	return ( isset( $data[ $key ] ) && 0 != $data[ $key ] ) ? 1 : $default;
+function hocwp_checkbox_post_data_value( $data, $key, $deprecated = null ) {
+	if ( $deprecated ) {
+		_deprecated_argument( __FUNCTION__, '3.4.5' );
+	}
+
+	return ( isset( $data[ $key ] ) && 0 != $data[ $key ] ) ? 1 : 0;
 }
 
 function hocwp_change_nav_menu_css_class( $terms, $classes, $item ) {

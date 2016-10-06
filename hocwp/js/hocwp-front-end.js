@@ -332,6 +332,44 @@ jQuery(document).ready(function ($) {
     })();
 
     (function () {
+        var $hocwp_widget_facebook_messenger = $('.hocwp .hocwp-widget-facebook-messenger');
+        if ($hocwp_widget_facebook_messenger.length) {
+            if ($hocwp_widget_facebook_messenger.hasClass('fixed')) {
+                var $messenger_box = $hocwp_widget_facebook_messenger.find('.messenger-box'),
+                    $module_header = $messenger_box.find('.module-header'),
+                    $icon_angle = $module_header.find('i'),
+                    $icon_delete = $module_header.find('.facebook-messenger-box-control'),
+                    box_height = parseInt($module_header.outerHeight()),
+                    box_width = parseInt($messenger_box.outerWidth());
+                if ($hocwp_widget_facebook_messenger.hasClass('bottom-left') || $hocwp_widget_facebook_messenger.hasClass('bottom-right')) {
+                    $messenger_box.css({height: box_height + 'px'});
+                    $module_header.on('click', function (e) {
+                        e.preventDefault();
+                        $messenger_box.toggleClass('active');
+                        if ($messenger_box.hasClass('active')) {
+                            $messenger_box.css({height: 'auto'});
+                            $icon_angle.toggleClass('fa-angle-up fa-angle-down');
+                        } else {
+                            $messenger_box.css({height: box_height + 'px'});
+                            $icon_angle.toggleClass('fa-angle-up fa-angle-down');
+                        }
+                    });
+                } else {
+                    $module_header.on('click', function (e) {
+                        e.preventDefault();
+                        $messenger_box.toggleClass('active');
+                        if ($messenger_box.hasClass('active')) {
+                            $icon_delete.hide();
+                        } else {
+                            $icon_delete.fadeIn();
+                        }
+                    });
+                }
+            }
+        }
+    })();
+
+    (function () {
         if ($body.hasClass('hocwp-shop-site')) {
             $body.on('click', '.number-up, .number-down', function (e) {
                 e.preventDefault();

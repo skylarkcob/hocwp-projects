@@ -341,10 +341,11 @@ function hocwp_classifieds_post_type_and_taxonomy() {
 		$name     = 'Thể loại';
 		$singular = $name;
 	}
+	$slug = apply_filters( 'hocwp_taxonomy_classifieds_type_slug', hocwp_taxonomy_classifieds_type_base() );
 	$args = array(
 		'name'          => $name,
 		'singular_name' => $singular,
-		'slug'          => hocwp_taxonomy_classifieds_type_base(),
+		'slug'          => $slug,
 		'taxonomy'      => 'classifieds_type',
 		'post_types'    => array( 'post' )
 	);
