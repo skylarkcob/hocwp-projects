@@ -205,7 +205,7 @@ jQuery(document).ready(function ($) {
                 max_file = -1;
             }
             if (max_file > 0 && count_file > max_file) {
-                alert('Bạn không được chọn quá ' + max_file + ' tập tin.');
+                alert(hocwp.i18n.max_file_item_select_error);
                 $element.val('');
                 return false;
             }

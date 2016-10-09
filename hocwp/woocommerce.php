@@ -240,7 +240,7 @@ function hocwp_wc_get_cart_preview_html() {
 	$cart_preview = '';
 	$cart_items   = hocwp_wc_get_cart_items();
 	$cart_preview .= '<ul class="cart-preview list-unstyled">';
-	$cart_preview .= '<li class="title">Giỏ hàng của bạn</li>';
+	$cart_preview .= '<li class="title">' . __( 'Your cart', 'hocwp-theme' ) . '</li>';
 	if ( hocwp_array_has_value( $cart_items ) ) {
 		$cart_preview .= '<li class="cart-items"><ul class="list-unstyled list-products">';
 		foreach ( $cart_items as $item ) {
@@ -261,8 +261,8 @@ function hocwp_wc_get_cart_preview_html() {
 				'permalink' => get_permalink( $post_id )
 			) );
 			echo '<p class="info">';
-			echo '<span class="price">Đơn giá: ' . hocwp_wc_format_price( $price ) . '</span>';
-			echo '<span class="quantity">Số lượng: ' . number_format( $quantity ) . '</span>';
+			echo '<span class="price">' . sprintf( __( 'Price: %s', 'hocwp-theme' ), hocwp_wc_format_price( $price ) ) . '</span>';
+			echo '<span class="quantity">' . sprintf( __( 'Quantity: %s', 'hocwp-theme' ), number_format( $quantity ) ) . '</span>';
 			echo '</p>';
 			echo '<i class="fa fa-remove" data-id="' . $post_id . '"></i>';
 			$li_html = ob_get_clean();
@@ -444,7 +444,7 @@ function hocwp_wc_single_product_fast_buy_button( $args = array() ) {
 					<div class="modal-header">
 						<button aria-label="Close" data-dismiss="modal" class="close" type="button"><span
 								aria-hidden="true">×</span></button>
-						<h4 class="modal-title">Đặt hàng nhanh</h4>
+						<h4 class="modal-title"><?php _e( 'Fast order', 'hocwp-theme' ); ?></h4>
 					</div>
 					<div class="modal-body">
 						<div class="row row-medium">
@@ -529,34 +529,37 @@ function hocwp_wc_single_product_fast_buy_button( $args = array() ) {
 									?>
 									<form class="order-form" method="post">
 										<div class="form-group">
-											<p>Thông tin bắt buộc phải nhập <?php echo HOCWP_REQUIRED_HTML; ?> vào</p>
+											<p><?php echo sprintf( __( 'Required fields are marked as %s', 'hocwp-theme' ), HOCWP_REQUIRED_HTML ); ?></p>
 										</div>
 										<div class="form-group">
 											<input type="text" required aria-required="true"
 											       value="<?php echo $name; ?>" class="full-name form-control"
-											       placeholder="Họ và tên *" name="fullname">
+											       placeholder="<?php _e( 'Full name *', 'hocwp-theme' ); ?>"
+											       name="fullname">
 										</div>
 										<div class="form-group">
 											<input type="text" class="phone form-control" value="<?php echo $phone; ?>"
-											       placeholder="Điện thoại" name="phone">
+											       placeholder="<?php _e( 'Phone', 'hocwp-theme' ); ?>" name="phone">
 										</div>
 										<div class="form-group">
 											<input type="text" required aria-required="true"
 											       value="<?php echo $email; ?>" class="email form-control"
-											       placeholder="Email *" name="email">
+											       placeholder="<?php _e( 'Email *', 'hocwp-theme' ); ?>" name="email">
 										</div>
 										<div class="form-group">
 											<input type="text" class="address form-control"
-											       value="<?php echo $address; ?>" placeholder="Địa chỉ" name="address">
+											       value="<?php echo $address; ?>"
+											       placeholder="<?php _e( 'Address', 'hocwp-theme' ); ?>"
+											       name="address">
 										</div>
 										<div class="form-group">
-											<label for="message">Ghi chú:</label>
+											<label for="message"><?php _e( 'Note:', 'hocwp-theme' ); ?></label>
 											<textarea id="message" name="message"
 											          class="message form-control"></textarea>
 										</div>
 										<div class="form-group">
 											<button class="btn-clickable orange" data-id="<?php echo $post_id; ?>">
-												<span>Đặt hàng</span>
+												<span><?php _e( 'Put order', 'hocwp-theme' ); ?></span>
 											</button>
 										</div>
 									</form>

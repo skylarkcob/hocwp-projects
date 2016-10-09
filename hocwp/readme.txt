@@ -44,5 +44,11 @@ If you have any questions, please visit [hocwp.net](http://hocwp.net/) for more 
 * Add - thumbnail column for bookmark table list.
 * Add - Facebook Messenger widget.
 * Update - default style for shop theme with WooCommerce.
+* Remove - Vietnamese text from gettext.
+* Add - function to display Google Plus One and Twitter Follow button.
+* Add - cache support for ajax request.
+* Update - get child terms function.
+* Add - shortcode to display custom post list.
+* Add - function to query post by type with interval support.
 
 == Upgrade Notice ==

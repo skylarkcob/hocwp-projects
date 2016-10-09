@@ -78,14 +78,32 @@ function hocwp_show_ads( $args = array() ) {
 		if ( $ads->have_posts() ) {
 			$posts = $ads->posts;
 			$ads   = array_shift( $posts );
-			$ads   = hocwp_get_post_meta( 'code', $ads->ID );
-			if ( ! empty( $ads ) ) {
+			$code  = hocwp_get_post_meta( 'code', $ads->ID );
+			if ( empty( $code ) ) {
+				$image = hocwp_get_post_meta( 'image', $ads->ID );
+				$image = hocwp_sanitize_media_value( $image );
+				$image = $image['url'];
+				if ( ! empty( $image ) ) {
+					$img = new HOCWP_HTML( 'img' );
+					$img->set_image_src( $image );
+					$url = hocwp_get_post_meta( 'url', $ads->ID );
+					if ( ! empty( $url ) ) {
+						$a = new HOCWP_HTML( 'a' );
+						$a->set_href( $url );
+						$a->set_text( $img );
+						$code = $a->build();
+					} else {
+						$code = $img->build();
+					}
+				}
+			}
+			if ( ! empty( $code ) ) {
 				$class = hocwp_get_value_by_key( $args, 'class' );
 				hocwp_add_string_with_space_before( $class, 'hocwp-ads text-center ads position-' . $position );
 				hocwp_add_string_with_space_before( $class, hocwp_sanitize_html_class( $position ) );
 				$div = new HOCWP_HTML( 'div' );
 				$div->set_class( $class );
-				$div->set_text( $ads );
+				$div->set_text( $code );
 				$div->output();
 			}
 		}

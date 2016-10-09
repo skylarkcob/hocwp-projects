@@ -517,6 +517,11 @@
     display: block;
 }
 
+.postbox .hocwp-meta-box .meta-row .field-group {
+    display: inline-block;
+    vertical-align: top;
+}
+
 .hocwp-meta-box .media-preview img,
 .hocwp-widget .media-preview img,
 .hocwp .media-preview img {

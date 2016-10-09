@@ -29,11 +29,7 @@ function hocwp_field_google_maps( $args = array() ) {
 	$post_id      = hocwp_get_value_by_key( $args, 'post_id' );
 	$scrollwheel  = hocwp_get_value_by_key( $args, 'scrollwheel', false );
 	if ( empty( $marker_title ) ) {
-		if ( 'vi' == $lang ) {
-			$marker_title = 'Di chuyển để tìm địa điểm!';
-		} else {
-			$marker_title = __( 'Drag to find address!', 'hocwp-theme' );
-		}
+		$marker_title = __( 'Drag to find address!', 'hocwp-theme' );
 	}
 	hocwp_field_before( $args );
 	?>
@@ -84,7 +80,7 @@ function hocwp_field_captcha( $args = array() ) {
 	if ( hocwp_string_empty( $id ) ) {
 		$id = 'hocwp_captcha';
 	}
-	$placeholder = isset( $args['placeholder'] ) ? $args['placeholder'] : ( 'vi' == $lang ) ? 'Nhập mã bảo mật' : __( 'Enter captcha code', 'hocwp-theme' );
+	$placeholder = isset( $args['placeholder'] ) ? $args['placeholder'] : __( 'Enter captcha code', 'hocwp-theme' );
 	$class       = isset( $args['class'] ) ? $args['class'] : '';
 	$input_width = isset( $args['input_width'] ) ? absint( $args['input_width'] ) : 125;
 	if ( is_numeric( $input_width ) && '%' !== hocwp_get_last_char( $input_width ) ) {
@@ -890,7 +886,11 @@ function hocwp_field_media_upload( $args = array() ) {
 	$value     = isset( $args['value'] ) ? $args['value'] : '';
 	$value     = hocwp_sanitize_media_value( $value );
 	$media_url = $value['url'];
+	$container = (bool) hocwp_get_value_by_key( $args, 'container' );
 	hocwp_field_before( $args );
+	if ( $container ) {
+		echo '<div class="media-container field-group">';
+	}
 	$media_preview = new HOCWP_HTML( 'span' );
 	$media_preview->set_class( 'media-preview' );
 	if ( ! empty( $media_url ) ) {
@@ -938,6 +938,9 @@ function hocwp_field_media_upload( $args = array() ) {
 		'value' => $value['id']
 	);
 	hocwp_field_input_hidden( $id_args );
+	if ( $container ) {
+		echo '</div>';
+	}
 	hocwp_field_after( $args );
 }
 

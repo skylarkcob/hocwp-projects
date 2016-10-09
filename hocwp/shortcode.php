@@ -251,3 +251,174 @@ function hocwp_shortcode_post_callback( $atts = array(), $content = null ) {
 }
 
 add_shortcode( 'hocwp_post', 'hocwp_shortcode_post_callback' );
+
+function hocwp_shortcode_support_form_callback( $atts = array(), $content = null ) {
+	$defaults   = array(
+		'style'       => '',
+		'name'        => 'full_name,email,phone,message',
+		'label'       => array(
+			__( 'Full name', 'hocwp-theme' ),
+			__( 'Email', 'hocwp-theme' ),
+			__( 'Phone', 'hocwp-theme' ),
+			__( 'Message', 'hocwp-theme' )
+		),
+		'type'        => 'text,email,text,textarea',
+		'placehoder'  => '',
+		'captcha'     => false,
+		'admin_email' => hocwp_get_admin_email()
+	);
+	$attributes = shortcode_atts( $defaults, $atts );
+
+	$name  = hocwp_get_value_by_key( $attributes, 'name' );
+	$names = explode( ',', $name );
+	if ( hocwp_array_has_value( $names ) ) {
+		$show_form = true;
+		$label     = hocwp_get_value_by_key( $attributes, 'label' );
+		if ( ! is_array( $label ) ) {
+			$label = explode( ',', $label );
+			$label = array_map( 'trim', $label );
+		}
+		$type        = hocwp_get_value_by_key( $attributes, 'type' );
+		$type        = explode( ',', $type );
+		$type        = array_map( 'trim', $type );
+		$placeholder = hocwp_get_value_by_key( $attributes, 'placeholder' );
+		if ( ! empty( $placeholder ) ) {
+			$placeholder = explode( ',', $placeholder );
+			$placeholder = array_map( 'trim', $placeholder );
+		}
+		$captcha = hocwp_get_value_by_key( $attributes, 'captcha' );
+		$names   = array_map( 'trim', $names );
+		$html    = hocwp_shortcode_before( 'support-form', $attributes );
+		if ( isset( $_POST['submit'] ) ) {
+			if ( hocwp_check_nonce( 'hocwp_support_form' ) ) {
+				if ( hocwp_check_captcha() ) {
+					$body = '';
+					foreach ( $names as $index => $name ) {
+						if ( empty( $name ) ) {
+							continue;
+						}
+						if ( 'name' == $name ) {
+							$name = 'full_name';
+						}
+						$field_type        = isset( $type[ $index ] ) ? $type[ $index ] : 'text';
+						$field_label       = isset( $label[ $index ] ) ? $label[ $index ] : '';
+						$field_placeholder = isset( $placeholder[ $index ] ) ? $placeholder[ $index ] : '';
+						$row               = isset( $_POST[ $name ] ) ? $_POST[ $name ] : '';
+						if ( ! empty( $field_label ) ) {
+							$last_char = hocwp_get_last_char( $field_label );
+							if ( ':' != $last_char ) {
+								$field_label .= ':';
+							}
+							$row = $field_label . ' ' . $row;
+						}
+						if ( ! empty( $row ) ) {
+							$body .= wpautop( $row );
+						}
+					}
+					if ( empty( $body ) ) {
+						$html .= hocwp_build_message( __( 'You must fill all required fields.', 'hocwp-theme' ), 'danger' );
+					} else {
+						$full_name = __( 'Guest', 'hocwp-theme' );
+						if ( isset( $_POST['full_name'] ) ) {
+							$full_name = $_POST['full_name'];
+						}
+						$subject     = sprintf( __( '[%1$s] Contact message from %2$s', 'hocwp-theme' ), get_bloginfo( 'name' ), $full_name );
+						$admin_email = hocwp_get_value_by_key( $attributes, 'admin_email' );
+						if ( ! is_email( $admin_email ) ) {
+							$admin_email = hocwp_get_admin_email();
+						}
+						$sent = hocwp_send_html_mail( $admin_email, $subject, $body );
+						if ( $sent ) {
+							$show_form = false;
+							$html .= hocwp_build_message( __( 'Your message has been sent, we will reply to you as soon as possible.', 'hocwp-theme' ), 'success' );
+						} else {
+							$html .= hocwp_build_message( __( 'There was an error occurred, please try again or contact administrators.', 'hocwp-theme' ), 'danger' );
+						}
+					}
+				} else {
+					$html .= hocwp_build_message( __( 'Captcha code is not valid.', 'hocwp-theme' ), 'danger' );
+				}
+			}
+		}
+		if ( $show_form ) {
+			ob_start();
+			?>
+			<form class="hocwp-support-form" action="" method="post">
+				<?php
+				foreach ( $names as $index => $name ) {
+					if ( empty( $name ) ) {
+						continue;
+					}
+					if ( 'name' == $name ) {
+						$name = 'full_name';
+					}
+					$field_type        = isset( $type[ $index ] ) ? $type[ $index ] : 'text';
+					$field_label       = isset( $label[ $index ] ) ? $label[ $index ] : '';
+					$field_placeholder = isset( $placeholder[ $index ] ) ? $placeholder[ $index ] : '';
+					?>
+					<div class="form-group form-row">
+						<div class="row">
+							<div class="col-sm-2">
+								<label for="<?php echo esc_attr( $name ); ?>"><?php echo $field_label; ?></label>
+							</div>
+							<div class="col-sm-10">
+								<?php
+								$value = isset( $_POST[ $name ] ) ? $_POST[ $name ] : '';
+								switch ( $field_type ) {
+									case 'longtext':
+									case 'textarea':
+										?>
+										<textarea id="<?php echo esc_attr( $name ); ?>"
+										          name="<?php echo esc_attr( $name ); ?>"
+										          class="form-control"
+										          placeholder="<?php echo esc_attr( $field_placeholder ); ?>"><?php echo $value; ?></textarea>
+										<?php
+										break;
+									default:
+										$input_type = 'text';
+										if ( 'email' == $field_type ) {
+											$input_type = 'email';
+										}
+										?>
+										<input id="<?php echo esc_attr( $name ); ?>"
+										       placeholder="<?php echo esc_attr( $field_placeholder ); ?>"
+										       value="<?php echo esc_attr( $value ); ?>"
+										       name="<?php echo esc_attr( $name ); ?>"
+										       type="<?php echo esc_attr( $input_type ); ?>">
+										<?php
+								}
+								?>
+							</div>
+						</div>
+					</div>
+					<?php
+				}
+				if ( $captcha ) {
+					echo '<div class="form-group form-row"><div class="row"><div class="col-sm-2"></div><div class="col-sm-10">';
+					hocwp_field_captcha( array( 'input_width' => 180 ) );
+					echo '</div></div></div>';
+				}
+				?>
+				<div class="form-hidden-fields">
+					<?php hocwp_nonce( 'hocwp_support_form' ); ?>
+				</div>
+				<div class="form-group form-row">
+					<div class="row">
+						<div class="col-sm-2"></div>
+						<div class="col-sm-10">
+							<input type="submit" name="submit" class="btn btn-warning"
+							       value="<?php _e( 'Send', 'hocwp-theme' ); ?>">
+						</div>
+					</div>
+				</div>
+			</form>
+			<?php
+			$html .= ob_get_clean();
+		}
+		$html .= hocwp_shortcode_after();
+	}
+
+	return apply_filters( 'hocwp_shortcode_support_form', $html, $attributes, $content );
+}
+
+add_shortcode( 'hocwp_support_form', 'hocwp_shortcode_support_form_callback' );

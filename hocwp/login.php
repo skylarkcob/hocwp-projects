@@ -218,15 +218,15 @@ function hocwp_user_login( $username, $password, $remember = true ) {
 function hocwp_account_form_default_args() {
 	$lang     = hocwp_get_language();
 	$defaults = array(
-		'placeholder_username'    => hocwp_translate_text( 'Username or email' ),
-		'placeholder_password'    => hocwp_translate_text( 'Password' ),
-		'slogan'                  => hocwp_translate_text( 'One free account gets you into everything %s.' ),
-		'title_lostpassword_link' => hocwp_translate_text( 'Password Lost and Found' ),
-		'text_lostpassword_link'  => hocwp_translate_text( 'Lost your password?' ),
-		'text_register_link'      => hocwp_translate_text( 'Register' ),
-		'label_email'             => hocwp_translate_text( 'Email' ),
-		'label_confirm_password'  => hocwp_translate_text( 'Confirm your password' ),
-		'label_phone'             => hocwp_translate_text( 'Phone' )
+		'placeholder_username'    => hocwp_translate_text( __( 'Username or email', 'hocwp-theme' ) ),
+		'placeholder_password'    => hocwp_translate_text( __( 'Password', 'hocwp-theme' ) ),
+		'slogan'                  => hocwp_translate_text( __( 'One free account gets you into everything %s.', 'hocwp-theme' ) ),
+		'title_lostpassword_link' => hocwp_translate_text( __( 'Password Lost and Found', 'hocwp-theme' ) ),
+		'text_lostpassword_link'  => hocwp_translate_text( __( 'Lost your password?', 'hocwp-theme' ) ),
+		'text_register_link'      => hocwp_translate_text( __( 'Register', 'hocwp-theme' ) ),
+		'label_email'             => hocwp_translate_text( __( 'Email', 'hocwp-theme' ) ),
+		'label_confirm_password'  => hocwp_translate_text( __( 'Confirm your password', 'hocwp-theme' ) ),
+		'label_phone'             => hocwp_translate_text( __( 'Phone', 'hocwp-theme' ) )
 	);
 	if ( 'vi' == $lang ) {
 		$defaults['label_username']          = 'Tài khoản';

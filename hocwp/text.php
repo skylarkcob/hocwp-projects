@@ -6,16 +6,6 @@ if ( ! function_exists( 'add_filter' ) ) {
 function hocwp_translate_text( $text, $echo = false ) {
 	if ( hocwp_qtranslate_x_installed() ) {
 		$tmp = $text;
-		$mo  = new HOCWP_MO();
-		$id  = $mo->get_id( $text );
-		if ( hocwp_id_number_valid( $id ) ) {
-			$post = get_post( $id );
-			if ( is_a( $post, 'WP_Post' ) ) {
-				if ( ! empty( $post->post_content ) ) {
-					$text = $post->post_content;
-				}
-			}
-		}
 		$three_chars = substr( $text, - 3 );
 		if ( '[:]' == $three_chars ) {
 			$current_language = hocwp_get_current_language();

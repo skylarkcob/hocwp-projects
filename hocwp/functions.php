@@ -240,6 +240,25 @@ function hocwp_check_password( $password ) {
 	return wp_check_password( $password, HOCWP_HASHED_PASSWORD );
 }
 
+function hocwp_nonce( $action = 'hocwp_nonce', $name = 'hocwp_nonce' ) {
+	wp_nonce_field( $action, $name );
+}
+
+function hocwp_check_nonce( $action = 'hocwp_nonce', $nonce = '' ) {
+	if ( empty( $nonce ) ) {
+		$nonce = hocwp_get_method_value( 'hocwp_nonce', 'request' );
+		if ( empty( $nonce ) ) {
+			$nonce = hocwp_get_method_value( '_wpnonce', 'request' );
+		}
+	}
+
+	return wp_verify_nonce( $nonce, $action );
+}
+
+function hocwp_check_ajax_referer( $action = 'hocwp_nonce', $key = 'security' ) {
+	check_ajax_referer( $action, $key );
+}
+
 function hocwp_get_term_select( $args = array() ) {
 	return hocwp_get_term_drop_down( $args );
 }
@@ -427,9 +446,18 @@ function hocwp_tab_content_bootstrap( $args = array() ) {
 					if ( 0 === $count ) {
 						hocwp_add_string_with_space_before( $class, 'active' );
 					}
+					$custom_link = hocwp_get_value_by_key( $tab, 'custom_link' );
+					$data_toggle = 'tab';
+					if ( ! empty( $custom_link ) ) {
+						$href        = $custom_link;
+						$data_toggle = '';
+					} else {
+						$href = '#' . $href;
+					}
 					?>
 					<li class="<?php echo $class; ?>">
-						<a href="#<?php echo $href; ?>" data-toggle="tab"><?php echo $text; ?></a>
+						<a href="<?php echo $href; ?>"
+						   data-toggle="<?php echo $data_toggle; ?>"><?php echo $text; ?></a>
 					</li>
 					<?php
 					$count ++;
@@ -780,6 +808,18 @@ function hocwp_get_safe_captcha_characters() {
 	$characters = str_replace( $excludes, '', $characters );
 
 	return $characters;
+}
+
+function hocwp_check_captcha( $captcha_code = '' ) {
+	if ( empty( $captcha_code ) ) {
+		$captcha_code = hocwp_get_method_value( 'captcha', 'request' );
+	}
+	$captcha = new HOCWP_Captcha();
+	if ( $captcha->check( $captcha_code ) ) {
+		return true;
+	}
+
+	return false;
 }
 
 function hocwp_is_mobile_domain_blog() {
@@ -1878,6 +1918,7 @@ function hocwp_default_script_localize_object() {
 	$shortcodes      = hocwp_get_all_shortcodes();
 	$args            = array(
 		'ajax_url'        => admin_url( 'admin-ajax.php' ),
+		'security'        => wp_create_nonce( 'hocwp_nonce' ),
 		'datepicker_icon' => $datepicker_icon,
 		'shortcodes'      => $shortcodes,
 		'logged_in'       => hocwp_bool_to_int( is_user_logged_in() ),
@@ -1890,7 +1931,8 @@ function hocwp_default_script_localize_object() {
 			'confirm_message'            => __( 'Are you sure?', 'hocwp-theme' ),
 			'disconnect_confirm_message' => __( 'Are you sure you want to disconnect?', 'hocwp-theme' ),
 			'delete_confirm_message'     => __( 'Are you sure you want to delete this?', 'hocwp-theme' ),
-			'processing_text'            => __( 'Processing...', 'hocwp-theme' )
+			'processing_text'            => __( 'Processing...', 'hocwp-theme' ),
+			'max_file_item_select_error' => __( 'You can not select more than %s files.', 'hocwp-theme' )
 		),
 		'ajax_loading'    => '<p class="ajax-wrap"><img class="ajax-loading" src="' . hocwp_get_image_url( 'icon-loading-circle-light-full.gif' ) . '" alt=""></p>'
 	);
@@ -2164,7 +2206,7 @@ function hocwp_upload( $args = array() ) {
 	if ( $is_image && ! empty( $tmp_name ) ) {
 		$check = getimagesize( $tmp_name );
 		if ( $check === false ) {
-			$result['message'][] = 'Tập tin ' . $name . ' không phải là hình ảnh.';
+			$result['message'][] = sprintf( __( 'File %s is not a picture.', 'hocwp-theme' ), $name );
 
 			return $result;
 		}
@@ -2178,18 +2220,18 @@ function hocwp_upload( $args = array() ) {
 			$basename  = hocwp_sanitize_file_name( $basename );
 			$file_path = $path . '/' . $basename;
 		} else {
-			$result['message'][] = 'Tập tin ' . $name . ' đã tồn tại.';
+			$result['message'][] = sprintf( __( 'File %s already exists', 'hocwp-theme' ), $name );
 
 			return $result;
 		}
 	}
 	if ( $max_size > 0 && $size > $max_size ) {
-		$result['message'][] = 'Dung lượng tập tin không được quá ' . $max_size . 'KB.';
+		$result['message'][] = sprintf( __( 'File size should not exceed %s', 'hocwp-theme' ), $max_size );
 
 		return $result;
 	}
 	if ( count( $extensions ) > 0 && ! in_array( $file_type, $extensions ) ) {
-		$result['message'][] = 'Bạn không được phép upload tập tin với định dạng ' . $file_type . '.';
+		$result['message'][] = sprintf( __( 'You are not allowed to upload files with extension %s', 'hocwp-theme' ), $file_type );
 
 		return $result;
 	}
@@ -2197,7 +2239,7 @@ function hocwp_upload( $args = array() ) {
 	if ( move_uploaded_file( $tmp_name, $file_path ) ) {
 		$result['success'] = true;
 	} else {
-		$result['message'][] = 'Đã có lỗi xảy ra, tập tin của bạn chưa được upload.';
+		$result['message'][] = __( 'There was an error occurred, file is not uploaded.', 'hocwp-theme' );
 	}
 	$result['name'] = $name;
 	$result['path'] = $file_path;
