@@ -402,9 +402,9 @@ add_action( 'woocommerce_product_thumbnails', 'hocwp_wc_after_product_thumbnails
 function hocwp_wc_product_fast_buy_button( $args = array() ) {
 	$post_id            = hocwp_get_value_by_key( $args, 'post_id' );
 	$post_id            = hocwp_return_post( $post_id, 'id' );
-	$button_text        = hocwp_get_value_by_key( $args, 'button_text', __( 'Mua hàng nhanh', 'hocwp-theme' ) );
+	$button_text        = hocwp_get_value_by_key( $args, 'button_text', __( 'Buy now', 'hocwp-theme' ) );
 	$button_text        = apply_filters( 'hocwp_wc_fast_buy_button_text', $button_text );
-	$button_description = hocwp_get_value_by_key( $args, 'button_description', __( 'Đặt hàng nhanh, không cần thêm sản phẩm vào giỏ hàng.', 'hocwp-theme' ) );
+	$button_description = hocwp_get_value_by_key( $args, 'button_description', __( 'Fast order, without adding products to cart.', 'hocwp-theme' ) );
 	$button_description = apply_filters( 'hocwp_wc_fast_buy_button_description', $button_description );
 	?>
 	<button data-target="#productBuy<?php echo $post_id; ?>" data-toggle="modal"
@@ -581,7 +581,7 @@ function hocwp_wc_after_single_product_summary() {
 add_action( 'woocommerce_after_single_product_summary', 'hocwp_wc_after_single_product_summary', 0 );
 
 function hocwp_wc_add_vietnam_dong_currency( $currencies ) {
-	$currencies['VNDU'] = __( 'Việt Nam Đồng', 'hocwp-theme' );
+	$currencies['VNDU'] = 'Việt Nam Đồng';
 
 	return $currencies;
 }
@@ -1018,8 +1018,8 @@ function hocwp_wc_review_order_before_submit() {
 add_action( 'woocommerce_review_order_before_submit', 'hocwp_wc_review_order_before_submit' );
 
 function hocwp_wc_review_order_after_submit() {
-	$url = hocwp_wc_get_cart_url( );
-	$button   = new HOCWP_HTML( 'a' );
+	$url    = hocwp_wc_get_cart_url();
+	$button = new HOCWP_HTML( 'a' );
 	$button->set_href( $url );
 	$button->set_text( __( 'Back to cart page', 'hocwp-theme' ) );
 	$button->add_class( 'btn navigation-link pull-right' );

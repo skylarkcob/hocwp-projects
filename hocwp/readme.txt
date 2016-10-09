@@ -39,5 +39,10 @@ If you have any questions, please visit [hocwp.net](http://hocwp.net/) for more 
 * Fix - WooCommerce product with sale flash has no add to cart button on single page.
 * Dev - add jQuery slider plugin using with slick.
 * Add - readme file to describe code and changelog.
+* Add - taxonomy and post type base slug filter for user can change it.
+* Update - some PHP core functions.
+* Add - thumbnail column for bookmark table list.
+* Add - Facebook Messenger widget.
+* Update - default style for shop theme with WooCommerce.
 
 == Upgrade Notice ==

@@ -243,6 +243,7 @@ function hocwp_google_login_script( $args = array() ) {
 					type: 'POST',
 					dataType: 'json',
 					url: hocwp.ajax_url,
+					cache: true,
 					data: {
 						action: 'hocwp_social_login_google',
 						data: JSON.stringify(response),
@@ -322,6 +323,7 @@ function hocwp_facebook_login_script( $args = array() ) {
 						type: 'POST',
 						dataType: 'json',
 						url: hocwp.ajax_url,
+						cache: true,
 						data: {
 							action: 'hocwp_social_login_facebook',
 							data: JSON.stringify(response),
@@ -465,22 +467,13 @@ function hocwp_favorite_post_button_text( $args = array() ) {
 	} else {
 		$post_id = hocwp_get_value_by_key( $args, 'post_id' );
 	}
-	$lang      = hocwp_get_language();
 	$save_text = hocwp_get_value_by_key( $args, 'save_text', '' );
 	if ( empty( $save_text ) ) {
-		if ( 'vi' == $lang ) {
-			$save_text = __( 'Lưu tin', 'hocwp-theme' );
-		} else {
-			$save_text = __( 'Favorite', 'hocwp-theme' );
-		}
+		$save_text = __( 'Favorite', 'hocwp-theme' );
 	}
 	$unsave_text = hocwp_get_value_by_key( $args, 'unsave_text' );
 	if ( empty( $unsave_text ) ) {
-		if ( 'vi' == $lang ) {
-			$unsave_text = __( 'Bỏ lưu', 'hocwp-theme' );
-		} else {
-			$unsave_text = __( 'Favorited', 'hocwp-theme' );
-		}
+		$unsave_text = __( 'Favorited', 'hocwp-theme' );
 	}
 	if ( ! hocwp_id_number_valid( $post_id ) ) {
 		$post_id = get_the_ID();
@@ -508,22 +501,13 @@ function hocwp_save_post_button_text( $args = array() ) {
 	} else {
 		$post_id = hocwp_get_value_by_key( $args, 'post_id' );
 	}
-	$lang      = hocwp_get_language();
 	$save_text = hocwp_get_value_by_key( $args, 'save_text', '' );
 	if ( empty( $save_text ) ) {
-		if ( 'vi' == $lang ) {
-			$save_text = __( 'Lưu tin', 'hocwp-theme' );
-		} else {
-			$save_text = __( 'Save', 'hocwp-theme' );
-		}
+		$save_text = __( 'Save', 'hocwp-theme' );
 	}
 	$unsave_text = hocwp_get_value_by_key( $args, 'unsave_text' );
 	if ( empty( $unsave_text ) ) {
-		if ( 'vi' == $lang ) {
-			$unsave_text = __( 'Bỏ lưu', 'hocwp-theme' );
-		} else {
-			$unsave_text = __( 'Saved', 'hocwp-theme' );
-		}
+		$unsave_text = __( 'Saved', 'hocwp-theme' );
 	}
 	if ( ! hocwp_id_number_valid( $post_id ) ) {
 		$post_id = get_the_ID();
@@ -911,7 +895,13 @@ function hocwp_disable_emoji() {
 	remove_action( 'admin_print_styles', 'print_emoji_styles' );
 }
 
-function hocwp_the_custom_content( $content ) {
+function hocwp_filter_custom_content( $content ) {
 	$content = apply_filters( 'hocwp_the_custom_content', $content );
+
+	return $content;
+}
+
+function hocwp_the_custom_content( $content ) {
+	$content = hocwp_filter_custom_content( $content );
 	echo $content;
 }

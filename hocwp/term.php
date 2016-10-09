@@ -343,6 +343,13 @@ function hocwp_term_icon_html( $term_id, $default = '' ) {
 }
 
 function hocwp_get_child_terms( $parent_id, $taxonomy, $args = array() ) {
+	if ( is_a( $parent_id, 'WP_Term' ) && ( is_array( $taxonomy ) || null == $taxonomy ) ) {
+		$taxonomy = $parent_id->taxonomy;
+		if ( is_array( $taxonomy ) ) {
+			$args = $taxonomy;
+		}
+		$parent_id = $parent_id->term_id;
+	}
 	$args['child_of'] = $parent_id;
 	$terms            = hocwp_get_terms( $taxonomy, $args );
 

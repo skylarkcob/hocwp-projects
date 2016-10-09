@@ -152,6 +152,7 @@ jQuery(document).ready(function ($) {
                                 type: 'POST',
                                 dataType: 'json',
                                 url: hocwp.ajax_url,
+                                cache: true,
                                 data: {
                                     action: 'hocwp_generate_slider_sortable_item',
                                     max_item_id: max_item_id,
@@ -211,6 +212,7 @@ jQuery(document).ready(function ($) {
                         type: 'POST',
                         dataType: 'json',
                         url: hocwp.ajax_url,
+                        cache: true,
                         data: {
                             action: 'hocwp_remove_slider_item',
                             item_id: parseInt($slider_item.attr('data-item')),
@@ -272,6 +274,7 @@ jQuery(document).ready(function ($) {
                 type: 'POST',
                 dataType: 'json',
                 url: hocwp.ajax_url,
+                cache: true,
                 data: {
                     action: 'hocwp_fetch_plugin_license',
                     use_for: $element.val()
@@ -424,6 +427,7 @@ jQuery(document).ready(function ($) {
                         type: 'POST',
                         dataType: 'json',
                         url: hocwp.ajax_url,
+                        cache: true,
                         data: {
                             action: 'hocwp_compress_style_and_script',
                             type: JSON.stringify(type),
@@ -454,6 +458,7 @@ jQuery(document).ready(function ($) {
                     type: 'POST',
                     dataType: 'json',
                     url: hocwp.ajax_url,
+                    cache: true,
                     data: {
                         action: 'hocwp_disconnect_social_account',
                         social: social,

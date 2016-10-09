@@ -10,9 +10,9 @@ if ( ! function_exists( 'add_filter' ) ) {
 
 function hocwp_pagination_defaults() {
 	$defaults = array(
-		'label'             => __( 'Trang', 'hocwp-theme' ),
-		'last'              => __( 'Trang cuối', 'hocwp-theme' ),
-		'first'             => __( 'Trang đầu', 'hocwp-theme' ),
+		'label'             => __( 'Pages', 'hocwp-theme' ),
+		'last'              => __( 'Last', 'hocwp-theme' ),
+		'first'             => __( 'First', 'hocwp-theme' ),
 		'show_first_item'   => false,
 		'next'              => '&raquo;',
 		'prev'              => '&laquo;',

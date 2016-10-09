@@ -14,6 +14,21 @@ function hocwp_query( $args = array() ) {
 		'orderby' => 'date'
 	);
 	$args     = wp_parse_args( $args, $defaults );
+	$cache    = isset( $args['cache'] ) ? $args['cache'] : false;
+	if ( false !== $cache ) {
+		$transient_name = 'hocwp_query_cache_' . md5( json_encode( $args ) );
+		if ( false === ( $query = get_transient( $transient_name ) ) ) {
+			$query = new WP_Query( $args );
+			if ( $query->have_posts() ) {
+				if ( ! is_numeric( $cache ) ) {
+					$cache = WEEK_IN_SECONDS;
+				}
+				set_transient( $transient_name, $query, $cache );
+			}
+		}
+
+		return $query;
+	}
 
 	return new WP_Query( $args );
 }
@@ -176,6 +191,80 @@ function hocwp_query_sanitize_meta_query( $item, &$args ) {
 	return $args;
 }
 
+function hocwp_query_sanitize_date_query_args( $item, &$args = array() ) {
+	$date_query = hocwp_get_value_by_key( $args, 'date_query' );
+	if ( ! is_array( $date_query ) ) {
+		$date_query = array();
+	}
+	if ( ! is_array( $item ) ) {
+		$today = getdate();
+		switch ( $item ) {
+			case 'today':
+			case 'daily':
+			case 'day':
+				$item = array(
+					'year'  => $today['year'],
+					'month' => $today['mon'],
+					'day'   => $today['mday'],
+				);
+				break;
+			case 'yesterday':
+				$item = array(
+					'column' => 'post_date_gmt',
+					'after'  => '1 day ago'
+				);
+				break;
+			case 'this_week':
+				$item = array(
+					'year' => date( 'Y' ),
+					'week' => date( 'W' ),
+				);
+				break;
+			case 'last_week':
+			case 'weekly':
+			case 'week':
+				$item = array(
+					'column' => 'post_date_gmt',
+					'after'  => '1 week ago'
+				);
+				break;
+			case 'this_month':
+				$item = array(
+					'year'  => $today['year'],
+					'month' => $today['mon']
+				);
+				break;
+			case 'last_month':
+			case 'monthly':
+			case 'month':
+				$item = array(
+					'column' => 'post_date_gmt',
+					'after'  => '1 month ago'
+				);
+				break;
+			case 'this_year':
+				$item = array(
+					'year' => $today['year']
+				);
+				break;
+			case 'last_year':
+			case 'yearly':
+			case 'year':
+				$item = array(
+					'column' => 'post_date_gmt',
+					'after'  => '1 year ago'
+				);
+				break;
+		}
+	}
+	if ( is_array( $item ) ) {
+		$date_query[] = $item;
+	}
+	$args['date_query'] = $date_query;
+
+	return $args;
+}
+
 function hocwp_query_build_binary_meta_args( $meta_key, $args = array() ) {
 	$meta_item = array(
 		'relation' => 'AND',
@@ -210,11 +299,91 @@ function hocwp_query_post_by_binary_meta( $meta_key, $args = array() ) {
 }
 
 function hocwp_query_post_by_format( $format, $args = array() ) {
-	$meta_item = array(
-		'key'   => 'post_format',
-		'value' => $format
+	if ( is_string( $format ) && ! hocwp_string_contain( $format, 'post-format-' ) ) {
+		$format = 'post-format-' . $format;
+	}
+	if ( ! is_array( $format ) ) {
+		$format = array( $format );
+	}
+	$item = array(
+		'taxonomy' => 'post_format',
+		'field'    => 'slug',
+		'terms'    => $format
 	);
-	$args      = hocwp_query_sanitize_meta_query( $meta_item, $args );
+	hocwp_query_sanitize_tax_query( $item, $args );
+
+	return hocwp_query( $args );
+}
+
+function hocwp_query_modified_post( $args = array() ) {
+	$args['orderby'] = 'modified';
+
+	return hocwp_query( $args );
+}
+
+function hocwp_query_most_viewed_post( $args = array() ) {
+	$args['meta_key'] = 'views';
+	$args['orderby']  = 'meta_value_num';
+	$args             = hocwp_query_build_binary_meta_args( 'views', $args );
+
+	return hocwp_query( $args );
+}
+
+function hocwp_query_random_post( $args = array() ) {
+	$args['orderby'] = 'rand';
+
+	return hocwp_query( $args );
+}
+
+function hocwp_query_most_comment_post( $args = array() ) {
+	$args['orderby'] = 'comment_count';
+
+	return hocwp_query( $args );
+}
+
+function hocwp_query_by( $by, $args = array(), $interval = '' ) {
+	switch ( $by ) {
+		case 'updated':
+		case 'update':
+		case 'modified':
+		case 'modify':
+			$args['orderby'] = 'modified';
+			break;
+		case 'rand':
+		case 'random':
+			$args['orderby'] = 'rand';
+			break;
+		case 'most_commented':
+		case 'most_comment':
+		case 'comment_count':
+		case 'comment':
+			$args['orderby'] = 'comment_count';
+			break;
+		case 'featured':
+			hocwp_query_sanitize_featured_args( $args );
+			break;
+		case 'most_likes':
+		case 'most_liked':
+		case 'most_like':
+		case 'likes':
+		case 'liked':
+		case 'like':
+			$args['meta_key'] = 'likes';
+			$args['orderby']  = 'meta_value_num';
+			break;
+		case 'most_views':
+		case 'most_viewed':
+		case 'most_view':
+		case 'views':
+		case 'viewed':
+		case 'view':
+			$args['meta_key'] = 'views';
+			$args['orderby']  = 'meta_value_num';
+			break;
+	}
+	if ( ! empty( $interval ) ) {
+		hocwp_query_sanitize_date_query_args( $interval, $args );
+	}
 
 	return hocwp_query( $args );
 }

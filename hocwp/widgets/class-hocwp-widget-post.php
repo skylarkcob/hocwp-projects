@@ -169,15 +169,19 @@ class HOCWP_Widget_Post extends WP_Widget {
 			case 'recent':
 				$get_by = true;
 				break;
+			case 'modified':
 			case 'recent_modified':
 				$get_by                = true;
 				$query_args['orderby'] = 'modified';
 				$query_args['order']   = 'DESC';
 				break;
+			case 'rand':
 			case 'random':
 				$get_by                = true;
 				$query_args['orderby'] = 'rand';
 				break;
+			case 'most_comment':
+			case 'comment_count':
 			case 'comment':
 				$get_by                = true;
 				$query_args['orderby'] = 'comment_count';

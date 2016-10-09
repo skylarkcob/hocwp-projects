@@ -181,6 +181,7 @@ function hocwp_dashboard_widget_script() {
 						type: 'POST',
 						dataType: 'json',
 						url: ajax_url,
+						cache: true,
 						data: {
 							action: 'hocwp_dashboard_widget',
 							widget: widget_id
@@ -1040,8 +1041,11 @@ function hocwp_loop_plugin_card( $plugin, $allow_tags = array(), $base_name = ''
 
 function hocwp_facebook_like_button( $args = array() ) {
 	$post_id   = isset( $args['post_id'] ) ? $args['post_id'] : get_the_ID();
-	$permalink = get_permalink( $post_id );
-	$class     = isset( $args['class'] ) ? $args['class'] : '';
+	$permalink = hocwp_get_value_by_key( $args, 'permalink', get_permalink( $post_id ) );
+	if ( empty( $permalink ) ) {
+		$permalink = home_url( '/' );
+	}
+	$class = isset( $args['class'] ) ? $args['class'] : '';
 	hocwp_add_string_with_space_before( $class, 'fb-like' );
 	$layout     = isset( $args['layout'] ) ? $args['layout'] : 'button_count';
 	$action     = isset( $args['action'] ) ? $args['action'] : 'like';
@@ -1050,9 +1054,106 @@ function hocwp_facebook_like_button( $args = array() ) {
 	$share      = isset( $args['share'] ) ? $args['share'] : true;
 	$share      = hocwp_bool_to_string( $share );
 	?>
-	<div class="<?php echo $class; ?>" data-href="<?php echo $permalink; ?>" data-layout="<?php echo $layout; ?>"
+	<div class="<?php echo $class; ?>" data-href="<?php echo esc_url( $permalink ); ?>"
+	     data-layout="<?php echo $layout; ?>"
 	     data-action="<?php echo $action; ?>" data-show-faces="<?php echo $show_faces; ?>"
 	     data-share="<?php echo $share; ?>"></div>
+	<?php
+}
+
+function hocwp_google_plus_one_button( $args = array() ) {
+	$post_id    = hocwp_get_value_by_key( $args, 'post_id', get_the_ID() );
+	$permalink  = hocwp_get_value_by_key( $args, 'permalink', get_permalink( $post_id ) );
+	$size       = hocwp_get_value_by_key( $args, 'size', 'medium' );
+	$annotation = hocwp_get_value_by_key( $args, 'annotation', 'bubble' );
+	$width      = hocwp_get_value_by_key( $args, 'width', 300 );
+	$language   = hocwp_get_value_by_key( $args, 'language', hocwp_get_language() );
+	if ( empty( $permalink ) ) {
+		$permalink = home_url( '/' );
+	}
+	?>
+	<!-- Place this tag where you want the +1 button to render. -->
+	<div class="g-plusone" data-width="<?php echo $width; ?>" data-annotation="<?php echo $annotation; ?>"
+	     data-size="<?php echo $size; ?>"
+	     data-href="<?php echo esc_url( $permalink ); ?>"></div>
+
+	<!-- Place this tag after the last +1 button tag. -->
+	<script type="text/javascript">
+		window.___gcfg = {lang: '<?php echo $language; ?>'};
+
+		(function () {
+			var po = document.createElement('script');
+			po.type = 'text/javascript';
+			po.async = true;
+			po.src = 'https://apis.google.com/js/platform.js';
+			var s = document.getElementsByTagName('script')[0];
+			s.parentNode.insertBefore(po, s);
+		})();
+	</script>
+	<?php
+}
+
+function hocwp_twitter_follow_button( $args = array() ) {
+	$username = hocwp_get_value_by_key( $args, 'username' );
+	if ( empty( $username ) ) {
+		$username = hocwp_get_value_by_key( $args, 'account' );
+	}
+	$permalink = hocwp_get_value_by_key( $args, 'permalink' );
+	if ( empty( $permalink ) ) {
+		$permalink = $username;
+	}
+	if ( ! empty( $permalink ) && ! hocwp_is_url( $permalink ) ) {
+		$permalink = 'https://twitter.com/' . $permalink;
+	}
+	if ( empty( $permalink ) ) {
+		$permalink = hocwp_get_option_by_name( 'hocwp_option_social', 'twitter_site' );
+	}
+	if ( empty( $permalink ) ) {
+		return;
+	}
+	$show_screen_name = hocwp_get_value_by_key( $args, 'show_screen_name' );
+	$show_count       = hocwp_get_value_by_key( $args, 'show_count' );
+	$show_count       = hocwp_bool_to_string( $show_count );
+	if ( empty( $username ) ) {
+		$username = hocwp_get_last_part_in_url( $permalink );
+	}
+	if ( ! empty( $username ) ) {
+		$first_char = hocwp_get_first_char( $username );
+		if ( '@' != $first_char ) {
+			$username = '@' . $username;
+		}
+	}
+	$text = __( 'Follow', 'hocwp-theme' );
+	if ( $show_screen_name ) {
+		$username = $text . ' ' . $username;
+	} else {
+		$username = $text;
+	}
+	$username         = trim( $username );
+	$size             = hocwp_get_value_by_key( $args, 'size' );
+	$show_screen_name = hocwp_bool_to_string( $show_screen_name );
+	?>
+	<a data-show-screen-name="<?php echo $show_screen_name; ?>" data-size="<?php echo $size; ?>"
+	   href="<?php echo esc_url( $permalink ); ?>" class="twitter-follow-button"
+	   data-show-count="<?php echo $show_count; ?>"><?php echo $username; ?></a>
+	<script type="text/javascript">
+		window.twttr = (function (d, s, id) {
+			var js, fjs = d.getElementsByTagName(s)[0],
+				t = window.twttr || {};
+			if (d.getElementById(id)) return t;
+			js = d.createElement(s);
+			js.id = id;
+			js.src = "https://platform.twitter.com/widgets.js";
+			fjs.parentNode.insertBefore(js, fjs);
+
+			t._e = [];
+			t.ready = function (f) {
+				t._e.push(f);
+			};
+
+			return t;
+		}(document, "script", "twitter-wjs"));
+	</script>
 	<?php
 }
 

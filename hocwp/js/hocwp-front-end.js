@@ -67,6 +67,7 @@ jQuery(document).ready(function ($) {
                 type: 'POST',
                 dataType: 'json',
                 url: hocwp.ajax_url,
+                cache: true,
                 data: {
                     action: 'hocwp_comment_likes',
                     comment_id: comment_id,
@@ -92,6 +93,7 @@ jQuery(document).ready(function ($) {
                 type: 'POST',
                 dataType: 'json',
                 url: hocwp.ajax_url,
+                cache: true,
                 data: {
                     action: 'hocwp_comment_report',
                     comment_id: comment_id
@@ -139,6 +141,7 @@ jQuery(document).ready(function ($) {
                 type: 'POST',
                 dataType: 'json',
                 url: hocwp.ajax_url,
+                cache: true,
                 data: {
                     action: 'hocwp_vote_post',
                     post_id: post_id,
@@ -169,6 +172,7 @@ jQuery(document).ready(function ($) {
                     type: 'POST',
                     dataType: 'json',
                     url: hocwp.ajax_url,
+                    cache: true,
                     data: {
                         action: 'hocwp_wc_remove_cart_item',
                         post_id: post_id
@@ -251,6 +255,7 @@ jQuery(document).ready(function ($) {
                         type: 'POST',
                         dataType: 'json',
                         url: hocwp.ajax_url,
+                        cache: true,
                         data: {
                             action: 'hocwp_wc_order_item',
                             post_id: $element.attr('data-id'),
@@ -306,6 +311,7 @@ jQuery(document).ready(function ($) {
                         type: 'POST',
                         dataType: 'json',
                         url: hocwp.ajax_url,
+                        cache: true,
                         data: {
                             action: 'hocwp_widget_subscribe',
                             name: $name.val(),
@@ -409,6 +415,7 @@ jQuery(document).ready(function ($) {
                     type: 'POST',
                     dataType: 'json',
                     url: hocwp.ajax_url,
+                    cache: true,
                     data: {
                         action: 'hocwp_favorite_post',
                         post_id: post_id,
@@ -465,6 +472,7 @@ jQuery(document).ready(function ($) {
                 type: 'POST',
                 dataType: 'json',
                 url: hocwp.ajax_url,
+                cache: true,
                 data: {
                     action: 'hocwp_update_post_temperature',
                     post_id: post_id,

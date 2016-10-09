@@ -465,9 +465,9 @@ function hocwp_rel_canonical() {
 
 function hocwp_posts_pagination( $args = array() ) {
 	$defaults = array(
-		'prev_text'          => __( 'Trước', 'hocwp-theme' ),
-		'next_text'          => __( 'Tiếp theo', 'hocwp-theme' ),
-		'screen_reader_text' => __( 'Phân trang', 'hocwp-theme' )
+		'prev_text'          => __( 'Prev', 'hocwp-theme' ),
+		'next_text'          => __( 'Next', 'hocwp-theme' ),
+		'screen_reader_text' => __( 'Pages', 'hocwp-theme' )
 	);
 	$args     = wp_parse_args( $args, $defaults );
 	the_posts_pagination( $args );

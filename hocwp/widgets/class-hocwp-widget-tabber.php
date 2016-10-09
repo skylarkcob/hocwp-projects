@@ -55,7 +55,7 @@ class HOCWP_Widget_Tabber extends WP_Widget {
 		$sidebar = hocwp_get_value_by_key( $instance, 'sidebar' );
 		hocwp_widget_before( $args, $instance, false );
 		if ( empty( $sidebar ) ) {
-			echo '<p>' . __( 'Xin vui lòng chọn sidebar chứa các tab widget trước.', 'hocwp-theme' ) . '</p>';
+			echo '<p>' . __( 'Please select sidebar that widgets will be displayed here as tabber.', 'hocwp-theme' ) . '</p>';
 		} elseif ( $args['id'] != $sidebar ) { ?>
 			<div class="hocwp-tab-content">
 				<ul class="nav nav-tabs list-tab hocwp-tabs"></ul>
@@ -70,7 +70,7 @@ class HOCWP_Widget_Tabber extends WP_Widget {
 							$sidebar_name = $sidebar_tmp['name'];
 						}
 						?>
-						<p><?php printf( __( 'Xin vui lòng kéo các widget cần hiển thị vào sidebar %s.', 'hocwp-theme' ), $sidebar_name ); ?></p>
+						<p><?php printf( __( 'Please drag and drop widget into sidebar %s.', 'hocwp-theme' ), $sidebar_name ); ?></p>
 						<?php
 					}
 					?>

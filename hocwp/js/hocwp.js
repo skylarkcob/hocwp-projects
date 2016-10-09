@@ -119,6 +119,7 @@ jQuery(document).ready(function ($) {
                 type: 'POST',
                 dataType: 'json',
                 url: hocwp.ajax_url,
+                cache: true,
                 data: {
                     action: 'hocwp_sanitize_media_value',
                     url: src,
@@ -183,6 +184,7 @@ jQuery(document).ready(function ($) {
             type: 'POST',
             dataType: 'json',
             url: hocwp.ajax_url,
+            cache: true,
             data: {
                 action: 'hocwp_debug_log',
                 object: data
@@ -265,6 +267,7 @@ jQuery(document).ready(function ($) {
                 type: 'POST',
                 dataType: 'json',
                 url: hocwp.ajax_url,
+                cache: true,
                 data: {
                     action: 'hocwp_change_captcha_image'
                 },
@@ -366,6 +369,7 @@ jQuery(document).ready(function ($) {
                 type: 'POST',
                 dataType: 'json',
                 url: hocwp.ajax_url,
+                cache: true,
                 data: {
                     action: 'hocwp_switcher_ajax',
                     post_id: $element.attr('data-id'),
@@ -596,6 +600,7 @@ jQuery(document).ready(function ($) {
                 type: 'POST',
                 dataType: 'json',
                 url: hocwp.ajax_url,
+                cache: true,
                 data: {
                     action: 'hocwp_fetch_administrative_boundaries',
                     parent: $element.val(),
@@ -822,7 +827,11 @@ jQuery(document).ready(function ($) {
                 placeholder: 'ui-state-highlight',
                 sort: function (event, ui) {
                     var that = $(this),
+                        $sortable_result = $container.find('.connected-result'),
                         ui_state_highlight = that.find('.ui-state-highlight');
+                    if ($sortable_result.length) {
+                        $sortable_result.css({'height': 'auto'});
+                    }
                     ui_state_highlight.css({'height': ui.item.height()});
                     if (that.hasClass('display-inline')) {
                         ui_state_highlight.css({'width': ui.item.width()});
@@ -844,7 +853,7 @@ jQuery(document).ready(function ($) {
                     } else {
                         hocwp.sortableStop($element, $container);
                     }
-                    if (element_height > sortable_result_height) {
+                    if (element_height >= sortable_result_height) {
                         $sortable_result.css({'height': element_height});
                     } else {
                         $sortable_result.css({'height': 'auto'});
@@ -856,7 +865,7 @@ jQuery(document).ready(function ($) {
         if ($sortable_result.length && $sortable_result.hasClass('sortable')) {
             var element_height = $element.height(),
                 sortable_result_height = $sortable_result.height();
-            if (element_height > sortable_result_height) {
+            if (element_height >= sortable_result_height) {
                 $sortable_result.css({'height': element_height});
             } else {
                 $sortable_result.css({'height': 'auto'});
@@ -1231,6 +1240,7 @@ jQuery(document).ready(function ($) {
                 type: 'POST',
                 dataType: 'json',
                 url: hocwp.ajax_url,
+                cache: true,
                 data: {
                     action: 'hocwp_rate_post',
                     post_id: post_id,
@@ -1358,6 +1368,7 @@ jQuery(document).ready(function ($) {
                             type: 'POST',
                             dataType: 'json',
                             url: hocwp.ajax_url,
+                            cache: true,
                             data: {
                                 action: 'hocwp_get_term_administrative_boundaries_address',
                                 term_id: $input_category.val(),
@@ -1413,6 +1424,7 @@ jQuery(document).ready(function ($) {
                             type: 'POST',
                             dataType: 'json',
                             url: hocwp.ajax_url,
+                            cache: true,
                             data: {
                                 action: 'hocwp_get_term_administrative_boundaries_address',
                                 term_id: term_id,

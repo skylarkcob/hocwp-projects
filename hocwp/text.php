@@ -59,54 +59,60 @@ function hocwp_get_text( $lang, $args = array() ) {
 }
 
 function hocwp_text_error_default( $lang = 'vi' ) {
+	$tmp  = __( 'There was an error occurred, please try again!', 'hocwp-theme' );
 	$text = hocwp_get_text( $lang, array(
-		'vi' => __( 'Đã có lỗi xảy ra, xin vui lòng thử lại!', 'hocwp-theme' ),
-		'en' => __( 'There was an error occurred, please try again!', 'hocwp-theme' )
+		'vi' => $tmp,
+		'en' => $tmp
 	) );
 
 	return apply_filters( 'hocwp_text_error_default', $text, $lang );
 }
 
 function hocwp_text_error_email_exists( $lang = 'vi' ) {
+	$tmp  = __( 'Email address already exists!', 'hocwp-theme' );
 	$text = hocwp_get_text( $lang, array(
-		'vi' => __( 'Địa chỉ email đã tồn tại!', 'hocwp-theme' ),
-		'en' => __( 'Email address already exists!', 'hocwp-theme' )
+		'vi' => $tmp,
+		'en' => $tmp
 	) );
 
 	return apply_filters( 'hocwp_text_error_email_exists', $text, $lang );
 }
 
 function hocwp_text_error_email_not_valid( $lang = 'vi' ) {
+	$tmp  = __( 'The email address is not correct!', 'hocwp-theme' );
 	$text = hocwp_get_text( $lang, array(
-		'vi' => __( 'Địa chỉ email không đúng!', 'hocwp-theme' ),
-		'en' => __( 'The email address is not correct!', 'hocwp-theme' )
+		'vi' => $tmp,
+		'en' => $tmp
 	) );
 
 	return apply_filters( 'hocwp_text_error_email_not_valid', $text, $lang );
 }
 
 function hocwp_text_error_captcha_not_valid( $lang = 'vi' ) {
+	$tmp  = __( 'The captcha code is not correct!', 'hocwp-theme' );
 	$text = hocwp_get_text( $lang, array(
-		'vi' => __( 'Mã bảo mật không đúng!', 'hocwp-theme' ),
-		'en' => __( 'The captcha code is not correct!', 'hocwp-theme' )
+		'vi' => $tmp,
+		'en' => $tmp
 	) );
 
 	return apply_filters( 'hocwp_text_error_captcha_not_valid', $text, $lang );
 }
 
 function hocwp_text_success_register_and_verify_email( $lang = 'vi' ) {
+	$tmp  = __( 'You have successfully registered, please check your email for activation.', 'hocwp-theme' );
 	$text = hocwp_get_text( $lang, array(
-		'vi' => __( 'Bạn đã đăng ký thành công, xin vui lòng kiểm tra email để kích hoạt.', 'hocwp-theme' ),
-		'en' => __( 'You have successfully registered, please check your email for activation.', 'hocwp-theme' )
+		'vi' => $tmp,
+		'en' => $tmp
 	) );
 
 	return apply_filters( 'hocwp_text_success_register_and_verify_email', $text, $lang );
 }
 
 function hocwp_text_email_subject_verify_subscription( $lang = 'vi' ) {
+	$tmp  = __( 'Activate your Email Subscription to: %s', 'hocwp-theme' );
 	$text = hocwp_get_text( $lang, array(
-		'vi' => __( 'Kích hoạt địa chỉ email của bạn tại: %s', 'hocwp-theme' ),
-		'en' => __( 'Activate your Email Subscription to: %s', 'hocwp-theme' )
+		'vi' => $tmp,
+		'en' => $tmp
 	) );
 	$text = sprintf( $text, get_bloginfo( 'name' ) );
 

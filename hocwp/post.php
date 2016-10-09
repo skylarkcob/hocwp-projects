@@ -360,8 +360,28 @@ function hocwp_post_thumbnail( $args = array() ) {
 	}
 	$loop        = isset( $args['loop'] ) ? $args['loop'] : true;
 	$custom_html = isset( $args['custom_html'] ) ? $args['custom_html'] : '';
-	$cover       = hocwp_get_value_by_key( $args, 'cover' );
-	$only_image  = hocwp_get_value_by_key( $args, 'only_image' );
+	$icon_video  = hocwp_get_value_by_key( $args, 'icon_video' );
+	if ( true === $icon_video ) {
+		$icon_video = '<i class="fa fa-play-circle-o" aria-hidden="true"></i>';
+	}
+	if ( ! empty( $icon_video ) && is_string( $icon_video ) && empty( $custom_html ) ) {
+		$a = new HOCWP_HTML( 'a' );
+		$a->set_href( $permalink );
+		$a->set_text( $icon_video );
+		$custom_html = $a->build();
+	}
+	$icon_image = hocwp_get_value_by_key( $args, 'icon_image' );
+	if ( true === $icon_image ) {
+		$icon_image = '<i class="fa fa-camera" aria-hidden="true"></i>';
+	}
+	if ( ! empty( $icon_image ) && is_string( $icon_image ) && empty( $custom_html ) ) {
+		$a = new HOCWP_HTML( 'a' );
+		$a->set_href( $permalink );
+		$a->set_text( $icon_image );
+		$custom_html = $a->build();
+	}
+	$cover      = hocwp_get_value_by_key( $args, 'cover' );
+	$only_image = hocwp_get_value_by_key( $args, 'only_image' );
 	if ( (bool) $only_image ) {
 		$img->output();
 		if ( (bool) $lazyload ) {
@@ -653,6 +673,22 @@ function hocwp_get_post_by_column( $column_name, $column_value, $output = 'OBJEC
 			break;
 		default:
 			$result = $post_id;
+	}
+
+	return $result;
+}
+
+function hocwp_find_post( $data, $post_type = 'post' ) {
+	$result = null;
+	if ( ! empty( $data ) ) {
+		if ( hocwp_id_number_valid( $data ) ) {
+			$temp = get_post( $data );
+			if ( hocwp_is_post( $temp ) && $temp->post_type == $post_type ) {
+				$result = $temp;
+			}
+		} else {
+			$result = hocwp_get_post_by_slug( $data, $post_type );
+		}
 	}
 
 	return $result;

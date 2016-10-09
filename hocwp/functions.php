@@ -65,26 +65,6 @@ function hocwp_create_database_table( $table_name, $sql_column ) {
 	}
 }
 
-function hocwp_get_all_shortcodes() {
-	return $GLOBALS['shortcode_tags'];
-}
-
-function hocwp_get_all_sb_shortcodes() {
-	$shortcodes = hocwp_get_all_shortcodes();
-	$result     = array();
-	foreach ( $shortcodes as $key => $function ) {
-		if ( ( 'sb' == substr( $key, 0, 2 ) && 'sb' == substr( $function, 0, 2 ) ) || ( 'hocwp' == substr( $key, 0, 5 ) && 'hocwp' == substr( $function, 0, 5 ) ) ) {
-			$result[ $key ] = $function;
-		}
-	}
-
-	return $result;
-}
-
-function hocwp_get_my_shortcodes() {
-	return hocwp_get_all_sb_shortcodes();
-}
-
 function hocwp_get_timezone_string() {
 	$timezone_string = get_option( 'timezone_string' );
 	if ( empty( $timezone_string ) && 'vi' == hocwp_get_language() ) {
@@ -478,7 +458,7 @@ function hocwp_modal_bootstrap( $args = array() ) {
 	$container_class = hocwp_get_value_by_key( $args, 'container_class' );
 	$callback        = hocwp_get_value_by_key( $args, 'callback' );
 	$buttons         = hocwp_get_value_by_key( $args, 'buttons', array() );
-	$close_text      = hocwp_get_value_by_key( $args, 'close_text', hocwp_get_value_by_key( $args, 'close_button_text', __( 'Đóng', 'hocwp-theme' ) ) );
+	$close_text      = hocwp_get_value_by_key( $args, 'close_text', hocwp_get_value_by_key( $args, 'close_button_text', __( 'Close', 'hocwp-theme' ) ) );
 	hocwp_add_string_with_space_before( $container_class, 'modal fade' );
 	$container_class = trim( $container_class );
 	if ( empty( $id ) || empty( $title ) || empty( $callback ) ) {
@@ -610,6 +590,9 @@ function hocwp_sanitize_array( $arr, $unique = '', $filter = '' ) {
 }
 
 function hocwp_sanitize_size( $size ) {
+	if ( is_string( $size ) ) {
+		$size = explode( ',', $size );
+	}
 	$size = (array) $size;
 	if ( isset( $size['size'] ) ) {
 		$type = $size['size'];
@@ -1803,9 +1786,9 @@ function hocwp_feedburner_form( $args = array() ) {
 		$submit_button_text = $args['button_text'];
 	}
 	if ( empty( $submit_button_text ) ) {
-		$submit_button_text = __( 'Đăng ký', 'hocwp-theme' );
+		$submit_button_text = __( 'Subscribe', 'hocwp-theme' );
 	}
-	$placeholder = isset( $args['placeholder'] ) ? $args['placeholder'] : __( 'Nhập địa chỉ email của bạn...', 'hocwp-theme' );
+	$placeholder = isset( $args['placeholder'] ) ? $args['placeholder'] : __( 'Your email address...', 'hocwp-theme' );
 	?>
 	<form class="feedburner-form" action="https://feedburner.google.com/fb/a/mailverify" method="post"
 	      target="popupwindow"
@@ -1872,12 +1855,17 @@ function hocwp_supported_languages() {
 }
 
 function hocwp_get_language() {
-	$lang = hocwp_option_get_value( 'theme_setting', 'language' );
-	if ( empty( $lang ) ) {
-		$lang = 'vi';
+	global $hocwp_language;
+	if ( empty( $hocwp_language ) || ! is_string( $hocwp_language ) ) {
+		$lang = hocwp_option_get_value( 'theme_setting', 'language' );
+		if ( empty( $lang ) ) {
+			$lang = 'vi';
+		}
+		$hocwp_language = $lang;
 	}
+	$hocwp_language = apply_filters( 'hocwp_language', $hocwp_language );
 
-	return apply_filters( 'hocwp_language', $lang );
+	return $hocwp_language;
 }
 
 function hocwp_register_core_style_and_script() {
