@@ -29,13 +29,21 @@ if ( 'wp-login.php' == $pagenow ) {
 }
 
 function hocwp_theme_translation_comments_title_text() {
-	return __( 'Gửi bình luận của bạn', 'hocwp-theme' );
+	return 'Gửi bình luận của bạn';
 }
 
 add_filter( 'hocwp_comments_title_text', 'hocwp_theme_translation_comments_title_text' );
 
 function hocwp_theme_translation_comments_title_count( $text, $comments_number ) {
-	return sprintf( _nx( '1 bình luận', '%d bình luận', $comments_number, 'tiêu đề bình luận', 'hocwp-theme' ), number_format_i18n( $comments_number ) );
+	if ( $comments_number > 1 ) {
+		$text = sprintf( '%d bình luận', number_format_i18n( $comments_number ) );
+	} elseif ( 1 == $comments_number ) {
+		$text = '1 bình luận';
+	} else {
+		$text = '0 bình luận';
+	}
+
+	return $text;
 }
 
 add_filter( 'hocwp_comments_title_count', 'hocwp_theme_translation_comments_title_count', 10, 2 );
@@ -49,17 +57,17 @@ function hocwp_theme_translation_comment_form_defaults( $defaults ) {
 	$req           = get_option( 'require_name_email' );
 	$aria_req      = ( $req ? " aria-required='true'" : '' );
 	$html_req      = ( $req ? " required='required'" : '' );
-	$required_text = sprintf( ' ' . __( 'Những mục bắt buộc được đánh dấu %s', 'hocwp-theme' ), '<span class="required">*</span>' );
+	$required_text = sprintf( ' ' . 'Những mục bắt buộc được đánh dấu %s', '<span class="required">*</span>' );
 	$html5         = 'html5' === $format;
 	$defaults      = array(
-		'comment_field'        => '<p class="comment-form-comment"><label for="comment">' . _x( 'Nội dung', 'noun' ) . '</label> <textarea id="comment" name="comment" cols="45" rows="8"  aria-required="true" required="required"></textarea></p>',
-		'must_log_in'          => '<p class="must-log-in">' . sprintf( __( 'Bạn phải <a href="%s">đăng nhập</a> trước khi có thể đăng bình luận.', 'hocwp-theme' ), wp_login_url( apply_filters( 'the_permalink', get_permalink( get_the_ID() ) ) ) ) . '</p>',
-		'logged_in_as'         => '<p class="logged-in-as">' . sprintf( __( 'Bạn đang đăng nhập với tài khoản <a href="%1$s">%2$s</a>. <a href="%3$s" title="Thoát khỏi tài khoản này">Thoát?</a>', 'hocwp-theme' ), get_edit_user_link(), $user_identity, wp_logout_url( apply_filters( 'the_permalink', get_permalink( get_the_ID() ) ) ) ) . '</p>',
-		'comment_notes_before' => '<p class="comment-notes"><span id="email-notes">' . __( 'Địa chỉ email của bạn sẽ được giữ bí mật.', 'hocwp-theme' ) . '</span>' . ( $req ? $required_text : '' ) . '</p>',
-		'title_reply'          => '<span class="title-text">' . __( 'Gửi bình luận', 'hocwp-theme' ) . '</span>',
-		'title_reply_to'       => __( 'Gửi trả lời cho %s', 'hocwp-theme' ),
-		'cancel_reply_link'    => __( 'Nhấn vào đây để hủy trả lời.', 'hocwp-theme' ),
-		'label_submit'         => __( 'Gửi bình luận', 'hocwp-theme' )
+		'comment_field'        => '<p class="comment-form-comment"><label for="comment">' . 'Nội dung' . '</label> <textarea id="comment" name="comment" cols="45" rows="8"  aria-required="true" required="required"></textarea></p>',
+		'must_log_in'          => '<p class="must-log-in">' . sprintf( 'Bạn phải <a href="%s">đăng nhập</a> trước khi có thể đăng bình luận.', wp_login_url( apply_filters( 'the_permalink', get_permalink( get_the_ID() ) ) ) ) . '</p>',
+		'logged_in_as'         => '<p class="logged-in-as">' . sprintf( 'Bạn đang đăng nhập với tài khoản <a href="%1$s">%2$s</a>. <a href="%3$s" title="Thoát khỏi tài khoản này">Thoát?</a>', get_edit_user_link(), $user_identity, wp_logout_url( apply_filters( 'the_permalink', get_permalink( get_the_ID() ) ) ) ) . '</p>',
+		'comment_notes_before' => '<p class="comment-notes"><span id="email-notes">' . 'Địa chỉ email của bạn sẽ được giữ bí mật.' . '</span>' . ( $req ? $required_text : '' ) . '</p>',
+		'title_reply'          => '<span class="title-text">' . 'Gửi bình luận' . '</span>',
+		'title_reply_to'       => 'Gửi trả lời cho %s',
+		'cancel_reply_link'    => 'Nhấn vào đây để hủy trả lời.',
+		'label_submit'         => 'Gửi bình luận'
 	);
 
 	return $defaults;
@@ -84,9 +92,9 @@ function hocwp_theme_translation_comments_list_callback( $comment, $args, $depth
 	}
 	$comment_date     = get_comment_date( 'Y-m-d H:i:s', $comment_id );
 	$comment_author   = '<div class="comment-author vcard">' . get_avatar( $comment, $avatar_size ) . '<b class="fn">' . get_comment_author_link() . '</b> <span class="says">nói:</span></div>';
-	$comment_metadata = '<div class="comment-metadata"><a href="' . $comment_permalink . '"><time datetime="' . get_comment_time( 'c' ) . '">' . hocwp_human_time_diff_to_now( $comment_date ) . ' ' . __( 'trước', 'hocwp-theme' ) . '</time></a> <a class="comment-edit-link" href="' . get_edit_comment_link( $comment_id ) . '">(' . __( 'Sửa', 'hocwp-theme' ) . ')</a></div>';
+	$comment_metadata = '<div class="comment-metadata"><a href="' . $comment_permalink . '"><time datetime="' . get_comment_time( 'c' ) . '">' . hocwp_human_time_diff_to_now( $comment_date ) . ' ' . 'trước' . '</time></a> <a class="comment-edit-link" href="' . get_edit_comment_link( $comment_id ) . '">(' . 'Sửa' . ')</a></div>';
 	if ( $comment->comment_approved == '0' ) {
-		$comment_metadata .= '<p class="comment-awaiting-moderation">' . __( 'Bình luận của bạn đang được chờ để xét duyệt.', 'hocwp-theme' ) . '</p>';
+		$comment_metadata .= '<p class="comment-awaiting-moderation">' . 'Bình luận của bạn đang được chờ để xét duyệt.' . '</p>';
 	}
 	$footer = new HOCWP_HTML( 'footer' );
 	$footer->set_class( 'comment-meta' );
@@ -114,14 +122,14 @@ function hocwp_theme_translation_comments_list_callback( $comment, $args, $depth
 		$a->set_attribute( 'data-session-likes-key', $session_comment_liked_key );
 		$likes = hocwp_get_comment_likes( $comment_id );
 		$a->set_attribute( 'data-likes', $likes );
-		$a->set_text( '<span class="text">' . __( 'Thích', 'hocwp-theme' ) . '</span> <i class="fa fa-thumbs-o-up"></i><span class="sep-dot">.</span> <span class="count">' . $likes . '</span>' );
+		$a->set_text( '<span class="text">' . 'Thích' . '</span> <i class="fa fa-thumbs-o-up"></i><span class="sep-dot">.</span> <span class="count">' . $likes . '</span>' );
 		$reply .= $a->build();
 		$a->set_class( 'comment-report' );
 		$a->remove_attribute( 'data-session-liked-key' );
-		$a->set_text( __( 'Báo cáo vi phạm', 'hocwp-theme' ) . '<i class="fa fa-flag"></i>' );
+		$a->set_text( 'Báo cáo vi phạm' . '<i class="fa fa-flag"></i>' );
 		$reply .= $a->build();
 		$a->set_class( 'comment-share' );
-		$share_text = '<span class="text">' . __( 'Chia sẻ', 'hocwp-theme' ) . '<i class="fa fa-angle-down"></i></span>';
+		$share_text = '<span class="text">' . 'Chia sẻ' . '<i class="fa fa-angle-down"></i></span>';
 		$share_text .= '<span class="list-share">';
 		$share_text .= '<i class="fa fa-facebook facebook" data-url="' . hocwp_get_social_share_url( array(
 				'social_name' => 'facebook',
@@ -173,11 +181,11 @@ function hocwp_theme_translation_comment_form_default_fields( $fields ) {
 	$require_attr  = $aria_req . ' ' . $html_req;
 	$html5         = 'html5' === $format;
 	$fields        = array(
-		'author' => '<p class="comment-form-author">' . '<label for="author">' . __( 'Họ và tên', 'hocwp-theme' ) . ( $req ? ' <span class="required">*</span>' : '' ) . '</label> ' .
+		'author' => '<p class="comment-form-author">' . '<label for="author">' . 'Họ và tên' . ( $req ? ' <span class="required">*</span>' : '' ) . '</label> ' .
 		            '<input id="author" name="author" type="text" value="' . esc_attr( $commenter['comment_author'] ) . '" size="30" ' . $require_attr . ' /></p>',
-		'email'  => '<p class="comment-form-email"><label for="email">' . __( 'Địa chỉ email', 'hocwp-theme' ) . ( $req ? ' <span class="required">*</span>' : '' ) . '</label> ' .
+		'email'  => '<p class="comment-form-email"><label for="email">' . 'Địa chỉ email' . ( $req ? ' <span class="required">*</span>' : '' ) . '</label> ' .
 		            '<input id="email" name="email" ' . ( $html5 ? 'type="email"' : 'type="text"' ) . ' value="' . esc_attr( $commenter['comment_author_email'] ) . '" size="30" aria-describedby="email-notes" ' . $require_attr . ' /></p>',
-		'url'    => '<p class="comment-form-url"><label for="url">' . __( 'Trang web', 'hocwp-theme' ) . '</label> ' .
+		'url'    => '<p class="comment-form-url"><label for="url">' . 'Trang web' . '</label> ' .
 		            '<input id="url" name="url" ' . ( $html5 ? 'type="url"' : 'type="text"' ) . ' value="' . esc_attr( $commenter['comment_author_url'] ) . '" size="30" /></p>',
 	);
 
@@ -190,7 +198,7 @@ function hocwp_theme_translation_wp_list_comments_args( $args ) {
 	if ( hocwp_wc_installed() && is_singular( 'product' ) ) {
 		return $args;
 	}
-	$args['reply_text'] = '<i class="fa fa-reply"></i><span class="text">' . __( 'Trả lời', 'hocwp-theme' ) . '</span>';
+	$args['reply_text'] = '<i class="fa fa-reply"></i><span class="text">' . 'Trả lời' . '</span>';
 	$args['callback']   = 'hocwp_theme_translation_comments_list_callback';
 
 	return $args;
@@ -223,6 +231,30 @@ function hocwp_theme_translation_gettext( $translation, $text ) {
 			break;
 		case 'Processing...':
 			$translation = 'Đang xử lý...';
+			break;
+		case 'Related posts':
+			$translation = 'Bài viết liên quan';
+			break;
+		case 'Enter captcha code':
+			$translation = 'Mã bảo mật';
+			break;
+		case 'Full name':
+			$translation = 'Họ và tên';
+			break;
+		case 'Full name *':
+			$translation = 'Họ và tên *';
+			break;
+		case 'Message':
+			$translation = 'Tin nhắn';
+			break;
+		case 'Send':
+			$translation = 'Gửi';
+			break;
+		case '[%1$s] Contact message from %2$s':
+			$translation = '[%1$s] Tin nhắn liên hệ từ %2$s';
+			break;
+		case 'Required fields are marked as %s';
+			$translation = 'Mục bắt buộc được đánh dấu %s';
 			break;
 	}
 
@@ -803,6 +835,18 @@ function hocwp_theme_translation_gettext_woocommerce( $translation, $text ) {
 			break;
 		case 'Back to cart page':
 			$translation = 'Cập nhật giỏ hàng';
+			break;
+		case 'Buy now':
+			$translation = 'Mua nhanh';
+			break;
+		case 'Fast order, without adding products to cart.':
+			$translation = 'Mua hàng nhanh không cần thêm sản phẩm vào giỏ hàng.';
+			break;
+		case 'Fast order':
+			$translation = 'Mua hàng nhanh';
+			break;
+		case 'Put order':
+			$translation = 'Đặt hàng';
 			break;
 	}
 

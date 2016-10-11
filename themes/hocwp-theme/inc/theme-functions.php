@@ -261,6 +261,7 @@ function hocwp_theme_the_menu( $args = array() ) {
 		$items_wrap = '<ul id="%1$s" class="sf-menu %2$s">%3$s</ul>';
 	}
 	$button_text = isset( $args['button_text'] ) ? $args['button_text'] : __( 'Menu', 'hocwp-theme' );
+	hocwp_add_string_with_space_before( $nav_class, 'clearfix' );
 	?>
 	<nav id="<?php echo hocwp_sanitize_id( $theme_location . '_navigation' ); ?>"
 	     class="<?php echo $nav_class; ?>"
@@ -463,7 +464,8 @@ function hocwp_theme_generate_license( $password, $site_url = '', $domain = '' )
 }
 
 function hocwp_theme_invalid_license_redirect() {
-	$option = hocwp_option_get_object_from_list( 'theme_license' );
+	$option         = hocwp_option_get_object_from_list( 'theme_license' );
+	$transient_name = hocwp_build_transient_name( 'hocwp_invalid_theme_license_%s', '' );
 	if ( hocwp_object_valid( $option ) && ! $option->is_this_page() ) {
 		global $pagenow;
 		$admin_page = hocwp_get_current_admin_page();
@@ -474,12 +476,12 @@ function hocwp_theme_invalid_license_redirect() {
 				exit;
 			}
 		} else {
-			if ( false === get_transient( 'hocwp_invalid_theme_license' ) ) {
+			if ( false === get_transient( $transient_name ) ) {
 				add_action( 'admin_notices', 'hocwp_setup_theme_invalid_license_message' );
 			}
 		}
 	} else {
-		if ( false === get_transient( 'hocwp_invalid_theme_license' ) ) {
+		if ( false === get_transient( $transient_name ) ) {
 			add_action( 'admin_notices', 'hocwp_setup_theme_invalid_license_message' );
 		}
 	}
@@ -583,6 +585,7 @@ function hocwp_theme_notification_posts_ajax_script() {
 	$scripts .= "type: 'POST',";
 	$scripts .= "dataType: 'json',";
 	$scripts .= "url: hocwp.ajax_url,";
+	$scripts .= "cache: true,";
 	$scripts .= "data: {";
 	$scripts .= "action: 'hocwp_notification_posts'";
 	$scripts .= "}";

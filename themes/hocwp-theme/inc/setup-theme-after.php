@@ -5,7 +5,7 @@ if ( ! function_exists( 'add_filter' ) ) {
 
 global $pagenow;
 
-function hocwp_theme_check_load_facebook_javascript_sdk() {
+function hocwp_theme_check_load_facebook_javascript_sdk($use) {
 	$data = apply_filters( 'hocwp_load_facebook_javascript_sdk_on_page_sidebar', array() );
 	foreach ( $data as $value ) {
 		$conditional_functions = isset( $value['condition'] ) ? $value['condition'] : '';
@@ -38,15 +38,19 @@ function hocwp_theme_check_load_facebook_javascript_sdk() {
 		}
 	}
 
-	return false;
+	return $use;
 }
 
 add_filter( 'hocwp_use_facebook_javascript_sdk', 'hocwp_theme_check_load_facebook_javascript_sdk' );
 
 function hocwp_setup_theme_add_facebook_javascript_sdk() {
-	if ( hocwp_use_facebook_javascript_sdk() ) {
+	$load_sdk = hocwp_use_facebook_javascript_sdk();
+	if ( $load_sdk ) {
 		$args   = array();
 		$app_id = hocwp_get_wpseo_social_value( 'fbadminapp' );
+		if ( empty( $app_id ) ) {
+			$app_id = hocwp_option_get_value( 'hocwp_option_social', 'fbadminapp' );
+		}
 		if ( ! empty( $app_id ) ) {
 			$args['app_id'] = $app_id;
 		}
@@ -621,9 +625,6 @@ function hocwp_setup_theme_comment_form_submit_field( $submit_field, $args ) {
 				'after'       => '</p>',
 				'input_width' => 165
 			);
-			if ( 'vi' == hocwp_get_language() ) {
-				$args['placeholder'] = __( 'Nhập mã bảo mật', 'hocwp-theme' );
-			}
 			hocwp_field_captcha( $args );
 			$captcha_field = ob_get_clean();
 			$submit_field .= $captcha_field;
@@ -642,30 +643,18 @@ function hocwp_setup_theme_preprocess_comment( $commentdata ) {
 		if ( isset( $_POST['captcha'] ) ) {
 			$captcha = $_POST['captcha'];
 			if ( empty( $captcha ) ) {
-				if ( 'vi' == $lang ) {
-					wp_die( __( 'Để xác nhận bạn không phải là máy tính, xin vui lòng nhập mã bảo mật!', 'hocwp-theme' ), __( 'Chưa nhập mã bảo mật', 'hocwp-theme' ) );
-				} else {
-					wp_die( __( 'To confirm you are not a computer, please enter the security code!', 'hocwp-theme' ), __( 'Empty captcha code error', 'hocwp-theme' ) );
-				}
+				wp_die( __( 'To confirm you are not a computer, please enter the security code!', 'hocwp-theme' ), __( 'Empty captcha code error', 'hocwp-theme' ) );
 				exit;
 			} else {
 				$hw_captcha = new HOCWP_Captcha();
 				if ( ! $hw_captcha->check( $captcha ) ) {
-					if ( 'vi' == $lang ) {
-						wp_die( __( 'Mã bảo mật bạn nhập không chính xác, xin vui lòng thử lại!', 'hocwp-theme' ), __( 'Sai mã bảo mật', 'hocwp-theme' ) );
-					} else {
-						wp_die( __( 'The security code you entered is incorrect, please try again!', 'hocwp-theme' ), __( 'Invalid captcha code', 'hocwp-theme' ) );
-					}
+					wp_die( __( 'The security code you entered is incorrect, please try again!', 'hocwp-theme' ), __( 'Invalid captcha code', 'hocwp-theme' ) );
 					exit;
 				}
 			}
 		} else {
 			$commentdata = null;
-			if ( 'vi' == $lang ) {
-				wp_die( __( 'Hệ thống đã phát hiện bạn không phải là người!', 'hocwp-theme' ), __( 'Lỗi gửi bình luận', 'hocwp-theme' ) );
-			} else {
-				wp_die( __( 'Our systems have detected that you are not a human!', 'hocwp-theme' ), __( 'Post comment error', 'hocwp-theme' ) );
-			}
+			wp_die( __( 'Our systems have detected that you are not a human!', 'hocwp-theme' ), __( 'Post comment error', 'hocwp-theme' ) );
 			exit;
 		}
 	}

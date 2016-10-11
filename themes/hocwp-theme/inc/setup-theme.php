@@ -390,7 +390,8 @@ function hocwp_setup_theme_invalid_license_message() {
 }
 
 function hocwp_setup_theme_invalid_license_admin_notice() {
-	if ( false !== ( $result = get_transient( 'hocwp_invalid_theme_license' ) ) && 1 == $result ) {
+	$transient_name = hocwp_build_transient_name( 'hocwp_invalid_theme_license_%s', '' );
+	if ( false !== ( $result = get_transient( $transient_name ) ) && 1 == $result ) {
 		hocwp_setup_theme_invalid_license_message();
 	}
 }
@@ -1031,10 +1032,10 @@ function hocwp_get_archive_title( $prefix = '' ) {
 		if ( is_search() ) {
 			$title = get_search_query();
 			if ( empty( $title ) ) {
-				$title = hocwp_text( 'Kết quả tìm kiếm', 'Search results', false );
+				$title = hocwp_text( 'Kết quả tìm kiếm', __( 'Search results', 'hocwp-theme' ), false );
 			}
 		} else {
-			$title = hocwp_text( 'Lưu trữ', 'Archive', false );
+			$title = hocwp_text( 'Lưu trữ', __( 'Archive', 'hocwp-theme' ), false );
 		}
 	}
 	if ( ! empty( $prefix ) ) {
@@ -1130,3 +1131,18 @@ function hocwp_setup_theme_woocommerce_product_tabs_callback( $key, $tab ) {
 }
 
 add_filter( 'woocommerce_product_tabs', 'hocwp_setup_theme_woocommerce_product_tabs' );
+
+function hocwp_setup_theme_build_transient_name( $transient, $format, $dynamic ) {
+	if ( defined( 'HOCWP_THEME_CORE_VERSION' ) ) {
+		$dynamic .= HOCWP_THEME_CORE_VERSION;
+	}
+	if ( defined( 'HOCWP_THEME_VERSION' ) ) {
+		$dynamic .= HOCWP_THEME_VERSION;
+	}
+	$dynamic = md5( $dynamic );
+	$transient .= '_' . $dynamic;
+
+	return $transient;
+}
+
+add_filter( 'hocwp_build_transient_name', 'hocwp_setup_theme_build_transient_name', 10, 3 );

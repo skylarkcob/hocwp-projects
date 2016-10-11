@@ -1,4 +1,8 @@
 <?php
+$use = apply_filters( 'hocwp_load_sidebar_fixed_widget_script', true );
+if ( ! $use ) {
+	return;
+}
 $anchor_bottom  = apply_filters( 'hocwp_fixed_widget_anchor_bottom', '' );
 $bottom_spacing = apply_filters( 'hocwp_fixed_widget_bottom_spacing', 0 );
 $min_width      = apply_filters( 'hocwp_sidebar_fixed_widget_window_min_width', 980 );

@@ -38,5 +38,8 @@ If you have any questions, please visit [hocwp.net](http://hocwp.net/) for more 
 = 5.2.2 - 01/10/16 =
 * Update - the core requirement version 3.4.5.
 * Add - readme file to describe code and changelog.
+* Add - theme custom css font file.
+* Add - theme custom shortcode file.
+* Update - move all theme default meta field to meta file.
 
 == Upgrade Notice ==

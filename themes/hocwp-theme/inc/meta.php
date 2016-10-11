@@ -113,17 +113,35 @@ function hocwp_theme_meta_box_ads_information( $post_type, $post ) {
 		$meta->set_id( 'hocwp_ads_information' );
 		$meta->set_title( __( 'Ads Information', 'hocwp-theme' ) );
 
+		$meta->add_field(
+			array(
+				'id'             => 'image',
+				'label'          => __( 'Image:', 'hocwp-theme' ),
+				'container'      => true,
+				'field_callback' => 'hocwp_field_media_upload'
+			)
+		);
+
+		$meta->add_field(
+			array(
+				'id'    => 'url',
+				'label' => __( 'Url:', 'hocwp-theme' )
+			)
+		);
+
 		$positions = hocwp_get_ads_positions();
 
 		if ( hocwp_array_has_value( $positions ) ) {
 			$all_option = hocwp_field_get_option( array( 'text' => '--Choose Position--' ) );
 			$selected   = get_post_meta( $post_id, 'position', true );
 			foreach ( $positions as $position ) {
-				$all_option .= hocwp_field_get_option( array(
-					'text'     => $position['name'],
-					'value'    => $position['id'],
-					'selected' => $selected
-				) );
+				$all_option .= hocwp_field_get_option(
+					array(
+						'text'     => $position['name'],
+						'value'    => $position['id'],
+						'selected' => $selected
+					)
+				);
 			}
 			$field_args = array(
 				'id'             => 'position',
@@ -135,18 +153,28 @@ function hocwp_theme_meta_box_ads_information( $post_type, $post ) {
 			$meta->add_field( $field_args );
 		}
 
-		$meta->add_field( array(
-			'id'             => 'expire',
-			'label'          => __( 'Expire:', 'hocwp-theme' ),
-			'field_callback' => 'hocwp_field_datetime_picker'
-		) );
-		$meta->add_field( array(
-			'id'             => 'code',
-			'label'          => __( 'Code:', 'hocwp-theme' ),
-			'field_callback' => 'hocwp_field_textarea'
-		) );
+		$meta->add_field(
+			array(
+				'id'             => 'expire',
+				'label'          => __( 'Expire:', 'hocwp-theme' ),
+				'field_callback' => 'hocwp_field_datetime_picker'
+			)
+		);
+
+		do_action( 'hocwp_meta_box_ads_fields', $meta, $post );
 
 		$meta->init();
+
+		$args = array(
+			'id'         => 'code_box',
+			'title'      => __( 'Code:', 'hocwp-theme' ),
+			'field_id'   => 'code',
+			'post_type'  => $post_type,
+			'field_args' => array(
+				'teeny' => true
+			)
+		);
+		hocwp_meta_box_editor( $args );
 	}
 }
 
@@ -253,6 +281,10 @@ function hocwp_setup_theme_save_post_meta_hook( $post_id ) {
 			if ( isset( $_POST['code'] ) ) {
 				update_post_meta( $post_id, 'code', $_POST['code'] );
 			}
+			$image = hocwp_get_method_value( 'image' );
+			update_post_meta( $post_id, 'image', $image );
+			$url = hocwp_get_method_value( 'url' );
+			update_post_meta( $post_id, 'url', $url );
 			break;
 		case 'hocwp_subscriber':
 			if ( isset( $_POST['subscriber_name'] ) ) {
