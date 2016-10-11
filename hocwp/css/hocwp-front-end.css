@@ -1183,7 +1183,7 @@ img.center {
     border-top: 3px solid #e0e0e0;
     font-size: 14px;
     font-weight: 400;
-    line-height: 26px;
+    line-height: 17px;
     margin-bottom: 5px;
     margin-top: 0;
 }
@@ -1194,7 +1194,7 @@ img.center {
     border-width: 3px 0 0;
     display: inline-block;
     margin-top: -3px;
-    padding-top: 0;
+    padding: 5px 0;
 }
 
 .hocwp .hocwp-shortcode-post .module-body .item {
@@ -1237,6 +1237,11 @@ img.center {
 .hocwp .hocwp-shortcode-post .module-body .one-post .entry-title {
     font-size: 14px;
     font-weight: 700;
+}
+
+.hocwp .hocwp-shortcode-post.right,
+.hocwp .hocwp-shortcode-post.left {
+    min-width: 140px;
 }
 
 .hocwp-shortcode.support-form {

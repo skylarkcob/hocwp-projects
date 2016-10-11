@@ -546,7 +546,8 @@ function hocwp_get_geo_code( $args = array() ) {
 	}
 	$address         = str_replace( ' ', '+', $address );
 	$args['address'] = $address;
-	$transient_name  = 'hocwp_geo_code_' . md5( implode( '_', $args ) );
+	$transient_name  = 'hocwp_geo_code_%s';
+	$transient_name  = hocwp_build_transient_name( $transient_name, $args );
 	if ( false === ( $results = get_transient( $transient_name ) ) ) {
 		$base    = 'https://maps.googleapis.com/maps/api/geocode/json';
 		$base    = add_query_arg( $args, $base );
@@ -561,7 +562,8 @@ function hocwp_get_geo_code( $args = array() ) {
 }
 
 function hocwp_generate_min_file( $file, $extension = 'js', $compress_min_file = false, $force_compress = false ) {
-	$transient_name = 'hocwp_minified_' . md5( $file );
+	$transient_name = 'hocwp_minified_%s';
+	$transient_name = hocwp_build_transient_name( $transient_name, $file );
 	if ( false === get_transient( $transient_name ) || $force_compress ) {
 		if ( file_exists( $file ) ) {
 			$extension = strtolower( $extension );
@@ -857,7 +859,8 @@ function hocwp_post_rating_ajax_callback() {
 }
 
 function hocwp_change_url( $new_url, $old_url = '', $force_update = false ) {
-	$transient_name = 'hocwp_update_data_after_url_changed';
+	$transient_name = 'hocwp_update_data_after_url_changed_%s';
+	$transient_name = hocwp_build_transient_name( $transient_name, '' );
 	$site_url       = trailingslashit( get_bloginfo( 'url' ) );
 	if ( ! empty( $old_url ) ) {
 		$old_url = trailingslashit( $old_url );

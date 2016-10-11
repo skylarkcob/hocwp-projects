@@ -1585,6 +1585,90 @@ jQuery(document).ready(function ($) {
 });
 
 jQuery(document).ready(function ($) {
+    var $body = $('body'),
+        $window = $(window);
+
+    function HocWFixed(element, options) {
+        this.self = this;
+        this.$element = $(element);
+        if (!this.$element.length) {
+            return this;
+        }
+        this.element = element;
+        this.options = $.extend({}, HocWFixed.DEFAULTS, options);
+        this._defaults = HocWFixed.DEFAULTS;
+        this._name = HocWFixed.NAME;
+        this.init();
+        var $element = this.$element,
+            settings = this.options,
+            element_width = $element.width(),
+            current_pos = $window.scrollTop(),
+            element_pos = $element.offset().top,
+            backup_style = $element.attr('style'),
+            backup_class = $element.attr('class'),
+            $admin_bar = $('#wpadminbar'),
+            window_width = $window.width(),
+            top = 0;
+        if (!backup_style) {
+            backup_style = '';
+        }
+        if (!backup_class) {
+            backup_class = '';
+        }
+        if ($admin_bar.length) {
+            top += $admin_bar.height();
+        }
+
+        $window.scroll(function () {
+            current_pos = $window.scrollTop();
+            if (current_pos > element_pos) {
+                var css = {
+                    position: 'fixed',
+                    zIndex: 499,
+                    top: top
+                };
+                $element.addClass('fixed');
+                if (settings.autoStretch) {
+                    var $element_inner = $element.children(':first');
+                    css.left = 0;
+                    css.right = 0;
+                    if (window_width > settings.changeInnerWidthMin) {
+                        $element_inner.css({
+                            width: element_width + 'px',
+                            marginLeft: 'auto',
+                            marginRight: 'auto'
+                        });
+                    }
+                }
+                $element.css(css);
+            } else {
+                $element.attr('style', backup_style);
+                $element.attr('class', backup_class);
+            }
+        });
+    }
+
+    HocWFixed.NAME = 'hocwp.fixed';
+
+    HocWFixed.DEFAULTS = {
+        autoStretch: false,
+        changeInnerWidthMin: 480
+    };
+
+    HocWFixed.prototype.init = function () {
+        this.$element.addClass('hocwp-fixed-plugin');
+    };
+
+    $.fn.hocwpFixed = function (options) {
+        return this.each(function () {
+            if (!$.data(this, HocWFixed.NAME)) {
+                $.data(this, HocWFixed.NAME, new HocWFixed(this, options));
+            }
+        });
+    };
+});
+
+jQuery(document).ready(function ($) {
     (function () {
         $('.btn-insert-media').hocwpMediaUpload();
     })();

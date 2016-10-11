@@ -32,11 +32,24 @@ function hocwp_get_text_base_on_number( $single, $plural, $number ) {
 	return sprintf( _n( $single, $plural, $number ), number_format_i18n( $number ) );
 }
 
+function hocwp_build_transient_name( $format, $dynamic ) {
+	if ( ! is_string( $dynamic ) ) {
+		$dynamic = json_encode( $dynamic );
+	}
+	$dynamic .= HOCWP_VERSION;
+	$dynamic        = md5( $dynamic );
+	$transient_name = sprintf( $format, $dynamic );
+	$transient_name = apply_filters( 'hocwp_build_transient_name', $transient_name, $format, $dynamic );
+
+	return $transient_name;
+}
+
 function hocwp_dashboard_widget_cache( $widget_id, $callback, $args = array() ) {
 	$loading   = hocwp_dashboard_widget_loading();
 	$locale    = get_locale();
-	$cache_key = 'hocwp_dashboard_' . md5( $widget_id . '_' . $locale );
-	if ( false !== ( $output = get_transient( $cache_key ) ) && ! empty( $output ) ) {
+	$transient_name = 'hocwp_dashboard_%s';
+	$transient_name = hocwp_build_transient_name( $transient_name, $widget_id . '_' . $locale );
+	if ( false !== ( $output = get_transient( $transient_name ) ) && ! empty( $output ) ) {
 		echo $output;
 
 		return true;
@@ -49,7 +62,7 @@ function hocwp_dashboard_widget_cache( $widget_id, $callback, $args = array() ) 
 		call_user_func( $callback, $args );
 		$html_data = ob_get_clean();
 		if ( ! empty( $html_data ) ) {
-			set_transient( $cache_key, $html_data, 12 * HOUR_IN_SECONDS );
+			set_transient( $transient_name, $html_data, 12 * HOUR_IN_SECONDS );
 		}
 	} else {
 		echo hocwp_build_message( __( 'Please set a valid callback for this widget!', 'hocwp-theme' ), '' );
@@ -208,7 +221,8 @@ function hocwp_get_feed_items( $args = array() ) {
 	}
 	$number         = hocwp_get_value_by_key( $args, 'number' );
 	$expiration     = hocwp_get_value_by_key( $args, 'expiration', 12 * HOUR_IN_SECONDS );
-	$transient_name = 'hocwp_fetch_feed_' . md5( $url );
+	$transient_name = 'hocwp_fetch_feed_%s';
+	$transient_name = hocwp_build_transient_name( $transient_name, $args );
 	if ( hocwp_id_number_valid( $number ) ) {
 		$transient_name .= '_' . $number;
 	}
@@ -276,7 +290,8 @@ function hocwp_rest_api_get( $base_url, $object = 'posts', $query = '' ) {
 
 function hocwp_read_xml( $xml, $is_url = false ) {
 	if ( $is_url ) {
-		$transient_name = 'hocwp_read_xml_' . md5( $xml );
+		$transient_name = 'hocwp_read_xml_%s';
+		$transient_name = hocwp_build_transient_name( $transient_name, $xml );
 		if ( false === ( $saved = get_transient( $transient_name ) ) ) {
 			$saved = @file_get_contents( $xml );
 			set_transient( $transient_name, $saved, HOUR_IN_SECONDS );
@@ -466,7 +481,7 @@ function hocwp_use_comment_form_captcha_custom_position() {
 function hocwp_build_license_transient_name( $type, $use_for ) {
 	$name = 'hocwp_' . $type . '_' . $use_for . '_license_valid';
 
-	return 'hocwp_check_license_' . md5( $name );
+	return hocwp_build_transient_name( 'hocwp_check_license_%s', $name );
 }
 
 function hocwp_replace_text_placeholder( $text ) {
@@ -718,8 +733,8 @@ function hocwp_plugins_api_get_information( $args = array() ) {
 	if ( empty( $slug ) ) {
 		return new WP_Error( 'missing_slug', __( 'Please set slug for this plugin.', 'hocwp-theme' ) );
 	}
-	$transient_name = 'hocwp_plugins_api_' . $slug . '_plugin_information';
-	$transient_name = hocwp_sanitize_id( $transient_name );
+	$transient_name = 'hocwp_plugins_api_%s_plugin_information';
+	$transient_name = hocwp_build_transient_name( $transient_name, $args );
 	if ( false === ( $data = get_transient( $transient_name ) ) ) {
 		$defaults = array(
 			'fields' => array(

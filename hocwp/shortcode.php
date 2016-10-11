@@ -90,7 +90,8 @@ function hocwp_shortcode_post_callback( $atts = array(), $content = null ) {
 		'interval'        => ''
 	);
 	$attributes     = shortcode_atts( $defaults, $atts );
-	$transient_name = 'hocwp_shortcode_post_' . md5( json_encode( $attributes ) );
+	$transient_name = 'hocwp_shortcode_post_%s';
+	$transient_name = hocwp_build_transient_name( $transient_name, $attributes );
 	if ( false === ( $html = get_transient( $transient_name ) ) ) {
 		$order     = $attributes['order'];
 		$orderby   = $attributes['orderby'];

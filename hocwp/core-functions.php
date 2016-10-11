@@ -924,7 +924,7 @@ function hocwp_parse_vietcombank_exchange_rate( $url = '' ) {
 	if ( empty( $url ) ) {
 		$url = 'https://www.vietcombank.com.vn/exchangerates/ExrateXML.aspx';
 	}
-	$transient_name = 'hocwp_exchange_rate_vietcombank';
+	$transient_name = hocwp_build_transient_name( 'hocwp_exchange_rate_vietcombank_%s', '' );
 	if ( false === ( $result = get_transient( $transient_name ) ) ) {
 		$xml = hocwp_parse_xml( $url );
 		if ( is_object( $xml ) ) {
@@ -962,7 +962,7 @@ function hocwp_parse_sjc_exchange_rate( $url = '' ) {
 	if ( empty( $url ) ) {
 		$url = 'http://www.sjc.com.vn/xml/tygiavang.xml';
 	}
-	$transient_name = 'hocwp_exchange_rate_sjc';
+	$transient_name = hocwp_build_transient_name( 'hocwp_exchange_rate_sjc_%s', '' );
 	if ( false === ( $result = get_transient( $transient_name ) ) ) {
 		$xml = hocwp_parse_xml( $url );
 		if ( is_object( $xml ) ) {
@@ -1282,8 +1282,10 @@ function hocwp_strtolower( $str, $charset = 'UTF-8' ) {
 	return hocwp_lowercase( $str, $charset );
 }
 
-function hocwp_is_localhost() {
-	$site_url    = get_bloginfo( 'url' );
+function hocwp_is_localhost( $site_url = '' ) {
+	if ( empty( $site_url ) ) {
+		$site_url = get_bloginfo( 'url' );
+	}
 	$domain      = hocwp_get_domain_name( $site_url );
 	$root_domain = hocwp_get_domain_name_only( $domain );
 	if ( empty( $root_domain ) ) {

@@ -210,8 +210,8 @@ function hocwp_add_parameter_to_oembed_result( $html, $url, $args ) {
 add_filter( 'oembed_result', 'hocwp_add_parameter_to_oembed_result', 99, 3 );
 
 function hocwp_get_youtube_data_object( $api_key, $video_id ) {
-	$transient_name = 'hocwp_theme_youtube_' . $video_id . '_data_object';
-	$transient_name = strtolower( $transient_name );
+	$transient_name = 'hocwp_theme_youtube_%s_data_object';
+	$transient_name = hocwp_build_transient_name( $transient_name, $video_id );
 	if ( false === ( $data = get_transient( $transient_name ) ) ) {
 		$data = file_get_contents( 'https://www.googleapis.com/youtube/v3/videos?key=' . $api_key . '&part=snippet&id=' . $video_id );
 		$data = json_decode( $data );
@@ -222,8 +222,8 @@ function hocwp_get_youtube_data_object( $api_key, $video_id ) {
 }
 
 function hocwp_get_youtube_thumbnail_data_object( $api_key, $video_id ) {
-	$transient_name = 'hocwp_youtube_' . $video_id . '_thumbnail_object';
-	$transient_name = strtolower( $transient_name );
+	$transient_name = 'hocwp_youtube_%s_thumbnail_object';
+	$transient_name = hocwp_build_transient_name( $transient_name, $video_id );
 	if ( false === ( $data = get_transient( $transient_name ) ) ) {
 		$data = hocwp_get_youtube_data_object( $api_key, $video_id );
 		$data = $data->items[0]->snippet->thumbnails;
@@ -295,8 +295,8 @@ function hocwp_get_youtube_thumbnail_url( $api_key, $video_id, $type = 'medium',
 }
 
 function hocwp_get_vimeo_data( $id ) {
-	$transient_name = 'hocwp_vimeo_' . $id . '_data';
-	$transient_name = strtolower( $transient_name );
+	$transient_name = 'hocwp_vimeo_%s_data';
+	$transient_name = hocwp_build_transient_name( $transient_name, $id );
 	if ( false === ( $data = get_transient( $transient_name ) ) ) {
 		$url  = 'http://vimeo.com/api/v2/video/' . $id . '.php';
 		$data = unserialize( file_get_contents( $url ) );
@@ -333,8 +333,8 @@ function hocwp_get_vimeo_thumbnail( $id, $type = 'medium', $thumbnails = null ) 
 }
 
 function hocwp_get_dailymotion_data( $id ) {
-	$transient_name = 'hocwp_dailymotion_' . $id . '_data';
-	$transient_name = strtolower( $transient_name );
+	$transient_name = 'hocwp_dailymotion_%s_data';
+	$transient_name = hocwp_build_transient_name( $transient_name, $id );
 	if ( false === ( $data = get_transient( $transient_name ) ) ) {
 		$fields = array(
 			'thumbnail_small_url',

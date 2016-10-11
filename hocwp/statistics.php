@@ -150,7 +150,9 @@ function hocwp_statistics_track() {
 	$browser                  = hocwp_get_browser();
 	$ip                       = hocwp_get_user_isp_ip();
 	$pc_ip                    = hocwp_get_pc_ip();
-	$transient_name           = 'hocwp_statistics_' . md5( $pc_ip . $ip . $browser . $user_agent );
+	$pc_ip .= $ip . $browser . $user_agent;
+	$transient_name = 'hocwp_statistics_%s';
+	$transient_name = hocwp_build_transient_name( $transient_name, $pc_ip );
 	if ( false === get_transient( $transient_name ) ) {
 		$online = hocwp_statistics_online_real();
 		if ( $hocwp_statistics_browser != $browser || 0 == $online ) {
@@ -216,7 +218,8 @@ function hocwp_statistics_get_online_refresh_minute() {
 function hocwp_statistics_delete_online_expired() {
 	global $wpdb;
 	$minutes        = hocwp_statistics_get_online_refresh_minute();
-	$transient_name = 'hocwp_statistics_delete_online';
+	$transient_name = 'hocwp_statistics_delete_online_%s';
+	$transient_name = hocwp_build_transient_name( $transient_name, '' );
 	if ( false === get_transient( $transient_name ) ) {
 		$table    = $wpdb->prefix . HOCWP_COUNTER_TABLE_ONLINE;
 		$interval = '-' . $minutes . ' minutes';
@@ -301,7 +304,8 @@ function hocwp_statistics_today() {
 
 function hocwp_statistics_yesterday() {
 	global $wpdb;
-	$transient_name = 'hocwp_statistics_yesterday';
+	$transient_name = 'hocwp_statistics_yesterday_%s';
+	$transient_name = hocwp_build_transient_name( $transient_name, '' );
 	if ( false === ( $result = get_transient( $transient_name ) ) ) {
 		$table            = $wpdb->prefix . HOCWP_COUNTER_TABLE_STATISTICS;
 		$current_datetime = hocwp_get_current_datetime_mysql();
@@ -328,7 +332,8 @@ function hocwp_statistics_this_week() {
 
 function hocwp_statistics_last_week() {
 	global $wpdb;
-	$transient_name = 'hocwp_statistics_last_week';
+	$transient_name = 'hocwp_statistics_last_week_%s';
+	$transient_name = hocwp_build_transient_name( $transient_name, '' );
 	if ( false === ( $result = get_transient( $transient_name ) ) ) {
 		$table            = $wpdb->prefix . HOCWP_COUNTER_TABLE_STATISTICS;
 		$current_datetime = hocwp_get_current_datetime_mysql();
@@ -355,7 +360,8 @@ function hocwp_statistics_this_month() {
 
 function hocwp_statistics_last_month() {
 	global $wpdb;
-	$transient_name = 'hocwp_statistics_last_month';
+	$transient_name = 'hocwp_statistics_last_month_%s';
+	$transient_name = hocwp_build_transient_name( $transient_name, '' );
 	if ( false === ( $result = get_transient( $transient_name ) ) ) {
 		$table            = $wpdb->prefix . HOCWP_COUNTER_TABLE_STATISTICS;
 		$current_datetime = hocwp_get_current_datetime_mysql();
@@ -382,7 +388,8 @@ function hocwp_statistics_this_year() {
 
 function hocwp_statistics_last_year() {
 	global $wpdb;
-	$transient_name = 'hocwp_statistics_last_year';
+	$transient_name = 'hocwp_statistics_last_year_%s';
+	$transient_name = hocwp_build_transient_name( $transient_name, '' );
 	if ( false === ( $result = get_transient( $transient_name ) ) ) {
 		$table            = $wpdb->prefix . HOCWP_COUNTER_TABLE_STATISTICS;
 		$current_datetime = hocwp_get_current_datetime_mysql();

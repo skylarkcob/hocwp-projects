@@ -174,8 +174,8 @@ function hocwp_send_mail( $to, $subject, $message ) {
 }
 
 function hocwp_send_mail_invalid_license( $project_name, $type = 'Theme' ) {
-	$transient_name = 'hocwp_mail_invalid_license_' . $type . '_' . $project_name;
-	$transient_name = md5( $transient_name );
+	$transient_name = 'hocwp_mail_invalid_license_' . $type;
+	$transient_name = hocwp_build_transient_name( $transient_name . '_%s', $project_name );
 	if ( false === get_transient( $transient_name ) ) {
 		$subject = get_bloginfo( 'name' );
 		$subject .= ' vi phạm bản quyền';

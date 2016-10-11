@@ -816,7 +816,7 @@ add_action( 'save_post', 'hocwp_classifieds_save_post', 99 );
 function hocwp_classifieds_admin_notice() {
 	$post_id = hocwp_get_method_value( 'post', 'request' );
 	if ( hocwp_id_number_valid( $post_id ) ) {
-		$transient_name = 'hocwp_save_classifieds_post_' . $post_id . '_error';
+		$transient_name = hocwp_build_transient_name( 'hocwp_save_classifieds_post_%s_error', $post_id );
 		$errors         = get_transient( $transient_name );
 		if ( false !== $errors ) {
 			foreach ( $errors as $error ) {

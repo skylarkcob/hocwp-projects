@@ -167,20 +167,20 @@ function hocwp_disqus_comment() {
 		 this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
 		 };
 		 */
-		(function() { // DON'T EDIT BELOW THIS LINE
+		(function () { // DON'T EDIT BELOW THIS LINE
 			var d = document, s = d.createElement('script');
 			s.src = '//hocwp.disqus.com/embed.js';
 			s.setAttribute('data-timestamp', +new Date());
 			(d.head || d.body).appendChild(s);
 		})();
 	</script>
-	<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+	<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by
+			Disqus.</a></noscript>
 	<?php
 }
 
 function hocwp_get_top_commenters( $number = 5, $time = 'all', $condition = '' ) {
-	$transient_name = 'hocwp_top_commenters_' . $time . '_' . $number;
-	$transient_name = hocwp_sanitize_id( $transient_name );
+	$transient_name = hocwp_build_transient_name( $transient_name . '_%s', $number );
 	if ( false === ( $results = get_transient( $transient_name ) ) ) {
 		global $wpdb;
 		$sql     = 'SELECT COUNT(comment_author_email) AS comments_count, comment_author_email, comment_author, comment_author_url, user_id FROM ' . $wpdb->comments . '

@@ -305,7 +305,7 @@ function hocwp_social_login_facebook_ajax_callback() {
 			$id                    = hocwp_get_value_by_key( $data, 'id' );
 			$requested_redirect_to = hocwp_get_method_value( 'redirect_to' );
 			$redirect_to           = home_url( '/' );
-			$transient_name        = 'hocwp_social_login_facebook_' . md5( $id );
+			$transient_name        = hocwp_build_transient_name( 'hocwp_social_login_facebook_%s', $id );
 			$user_id               = get_transient( $transient_name );
 			$user                  = get_user_by( 'ID', $user_id );
 			if ( $connect && is_user_logged_in() ) {
@@ -406,7 +406,7 @@ function hocwp_social_login_google_ajax_callback() {
 			$id                    = hocwp_get_value_by_key( $data, 'id' );
 			$requested_redirect_to = hocwp_get_method_value( 'redirect_to' );
 			$redirect_to           = home_url( '/' );
-			$transient_name        = 'hocwp_social_login_google_' . md5( $id );
+			$transient_name        = hocwp_build_transient_name( 'hocwp_social_login_google_%s', $id );
 			$user_id               = get_transient( $transient_name );
 			$user                  = get_user_by( 'id', $user_id );
 			if ( $connect && is_user_logged_in() ) {
@@ -551,8 +551,8 @@ function hocwp_notification_posts_ajax_callback() {
 		if ( $query->have_posts() ) {
 			$subscribers    = $query->posts;
 			$date           = hocwp_get_current_date();
-			$transient_name = 'hocwp_notification_posts_table_' . md5( $date );
-			if ( true || false === ( $table_content = get_transient( $transient_name ) ) ) {
+			$transient_name = hocwp_build_transient_name( 'hocwp_notification_posts_table_%s', $date );
+			if ( false === ( $table_content = get_transient( $transient_name ) ) ) {
 				$table = new HOCWP_HTML( 'table' );
 				$table->set_attribute( 'align', 'center' );
 				$table->set_attribute( 'width', '100%' );
@@ -615,8 +615,9 @@ function hocwp_notification_posts_ajax_callback() {
 				foreach ( $subscribers as $subscriber ) {
 					$email = hocwp_get_post_meta( 'subscriber_email', $subscriber->ID );
 					if ( is_email( $email ) ) {
-						$transient_name = 'hocwp_notification_posts_to_user_' . md5( $email ) . '_table_' . md5( $table_content );
-						if ( true || false === get_transient( $transient_name ) ) {
+						$transient_name = 'hocwp_notification_posts_to_user_' . md5( $email );
+						$transient_name = hocwp_build_transient_name( $transient_name . '_%s', $table_content );
+						if ( false === get_transient( $transient_name ) ) {
 							$subject = '[' . get_bloginfo( 'name' ) . '] New content updated on ' . hocwp_get_current_date( hocwp_get_date_format() );
 							$message = $table_content;
 							$message = hocwp_mail_unsubscribe_link_footer( $message, $email );

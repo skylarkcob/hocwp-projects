@@ -279,7 +279,7 @@ function hocwp_execute_register() {
 			$captcha        = hocwp_get_method_value( 'captcha' );
 			$user_login     = sanitize_user( $user_login, true );
 			$user_email     = sanitize_email( $user_email );
-			$transient_name = 'hocwp_register_user_' . md5( $user_email );
+			$transient_name = hocwp_build_transient_name( 'hocwp_register_user_%s', $user_email );
 			if ( false === ( $transient = get_transient( $transient_name ) ) ) {
 				if ( empty( $user_login ) || empty( $user_email ) || empty( $pwd ) || empty( $pwd_again ) || empty( $phone ) || empty( $captcha ) ) {
 					$error   = true;
@@ -568,7 +568,7 @@ function hocwp_execute_lostpassword() {
 		$action = hocwp_get_method_value( 'action' );
 		if ( 'lostpassword' === $action || 'retrievepassword' === $action ) {
 			$user_login     = hocwp_get_method_value( 'user_login' );
-			$transient_name = 'hocwp_lostpassword_user_' . md5( $user_login );
+			$transient_name = hocwp_build_transient_name( 'hocwp_lostpassword_user_%s', $user_login );
 			if ( ( isset( $_POST['submit'] ) || isset( $_POST['wp-submit'] ) ) && false === ( $transient = get_transient( $transient_name ) ) ) {
 				if ( empty( $user_login ) ) {
 					$error   = true;

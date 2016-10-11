@@ -419,7 +419,7 @@ class HOCWP_License {
 	}
 
 	public function check_from_server( $args = array() ) {
-		$transient_name = md5( json_encode( $args ) );
+		$transient_name = hocwp_build_transient_name( 'hocwp_check_license_from_server_%s', $args );
 		if ( false === ( $valid = get_transient( $transient_name ) ) ) {
 			$customer_email = hocwp_get_value_by_key( $args, 'customer_email', hocwp_get_value_by_key( $args, 'email', hocwp_get_admin_email() ) );
 			if ( ! is_email( $customer_email ) ) {

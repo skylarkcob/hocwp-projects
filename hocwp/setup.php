@@ -122,7 +122,8 @@ function hocwp_license_control() {
 add_action( 'init', 'hocwp_license_control' );
 
 function hocwp_setup_warning_php_minimum_version() {
-	$transient_name = 'hocwp_warning_php_recommend_version';
+	$transient_name = 'hocwp_warning_php_recommend_version_%s';
+	$transient_name = hocwp_build_transient_name( $transient_name, '' );
 	if ( false === get_transient( $transient_name ) ) {
 		global $wp_version;
 		$args = array(
@@ -142,7 +143,8 @@ function hocwp_setup_warning_php_recommend_version() {
 		return;
 	}
 	global $wp_version;
-	$transient_name = 'hocwp_warning_php_recommend_version';
+	$transient_name = 'hocwp_warning_php_recommend_version_%s';
+	$transient_name = hocwp_build_transient_name( $transient_name, '' );
 	if ( false === get_transient( $transient_name ) ) {
 		if ( hocwp_is_admin() ) {
 			if ( version_compare( PHP_VERSION, HOCWP_RECOMMEND_PHP_VERSION, '<' ) ) {
