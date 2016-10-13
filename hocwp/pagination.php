@@ -1,8 +1,8 @@
 <?php
 /*
  * Name: HocWP Pagination
- * Version: 1.0.2
- * Last updated: 25/02/2016
+ * Version: 1.0.3
+ * Last updated: 13/10/2016
  */
 if ( ! function_exists( 'add_filter' ) ) {
 	exit;
@@ -117,6 +117,64 @@ function hocwp_has_paged( $args = array() ) {
 	return false;
 }
 
+function hocwp_pagination_dropdown( $args = array() ) {
+	$defaults        = hocwp_pagination_defaults();
+	$previous        = hocwp_get_value_by_key( $args, 'prev', hocwp_get_value_by_key( $defaults, 'prev' ) );
+	$next            = hocwp_get_value_by_key( $args, 'next', hocwp_get_value_by_key( $defaults, 'next' ) );
+	$show_first_item = hocwp_get_value_by_key( $args, 'show_first_item', hocwp_get_value_by_key( $defaults, 'show_first_item' ) );
+	$request         = isset( $args['request'] ) ? $args['request'] : '';
+	if ( empty( $request ) ) {
+		$request = hocwp_get_request();
+	}
+	$current_page = hocwp_get_value_by_key( $args, 'current_page' );
+	if ( ! isset( $args['current_page'] ) ) {
+		$query        = hocwp_get_query( $args );
+		$current_page = isset( $query->query_vars['paged'] ) ? $query->query_vars['paged'] : '0';
+	}
+	$total_page = hocwp_get_value_by_key( $args, 'total_page', hocwp_get_total_page( $args ) );
+	if ( 1 > $current_page || $current_page > $total_page ) {
+		$current_page = hocwp_get_paged();
+	}
+	$args['current_page'] = $current_page;
+	if ( 1 >= $total_page ) {
+		return '';
+	}
+	$select = new HOCWP_HTML( 'select' );
+	$select->set_attribute( 'autocomplete', 'off' );
+	$select->add_class( 'dropdown-pagination' );
+	$select->set_attribute( 'onchange', 'this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);' );
+	$args['total_page'] = $total_page;
+	$result             = '';
+	if ( $current_page > 1 || $show_first_item ) {
+		$link_href = hocwp_get_pagenum_link( array( 'pagenum' => 1, 'request' => $request ) );
+		if ( ! empty( $first ) ) {
+			$result .= '<a class="item link-item first-item" href="' . $link_href . '" data-paged="' . 1 . '">' . $first . '</a>';
+		}
+		$link_href = hocwp_get_pagenum_link( array( 'pagenum' => ( $current_page - 1 ), 'request' => $request ) );
+		$result .= '<a class="item link-item previous-item prev-item" href="' . $link_href . '" data-paged="' . ( $current_page - 1 ) . '">' . $previous . '</a>';
+	}
+	$options = '';
+	for ( $i = 1; $i <= $total_page; $i ++ ) {
+		$link_href = hocwp_get_pagenum_link( array( 'pagenum' => $i, 'request' => $request ) );
+		$option    = '<option ' . selected( $current_page, $i, false );
+		$option .= ' value="' . $link_href . '"';
+		$option .= '>' . sprintf( __( 'Page %1$s of %2$s', 'hocwp-theme' ), $i, $total_page ) . '</option>';
+		$options .= $option;
+	}
+	$select->set_text( $options );
+	$result .= $select->build();
+	if ( $current_page < $total_page ) {
+		$link_href = hocwp_get_pagenum_link( array( 'pagenum' => ( $current_page + 1 ), 'request' => $request ) );
+		$result .= '<a href="' . $link_href . '" class="item next-item link-item" data-paged="' . ( $current_page + 1 ) . '">' . $next . '</a>';
+		$link_href = hocwp_get_pagenum_link( array( 'pagenum' => $total_page, 'request' => $request ) );
+		if ( ! empty( $last ) ) {
+			$result .= '<a href="' . $link_href . '" class="item last-item link-item" data-paged="' . $total_page . '">' . $last . '</a>';
+		}
+	}
+
+	return $result;
+}
+
 function hocwp_build_pagination( $args = array() ) {
 	$defaults        = hocwp_pagination_defaults();
 	$label           = trim( hocwp_get_value_by_key( $args, 'label', hocwp_get_value_by_key( $defaults, 'label' ) ) );
@@ -204,6 +262,8 @@ function hocwp_pagination_before( $args = array() ) {
 		hocwp_add_string_with_space_before( $class, 'ajax' );
 	}
 	$total_page = hocwp_get_total_page( $args );
+	$layout     = hocwp_get_value_by_key( $args, 'layout', 'default' );
+	hocwp_add_string_with_space_before( $class, 'layout-' . $layout );
 	echo '<nav class="' . $class . '" data-query-vars="' . esc_attr( json_encode( $query_vars ) ) . '" data-total-page="' . $total_page . '">';
 }
 
@@ -214,8 +274,16 @@ function hocwp_pagination_after() {
 function hocwp_show_pagination( $args = array() ) {
 	$defaults = apply_filters( 'hocwp_pagination_args', array() );
 	$args     = wp_parse_args( $args, $defaults );
+	$dropdown = isset( $args['dropdown'] ) ? (bool) $args['dropdown'] : false;
+	if ( $dropdown ) {
+		$args['layout'] = 'dropdown';
+	}
 	hocwp_pagination_before( $args );
-	echo hocwp_build_pagination( $args );
+	if ( isset( $args['dropdown'] ) && (bool) $args['dropdown'] ) {
+		echo hocwp_pagination_dropdown( $args );
+	} else {
+		echo hocwp_build_pagination( $args );
+	}
 	hocwp_pagination_after();
 }
 
