@@ -277,6 +277,19 @@ jQuery(document).ready(function ($) {
         }
     })();
 
+    (function () {
+        if ($body.hasClass('woocommerce') && $body.hasClass('single-product')) {
+            var $main_image = $('.single-product.woocommerce .images .woocommerce-main-image');
+            $('.single-product.woocommerce .images .thumbnails img').on('mouseover', function (e) {
+                e.preventDefault();
+                var $element = $(this),
+                    url = $element.attr('url'),
+                    srcset = $element.attr('srcset');
+                $main_image.children('img').attr('src', url).attr('srcset', srcset);
+            });
+        }
+    })();
+
     // User subscribe widget
     (function () {
         var $hocwp_widget_subscribe = $('.hocwp-subscribe-widget');

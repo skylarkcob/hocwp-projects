@@ -426,6 +426,16 @@ function hocwp_register_post_type_news( $args = array() ) {
 	}
 }
 
+function hocwp_register_post_type_mega_menu( $args = array() ) {
+	$defaults = array(
+		'name'          => __( 'Mega Menus', 'hocwp-theme' ),
+		'singular_name' => __( 'Mega Menu', 'hocwp-theme' ),
+		'slug'          => 'hocwp_mega_menu'
+	);
+	$args     = wp_parse_args( $defaults, $args );
+	hocwp_register_post_type_private( $args );
+}
+
 function hocwp_register_lib_google_maps( $api_key = null ) {
 	if ( empty( $api_key ) ) {
 		$options = get_option( 'hocwp_option_social' );

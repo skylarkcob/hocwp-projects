@@ -68,6 +68,21 @@ function hocwp_wc_is_sale( $post_id = null ) {
 	return $product->is_on_sale();
 }
 
+function hocwp_wc_onsale_flash_html( $post_id = null, $percentage = false ) {
+	if ( hocwp_wc_is_sale( $post_id ) ) {
+		if ( $percentage ) {
+			global $product;
+			$tmp = $product;
+			if ( hocwp_id_number_valid( $post_id ) ) {
+				$tmp = new WC_Product( $post_id );
+			}
+			echo '<span class="onsale">-' . hocwp_percentage( $tmp->regular_price, $tmp->sale_price ) . '%</span>';
+		} else {
+			echo '<span class="onsale">Giảm giá!</span>';
+		}
+	}
+}
+
 function hocwp_wc_get_shop_page() {
 	$id = get_option( 'woocommerce_shop_page_id' );
 
@@ -804,6 +819,17 @@ function hocwp_wc_body_classes( $classes ) {
 	}
 	$classes[] = 'hocwp-shop-site';
 
+	if ( is_singular( 'product' ) ) {
+		$left_gallery = get_option( 'hocwp_single_product_gallery_left' );
+		$left_gallery = hocwp_string_to_bool( $left_gallery );
+		if ( $left_gallery ) {
+			$classes[] = 'gallery-on-left';
+		}
+	}
+	if ( is_woocommerce() ) {
+		$classes[] = 'archive-product';
+	}
+
 	return $classes;
 }
 
@@ -982,9 +1008,18 @@ function hocwp_wc_product_settings_page( $settings ) {
 	hocwp_wc_add_product_display_catalog_settings( $settings, $item );
 
 	$item = array(
-		'title'   => __( 'Percentage sale flash', 'woocommerce' ),
-		'desc'    => __( 'Display product sale flash as percentage instead of text', 'woocommerce' ),
+		'title'   => __( 'Percentage sale flash', 'hocwp-theme' ),
+		'desc'    => __( 'Display product sale flash as percentage instead of text', 'hocwp-theme' ),
 		'id'      => 'hocwp_product_percentage_sale_flash',
+		'default' => 'no',
+		'type'    => 'checkbox'
+	);
+	hocwp_wc_add_product_display_catalog_settings( $settings, $item );
+
+	$item = array(
+		'title'   => __( 'Gallery on left', 'hocwp-theme' ),
+		'desc'    => __( 'Display gallery on the left of single product main image.', 'hocwp-theme' ),
+		'id'      => 'hocwp_single_product_gallery_left',
 		'default' => 'no',
 		'type'    => 'checkbox'
 	);
@@ -1030,3 +1065,11 @@ function hocwp_wc_review_order_after_submit() {
 }
 
 add_action( 'woocommerce_review_order_after_submit', 'hocwp_wc_review_order_after_submit' );
+
+function hocwp_wc_breadcrumb_defaults( $args ) {
+	$args['delimiter'] = '<span class="delimiter sep separator"><i class="fa fa-angle-right"></i></span>';
+
+	return $args;
+}
+
+add_filter( 'woocommerce_breadcrumb_defaults', 'hocwp_wc_breadcrumb_defaults' );

@@ -172,6 +172,13 @@ function hocwp_meta_box_links_manager() {
 
 add_action( 'add_meta_boxes_link', 'hocwp_meta_box_links_manager' );
 
+function hocwp_meta_boxes_init( $post_type, $post ) {
+	do_action( 'hocwp_meta_boxes', $post_type, $post );
+	do_action( 'hocwp_' . $post_type . '_meta_boxes', $post );
+}
+
+add_action( 'add_meta_boxes', 'hocwp_meta_boxes_init', 6, 2 );
+
 function hocwp_update_link_meta( $link_id, $meta_key, $meta_value ) {
 	$meta_key = 'hocwp_link_' . $link_id . '_' . $meta_key;
 	update_option( $meta_key, $meta_key );

@@ -1781,7 +1781,7 @@ function hocwp_search_form( $args = array() ) {
 	$echo  = isset( $args['echo'] ) ? (bool) $args['echo'] : true;
 	$class = isset( $args['class'] ) ? $args['class'] : '';
 	hocwp_add_string_with_space_before( $class, 'search-form' );
-	$placeholder = isset( $args['placeholder'] ) ? $args['placeholder'] : _x( 'Search &hellip;', 'placeholder' );
+	$placeholder = isset( $args['placeholder'] ) ? $args['placeholder'] : _x( 'Search &hellip;', 'placeholder', 'hocwp-theme' );
 	$search_icon = isset( $args['search_icon'] ) ? $args['search_icon'] : false;
 	$submit_text = _x( 'Search', 'submit button' );
 	if ( $search_icon ) {
@@ -1792,13 +1792,15 @@ function hocwp_search_form( $args = array() ) {
 	if ( (bool) $icon_in ) {
 		hocwp_add_string_with_space_before( $class, 'icon-in' );
 	}
-	$action     = hocwp_get_value_by_key( $args, 'action', home_url( '/' ) );
-	$action     = trailingslashit( $action );
-	$name       = hocwp_get_value_by_key( $args, 'name', 's' );
-	$form       = '<form method="get" class="' . $class . '" action="' . esc_url( $action ) . '">
+	$action              = hocwp_get_value_by_key( $args, 'action', home_url( '/' ) );
+	$action              = trailingslashit( $action );
+	$name                = hocwp_get_value_by_key( $args, 'name', 's' );
+	$before_search_field = apply_filters( 'hocwp_search_form_before_search_field', '', $args );
+	$form                = '<form method="get" class="' . $class . '" action="' . esc_url( $action ) . '">
 				<label>
-					<span class="screen-reader-text">' . _x( 'Search for:', 'label' ) . '</span>
-					<input type="search" class="search-field" placeholder="' . esc_attr( $placeholder ) . '" value="' . get_search_query() . '" name="' . $name . '" title="' . esc_attr_x( 'Search for:', 'label' ) . '" />
+					<span class="screen-reader-text">' . _x( 'Search for:', 'label', 'hocwp-theme' ) . '</span>';
+	$form .= $before_search_field;
+	$form .= '<input type="search" class="search-field" placeholder="' . esc_attr( $placeholder ) . '" value="' . get_search_query() . '" name="' . $name . '" title="' . esc_attr_x( 'Search for:', 'label' ) . '" />
 				</label>
 				<input type="submit" class="search-submit" value="' . esc_attr( $submit_text ) . '" />';
 	$post_types = hocwp_get_value_by_key( $args, 'post_type' );

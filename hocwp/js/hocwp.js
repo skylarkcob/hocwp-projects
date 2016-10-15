@@ -1588,16 +1588,16 @@ jQuery(document).ready(function ($) {
     var $body = $('body'),
         $window = $(window);
 
-    function HocWFixed(element, options) {
+    function HocWPFixed(element, options) {
         this.self = this;
         this.$element = $(element);
         if (!this.$element.length) {
             return this;
         }
         this.element = element;
-        this.options = $.extend({}, HocWFixed.DEFAULTS, options);
-        this._defaults = HocWFixed.DEFAULTS;
-        this._name = HocWFixed.NAME;
+        this.options = $.extend({}, HocWPFixed.DEFAULTS, options);
+        this._defaults = HocWPFixed.DEFAULTS;
+        this._name = HocWPFixed.NAME;
         this.init();
         var $element = this.$element,
             settings = this.options,
@@ -1618,14 +1618,20 @@ jQuery(document).ready(function ($) {
         if ($admin_bar.length) {
             top += $admin_bar.height();
         }
+        if (settings.anchorTop && $.isNumeric(settings.anchorTop)) {
+            element_pos = settings.anchorTop;
+        }
 
         $window.scroll(function () {
             current_pos = $window.scrollTop();
             if (current_pos > element_pos) {
                 var css = {
                     position: 'fixed',
-                    zIndex: 499,
-                    top: top
+                    display: 'block',
+                    zIndex: 599,
+                    top: top,
+                    left: 0,
+                    right: 0
                 };
                 $element.addClass('fixed');
                 if (settings.autoStretch) {
@@ -1648,21 +1654,85 @@ jQuery(document).ready(function ($) {
         });
     }
 
-    HocWFixed.NAME = 'hocwp.fixed';
+    HocWPFixed.NAME = 'hocwp.fixed';
 
-    HocWFixed.DEFAULTS = {
+    HocWPFixed.DEFAULTS = {
         autoStretch: false,
-        changeInnerWidthMin: 480
+        changeInnerWidthMin: 480,
+        anchorTop: null
     };
 
-    HocWFixed.prototype.init = function () {
+    HocWPFixed.prototype.init = function () {
         this.$element.addClass('hocwp-fixed-plugin');
     };
 
     $.fn.hocwpFixed = function (options) {
         return this.each(function () {
-            if (!$.data(this, HocWFixed.NAME)) {
-                $.data(this, HocWFixed.NAME, new HocWFixed(this, options));
+            if (!$.data(this, HocWPFixed.NAME)) {
+                $.data(this, HocWPFixed.NAME, new HocWPFixed(this, options));
+            }
+        });
+    };
+});
+
+jQuery(document).ready(function ($) {
+    var $body = $('body'),
+        $window = $(window);
+
+    function DropdownChosen(element, options) {
+        this.self = this;
+        this.$element = $(element);
+        if (!this.$element.length) {
+            return this;
+        }
+        this.element = element;
+        this.options = $.extend({}, DropdownChosen.DEFAULTS, options);
+        this._defaults = DropdownChosen.DEFAULTS;
+        this._name = DropdownChosen.NAME;
+        this.init();
+        var $element = this.$element,
+            settings = this.options,
+            $input = $element.children('input[type="hidden"]'),
+            $text = $element.children('.text'),
+            $menu = $element.children('.menu'),
+            $items = $menu.children('.item');
+        $text.css({
+            cursor: 'pointer',
+            display: 'inline-block'
+        });
+        $element.css({
+            width: '1%',
+            whiteSpace: 'nowrap'
+        });
+        $text.on('click', function (e) {
+            e.preventDefault();
+            $element.toggleClass('active');
+        });
+        $items.on('click', function (e) {
+            e.preventDefault();
+            var new_item = $(this).attr('data-id');
+            $element.toggleClass('active');
+            $menu.find('.item').removeClass('active');
+            $(this).addClass('active');
+            $input.val(new_item);
+            $text.attr('data-id', new_item);
+            $text.html($(this).html());
+            //$element.css({width: 'auto'});
+        });
+    }
+
+    DropdownChosen.NAME = 'hocwp.dropdownChosen';
+
+    DropdownChosen.DEFAULTS = {};
+
+    DropdownChosen.prototype.init = function () {
+        this.$element.addClass('hocwp-dropdown-chosen');
+    };
+
+    $.fn.hocwpDropdownChosen = function (options) {
+        return this.each(function () {
+            if (!$.data(this, DropdownChosen.NAME)) {
+                $.data(this, DropdownChosen.NAME, new DropdownChosen(this, options));
             }
         });
     };

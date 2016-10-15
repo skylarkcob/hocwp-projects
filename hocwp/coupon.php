@@ -798,7 +798,7 @@ function hocwp_coupon_meta_box_init( $post_type, $post ) {
 	}
 }
 
-add_action( 'hocwp_post_meta_boxes', 'hocwp_coupon_meta_box_init', 10, 2 );
+add_action( 'hocwp_coupon_meta_boxes', 'hocwp_coupon_meta_box_init', 10, 2 );
 
 function hocwp_coupon_on_save_post( $post_id ) {
 	if ( ! hocwp_can_save_post( $post_id ) ) {

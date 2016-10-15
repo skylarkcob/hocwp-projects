@@ -50,5 +50,8 @@ If you have any questions, please visit [hocwp.net](http://hocwp.net/) for more 
 * Update - get child terms function.
 * Add - shortcode to display custom post list.
 * Add - function to query post by type with interval support.
+* Add function to build transient name, re-update transient after version change.
+* Update function to show ads with ads object or position or args.
+* Add fixed element jQuery plugin.
 
 == Upgrade Notice ==

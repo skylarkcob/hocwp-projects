@@ -14,6 +14,18 @@ function hocwp_register_post_type_product() {
 	hocwp_register_post_type_normal( $args );
 }
 
+function hocwp_register_post_type_deal( $args = array() ) {
+	$slug     = apply_filters( 'hocwp_post_type_deal_slug', 'deal' );
+	$defaults = array(
+		'name'          => __( 'Deals', 'hocwp-theme' ),
+		'singular_name' => __( 'Deal', 'hocwp-theme' ),
+		'post_type'     => 'deal',
+		'slug'          => $slug
+	);
+	$args     = wp_parse_args( $defaults, $args );
+	hocwp_register_post_type_normal( $args );
+}
+
 function hocwp_register_taxonomy_product_cat() {
 	$slug = apply_filters( 'hocwp_taxonomy_product_cat_slug', 'product-cat' );
 	$args = array(

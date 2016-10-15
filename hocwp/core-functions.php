@@ -809,8 +809,9 @@ function hocwp_bool_to_string( $value ) {
 }
 
 function hocwp_string_to_bool( $string ) {
+	$string = trim( $string );
 	$string = strtolower( $string );
-	if ( 'true' == $string ) {
+	if ( 'true' == $string || 'yes' == $string ) {
 		return true;
 	}
 
