@@ -27,7 +27,7 @@ class HOCWP_Remove_Term_Base {
 
 	public function set_query_var( $query_var ) {
 		$this->query_var = $query_var;
-		$this->set_query_var_redirect( $this->query_var . '_redirect' );
+		$this->set_query_var_redirect( $query_var . '_redirect' );
 	}
 
 	public function set_query_var_redirect( $query_var_redirect ) {
@@ -96,7 +96,15 @@ class HOCWP_Remove_Term_Base {
 	}
 
 	public function flush_rewrite_rule() {
-		flush_rewrite_rules();
+		if ( get_option( 'hocwp_flush_rewrite' ) ) {
+
+			add_action( 'shutdown', 'flush_rewrite_rules' );
+			delete_option( 'hocwp_flush_rewrite' );
+
+			return true;
+		}
+
+		return false;
 	}
 
 	public function init() {
@@ -112,26 +120,31 @@ class HOCWP_Remove_Term_Base {
 		}
 	}
 
+	public function schedule_flush() {
+		update_option( 'hocwp_flush_rewrite', 1 );
+	}
+
 	public function remove_taxonomy_base() {
 		$base = apply_filters( 'hocwp_remove_term_base_taxonomy_base', $this->base, $this->taxonomy );
 		$this->set_base( $base );
+		unset( $base );
 		if ( empty( $this->base ) || empty( $this->query_var ) ) {
 			return;
 		}
-
-		add_action( 'init', array( $this, 'add_permastructs' ) );
 		add_filter( 'query_vars', array( $this, 'add_query_vars' ) );
 		add_filter( 'request', array( $this, 'control_request' ) );
-		add_filter( $this->taxonomy . '_rewrite_rules', array( $this, 'term_rewrite_rules' ) );
 		add_filter( 'term_link', array( $this, 'term_link' ), 10, 3 );
-		add_action( 'created_' . $this->taxonomy, array( $this, 'flush_rewrite_rule' ) );
-		add_action( 'edited_' . $this->taxonomy, array( $this, 'flush_rewrite_rule' ) );
-		add_action( 'delete_' . $this->taxonomy, array( $this, 'flush_rewrite_rule' ) );
+		add_filter( $this->taxonomy . '_rewrite_rules', array( $this, 'term_rewrite_rules' ) );
+		add_action( 'created_' . $this->taxonomy, array( $this, 'schedule_flush' ) );
+		add_action( 'edited_' . $this->taxonomy, array( $this, 'schedule_flush' ) );
+		add_action( 'delete_' . $this->taxonomy, array( $this, 'schedule_flush' ) );
+		add_action( 'init', array( $this, 'flush_rewrite_rule' ), 999 );
 	}
 
 	public function get_taxonomy_base_slug( $key, $default ) {
 		$saved    = get_option( $key );
 		$tax_base = ( empty( $saved ) ) ? $default : $saved;
+		unset( $saved );
 
 		return $tax_base;
 	}
@@ -144,6 +157,7 @@ class HOCWP_Remove_Term_Base {
 		} else {
 			$wp_rewrite->extra_permastructs[ $taxonomy_name ]['struct'] = $tag_struct;
 		}
+		unset( $is_old_wp_version );
 	}
 
 	public function add_query_var( $query_vars, $query_var ) {
@@ -156,21 +170,49 @@ class HOCWP_Remove_Term_Base {
 		if ( isset( $query_vars[ $query_var ] ) ) {
 			$term_name      = user_trailingslashit( $query_vars[ $query_var ], $taxonomy_name );
 			$term_permalink = home_url( $term_name );
+			unset( $term_name );
 			wp_redirect( $term_permalink, 301 );
 			exit;
 		}
 	}
 
 	public function add_rewrite_rule( $taxonomy_name, $tax_base, $wp_query_var, $query_var, $rules ) {
-		$rules = array();
-		$terms = hocwp_get_terms( $taxonomy_name, array( 'hide_empty' => false ) );
-		foreach ( $terms as $term ) {
-			$rules[ '(' . $term->slug . ')/(?:feed/)?(feed|rdf|rss|rss2|atom)/?$' ] = 'index.php?' . $wp_query_var . '=$matches[1]&feed=$matches[2]';
-			$rules[ '(' . $term->slug . ')/page/?([0-9]{1,})/?$' ]                  = 'index.php?' . $wp_query_var . '=$matches[1]&paged=$matches[2]';
-			$rules[ '(' . $term->slug . ')/?$' ]                                    = 'index.php?' . $wp_query_var . '=$matches[1]';
+		global $wp_rewrite;
+		$new_rules           = array();
+		$taxonomy            = get_taxonomy( $taxonomy_name );
+		$permalink_structure = get_option( 'permalink_structure' );
+		$blog_prefix         = '';
+		if ( is_multisite() && ! is_subdomain_install() && is_main_site() && 0 === strpos( $permalink_structure, '/blog/' ) ) {
+			$blog_prefix = 'blog/';
 		}
-		$tax_base                      = trim( $tax_base, '/' );
-		$rules[ $tax_base . '/(.*)$' ] = 'index.php?' . $query_var . '=$matches[1]';
+		$terms = hocwp_get_terms( $taxonomy_name, array( 'hide_empty' => false ) );
+		if ( hocwp_array_has_value( $terms ) ) {
+			foreach ( $terms as $term ) {
+				$term_nicename = $term->slug;
+				if ( $term->parent == $term->cat_ID ) {
+					$term->parent = 0;
+				} elseif ( $taxonomy->rewrite['hierarchical'] != 0 && $term->parent != 0 ) {
+					$parents = hocwp_get_term_parents( $taxonomy_name, $term->parent, false, '/', true );
+					if ( ! is_wp_error( $parents ) ) {
+						$term_nicename = $parents . $term_nicename;
+					}
+					unset( $parents );
+				}
+
+				$new_rules[ $blog_prefix . '(' . $term_nicename . ')/(?:feed/)?(feed|rdf|rss|rss2|atom)/?$' ]                = 'index.php?' . $wp_query_var . '=$matches[1]&feed=$matches[2]';
+				$new_rules[ $blog_prefix . '(' . $term_nicename . ')/' . $wp_rewrite->pagination_base . '/?([0-9]{1,})/?$' ] = 'index.php?' . $wp_query_var . '=$matches[1]&paged=$matches[2]';
+				$new_rules[ $blog_prefix . '(' . $term_nicename . ')/?$' ]                                                   = 'index.php?' . $wp_query_var . '=$matches[1]';
+			}
+			unset( $terms, $term, $term_nicename );
+		}
+		$old_base                     = $wp_rewrite->get_extra_permastruct( $taxonomy_name );
+		$old_base                     = str_replace( '%' . $tax_base . '%', '(.+)', $old_base );
+		$old_base                     = trim( $old_base, '/' );
+		$new_rules[ $old_base . '$' ] = 'index.php?' . $query_var . '=$matches[1]';
+		if ( hocwp_array_has_value( $new_rules ) ) {
+			$rules = $new_rules;
+		}
+		unset( $new_rules, $old_base );
 
 		return $rules;
 	}
@@ -178,14 +220,14 @@ class HOCWP_Remove_Term_Base {
 	// Remove category (/category/ into /) base slug from url
 
 	public function remove_category_base() {
-		add_action( 'init', array( $this, 'category_extra_permastructs' ) );
 		add_filter( 'query_vars', array( $this, 'category_query_vars' ) );
+		add_filter( 'category_link', array( $this, 'category_link' ) );
 		add_filter( 'request', array( $this, 'category_request' ) );
 		add_filter( 'category_rewrite_rules', array( $this, 'category_rewrite_rules' ) );
-		add_filter( 'category_link', array( $this, 'category_link' ) );
-		add_action( 'created_category', array( $this, 'flush_rewrite_rule' ) );
-		add_action( 'edited_category', array( $this, 'flush_rewrite_rule' ) );
-		add_action( 'delete_category', array( $this, 'flush_rewrite_rule' ) );
+		add_action( 'created_category', array( $this, 'schedule_flush' ) );
+		add_action( 'edited_category', array( $this, 'schedule_flush' ) );
+		add_action( 'delete_category', array( $this, 'schedule_flush' ) );
+		add_action( 'init', array( $this, 'flush_rewrite_rule' ), 999 );
 	}
 
 	public function get_category_base() {
@@ -221,14 +263,14 @@ class HOCWP_Remove_Term_Base {
 	// Remove post_tag (/tag/ into /) base slug from url
 
 	public function remove_post_tag_base_slug() {
-		add_action( 'init', array( $this, 'tag_extra_permastructs' ) );
 		add_filter( 'query_vars', array( $this, 'tag_query_vars' ) );
+		add_filter( 'tag_link', array( $this, 'tag_link' ) );
 		add_filter( 'request', array( $this, 'tag_request' ) );
 		add_filter( 'tag_rewrite_rules', array( $this, 'tag_rewrite_rules' ) );
-		add_filter( 'tag_link', array( $this, 'tag_link' ) );
-		add_action( 'created_post_tag', array( $this, 'flush_rewrite_rule' ) );
-		add_action( 'edited_post_tag', array( $this, 'flush_rewrite_rule' ) );
-		add_action( 'delete_post_tag', array( $this, 'flush_rewrite_rule' ) );
+		add_action( 'created_post_tag', array( $this, 'schedule_flush' ) );
+		add_action( 'edited_post_tag', array( $this, 'schedule_flush' ) );
+		add_action( 'delete_post_tag', array( $this, 'schedule_flush' ) );
+		add_action( 'init', array( $this, 'flush_rewrite_rule' ), 999 );
 	}
 
 	public function get_tag_base() {

@@ -180,7 +180,7 @@ function hocwp_disqus_comment() {
 }
 
 function hocwp_get_top_commenters( $number = 5, $time = 'all', $condition = '' ) {
-	$transient_name = hocwp_build_transient_name( $transient_name . '_%s', $number );
+	$transient_name = hocwp_build_transient_name( 'hocwp_top_commenters_%s', $number );
 	if ( false === ( $results = get_transient( $transient_name ) ) ) {
 		global $wpdb;
 		$sql     = 'SELECT COUNT(comment_author_email) AS comments_count, comment_author_email, comment_author, comment_author_url, user_id FROM ' . $wpdb->comments . '

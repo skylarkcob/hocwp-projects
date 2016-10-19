@@ -241,7 +241,7 @@ class HOCWP_Captcha {
 			'save_path'       => HOCWP_CONTENT_PATH . '/captcha',
 			'save_url'        => content_url( 'hocwp/captcha' ),
 			'session_name'    => 'hocwp_captcha',
-			'expired_minutes' => 3,
+			'expired_minutes' => 5,
 			'fonts'           => array( HOCWP_PATH . '/fonts/Tahoma.ttf' )
 		);
 		$args     = apply_filters( 'hocwp_captcha_default_args', array() );

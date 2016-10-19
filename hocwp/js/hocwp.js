@@ -1109,6 +1109,7 @@ jQuery(document).ready(function ($) {
                 }
             });
         }
+        $element.closest('.navigation').show();
     }
 
     MobileMenu.NAME = 'hocwp.mobileMenu';
@@ -1622,8 +1623,7 @@ jQuery(document).ready(function ($) {
             element_pos = settings.anchorTop;
         }
 
-        $window.scroll(function () {
-            current_pos = $window.scrollTop();
+        function hocwp_fix_item_helper(current_pos, element_pos) {
             if (current_pos > element_pos) {
                 var css = {
                     position: 'fixed',
@@ -1651,6 +1651,13 @@ jQuery(document).ready(function ($) {
                 $element.attr('style', backup_style);
                 $element.attr('class', backup_class);
             }
+        }
+
+        hocwp_fix_item_helper(current_pos, element_pos);
+
+        $window.scroll(function () {
+            current_pos = $window.scrollTop();
+            hocwp_fix_item_helper(current_pos, element_pos);
         });
     }
 

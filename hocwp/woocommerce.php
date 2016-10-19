@@ -78,7 +78,7 @@ function hocwp_wc_onsale_flash_html( $post_id = null, $percentage = false ) {
 			}
 			echo '<span class="onsale">-' . hocwp_percentage( $tmp->regular_price, $tmp->sale_price ) . '%</span>';
 		} else {
-			echo '<span class="onsale">Giảm giá!</span>';
+			echo '<span class="onsale">' . __( 'Sale!', 'hocwp-theme' ) . '</span>';
 		}
 	}
 }
@@ -820,11 +820,30 @@ function hocwp_wc_body_classes( $classes ) {
 	$classes[] = 'hocwp-shop-site';
 
 	if ( is_singular( 'product' ) ) {
-		$left_gallery = get_option( 'hocwp_single_product_gallery_left' );
-		$left_gallery = hocwp_string_to_bool( $left_gallery );
+		$left_gallery = hocwp_wc_single_product_gallery_left();
 		if ( $left_gallery ) {
 			$classes[] = 'gallery-on-left';
 		}
+		unset( $left_gallery );
+
+		$thumbnail_on_gallery = hocwp_wc_single_product_thumbnail_on_gallery();
+		if ( $thumbnail_on_gallery ) {
+			$classes[] = 'thumbnail-on-gallery';
+		}
+		unset( $thumbnail_on_gallery );
+
+		$thumbnail_zooming = hocwp_wc_single_product_thumbnail_zooming();
+		if ( $thumbnail_zooming ) {
+			$classes[] = 'thumbnail-zooming';
+		}
+		unset( $thumbnail_zooming );
+
+		$thumbnail_preview = hocwp_wc_single_product_gallery_preview();
+		if ( $thumbnail_preview ) {
+			$classes[] = 'thumbnail-preview';
+			$classes[] = 'gallery-preview';
+		}
+		unset( $thumbnail_preview );
 	}
 	if ( is_woocommerce() ) {
 		$classes[] = 'archive-product';
@@ -994,6 +1013,50 @@ function hocwp_wc_add_product_display_catalog_settings( &$settings, $item ) {
 
 function hocwp_wc_product_settings_page( $settings ) {
 	$item = array(
+		'title'   => __( 'Thumbnail on gallery', 'hocwp-theme' ),
+		'desc'    => __( 'Auto add current product thumbnail into it\'s gallery', 'hocwp-theme' ),
+		'id'      => 'hocwp_single_product_thumbnail_on_gallery',
+		'default' => 'no',
+		'type'    => 'checkbox'
+	);
+	hocwp_wc_add_settings_field( $settings, $item, 'image_options' );
+
+	$item = array(
+		'title'   => __( 'Thumbnail zooming', 'hocwp-theme' ),
+		'desc'    => __( 'Add function allow user can zoom current product image on single page', 'hocwp-theme' ),
+		'id'      => 'hocwp_single_product_thumbnail_zoom',
+		'default' => 'no',
+		'type'    => 'checkbox'
+	);
+	hocwp_wc_add_settings_field( $settings, $item, 'image_options' );
+
+	$item = array(
+		'title'   => __( 'Gallery on left', 'hocwp-theme' ),
+		'desc'    => __( 'Display gallery on the left of single product main image', 'hocwp-theme' ),
+		'id'      => 'hocwp_single_product_gallery_left',
+		'default' => 'no',
+		'type'    => 'checkbox'
+	);
+	hocwp_wc_add_settings_field( $settings, $item, 'image_options' );
+
+	$item = array(
+		'title'   => __( 'Gallery preview', 'hocwp-theme' ),
+		'desc'    => __( 'Auto show gallery image in current product thumbnail on mouse hover', 'hocwp-theme' ),
+		'id'      => 'hocwp_single_product_gallery_preview',
+		'default' => 'yes',
+		'type'    => 'checkbox'
+	);
+	hocwp_wc_add_settings_field( $settings, $item, 'image_options' );
+
+	$item = array(
+		'title' => __( 'Additional Settings', 'hocwp-theme' ),
+		'type'  => 'title',
+		'desc'  => __( 'You can change number products to show on archive page.', 'hocwp-theme' ),
+		'id'    => 'hocwp_additional_settings'
+	);
+	hocwp_wc_add_settings_field( $settings, $item, '' );
+
+	$item = array(
 		'title'             => __( 'Posts per page', 'hocwp-theme' ),
 		'id'                => 'hocwp_product_posts_per_page',
 		'type'              => 'number',
@@ -1005,7 +1068,7 @@ function hocwp_wc_product_settings_page( $settings ) {
 		'default'           => hocwp_get_posts_per_page(),
 		'autoload'          => false
 	);
-	hocwp_wc_add_product_display_catalog_settings( $settings, $item );
+	hocwp_wc_add_settings_field( $settings, $item, 'hocwp_additional_settings' );
 
 	$item = array(
 		'title'   => __( 'Percentage sale flash', 'hocwp-theme' ),
@@ -1014,16 +1077,13 @@ function hocwp_wc_product_settings_page( $settings ) {
 		'default' => 'no',
 		'type'    => 'checkbox'
 	);
-	hocwp_wc_add_product_display_catalog_settings( $settings, $item );
+	hocwp_wc_add_settings_field( $settings, $item, 'hocwp_additional_settings' );
 
 	$item = array(
-		'title'   => __( 'Gallery on left', 'hocwp-theme' ),
-		'desc'    => __( 'Display gallery on the left of single product main image.', 'hocwp-theme' ),
-		'id'      => 'hocwp_single_product_gallery_left',
-		'default' => 'no',
-		'type'    => 'checkbox'
+		'type' => 'sectionend',
+		'id'   => 'hocwp_additional_settings'
 	);
-	hocwp_wc_add_product_display_catalog_settings( $settings, $item );
+	hocwp_wc_add_settings_field( $settings, $item, '' );
 
 	return $settings;
 }
@@ -1073,3 +1133,80 @@ function hocwp_wc_breadcrumb_defaults( $args ) {
 }
 
 add_filter( 'woocommerce_breadcrumb_defaults', 'hocwp_wc_breadcrumb_defaults' );
+
+function hocwp_wc_single_product_image_html( $html, $post_id ) {
+	$thumbnail_zoom = hocwp_wc_single_product_thumbnail_zooming();
+	if ( $thumbnail_zoom ) {
+		global $post, $product;
+		if ( has_post_thumbnail() ) {
+			$image_ids = $product->get_gallery_attachment_ids();
+			$count     = count( $image_ids );
+			$gallery   = $count > 0 ? '[product-gallery]' : '';
+			$thumb_id  = get_post_thumbnail_id();
+			$props     = wc_get_product_attachment_props( $thumb_id, $post );
+			$image_url = $props['url'];
+			$size      = get_option( 'shop_single_image_size' );
+			$size      = hocwp_sanitize_size( $size );
+			$size      = apply_filters( 'single_product_large_thumbnail_size', $size );
+			$args      = array(
+				'title' => $props['title'],
+				'alt'   => $props['alt']
+			);
+			$image     = get_the_post_thumbnail( $post, 'full', $args );
+			$html      = sprintf(
+				'<a href="%s" itemprop="image" class="woocommerce-main-image zoom" title="%s" data-rel="prettyPhoto%s">%s</a>',
+				esc_url( $image_url ),
+				esc_attr( $props['caption'] ),
+				$gallery,
+				$image
+			);
+			$html      = apply_filters( 'hocwp_wc_single_product_image_html', $html, $post->ID );
+		}
+	}
+
+	return $html;
+}
+
+add_filter( 'woocommerce_single_product_image_html', 'hocwp_wc_single_product_image_html', 10, 2 );
+
+function hocwp_wc_single_product_thumbnail_on_gallery() {
+	$thumbnail_on_gallery = get_option( 'hocwp_single_product_thumbnail_on_gallery' );
+	$thumbnail_on_gallery = hocwp_string_to_bool( $thumbnail_on_gallery );
+
+	return apply_filters( 'hocwp_wc_single_product_thumbnail_on_gallery', $thumbnail_on_gallery );
+}
+
+function hocwp_wc_single_product_thumbnail_zooming() {
+	$result = get_option( 'hocwp_single_product_thumbnail_zoom' );
+	$result = hocwp_string_to_bool( $result );
+
+	return apply_filters( 'hocwp_wc_single_product_thumbnail_zooming', $result );
+}
+
+function hocwp_wc_single_product_gallery_preview() {
+	$result = get_option( 'hocwp_single_product_gallery_preview' );
+	$result = hocwp_string_to_bool( $result );
+
+	return apply_filters( 'hocwp_wc_single_product_gallery_preview', $result );
+}
+
+function hocwp_wc_single_product_gallery_left() {
+	$result = get_option( 'hocwp_single_product_gallery_left' );
+	$result = hocwp_string_to_bool( $result );
+
+	return apply_filters( 'hocwp_wc_single_product_gallery_left', $result );
+}
+
+function hocwp_wc_product_gallery_attachment_ids( $ids, $product ) {
+	$thumbnail_on_gallery = hocwp_wc_single_product_thumbnail_on_gallery();
+	if ( $thumbnail_on_gallery && hocwp_array_has_value( $ids ) ) {
+		if ( has_post_thumbnail() ) {
+			$thumb_id = get_post_thumbnail_id();
+			array_unshift( $ids, $thumb_id );
+		}
+	}
+
+	return $ids;
+}
+
+add_filter( 'woocommerce_product_gallery_attachment_ids', 'hocwp_wc_product_gallery_attachment_ids', 10, 2 );

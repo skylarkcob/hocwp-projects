@@ -10,6 +10,10 @@ html {
     height: 100%;
 }
 
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+    line-height: 1.5;
+}
+
 body.hocwp {
     min-width: 250px;
 }
@@ -1040,6 +1044,7 @@ img.center {
 
 .hocwp .entry-content table {
     border-collapse: collapse;
+    min-width: 320px;
 }
 
 /**
@@ -4144,6 +4149,15 @@ input.button:hover,
     min-width: 90%;
 }
 
+.hocwp.thumbnail-zooming .images .woocommerce-main-image {
+    display: block;
+    overflow: hidden;
+}
+
+.hocwp.single-product.thumbnail-zooming .images .woocommerce-main-image + .thumbnails a.active {
+    border: 1px solid #ddd;
+}
+
 .single-product.woocommerce .modal.product-fast-buy .modal-header {
     background-color: #eee;
 }
@@ -4424,4 +4438,13 @@ input.button:hover,
     margin-top: -16px;
     position: absolute;
     top: 50%;
+}
+
+/*
+* Image Zoom
+*/
+
+.zoomWindowContainer .zoomWindow {
+    min-height: 300px;
+    min-width: 300px;
 }

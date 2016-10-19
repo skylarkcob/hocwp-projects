@@ -280,13 +280,50 @@ jQuery(document).ready(function ($) {
     (function () {
         if ($body.hasClass('woocommerce') && $body.hasClass('single-product')) {
             var $main_image = $('.single-product.woocommerce .images .woocommerce-main-image');
-            $('.single-product.woocommerce .images .thumbnails img').on('mouseover', function (e) {
-                e.preventDefault();
-                var $element = $(this),
-                    url = $element.attr('url'),
-                    srcset = $element.attr('srcset');
-                $main_image.children('img').attr('src', url).attr('srcset', srcset);
-            });
+            if ($main_image.length) {
+                var current_image = $main_image.html(),
+                    $current_image = $main_image.children('img'),
+                    $thumbnails = $main_image.next('.thumbnails');
+                if ($thumbnails.length && $body.hasClass('thumbnail-preview')) {
+                    $thumbnails.on('mouseover', 'img', function (e) {
+                        e.preventDefault();
+                        var $element = $(this),
+                            url = $element.attr('url'),
+                            srcset = $element.attr('srcset');
+                        $thumbnails.children('a').removeClass('active');
+                        $element.parent().addClass('active');
+                        $current_image.attr('src', url).attr('srcset', srcset);
+                        $main_image.trigger('hocwp:image_src_changed', [url]);
+                    });
+                }
+                if ($body.hasClass('thumbnail-zooming')) {
+                    if ($thumbnails.length) {
+                        $thumbnails.children('a').first().addClass('active');
+                    }
+                    if (hocwp.is_function(jQuery().zoom)) {
+                        $main_image.zoom({
+                            callback: function () {
+                                var $image_zoom = $main_image.find('.zoomImg');
+                                if ($image_zoom.width() < $main_image.width()) {
+                                    $main_image.trigger('zoom.destroy');
+                                }
+                            }
+                        });
+                        $main_image.on('hocwp:image_src_changed', function (e, url) {
+                            $main_image.trigger('zoom.destroy');
+                            $main_image.zoom({
+                                url: url,
+                                callback: function () {
+                                    var $image_zoom = $main_image.find('.zoomImg');
+                                    if ($image_zoom.width() < $main_image.width()) {
+                                        $main_image.trigger('zoom.destroy');
+                                    }
+                                }
+                            });
+                        });
+                    }
+                }
+            }
         }
     })();
 

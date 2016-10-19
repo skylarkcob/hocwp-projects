@@ -106,21 +106,25 @@ function hocwp_query_product_by_category( $term, $args = array() ) {
 function hocwp_query_sanitize_post_by_category( $term, &$args = array() ) {
 	if ( is_array( $term ) ) {
 		foreach ( $term as $aterm ) {
-			$tax_item = array(
-				'taxonomy' => $aterm->taxonomy,
-				'field'    => 'id',
-				'terms'    => $aterm->term_id
-			);
-			hocwp_query_sanitize_tax_query( $tax_item, $args );
-			$args['tax_query']['relation'] = 'OR';
+			if ( is_a( $aterm, 'WP_Term' ) ) {
+				$tax_item = array(
+					'taxonomy' => $aterm->taxonomy,
+					'field'    => 'id',
+					'terms'    => $aterm->term_id
+				);
+				hocwp_query_sanitize_tax_query( $tax_item, $args );
+				$args['tax_query']['relation'] = 'OR';
+			}
 		}
 	} else {
-		$tax_item = array(
-			'taxonomy' => $term->taxonomy,
-			'field'    => 'id',
-			'terms'    => $term->term_id
-		);
-		hocwp_query_sanitize_tax_query( $tax_item, $args );
+		if ( is_a( $term, 'WP_Term' ) ) {
+			$tax_item = array(
+				'taxonomy' => $term->taxonomy,
+				'field'    => 'id',
+				'terms'    => $term->term_id
+			);
+			hocwp_query_sanitize_tax_query( $tax_item, $args );
+		}
 	}
 
 	return $args;
@@ -138,6 +142,7 @@ function hocwp_query_post_by_meta( $meta_key, $meta_value, $args = array(), $met
 		$meta_item['compare'] = $compare;
 	}
 	$args = hocwp_query_sanitize_meta_query( $meta_item, $args );
+	unset( $meta_item );
 
 	return hocwp_query( $args );
 }

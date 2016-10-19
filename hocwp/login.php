@@ -502,12 +502,12 @@ function hocwp_login_form( $args = array() ) {
 			$slogan->set_text( sprintf( $args['slogan'], hocwp_get_root_domain_name( home_url( '/' ) ) ) );
 			$slogan->output();
 			if ( isset( $_REQUEST['error'] ) ) {
-				echo '<p class="alert alert-danger">' . hocwp_translate_text( 'There was an error occurred, please try again.' ) . '</p>';
+				echo '<p class="alert alert-danger">' . hocwp_translate_text( __( 'There was an error occurred, please try again.', 'hocwp-theme' ) ) . '</p>';
 			}
 			?>
 		</div>
 		<div class="module-body">
-			<h4 class="form-title"><?php hocwp_translate_text( 'Login', true ); ?></h4>
+			<h4 class="form-title"><?php hocwp_translate_text( __( 'Login', 'hocwp-theme' ), true ); ?></h4>
 			<?php
 			if ( $hide_form ) {
 				$login_form_top    = apply_filters( 'login_form_top', '', $args );

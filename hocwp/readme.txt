@@ -53,5 +53,10 @@ If you have any questions, please visit [hocwp.net](http://hocwp.net/) for more 
 * Add function to build transient name, re-update transient after version change.
 * Update function to show ads with ads object or position or args.
 * Add fixed element jQuery plugin.
+* Add dropdown chosen jQuery plugin.
+* Update function for WooCommerce
+* Add function to register deal and mega menus post type.
+* Add hook meta boxes.
+* Update front-end css.
 
 == Upgrade Notice ==

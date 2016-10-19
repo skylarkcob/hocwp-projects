@@ -19,7 +19,8 @@ function hocwp_plugin_remove_option_submenu_page() {
 add_action( 'admin_menu', 'hocwp_plugin_remove_option_submenu_page', 99 );
 
 function hocwp_plugin_redirect_option_page() {
-	if ( ! hocwp_doc_man_license_valid() ) {
+	$valid = apply_filters( 'hocwp_plugin_license_valid', true );
+	if ( ! $valid ) {
 		$page = hocwp_get_current_admin_page();
 		if ( 'hocwp_plugin_option' == $page ) {
 			$base_url = admin_url( 'admin.php' );

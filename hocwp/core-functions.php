@@ -9,6 +9,7 @@ function hocwp_permutation( &$a, &$b ) {
 	$tmp = $a;
 	$a   = $b;
 	$b   = $tmp;
+	unset( $tmp );
 }
 
 function hocwp_create_file( $path, $content = '' ) {
@@ -53,6 +54,7 @@ function hocwp_get_ipinfo( $ip ) {
 	$json    = @file_get_contents( 'http://ipinfo.io/' . $ip );
 	$details = json_decode( $json );
 	$details = (array) $details;
+	unset( $json );
 
 	return $details;
 }
@@ -68,6 +70,7 @@ function hocwp_get_user_isp_ip() {
 	} else {
 		$ip = $remote;
 	}
+	unset( $client, $forward, $remote );
 
 	return $ip;
 }
@@ -91,6 +94,7 @@ function hocwp_array_insert( &$array, $position, $insert ) {
 		$firsts = array_slice( $array, 0, $pos );
 		$lasts  = array_slice( $array, $pos );
 		$array  = $firsts + $insert + $lasts;
+		unset( $pos, $firsts, $lasts );
 	}
 }
 
@@ -232,6 +236,7 @@ function hocwp_in_array( $needle, $haystack ) {
 			return true;
 		}
 	}
+	unset( $element );
 
 	return false;
 }

@@ -393,3 +393,27 @@ function hocwp_return_term( $taxonomy, $term_id = null, $output = OBJECT ) {
 
 	return $term->term_id;
 }
+
+function hocwp_get_term_parents( $taxonomy, $id, $link = false, $separator = '/', $nicename = false, $visited = array() ) {
+	$chain  = '';
+	$parent = get_term( $id, $taxonomy );
+	if ( is_wp_error( $parent ) ) {
+		return $parent;
+	}
+	if ( $nicename ) {
+		$name = $parent->slug;
+	} else {
+		$name = $parent->name;
+	}
+	if ( $parent->parent && ( $parent->parent != $parent->term_id ) && ! in_array( $parent->parent, $visited ) ) {
+		$visited[] = $parent->parent;
+		$chain .= hocwp_get_term_parents( $taxonomy, $parent->parent, $link, $separator, $nicename, $visited );
+	}
+	if ( $link ) {
+		$chain .= '<a href="' . esc_url( get_term_link( $parent ) ) . '">' . $name . '</a>' . $separator;
+	} else {
+		$chain .= $name . $separator;
+	}
+
+	return $chain;
+}
