@@ -1146,3 +1146,13 @@ function hocwp_setup_theme_build_transient_name( $transient, $format, $dynamic )
 }
 
 add_filter( 'hocwp_build_transient_name', 'hocwp_setup_theme_build_transient_name', 10, 3 );
+
+function hocwp_setup_theme_delete_menu_cache() {
+	hocwp_delete_transient( 'hocwp_menu_cache' );
+}
+
+add_action( 'save_post', 'hocwp_setup_theme_delete_menu_cache' );
+add_action( 'wp_update_nav_menu', 'hocwp_setup_theme_delete_menu_cache' );
+add_action( 'hocwp_option_saved', 'hocwp_setup_theme_delete_menu_cache' );
+
+unset( $lang, $dash_widget );

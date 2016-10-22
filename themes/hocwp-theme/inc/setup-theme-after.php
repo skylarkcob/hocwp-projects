@@ -5,7 +5,7 @@ if ( ! function_exists( 'add_filter' ) ) {
 
 global $pagenow;
 
-function hocwp_theme_check_load_facebook_javascript_sdk($use) {
+function hocwp_theme_check_load_facebook_javascript_sdk( $use ) {
 	$data = apply_filters( 'hocwp_load_facebook_javascript_sdk_on_page_sidebar', array() );
 	foreach ( $data as $value ) {
 		$conditional_functions = isset( $value['condition'] ) ? $value['condition'] : '';
@@ -1133,22 +1133,25 @@ add_action( 'wp_footer', 'hocwp_setup_theme_custom_footer_data', 99 );
 add_filter( 'hocwp_replace_text_placeholder', 'hocwp_replace_text_placeholder' );
 
 function hocwp_setup_theme_nice_future_post_permalink( $permalink, $post, $leavename ) {
-	if ( isset( $post->post_status ) && ( 'future' === $post->post_status ) ) {
-		$post->post_status = 'publish';
-		remove_filter( 'post_type_link', 'hocwp_setup_theme_nice_future_post_permalink', 99 );
-		$permalink = get_permalink( $post, $leavename );
-		add_filter( 'post_type_link', 'hocwp_setup_theme_nice_future_post_permalink', 99, 3 );
+	$hocwp_permalinks           = get_option( 'hocwp_permalink' );
+	$nice_future_post_permalink = (bool) hocwp_get_value_by_key( $hocwp_permalinks, 'nice_future_post_permalink' );
+	if ( (bool) $nice_future_post_permalink ) {
+		if ( isset( $post->post_status ) && ( 'future' === $post->post_status ) ) {
+			$post->post_status = 'publish';
+			remove_filter( 'post_type_link', 'hocwp_setup_theme_nice_future_post_permalink', 99 );
+			$permalink = get_permalink( $post, $leavename );
+			add_filter( 'post_type_link', 'hocwp_setup_theme_nice_future_post_permalink', 99, 3 );
+		}
 	}
 
 	return $permalink;
 }
 
+add_filter( 'post_type_link', 'hocwp_setup_theme_nice_future_post_permalink', 99, 3 );
+
 function hocwp_setup_theme_remove_term_base() {
-	$hocwp_permalinks           = get_option( 'hocwp_permalink' );
-	$nice_future_post_permalink = (bool) hocwp_get_value_by_key( $hocwp_permalinks, 'nice_future_post_permalink' );
-	if ( (bool) $nice_future_post_permalink ) {
-		add_filter( 'post_type_link', 'hocwp_setup_theme_nice_future_post_permalink', 99, 3 );
-	}
+	$hocwp_permalinks = get_option( 'hocwp_permalink' );
+
 	if ( isset( $hocwp_permalinks['remove_taxonomy_base'] ) ) {
 		$json_taxs = $hocwp_permalinks['remove_taxonomy_base'];
 		$json_taxs = hocwp_json_string_to_array( $json_taxs );
@@ -1419,8 +1422,23 @@ function hocwp_setup_theme_pre_get_posts( WP_Query $query ) {
 
 		}
 		if ( hocwp_wc_installed() ) {
-			if ( is_post_type_archive( 'product' ) || is_product_taxonomy() || is_search() ) {
-				$query->set( 'posts_per_page', hocwp_get_product_posts_per_page() );
+			if ( is_search() || ( is_archive() && function_exists( 'is_woocommerce' ) && is_woocommerce() ) ) {
+				if ( ! isset( $_POST['ppp'] ) ) {
+					$query->set( 'posts_per_page', hocwp_get_product_posts_per_page() );
+				}
+			}
+			if ( is_search() ) {
+				$search_cat = hocwp_get_method_value( 'search_cat', 'request' );
+				if ( hocwp_id_number_valid( $search_cat ) ) {
+					$tax_query = array(
+						array(
+							'taxonomy' => 'product_cat',
+							'field'    => 'id',
+							'terms'    => array( $search_cat )
+						)
+					);
+					$query->set( 'tax_query', $tax_query );
+				}
 			}
 		}
 	}

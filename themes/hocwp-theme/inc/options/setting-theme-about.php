@@ -77,8 +77,9 @@ function hocwp_option_page_about_content() {
 					'content' => $content
 				);
 				hocwp_field_admin_postbox( $args );
+				unset( $content, $args );
+				ob_start();
 				?>
-				<?php ob_start(); ?>
 				<table>
 					<tbody>
 					<tr>
@@ -114,6 +115,7 @@ function hocwp_option_page_about_content() {
 					'content' => $content
 				);
 				hocwp_field_admin_postbox( $args );
+				unset( $content, $args, $themes, $current_theme );
 				?>
 			</div>
 			<div class="postbox-container">
@@ -164,8 +166,9 @@ function hocwp_option_page_about_content() {
 					'content' => $content
 				);
 				hocwp_field_admin_postbox( $args );
+				unset( $args, $content );
+				ob_start();
 				?>
-				<?php ob_start(); ?>
 				<table>
 					<tbody>
 					<tr>
@@ -194,6 +197,9 @@ function hocwp_option_page_about_content() {
 		</div>
 	</div>
 	<?php
+	unset( $current_theme, $args, $content );
 }
 
 add_action( 'hocwp_option_page_' . $option->get_option_name_no_prefix() . '_content', 'hocwp_option_page_about_content' );
+
+unset( $option, $parent_slug );

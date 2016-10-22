@@ -256,6 +256,37 @@ function hocwp_theme_translation_gettext( $translation, $text ) {
 		case 'Required fields are marked as %s';
 			$translation = 'Mục bắt buộc được đánh dấu %s';
 			break;
+		case 'Page %1$s of %2$s':
+			$translation = 'Trang %1$s trên tổng số %2$s';
+			break;
+		case 'Page %1$s':
+			$translation = 'Trang %1$s';
+			break;
+		case 'Page %s':
+			$translation = 'Trang %s';
+			break;
+		case 'Page %d':
+			$translation = 'Trang %d';
+			break;
+		case 'Page':
+			$translation = 'Trang';
+			break;
+		case 'Search results for &ldquo;%s&rdquo;':
+			$translation = 'Kết quả tìm kiếm cho &ldquo;%s&rdquo;';
+			break;
+		case 'Author: %s':
+			$translation = 'Tác giả: %s';
+			break;
+		case 'Products tagged &ldquo;%s&rdquo;':
+		case 'Posts tagged &ldquo;%s&rdquo;':
+			$translation = 'Thẻ &ldquo;%s&rdquo;';
+			break;
+		case 'Error 404':
+			$translation = 'Không tìm thấy trang';
+			break;
+		case 'Close':
+			$translation = 'Đóng';
+			break;
 	}
 
 	return $translation;
@@ -273,6 +304,12 @@ function hocwp_theme_translation_gettext_with_context( $translation, $text, $con
 			break;
 		case 'Search':
 			$translation = 'Tìm kiếm';
+			break;
+		case 'Page %s':
+			$translation = 'Trang %s';
+			break;
+		case 'Page':
+			$translation = 'Trang';
 			break;
 	}
 
@@ -323,6 +360,12 @@ function hocwp_theme_translation_ngettext( $translation, $single, $plural, $numb
 		case 'Tag:':
 			$translation = 'Thẻ:';
 			break;
+		case 'Page %s':
+			$translation = 'Trang %s';
+			break;
+		case 'Page':
+			$translation = 'Trang';
+			break;
 		default:
 			$translation = apply_filters( 'hocwp_theme_translation_ngettext', $translation, $single, $plural, $number, $domain );
 	}
@@ -361,6 +404,7 @@ function hocwp_theme_translation_gettext_woocommerce( $translation, $text ) {
 		case 'Order Details':
 			$translation = 'Chi tiết đơn hàng';
 			break;
+		case 'Products':
 		case 'Product':
 			$translation = 'Sản phẩm';
 			break;
@@ -848,6 +892,9 @@ function hocwp_theme_translation_gettext_woocommerce( $translation, $text ) {
 		case 'Put order':
 			$translation = 'Đặt hàng';
 			break;
+		case 'Checkout is not available whilst your cart is empty.':
+			$translation = 'Bạn không thể thanh toán khi giỏ hàng đang trống.';
+			break;
 	}
 
 	return $translation;
@@ -875,6 +922,9 @@ function hocwp_theme_translation_gettext_with_context_woocommerce( $translation,
 			break;
 		case 'Shipping %s':
 			$translation = 'Địa chỉ nhận hàng %s';
+			break;
+		case 'Home':
+			$translation = 'Trang chủ';
 			break;
 	}
 
@@ -906,6 +956,9 @@ function hocwp_theme_translation_ngettext_woocommerce( $translation, $single, $p
 			break;
 		case 'Shipping':
 			$translation = 'Phí vận chuyển';
+			break;
+		case 'Home':
+			$translation = 'Trang chủ';
 			break;
 	}
 

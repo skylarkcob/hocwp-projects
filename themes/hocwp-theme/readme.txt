@@ -41,5 +41,7 @@ If you have any questions, please visit [hocwp.net](http://hocwp.net/) for more 
 * Add - theme custom css font file.
 * Add - theme custom shortcode file.
 * Update - move all theme default meta field to meta file.
+* Update - meta box for ads post type.
+* Update theme for support translation with gettext.
 
 == Upgrade Notice ==

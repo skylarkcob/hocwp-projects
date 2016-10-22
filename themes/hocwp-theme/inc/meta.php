@@ -204,7 +204,6 @@ if ( 'post.php' == $pagenow || 'post-new.php' == $pagenow ) {
 	);
 	hocwp_theme_meta_box_sidebar_information( $post_type, $post );
 	hocwp_theme_meta_box_subscriber_information( $post_type, $post );
-	do_action( 'hocwp_post_meta_boxes', $post_type, $post );
 }
 
 function hocwp_theme_meta_boxes_init( $post_type, $post ) {
