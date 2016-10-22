@@ -449,12 +449,12 @@ function hocwp_coupon_button_html( $args = array() ) {
 	$code_hint    = hocwp_get_value_by_key( $args, 'code_hint' );
 	$type_text    = hocwp_get_value_by_key( $args, 'type_text', $type );
 	$out_url      = hocwp_get_value_by_key( $args, 'out_url', hocwp_get_coupon_out_url( $post_id ) );
-	$cc_label     = sprintf( hocwp_translate_text( 'Get %s' ), $type_text );
+	$cc_label     = sprintf( __( 'Get %s', 'hocwp-theme' ), $type_text );
 	$class        = hocwp_get_value_by_key( $args, 'class' );
 	$button_class = 'code type-' . $type;
 	hocwp_add_string_with_space_before( $button_class, $class );
 	if ( 'future' == get_post_status( $post_id ) ) {
-		$cc_label = hocwp_translate_text( 'Coming soon' );
+		$cc_label = __( 'Coming soon', 'hocwp-theme' );
 		hocwp_add_string_with_space_before( $button_class, 'disabled' );
 	}
 	if ( isset( $args['expired'] ) ) {
@@ -492,7 +492,7 @@ function hocwp_coupon_button_code_html( $args = array() ) {
 		<input class="<?php echo $input_class; ?>" type="text" value="<?php echo $code; ?>" readonly>
 		<a class="<?php echo $button_class; ?>" data-clipboard-text="<?php echo $code; ?>"
 		   data-out-url="<?php echo $out_url; ?>"
-		   data-copied-text="<?php hocwp_translate_text( 'Copied', true ); ?>"><?php hocwp_translate_text( 'Copy', true ); ?></a>
+		   data-copied-text="<?php _e( 'Copied', 'hocwp-theme' ); ?>"><?php _e( 'Copy', 'hocwp-theme' ); ?></a>
 	</div>
 	<?php
 }
@@ -525,7 +525,7 @@ function hocwp_coupon_vote_comment_html( $args = array() ) {
 	?>
 	<p class="vote-result" data-post-id="<?php the_ID(); ?>">
 		<i class="fa fa-thumbs-o-up"></i>
-		<span><?php printf( hocwp_translate_text( '%s Success' ), $result ); ?></span>
+		<span><?php printf( __( '%s Success', 'hocwp-theme' ), $result ); ?></span>
 	</p>
 	<?php
 	if ( comments_open( $post_id ) || get_comments_number( $post_id ) ) {
@@ -537,7 +537,7 @@ function hocwp_coupon_vote_comment_html( $args = array() ) {
 		?>
 		<p class="<?php echo $class; ?>">
 			<a href="#respond">
-				<i class="fa fa-comments-o"></i> <?php hocwp_translate_text( 'Add a Comment', true ); ?>
+				<i class="fa fa-comments-o"></i> <?php _e( 'Add a Comment', 'hocwp-theme' ); ?>
 			</a>
 		</p>
 		<?php
@@ -587,7 +587,7 @@ function hocwp_coupon_type_select( $taxonomy = 'coupon_type' ) {
 	?>
 	<select name="stype" class="form-control select-<?php echo hocwp_sanitize_html_class( $taxonomy ); ?>"
 	        autocomplete="off">
-		<option value=""><?php echo hocwp_translate_text( 'All coupons' ); ?></option>
+		<option value=""><?php _e( 'All coupons', 'hocwp-theme' ); ?></option>
 		<?php
 		if ( hocwp_array_has_value( $types ) ) {
 			$stype = hocwp_get_method_value( 'stype', 'request' );
@@ -635,7 +635,7 @@ function hocwp_coupon_store_select( $taxonomy = 'store' ) {
 	?>
 	<select name="sstore" class="form-control select-<?php echo hocwp_sanitize_html_class( $taxonomy ); ?>"
 	        autocomplete="off">
-		<option value=""><?php echo hocwp_translate_text( 'All stores' ); ?></option>
+		<option value=""><?php echo __( 'All stores', 'hocwp-theme' ); ?></option>
 		<?php
 		if ( hocwp_array_has_value( $stores ) ) {
 			$sstore = hocwp_get_method_value( 'sstore', 'request' );

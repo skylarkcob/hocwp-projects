@@ -317,12 +317,12 @@ class HOCWP_Widget_Post extends WP_Widget {
 							<a class="left carousel-control" href="#<?php echo $carousel_id; ?>" role="button"
 							   data-slide="prev">
 								<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-								<span class="sr-only"><?php hocwp_translate_text( 'Previous', true ); ?></span>
+								<span class="sr-only"><?php _e( 'Previous', 'hocwp-theme' ); ?></span>
 							</a>
 							<a class="right carousel-control" href="#<?php echo $carousel_id; ?>" role="button"
 							   data-slide="next">
 								<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-								<span class="sr-only"><?php hocwp_translate_text( 'Next', true ); ?></span>
+								<span class="sr-only"><?php _e( 'Next', 'hocwp-theme' ); ?></span>
 							</a>
 						</div>
 						<?php
@@ -344,7 +344,7 @@ class HOCWP_Widget_Post extends WP_Widget {
 				}
 				$widget_html .= apply_filters( 'hocwp_widget_post_after_loop', '', $args, $instance, $this );
 			} else {
-				$widget_html .= '<p class="nothing-found">' . hocwp_translate_text( 'Nothing found!' ) . '</p>';
+				$widget_html .= '<p class="nothing-found">' . __( 'Nothing found!', 'hocwp-theme' ) . '</p>';
 			}
 		}
 		$widget_html = apply_filters( 'hocwp_widget_post_html', $widget_html, $args, $instance, $this );

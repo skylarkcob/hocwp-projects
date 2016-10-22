@@ -155,28 +155,28 @@ function hocwp_seconds_to_time_string( $seconds, $sep = ' ', $echo = false ) {
 		$start  = false;
 		if ( $year > 0 ) {
 			$start = true;
-			$tmp .= $year . ' ' . _n( hocwp_translate_text( 'year' ), hocwp_translate_text( 'years' ), $year ) . $sep;
+			$tmp .= $year . ' ' . _n( 'year', 'years', $year, 'hocwp-theme' ) . $sep;
 		}
 		if ( $month > 0 || $start ) {
 			$start = true;
-			$tmp .= $month . ' ' . _n( hocwp_translate_text( 'month' ), hocwp_translate_text( 'months' ), $month ) . $sep;
+			$tmp .= $month . ' ' . _n( 'month', 'months', $month, 'hocwp-theme' ) . $sep;
 		}
 		if ( $week > 0 || $start ) {
 			$start = true;
-			$tmp .= $week . ' ' . _n( hocwp_translate_text( 'week' ), hocwp_translate_text( 'weeks' ), $week ) . $sep;
+			$tmp .= $week . ' ' . _n( 'week', 'weeks', $week, 'hocwp-theme' ) . $sep;
 		}
 		if ( $day > 0 || $start ) {
 			$start = true;
-			$tmp .= $day . ' ' . _n( hocwp_translate_text( 'day' ), hocwp_translate_text( 'days' ), $day ) . $sep;
+			$tmp .= $day . ' ' . _n( 'day', 'days', $day, 'hocwp-theme' ) . $sep;
 		}
 		if ( $hour > 0 || $start ) {
 			$start = true;
-			$tmp .= $hour . ' ' . _n( hocwp_translate_text( 'hour' ), hocwp_translate_text( 'hours' ), $hour ) . $sep;
+			$tmp .= $hour . ' ' . _n( 'hour', 'hours', $hour, 'hocwp-theme' ) . $sep;
 		}
 		if ( $minute > 0 || $start ) {
-			$tmp .= $minute . ' ' . _n( hocwp_translate_text( 'minute' ), hocwp_translate_text( 'minutes' ), $minute ) . $sep;
+			$tmp .= $minute . ' ' . _n( 'minute', 'minutes', $minute, 'hocwp-theme' ) . $sep;
 		}
-		$tmp .= $second . ' ' . _n( hocwp_translate_text( 'second' ), hocwp_translate_text( 'seconds' ), $second );
+		$tmp .= $second . ' ' . _n( 'second', 'seconds', $second, 'hocwp-theme' );
 		$result = $tmp;
 		$result = apply_filters( 'hocwp_seconds_to_time_string', $result, $seconds );
 		if ( $echo ) {

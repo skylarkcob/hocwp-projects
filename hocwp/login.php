@@ -98,10 +98,10 @@ function hocwp_verify_login_captcha( $user, $password ) {
 			return $user;
 		}
 
-		return new WP_Error( hocwp_translate_text( 'Captcha Invalid' ), '<strong>' . hocwp_translate_text( 'ERROR:' ) . '</strong> ' . hocwp_translate_text( 'Please enter a valid captcha.' ) );
+		return new WP_Error( __( 'Captcha Invalid', 'hocwp-theme' ), '<strong>' . __( 'ERROR:', 'hocwp-theme' ) . '</strong> ' . __( 'Please enter a valid captcha.', 'hocwp-theme' ) );
 	}
 
-	return new WP_Error( hocwp_translate_text( 'Captcha Invalid' ), '<strong>' . hocwp_translate_text( 'ERROR:' ) . '</strong> ' . hocwp_translate_text( 'You are a robot, if not please check JavaScript enabled on your browser.' ) );
+	return new WP_Error( __( 'Captcha Invalid', 'hocwp-theme' ), '<strong>' . __( 'ERROR:', 'hocwp-theme' ) . '</strong> ' . __( 'You are a robot, if not please check JavaScript enabled on your browser.', 'hocwp-theme' ) );
 }
 
 function hocwp_verify_registration_captcha( $errors, $sanitized_user_login, $user_email ) {
@@ -109,10 +109,10 @@ function hocwp_verify_registration_captcha( $errors, $sanitized_user_login, $use
 		$captcha_code = $_POST['captcha'];
 		$captcha      = new HOCWP_Captcha();
 		if ( ! $captcha->check( $captcha_code ) ) {
-			$errors->add( hocwp_translate_text( 'Captcha Invalid' ), '<strong>' . hocwp_translate_text( 'ERROR:' ) . '</strong> ' . hocwp_translate_text( 'Please enter a valid captcha.' ) );
+			$errors->add( __( 'Captcha Invalid', 'hocwp-theme' ), '<strong>' . __( 'ERROR:', 'hocwp-theme' ) . '</strong> ' . __( 'Please enter a valid captcha.', 'hocwp-theme' ) );
 		}
 	} else {
-		$errors->add( hocwp_translate_text( 'Captcha Invalid' ), '<strong>' . hocwp_translate_text( 'ERROR:' ) . '</strong> ' . hocwp_translate_text( 'You are a robot, if not please check JavaScript enabled on your browser.' ) );
+		$errors->add( __( 'Captcha Invalid', 'hocwp-theme' ), '<strong>' . __( 'ERROR:', 'hocwp-theme' ) . '</strong> ' . __( 'You are a robot, if not please check JavaScript enabled on your browser.', 'hocwp-theme' ) );
 	}
 
 	return $errors;
@@ -123,10 +123,10 @@ function hocwp_verify_lostpassword_captcha() {
 		$captcha_code = $_POST['captcha'];
 		$captcha      = new HOCWP_Captcha();
 		if ( ! $captcha->check( $captcha_code ) ) {
-			wp_die( '<strong>' . hocwp_translate_text( 'ERROR:' ) . '</strong> ' . hocwp_translate_text( 'Please enter a valid captcha.' ), hocwp_translate_text( 'Captcha Invalid' ) );
+			wp_die( '<strong>' . __( 'ERROR:', 'hocwp-theme' ) . '</strong> ' . __( 'Please enter a valid captcha.', 'hocwp-theme' ), __( 'Captcha Invalid', 'hocwp-theme' ) );
 		}
 	} else {
-		wp_die( '<strong>' . hocwp_translate_text( 'ERROR:' ) . '</strong> ' . hocwp_translate_text( 'You are a robot, if not please check JavaScript enabled on your browser.' ), hocwp_translate_text( 'Captcha Invalid' ) );
+		wp_die( '<strong>' . __( 'ERROR:', 'hocwp-theme' ) . '</strong> ' . __( 'You are a robot, if not please check JavaScript enabled on your browser.', 'hocwp-theme' ), __( 'Captcha Invalid', 'hocwp-theme' ) );
 	}
 }
 
@@ -218,15 +218,15 @@ function hocwp_user_login( $username, $password, $remember = true ) {
 function hocwp_account_form_default_args() {
 	$lang     = hocwp_get_language();
 	$defaults = array(
-		'placeholder_username'    => hocwp_translate_text( __( 'Username or email', 'hocwp-theme' ) ),
-		'placeholder_password'    => hocwp_translate_text( __( 'Password', 'hocwp-theme' ) ),
-		'slogan'                  => hocwp_translate_text( __( 'One free account gets you into everything %s.', 'hocwp-theme' ) ),
-		'title_lostpassword_link' => hocwp_translate_text( __( 'Password Lost and Found', 'hocwp-theme' ) ),
-		'text_lostpassword_link'  => hocwp_translate_text( __( 'Lost your password?', 'hocwp-theme' ) ),
-		'text_register_link'      => hocwp_translate_text( __( 'Register', 'hocwp-theme' ) ),
-		'label_email'             => hocwp_translate_text( __( 'Email', 'hocwp-theme' ) ),
-		'label_confirm_password'  => hocwp_translate_text( __( 'Confirm your password', 'hocwp-theme' ) ),
-		'label_phone'             => hocwp_translate_text( __( 'Phone', 'hocwp-theme' ) )
+		'placeholder_username'    => __( 'Username or email', 'hocwp-theme' ),
+		'placeholder_password'    => __( 'Password', 'hocwp-theme' ),
+		'slogan'                  => __( 'One free account gets you into everything %s.', 'hocwp-theme' ),
+		'title_lostpassword_link' => __( 'Password Lost and Found', 'hocwp-theme' ),
+		'text_lostpassword_link'  => __( 'Lost your password?', 'hocwp-theme' ),
+		'text_register_link'      => __( 'Register', 'hocwp-theme' ),
+		'label_email'             => __( 'Email', 'hocwp-theme' ),
+		'label_confirm_password'  => __( 'Confirm your password', 'hocwp-theme' ),
+		'label_phone'             => __( 'Phone', 'hocwp-theme' )
 	);
 
 	return apply_filters( 'hocwp_account_form_default_args', $defaults );
@@ -241,7 +241,7 @@ function hocwp_execute_register() {
 	$phone                 = '';
 	$captcha               = '';
 	$error                 = false;
-	$message               = hocwp_translate_text( 'There was an error occurred, please try again.' );
+	$message               = __( 'There was an error occurred, please try again.', 'hocwp-theme' );
 	$inserted              = false;
 	$user_id               = 0;
 	$registration_redirect = hocwp_get_value_by_key( $_REQUEST, 'redirect_to' );
@@ -269,25 +269,25 @@ function hocwp_execute_register() {
 			if ( false === ( $transient = get_transient( $transient_name ) ) ) {
 				if ( empty( $user_login ) || empty( $user_email ) || empty( $pwd ) || empty( $pwd_again ) || empty( $phone ) || empty( $captcha ) ) {
 					$error   = true;
-					$message = hocwp_translate_text( 'Please enter your complete registration information.' );
+					$message = __( 'Please enter your complete registration information.', 'hocwp-theme' );
 				} elseif ( ! is_email( $user_email ) ) {
 					$error   = true;
-					$message = hocwp_translate_text( 'The email address is not correct.' );
+					$message = __( 'The email address is not correct.', 'hocwp-theme' );
 				} elseif ( $pwd !== $pwd_again ) {
 					$error   = true;
-					$message = hocwp_translate_text( 'Password is incorrect.' );
+					$message = __( 'Password is incorrect.', 'hocwp-theme' );
 				} elseif ( username_exists( $user_login ) ) {
 					$error   = true;
-					$message = hocwp_translate_text( 'Account already exists.' );
+					$message = __( 'Account already exists.', 'hocwp-theme' );
 				} elseif ( email_exists( $user_email ) ) {
 					$error   = true;
-					$message = hocwp_translate_text( 'The email address already exists.' );
+					$message = __( 'The email address already exists.', 'hocwp-theme' );
 				} else {
 					if ( isset( $_POST['captcha'] ) ) {
 						$capt = new HOCWP_Captcha();
 						if ( ! $capt->check( $captcha ) ) {
 							$error   = true;
-							$message = hocwp_translate_text( 'The security code is incorrect.' );
+							$message = __( 'The security code is incorrect.', 'hocwp-theme' );
 						}
 					}
 				}
@@ -302,7 +302,7 @@ function hocwp_execute_register() {
 						update_user_meta( $user, 'phone', $phone );
 						$inserted = true;
 						hocwp_user_force_login( $user );
-						$message = hocwp_translate_text( 'Your account has been successfully created.' );
+						$message = __( 'Your account has been successfully created.', 'hocwp-theme' );
 						$user_id = $user;
 						set_transient( $transient_name, $user_id );
 					}
@@ -314,7 +314,7 @@ function hocwp_execute_register() {
 			} else {
 				if ( hocwp_id_number_valid( $transient ) ) {
 					$inserted = true;
-					$message  = hocwp_translate_text( 'Your account has been successfully created.' );
+					$message  = __( 'Your account has been successfully created.', 'hocwp-theme' );
 				}
 			}
 		}
@@ -383,13 +383,13 @@ function hocwp_register_form( $args = array() ) {
 			?>
 		</div>
 		<div class="module-body">
-			<h4 class="form-title"><?php hocwp_translate_text( 'Registration', true ); ?></h4>
+			<h4 class="form-title"><?php _e( 'Registration', 'hocwp-theme' ); ?></h4>
 
 			<form name="registerform register-form signup-form" id="registerform" action="" method="post"
 			      novalidate="novalidate">
 				<p>
 					<label
-						for="user_login"><?php echo hocwp_get_value_by_key( $args, 'label_username', hocwp_translate_text( 'Username' ) ); ?>
+						for="user_login"><?php echo hocwp_get_value_by_key( $args, 'label_username', __( 'Username', 'hocwp-theme' ) ); ?>
 						<br/>
 						<input type="text" name="user_login" id="user_login" class="input"
 						       value="<?php echo esc_attr( wp_unslash( $user_login ) ); ?>" size="20"/></label>
@@ -403,7 +403,7 @@ function hocwp_register_form( $args = array() ) {
 
 				<p>
 					<label
-						for="user_pass"><?php echo hocwp_get_value_by_key( $args, 'label_password', hocwp_translate_text( 'Password' ) ); ?>
+						for="user_pass"><?php echo hocwp_get_value_by_key( $args, 'label_password', __( 'Password', 'hocwp-theme' ) ); ?>
 						<br/>
 						<input type="password" name="pwd" id="user_pass" class="input" value="<?php echo $pwd; ?>"
 						       size="20"/></label>
@@ -432,7 +432,7 @@ function hocwp_register_form( $args = array() ) {
 		<div class="module-footer">
 			<div class="text-center">
 				<p class="form-nav">
-					<a href="<?php echo esc_url( wp_login_url() ); ?>"><?php echo hocwp_get_value_by_key( $args, 'label_log_in', hocwp_translate_text( 'Login' ) ); ?></a>
+					<a href="<?php echo esc_url( wp_login_url() ); ?>"><?php echo hocwp_get_value_by_key( $args, 'label_log_in', __( 'Login', 'hocwp-theme' ) ); ?></a>
 					<span class="sep">|</span>
 					<a href="<?php echo esc_url( wp_lostpassword_url() ); ?>"
 					   title="<?php echo $args['title_lostpassword_link']; ?>"><?php echo $args['text_lostpassword_link']; ?></a>
@@ -488,12 +488,12 @@ function hocwp_login_form( $args = array() ) {
 			$slogan->set_text( sprintf( $args['slogan'], hocwp_get_root_domain_name( home_url( '/' ) ) ) );
 			$slogan->output();
 			if ( isset( $_REQUEST['error'] ) ) {
-				echo '<p class="alert alert-danger">' . hocwp_translate_text( __( 'There was an error occurred, please try again.', 'hocwp-theme' ) ) . '</p>';
+				echo '<p class="alert alert-danger">' . __( 'There was an error occurred, please try again.', 'hocwp-theme' ) . '</p>';
 			}
 			?>
 		</div>
 		<div class="module-body">
-			<h4 class="form-title"><?php hocwp_translate_text( __( 'Login', 'hocwp-theme' ), true ); ?></h4>
+			<h4 class="form-title"><?php _e( 'Login', 'hocwp-theme' ); ?></h4>
 			<?php
 			if ( $hide_form ) {
 				$login_form_top    = apply_filters( 'login_form_top', '', $args );
@@ -538,7 +538,7 @@ function hocwp_execute_lostpassword() {
 	$user_id     = '';
 	$user_email  = '';
 	$error       = false;
-	$message     = hocwp_translate_text( 'There was an error occurred, please try again.' );
+	$message     = __( 'There was an error occurred, please try again.', 'hocwp-theme' );
 	$redirect    = hocwp_get_value_by_key( $_REQUEST, 'redirect_to' );
 	$redirect_to = apply_filters( 'lostpassword_redirect', $redirect );
 	if ( is_user_logged_in() ) {
@@ -558,20 +558,20 @@ function hocwp_execute_lostpassword() {
 			if ( ( isset( $_POST['submit'] ) || isset( $_POST['wp-submit'] ) ) && false === ( $transient = get_transient( $transient_name ) ) ) {
 				if ( empty( $user_login ) ) {
 					$error   = true;
-					$message = hocwp_translate_text( 'Please enter your account name or email address.' );
+					$message = __( 'Please enter your account name or email address.', 'hocwp-theme' );
 				} else {
 					if ( isset( $_POST['captcha'] ) ) {
 						$capt = new HOCWP_Captcha();
 						if ( ! $capt->check( $captcha ) ) {
 							$error   = true;
-							$message = hocwp_translate_text( 'The security code is incorrect.' );
+							$message = __( 'The security code is incorrect.', 'hocwp-theme' );
 						}
 					}
 					if ( ! $error ) {
 						$user = hocwp_return_user( $user_login );
 						if ( ! is_a( $user, 'WP_User' ) ) {
 							$error   = true;
-							$message = hocwp_translate_text( 'Username or email is not exists.' );
+							$message = __( 'Username or email is not exists.', 'hocwp-theme' );
 						} else {
 							$user_login = $user->user_login;
 							$user_id    = $user->ID;
@@ -583,13 +583,13 @@ function hocwp_execute_lostpassword() {
 					$key = get_password_reset_key( $user );
 					if ( is_wp_error( $key ) ) {
 						$error   = true;
-						$message = hocwp_translate_text( 'There was an error occurred, please try again or contact the administrator.' );
+						$message = __( 'There was an error occurred, please try again or contact the administrator.', 'hocwp-theme' );
 					} else {
-						$message = wpautop( hocwp_translate_text( 'Someone has requested a password reset for the following account:' ) );
+						$message = wpautop( __( 'Someone has requested a password reset for the following account:', 'hocwp-theme' ) );
 						$message .= wpautop( network_home_url( '/' ) );
-						$message .= wpautop( sprintf( hocwp_translate_text( 'Username: %s' ), $user_login ) );
-						$message .= wpautop( hocwp_translate_text( 'If this was a mistake, just ignore this email and nothing will happen.' ) );
-						$message .= wpautop( hocwp_translate_text( 'To reset your password, visit the following address:' ) );
+						$message .= wpautop( sprintf( __( 'Username: %s', 'hocwp-theme' ), $user_login ) );
+						$message .= wpautop( __( 'If this was a mistake, just ignore this email and nothing will happen.', 'hocwp-theme' ) );
+						$message .= wpautop( __( 'To reset your password, visit the following address:', 'hocwp-theme' ) );
 						$message .= wpautop( network_site_url( "wp-login.php?action=rp&key=$key&login=" . rawurlencode( $user_login ), 'login' ) );
 
 						if ( is_multisite() ) {
@@ -605,10 +605,10 @@ function hocwp_execute_lostpassword() {
 						}
 						if ( $message && ! hocwp_send_html_mail( $user_email, wp_specialchars_decode( $title ), $message ) ) {
 							$error   = true;
-							$message = hocwp_translate_text( 'The email could not be sent. Possible reason: your host may have disabled the mail() function.' );
+							$message = __( 'The email could not be sent. Possible reason: your host may have disabled the mail() function.', 'hocwp-theme' );
 						} else {
 							$error   = false;
-							$message = hocwp_translate_text( 'Password recovery information has been sent, please check your mailbox.' );
+							$message = __( 'Password recovery information has been sent, please check your mailbox.', 'hocwp-theme' );
 							set_transient( $transient_name, $user_id, 15 * MINUTE_IN_SECONDS );
 						}
 					}
@@ -616,7 +616,7 @@ function hocwp_execute_lostpassword() {
 			} else {
 				if ( hocwp_id_number_valid( $transient ) ) {
 					$error   = false;
-					$message = hocwp_translate_text( 'Password recovery information has been sent, please check your mailbox.' );
+					$message = __( 'Password recovery information has been sent, please check your mailbox.', 'hocwp-theme' );
 				}
 			}
 		}
@@ -676,12 +676,12 @@ function hocwp_lostpassword_form( $args = array() ) {
 			?>
 		</div>
 		<div class="module-body">
-			<h4 class="form-title"><?php hocwp_translate_text( 'Reset password', true ); ?></h4>
+			<h4 class="form-title"><?php _e( 'Reset password', 'hocwp-theme' ); ?></h4>
 
 			<form name="lostpasswordform" id="lostpasswordform" action="<?php echo esc_url( wp_lostpassword_url() ); ?>"
 			      method="post">
 				<p>
-					<label><?php echo hocwp_get_value_by_key( $args, 'label_username', hocwp_translate_text( 'Username or Email' ) ); ?>
+					<label><?php echo hocwp_get_value_by_key( $args, 'label_username', __( 'Username or Email', 'hocwp-theme' ) ); ?>
 						<br>
 						<input type="text" size="20" value="<?php echo esc_attr( $user_login ); ?>" class="input"
 						       id="user_login" name="user_login"></label>
@@ -697,7 +697,7 @@ function hocwp_lostpassword_form( $args = array() ) {
 		<div class="module-footer">
 			<div class="text-center">
 				<p class="form-nav">
-					<a href="<?php echo esc_url( wp_login_url() ); ?>"><?php echo hocwp_get_value_by_key( $args, 'label_log_in', hocwp_translate_text( 'Login' ) ); ?></a>
+					<a href="<?php echo esc_url( wp_login_url() ); ?>"><?php echo hocwp_get_value_by_key( $args, 'label_log_in', __( 'Login', 'hocwp-theme' ) ); ?></a>
 					<span class="sep">|</span>
 					<a href="<?php echo esc_url( wp_lostpassword_url() ); ?>"
 					   title="<?php echo $args['title_lostpassword_link']; ?>"><?php echo $args['text_lostpassword_link']; ?></a>
