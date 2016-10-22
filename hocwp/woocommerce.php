@@ -286,11 +286,11 @@ function hocwp_wc_get_cart_preview_html() {
 		}
 		$cart_preview .= '</ul></li>';
 		$cart_preview .= '<li class="bottom">';
-		$cart_preview .= '<span class="total">Tổng cộng: <strong>' . hocwp_wc_get_cart_total_formatted() . '</strong></span>';
-		$cart_preview .= '<a class="btn-clickable orange go-page" href="' . hocwp_wc_get_checkout_url() . '">Thanh toán</a>';
+		$cart_preview .= '<span class="total">' . __( 'Total', 'hocwp-theme' ) . ': <strong>' . hocwp_wc_get_cart_total_formatted() . '</strong></span>';
+		$cart_preview .= '<a class="btn-clickable orange go-page" href="' . hocwp_wc_get_checkout_url() . '">' . __( 'Checkout', 'hocwp-theme' ) . '</a>';
 		$cart_preview .= '</li>';
 	} else {
-		$cart_preview .= '<li class="no-item-message">Hiện chưa có sản phẩm nào trong giỏ hàng của bạn.</li>';
+		$cart_preview .= '<li class="no-item-message">' . __( 'Your cart is empty now.', 'hocwp-theme' ) . '</li>';
 	}
 	$cart_preview .= '</ul>';
 	$cart_preview = apply_filters( 'hocwp_wc_cart_preview_html', $cart_preview );
@@ -300,7 +300,7 @@ function hocwp_wc_get_cart_preview_html() {
 
 function hocwp_wc_get_cart( $args = array() ) {
 	$lang         = hocwp_get_language();
-	$title        = isset( $args['title'] ) ? $args['title'] : ( ( 'vi' == $lang ) ? 'Thông tin giỏ hàng' : __( 'View your shopping cart', 'hocwp-theme' ) );
+	$title        = isset( $args['title'] ) ? $args['title'] : __( 'View your shopping cart', 'hocwp-theme' );
 	$show_item    = isset( $args['show_item'] ) ? (bool) $args['show_item'] : true;
 	$show_price   = isset( $args['show_price'] ) ? (bool) $args['show_price'] : true;
 	$show_icon    = isset( $args['show_icon'] ) ? (bool) $args['show_icon'] : true;
@@ -315,10 +315,7 @@ function hocwp_wc_get_cart( $args = array() ) {
 		}
 		if ( $show_item ) {
 			$count_cart = hocwp_wc_count_cart();
-			$item_text  = $count_cart . ' sản phẩm';
-			if ( 'vi' != $lang ) {
-				$item_text = sprintf( _n( '%d item', '%d items', $count_cart, 'hocwp-theme' ), $count_cart );
-			}
+			$item_text  = sprintf( _n( '%d item', '%d items', $count_cart, 'hocwp-theme' ), $count_cart );
 			$cart .= '<span class="product-number">' . $item_text . '</span>';
 			if ( $show_price ) {
 				if ( isset( $args['separator'] ) ) {
@@ -599,7 +596,7 @@ function hocwp_wc_after_single_product_summary() {
 add_action( 'woocommerce_after_single_product_summary', 'hocwp_wc_after_single_product_summary', 0 );
 
 function hocwp_wc_add_vietnam_dong_currency( $currencies ) {
-	$currencies['VNDU'] = 'Việt Nam Đồng';
+	$currencies['VNDU'] = __( 'Vietnamese Dong', 'hocwp-theme' );
 
 	return $currencies;
 }
@@ -623,7 +620,7 @@ if ( 'vi' == $lang ) {
 }
 
 function hocwp_wc_single_add_to_cart_button_text() {
-	$text = 'Thêm sản phẩm vào giỏ hàng';
+	$text = __( 'Add to cart', 'hocwp-theme' );
 	$text = apply_filters( 'hocwp_wc_single_add_to_cart_button_text', $text );
 
 	return $text;
@@ -634,7 +631,7 @@ if ( 'vi' == $lang ) {
 }
 
 function hocwp_wc_product_add_to_cart_text() {
-	$text = 'Thêm vào giỏ';
+	$text = __( 'Add to cart', 'hocwp-theme' );
 	$text = apply_filters( 'hocwp_wc_add_to_cart_button_text', $text );
 
 	return $text;
@@ -695,7 +692,7 @@ add_action( 'wp_ajax_nopriv_hocwp_wc_remove_cart_item', 'hocwp_wc_remove_cart_it
 function hocwp_wc_order_item_ajax_callback() {
 	$result  = array(
 		'success'   => false,
-		'html_data' => '<p class="alert alert-danger">Đã có lỗi xảy ra, xin vui lòng thử lại sau.</p>'
+		'html_data' => '<p class="alert alert-danger">' . __( 'There was an error occurred, please try again.', 'hocwp-theme' ) . '</p>'
 	);
 	$post_id = hocwp_get_method_value( 'post_id' );
 	if ( hocwp_id_number_valid( $post_id ) ) {
@@ -718,7 +715,7 @@ function hocwp_wc_order_item_ajax_callback() {
 			) );
 			if ( false !== $order ) {
 				$result['success']   = true;
-				$result['html_data'] = '<p class="alert alert-success">Đơn hàng của bạn đã được lưu thành công, chúng tôi sẽ liên hệ lại với bạn trong thời gian sớm nhất.</p>';
+				$result['html_data'] = '<p class="alert alert-success">' . __( 'Your order has been successfully saved, we will reply to you as soon as possible.', 'hocwp-theme' ) . '</p>';
 			}
 		}
 	}
@@ -733,7 +730,7 @@ function hocwp_wc_after_cart_table() {
 	$permalink = apply_filters( 'hocwp_return_shop_url', get_permalink( $page ) );
 	?>
 	<a title="" href="<?php echo $permalink; ?>" class="btn-grey hocwp-button return-shop"><i
-			class="fa fa-angle-left icon-left"></i> <?php hocwp_text( 'Tiếp tục mua hàng', __( 'Continue shopping', 'hocwp-theme' ) ); ?>
+			class="fa fa-angle-left icon-left"></i> <?php _e( 'Continue shopping', 'hocwp-theme' ); ?>
 	</a>
 	<?php
 	do_action( 'hocwp_wc_after_return_shop_button' );
@@ -885,7 +882,7 @@ if ( $custom_quantity_input ) {
 			$input->set_attribute( 'type', 'number' );
 			$input->set_attribute( 'size', $size );
 			$input->set_class( 'input-text qty text input-number' );
-			$input->set_attribute( 'title', hocwp_text( 'Số lượng', __( 'Qty', 'hocwp-theme' ), false ) );
+			$input->set_attribute( 'title', __( 'Qty', 'hocwp-theme' ) );
 			$input->set_attribute( 'value', $input_value );
 			$input->set_attribute( 'name', $input_name );
 			$input->set_attribute( 'max', $max );

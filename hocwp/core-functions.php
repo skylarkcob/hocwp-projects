@@ -1497,31 +1497,31 @@ function hocwp_convert_day_name_to_vietnamese( $day_name ) {
 	switch ( $weekday ) {
 		case 'Mon':
 		case 'Monday':
-			$weekday = 'Thứ hai';
+			$weekday = __( 'Monday', 'hocwp-theme' );
 			break;
 		case 'Tue':
 		case 'Tuesday':
-			$weekday = 'Thứ ba';
+			$weekday = __( 'Tuesday', 'hocwp-theme' );
 			break;
 		case 'Wed':
 		case 'Wednesday':
-			$weekday = 'Thứ tư';
+			$weekday = __( 'Wednesday', 'hocwp-theme' );
 			break;
 		case 'Thur':
 		case 'Thursday':
-			$weekday = 'Thứ năm';
+			$weekday = __( 'Thursday', 'hocwp-theme' );
 			break;
 		case 'Fri':
 		case 'Friday':
-			$weekday = 'Thứ sáu';
+			$weekday = __( 'Friday', 'hocwp-theme' );
 			break;
 		case 'Sat':
 		case 'Saturday':
-			$weekday = 'Thứ bảy';
+			$weekday = __( 'Saturday', 'hocwp-theme' );
 			break;
 		case 'Sun':
 		case 'Sunday':
-			$weekday = 'Chủ nhật';
+			$weekday = __( 'Sunday', 'hocwp-theme' );
 			break;
 	}
 
@@ -1541,50 +1541,50 @@ function hocwp_convert_month_name_to_vietnamese( $month_full_name ) {
 	switch ( $month_full_name ) {
 		case 'Jan':
 		case 'January':
-			$month_full_name = 'Tháng một';
+			$month_full_name = __( 'January', 'hocwp-theme' );
 			break;
 		case 'Feb':
 		case 'February':
-			$month_full_name = 'Tháng hai';
+			$month_full_name = __( 'February', 'hocwp-theme' );
 			break;
 		case 'Mar';
 		case 'March':
-			$month_full_name = 'Tháng ba';
+			$month_full_name = __( 'March', 'hocwp-theme' );
 			break;
 		case 'Apr':
 		case 'April':
-			$month_full_name = 'Tháng tư';
+			$month_full_name = __( 'April', 'hocwp-theme' );
 			break;
 		case 'May':
-			$month_full_name = 'Tháng năm';
+			$month_full_name = __( 'May', 'hocwp-theme' );
 			break;
 		case 'Jun':
 		case 'June':
-			$month_full_name = 'Tháng sáu';
+			$month_full_name = __( 'June', 'hocwp-theme' );
 			break;
 		case 'Jul':
 		case 'July':
-			$month_full_name = 'Tháng bảy';
+			$month_full_name = __( 'July', 'hocwp-theme' );
 			break;
 		case 'Aug':
 		case 'August':
-			$month_full_name = 'Tháng tám';
+			$month_full_name = __( 'August', 'hocwp-theme' );
 			break;
 		case 'Sep':
 		case 'September':
-			$month_full_name = 'Tháng chín';
+			$month_full_name = __( 'September', 'hocwp-theme' );
 			break;
 		case 'Oct':
 		case 'October':
-			$month_full_name = 'Tháng mười';
+			$month_full_name = __( 'October', 'hocwp-theme' );
 			break;
 		case 'Nov':
 		case 'November':
-			$month_full_name = 'Tháng mười một';
+			$month_full_name = __( 'November', 'hocwp-theme' );
 			break;
 		case 'Dec':
 		case 'December':
-			$month_full_name = 'Tháng mười hai';
+			$month_full_name = __( 'December', 'hocwp-theme' );
 			break;
 	}
 

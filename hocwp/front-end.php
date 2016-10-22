@@ -220,9 +220,9 @@ function hocwp_facebook_login_button() {
         <span>
             <?php
             if ( 'register' == $action ) {
-	            hocwp_text( 'Đăng ký bằng Facebook', __( 'Register with Facebook', 'hocwp-theme' ) );
+	            _e( 'Register with Facebook', 'hocwp-theme' );
             } else {
-	            hocwp_text( 'Đăng nhập bằng Facebook', __( 'Login with Facebook', 'hocwp-theme' ) );
+	            _e( 'Login with Facebook', 'hocwp-theme' );
             }
             ?>
         </span>
@@ -243,9 +243,9 @@ function hocwp_google_login_button() {
         <span>
             <?php
             if ( 'register' == $action ) {
-	            hocwp_text( 'Đăng ký bằng Google', __( 'Register with Google', 'hocwp-theme' ) );
+	            _e( 'Register with Google', 'hocwp-theme' );
             } else {
-	            hocwp_text( 'Đăng nhập bằng Google', __( 'Login with Google', 'hocwp-theme' ) );
+	            _e( 'Login with Google', 'hocwp-theme' );
             }
             ?>
         </span>
@@ -287,7 +287,7 @@ function hocwp_the_comment_link( $args = array() ) {
 		$comment_count = hocwp_get_post_comment_count( $post_id );
 		$format        = hocwp_get_value_by_key( $args, 'format' );
 		if ( empty( $format ) ) {
-			$format = '%COUNT% Bình luận';
+			$format = '%COUNT% ' . _n( 'Comment', 'Comments', $comment_count, 'hocwp-theme' );
 		}
 		$comment_text = str_replace( '%COUNT%', $comment_count, $format );
 		?>
@@ -326,7 +326,7 @@ function hocwp_entry_meta( $args = array() ) {
 	}
 	$author_url    = hocwp_get_author_posts_url();
 	$comment_count = hocwp_get_post_comment_count( $post_id );
-	$comment_text  = $comment_count . ' Bình luận';
+	$comment_text  = $comment_count . ' ' . _n( 'Comment', 'Comments', $comment_count, 'hocwp-theme' );
 	hocwp_add_string_with_space_before( $class, 'entry-meta' );
 	$show_date    = hocwp_get_value_by_key( $args, 'show_date', true );
 	$show_updated = hocwp_get_value_by_key( $args, 'show_updated', true );
@@ -400,7 +400,7 @@ function hocwp_entry_meta_author_first( $args = array() ) {
 	}
 	$author_url    = hocwp_get_author_posts_url();
 	$comment_count = hocwp_get_post_comment_count( $post_id );
-	$comment_text  = $comment_count . ' Bình luận';
+	$comment_text  = $comment_count . ' ' . _n( 'Comment', 'Comments', $comment_count, 'hocwp-theme' );
 	hocwp_add_string_with_space_before( $class, 'entry-meta' );
 	?>
 	<p class="<?php echo $class; ?>">

@@ -178,15 +178,15 @@ function hocwp_send_mail_invalid_license( $project_name, $type = 'Theme' ) {
 	$transient_name = hocwp_build_transient_name( $transient_name . '_%s', $project_name );
 	if ( false === get_transient( $transient_name ) ) {
 		$subject = get_bloginfo( 'name' );
-		$subject .= ' vi phạm bản quyền';
-		$message = wpautop( 'Địa chỉ website: ' . get_bloginfo( 'url' ) );
+		$subject .= ' piracy';
+		$message = wpautop( 'Website: ' . get_bloginfo( 'url' ) );
 		$message .= wpautop( 'Admin email: ' . hocwp_get_admin_email() );
-		$message .= wpautop( 'Thể loại: ' . $type );
-		$message .= wpautop( 'Tên dự án: ' . $project_name );
+		$message .= wpautop( 'Type: ' . $type );
+		$message .= wpautop( 'Project name: ' . $project_name );
 		$type = strtolower( $type );
 		$type = trim( $type );
 		if ( 'theme' == $type ) {
-			$message .= wpautop( 'Tên thư mục: ' . get_option( 'stylesheet' ) );
+			$message .= wpautop( 'Folder name: ' . get_option( 'stylesheet' ) );
 		}
 		hocwp_send_html_mail( HOCWP_EMAIL, $subject, $message );
 		set_transient( $transient_name, 1, DAY_IN_SECONDS );

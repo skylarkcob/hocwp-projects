@@ -177,14 +177,9 @@ function hocwp_register_taxonomy_administrative_boundaries( $post_type = null ) 
 	if ( ! is_array( $post_type ) ) {
 		$post_type = hocwp_administrative_boundaries_post_types();
 	}
-	$lang     = hocwp_get_language();
 	$name     = __( 'Provinces', 'hocwp-theme' );
 	$singular = __( 'Province', 'hocwp-theme' );
-	if ( 'vi' == $lang ) {
-		$name     = 'Tỉnh / Thành phố';
-		$singular = $name;
-	}
-	$args = array(
+	$args     = array(
 		'name'          => $name,
 		'singular_name' => $singular,
 		'slug'          => hocwp_taxonomy_province_base(),
@@ -194,11 +189,7 @@ function hocwp_register_taxonomy_administrative_boundaries( $post_type = null ) 
 	hocwp_register_taxonomy( $args );
 	$name     = __( 'Districts', 'hocwp-theme' );
 	$singular = __( 'District', 'hocwp-theme' );
-	if ( 'vi' == $lang ) {
-		$name     = 'Quận / Huyện';
-		$singular = $name;
-	}
-	$args = array(
+	$args     = array(
 		'name'              => $name,
 		'singular_name'     => $singular,
 		'slug'              => hocwp_taxonomy_district_base(),
@@ -209,11 +200,7 @@ function hocwp_register_taxonomy_administrative_boundaries( $post_type = null ) 
 	hocwp_register_taxonomy( $args );
 	$name     = __( 'Wards', 'hocwp-theme' );
 	$singular = __( 'Ward', 'hocwp-theme' );
-	if ( 'vi' == $lang ) {
-		$name     = 'Phường / Xã';
-		$singular = $name;
-	}
-	$args = array(
+	$args     = array(
 		'name'              => $name,
 		'singular_name'     => $singular,
 		'slug'              => hocwp_taxonomy_ward_base(),
@@ -226,11 +213,7 @@ function hocwp_register_taxonomy_administrative_boundaries( $post_type = null ) 
 	if ( $hamlet ) {
 		$name     = __( 'Hamlets', 'hocwp-theme' );
 		$singular = __( 'Hamlet', 'hocwp-theme' );
-		if ( 'vi' == $lang ) {
-			$name     = 'Thôn / Xóm';
-			$singular = $name;
-		}
-		$args = array(
+		$args     = array(
 			'name'              => $name,
 			'singular_name'     => $singular,
 			'slug'              => hocwp_taxonomy_hamlet_base(),
@@ -242,11 +225,7 @@ function hocwp_register_taxonomy_administrative_boundaries( $post_type = null ) 
 	}
 	$name     = __( 'Streets', 'hocwp-theme' );
 	$singular = __( 'Street', 'hocwp-theme' );
-	if ( 'vi' == $lang ) {
-		$name     = 'Đường / Phố';
-		$singular = $name;
-	}
-	$args = array(
+	$args     = array(
 		'name'              => $name,
 		'singular_name'     => $singular,
 		'slug'              => hocwp_taxonomy_street_base(),
@@ -285,7 +264,7 @@ function hocwp_classifieds_get_price( $post_id = null ) {
 		if ( is_a( $price, 'WP_Term' ) ) {
 			$price = $price->name;
 		} else {
-			$price = 'Thỏa thuận';
+			$price = __( 'Negotiable', 'hocwp-theme' );
 		}
 	}
 
@@ -334,15 +313,10 @@ if ( ! $use ) {
 }
 
 function hocwp_classifieds_post_type_and_taxonomy() {
-	$lang     = hocwp_get_language();
 	$name     = __( 'Types', 'hocwp-theme' );
 	$singular = __( 'Type', 'hocwp-theme' );
-	if ( 'vi' == $lang ) {
-		$name     = 'Thể loại';
-		$singular = $name;
-	}
-	$slug = apply_filters( 'hocwp_taxonomy_classifieds_type_slug', hocwp_taxonomy_classifieds_type_base() );
-	$args = array(
+	$slug     = apply_filters( 'hocwp_taxonomy_classifieds_type_slug', hocwp_taxonomy_classifieds_type_base() );
+	$args     = array(
 		'name'          => $name,
 		'singular_name' => $singular,
 		'slug'          => $slug,
@@ -359,11 +333,7 @@ function hocwp_classifieds_post_type_and_taxonomy() {
 	}
 	$name     = __( 'Prices', 'hocwp-theme' );
 	$singular = __( 'Price', 'hocwp-theme' );
-	if ( 'vi' == $lang ) {
-		$name     = 'Mức giá';
-		$singular = $name;
-	}
-	$args = array(
+	$args     = array(
 		'name'              => $name,
 		'singular_name'     => $singular,
 		'slug'              => hocwp_taxonomy_price_base(),
@@ -374,11 +344,7 @@ function hocwp_classifieds_post_type_and_taxonomy() {
 	hocwp_register_taxonomy( $args );
 	$name     = __( 'Acreages', 'hocwp-theme' );
 	$singular = __( 'Acreage', 'hocwp-theme' );
-	if ( 'vi' == $lang ) {
-		$name     = 'Diện tích';
-		$singular = $name;
-	}
-	$args = array(
+	$args     = array(
 		'name'              => $name,
 		'singular_name'     => $singular,
 		'slug'              => hocwp_taxonomy_acreage_base(),
@@ -391,11 +357,7 @@ function hocwp_classifieds_post_type_and_taxonomy() {
 	if ( $use ) {
 		$name     = __( 'Objects', 'hocwp-theme' );
 		$singular = __( 'Object', 'hocwp-theme' );
-		if ( 'vi' == $lang ) {
-			$name     = 'Đối tượng';
-			$singular = $name;
-		}
-		$args = array(
+		$args     = array(
 			'name'              => $name,
 			'singular_name'     => $singular,
 			'slug'              => hocwp_taxonomy_classifieds_object_base(),
@@ -410,11 +372,7 @@ function hocwp_classifieds_post_type_and_taxonomy() {
 	if ( $use ) {
 		$name     = __( 'Salaries', 'hocwp-theme' );
 		$singular = __( 'Salary', 'hocwp-theme' );
-		if ( 'vi' == $lang ) {
-			$name     = 'Mức lương';
-			$singular = $name;
-		}
-		$args = array(
+		$args     = array(
 			'name'              => $name,
 			'singular_name'     => $singular,
 			'slug'              => hocwp_taxonomy_salary_base(),
@@ -427,11 +385,7 @@ function hocwp_classifieds_post_type_and_taxonomy() {
 
 	$name     = __( 'Units', 'hocwp-theme' );
 	$singular = __( 'Unit', 'hocwp-theme' );
-	if ( 'vi' == $lang ) {
-		$name     = 'Đơn vị';
-		$singular = $name;
-	}
-	$args = array(
+	$args     = array(
 		'name'              => $name,
 		'singular_name'     => $singular,
 		'slug'              => 'currency_unit',
@@ -597,7 +551,7 @@ function hocwp_classifieds_widget_post_after_post( $args, $instance, $widget ) {
 				</div>
 				<div class="pull-right">
 					<div class="meta modified">
-						<?php echo hocwp_human_time_diff_to_now( $modified ) . ' trước'; ?>
+						<?php echo hocwp_human_time_diff_to_now( $modified ) . ' ' . __( 'ago', 'hocwp-theme' ); ?>
 					</div>
 				</div>
 			</div>

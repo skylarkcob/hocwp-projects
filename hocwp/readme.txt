@@ -35,6 +35,9 @@ If you have any questions, please visit [hocwp.net](http://hocwp.net/) for more 
 
 == Changelog ==
 
+= 3.4.6 - 22/10/16 =
+* Remove all Vietnamese text.
+
 = 3.4.5 - 01/10/16 =
 * Fix - WooCommerce product with sale flash has no add to cart button on single page.
 * Dev - add jQuery slider plugin using with slick.

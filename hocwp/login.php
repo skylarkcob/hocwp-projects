@@ -228,20 +228,6 @@ function hocwp_account_form_default_args() {
 		'label_confirm_password'  => hocwp_translate_text( __( 'Confirm your password', 'hocwp-theme' ) ),
 		'label_phone'             => hocwp_translate_text( __( 'Phone', 'hocwp-theme' ) )
 	);
-	if ( 'vi' == $lang ) {
-		$defaults['label_username']          = 'Tài khoản';
-		$defaults['placeholder_username']    = 'Tên tài khoản hoặc email';
-		$defaults['label_password']          = 'Mật khẩu';
-		$defaults['placeholder_password']    = 'Mật khẩu';
-		$defaults['label_remember']          = 'Ghi nhớ đăng nhập?';
-		$defaults['label_log_in']            = 'Đăng nhập';
-		$defaults['slogan']                  = 'Một tài khoản dùng cho tất cả dịch vụ của %s.';
-		$defaults['title_lostpassword_link'] = 'Nếu bạn đã quên mật khẩu thì vào đây để lấy lại';
-		$defaults['text_lostpassword_link']  = 'Quên mật khẩu?';
-		$defaults['text_register_link']      = 'Đăng ký';
-		$defaults['label_confirm_password']  = 'Xác nhận mật khẩu';
-		$defaults['label_phone']             = 'Điện thoại';
-	}
 
 	return apply_filters( 'hocwp_account_form_default_args', $defaults );
 }

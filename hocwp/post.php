@@ -276,168 +276,190 @@ function hocwp_post_thumbnail( $args = array() ) {
 	if ( post_password_required( $post_id ) || is_attachment() ) {
 		return;
 	}
-	$thumbnail_url = hocwp_get_value_by_key( $args, 'thumbnail_url' );
-	if ( empty( $thumbnail_url ) ) {
-		$large_size = hocwp_get_value_by_key( $args, 'large_size' );
-		if ( $large_size ) {
-			$thumbnail_url = get_post_meta( $post_id, 'large_thumbnail', true );
-			$thumbnail_url = hocwp_sanitize_media_value( $thumbnail_url );
-			$thumbnail_url = $thumbnail_url['url'];
-			if ( empty( $thumbnail_url ) ) {
+	$args['post_id'] = $post_id;
+	$transient_name  = hocwp_build_transient_name( 'hocwp_cache_post_thumbnail_%s', $args );
+	if ( false === ( $html = get_transient( $transient_name ) ) ) {
+		$cache         = hocwp_get_value_by_key( $args, 'cache', HOUR_IN_SECONDS );
+		$thumbnail_url = hocwp_get_value_by_key( $args, 'thumbnail_url' );
+		if ( empty( $thumbnail_url ) ) {
+			$large_size = hocwp_get_value_by_key( $args, 'large_size' );
+			if ( $large_size ) {
+				$thumbnail_url = get_post_meta( $post_id, 'large_thumbnail', true );
+				$thumbnail_url = hocwp_sanitize_media_value( $thumbnail_url );
+				$thumbnail_url = $thumbnail_url['url'];
+				if ( empty( $thumbnail_url ) ) {
+					$thumbnail_url = hocwp_get_post_thumbnail_url( $post_id );
+				}
+			} else {
 				$thumbnail_url = hocwp_get_post_thumbnail_url( $post_id );
 			}
-		} else {
-			$thumbnail_url = hocwp_get_post_thumbnail_url( $post_id );
 		}
-	}
-	if ( empty( $thumbnail_url ) ) {
-		return;
-	}
-	$bfi_thumb = isset( $args['bfi_thumb'] ) ? $args['bfi_thumb'] : true;
-	$bfi_thumb = apply_filters( 'hocwp_use_bfi_thumb', $bfi_thumb, $post_id );
-	$size      = hocwp_sanitize_size( $args );
-	$width     = $size[0];
-	$height    = $size[1];
-	$enlarge   = apply_filters( 'hocwp_enlarge_post_thumbnail_on_mobile', false );
-	if ( $enlarge && wp_is_mobile() ) {
-		$ratio = 600 / $width;
-		$ratio = round( $ratio );
-		if ( $ratio > 1 ) {
-			$width *= $ratio;
-			$height *= $ratio;
+		if ( empty( $thumbnail_url ) ) {
+			return;
 		}
-	}
-	$original = $thumbnail_url;
-	if ( $bfi_thumb ) {
-		$params = isset( $args['params'] ) ? $args['params'] : array();
+		$bfi_thumb = isset( $args['bfi_thumb'] ) ? $args['bfi_thumb'] : true;
+		$bfi_thumb = apply_filters( 'hocwp_use_bfi_thumb', $bfi_thumb, $post_id );
+		$size      = hocwp_sanitize_size( $args );
+		$width     = $size[0];
+		$height    = $size[1];
+		$enlarge   = apply_filters( 'hocwp_enlarge_post_thumbnail_on_mobile', false );
+		if ( $enlarge && wp_is_mobile() ) {
+			$ratio = 600 / $width;
+			$ratio = round( $ratio );
+			if ( $ratio > 1 ) {
+				$width *= $ratio;
+				$height *= $ratio;
+			}
+		}
+		$original = $thumbnail_url;
+		if ( $bfi_thumb ) {
+			$params = isset( $args['params'] ) ? $args['params'] : array();
+			if ( is_numeric( $width ) && $width > 0 ) {
+				$params['width'] = $width;
+			}
+			if ( is_numeric( $height ) && $height > 0 ) {
+				$params['height'] = $height;
+			}
+			$bfi_url = apply_filters( 'hocwp_pre_bfi_thumb', '', $thumbnail_url, $params );
+			if ( empty( $bfi_url ) ) {
+				if ( $width > 0 || $height > 0 ) {
+					$bfi_url = bfi_thumb( $thumbnail_url, $params );
+				}
+			}
+			if ( ! empty( $bfi_url ) ) {
+				$thumbnail_url = $bfi_url;
+			}
+		}
+		$img = new HOCWP_HTML( 'img' );
 		if ( is_numeric( $width ) && $width > 0 ) {
-			$params['width'] = $width;
+			$img->set_attribute( 'width', $size[0] );
 		}
 		if ( is_numeric( $height ) && $height > 0 ) {
-			$params['height'] = $height;
+			$img->set_attribute( 'height', $size[1] );
 		}
-		$bfi_url = apply_filters( 'hocwp_pre_bfi_thumb', '', $thumbnail_url, $params );
-		if ( empty( $bfi_url ) ) {
-			if ( $width > 0 || $height > 0 ) {
-				$bfi_url = bfi_thumb( $thumbnail_url, $params );
-			}
-		}
-		if ( ! empty( $bfi_url ) ) {
-			$thumbnail_url = $bfi_url;
-		}
-	}
-	$img = new HOCWP_HTML( 'img' );
-	if ( is_numeric( $width ) && $width > 0 ) {
-		$img->set_attribute( 'width', $size[0] );
-	}
-	if ( is_numeric( $height ) && $height > 0 ) {
-		$img->set_attribute( 'height', $size[1] );
-	}
-	$img->set_attribute( 'data-original', $original );
-	$permalink = hocwp_get_value_by_key( $args, 'permalink', get_permalink( $post_id ) );
-	$lazyload  = hocwp_get_value_by_key( $args, 'lazyload', false );
-	$before    = hocwp_get_value_by_key( $args, 'before' );
-	$after     = hocwp_get_value_by_key( $args, 'after' );
-	$img->set_attribute( 'alt', get_the_title( $post_id ) );
-	$img->set_class( 'attachment-post-thumbnail wp-post-image img-responsive' );
-	$img->set_attribute( 'src', $thumbnail_url );
-	$centered = (bool) hocwp_get_value_by_key( $args, 'centered', false );
-	if ( $centered ) {
-		$img->add_class( 'centered' );
-	}
-	$bk_img = '';
-	if ( (bool) $lazyload ) {
-		$img->set_wrap_tag( 'noscript' );
-		$bk_img = $img->build();
-		$img->set_wrap_tag( '' );
-		$loading_icon = hocwp_get_value_by_key( $args, 'loading_icon' );
-		if ( ! hocwp_is_image( $loading_icon ) ) {
-			$loading_icon = hocwp_get_image_url( 'transparent.gif' );
-		}
-		$img->set_image_src( $loading_icon );
-		$img->set_attribute( 'data-original', $thumbnail_url );
-		$img->add_class( 'lazyload' );
-	}
-	$loop        = isset( $args['loop'] ) ? $args['loop'] : true;
-	$custom_html = isset( $args['custom_html'] ) ? $args['custom_html'] : '';
-	$icon_video  = hocwp_get_value_by_key( $args, 'icon_video' );
-	if ( true === $icon_video ) {
-		$icon_video = '<i class="fa fa-play-circle-o" aria-hidden="true"></i>';
-	}
-	if ( ! empty( $icon_video ) && is_string( $icon_video ) && empty( $custom_html ) ) {
-		$a = new HOCWP_HTML( 'a' );
-		$a->set_href( $permalink );
-		$a->set_text( $icon_video );
-		$custom_html = $a->build();
-	}
-	$icon_image = hocwp_get_value_by_key( $args, 'icon_image' );
-	if ( true === $icon_image ) {
-		$icon_image = '<i class="fa fa-camera" aria-hidden="true"></i>';
-	}
-	if ( ! empty( $icon_image ) && is_string( $icon_image ) && empty( $custom_html ) ) {
-		$a = new HOCWP_HTML( 'a' );
-		$a->set_href( $permalink );
-		$a->set_text( $icon_image );
-		$custom_html = $a->build();
-	}
-	$cover      = hocwp_get_value_by_key( $args, 'cover' );
-	$only_image = hocwp_get_value_by_key( $args, 'only_image' );
-	if ( (bool) $only_image ) {
-		$img->output();
-		if ( (bool) $lazyload ) {
-			echo $bk_img;
-		}
+		$img->set_attribute( 'data-original', $original );
 
-		return;
+		$lazyload = hocwp_get_value_by_key( $args, 'lazyload', false );
+
+
+		$img->set_attribute( 'alt', get_the_title( $post_id ) );
+		$img->set_class( 'attachment-post-thumbnail wp-post-image img-responsive' );
+		$img->set_attribute( 'src', $thumbnail_url );
+		$centered = (bool) hocwp_get_value_by_key( $args, 'centered', false );
+		if ( $centered ) {
+			$img->add_class( 'centered' );
+		}
+		$bk_img = '';
+		if ( (bool) $lazyload ) {
+			$img->set_wrap_tag( 'noscript' );
+			$bk_img = $img->build();
+			$img->set_wrap_tag( '' );
+			$loading_icon = hocwp_get_value_by_key( $args, 'loading_icon' );
+			if ( ! hocwp_is_image( $loading_icon ) ) {
+				$loading_icon = hocwp_get_image_url( 'transparent.gif' );
+			}
+			$img->set_image_src( $loading_icon );
+			$img->set_attribute( 'data-original', $thumbnail_url );
+			$img->add_class( 'lazyload' );
+		}
+		$only_image = hocwp_get_value_by_key( $args, 'only_image' );
+		if ( (bool) $only_image ) {
+			$html = $img->build();
+			if ( (bool) $lazyload ) {
+				$html = $bk_img;
+			}
+		} else {
+			$before      = hocwp_get_value_by_key( $args, 'before' );
+			$after       = hocwp_get_value_by_key( $args, 'after' );
+			$permalink   = hocwp_get_value_by_key( $args, 'permalink', get_permalink( $post_id ) );
+			$loop        = isset( $args['loop'] ) ? $args['loop'] : true;
+			$custom_html = isset( $args['custom_html'] ) ? $args['custom_html'] : '';
+			$icon_video  = hocwp_get_value_by_key( $args, 'icon_video' );
+			if ( true === $icon_video ) {
+				$icon_video = '<i class="fa fa-play-circle-o" aria-hidden="true"></i>';
+			}
+			$fancybox = (bool) hocwp_get_value_by_key( $args, 'fancybox' );
+			$a        = new HOCWP_HTML( 'a' );
+			$a->set_href( $permalink );
+			if ( ! empty( $icon_video ) && is_string( $icon_video ) && empty( $custom_html ) ) {
+				$a->set_text( $icon_video );
+				$custom_html = $a->build();
+			}
+			$icon_image = hocwp_get_value_by_key( $args, 'icon_image' );
+			if ( true === $icon_image ) {
+				$icon_image = '<i class="fa fa-camera" aria-hidden="true"></i>';
+			}
+			if ( ! empty( $icon_image ) && is_string( $icon_image ) && empty( $custom_html ) ) {
+				$a->set_text( $icon_image );
+				$custom_html = $a->build();
+			}
+			$cover  = hocwp_get_value_by_key( $args, 'cover' );
+			$schema = '';
+			if ( current_theme_supports( 'hocwp-schema' ) ) {
+				ob_start();
+				?>
+				<meta itemprop="url" content="<?php echo $thumbnail_url; ?>">
+				<meta itemprop="width" content="<?php echo $width; ?>">
+				<meta itemprop="height" content="<?php echo $height; ?>">
+				<?php
+				$schema = ob_get_clean();
+			}
+			$html = $before;
+			if ( is_singular() && ! $loop ) {
+				ob_start();
+				?>
+				<div class="post-thumbnail entry-thumb"<?php hocwp_html_tag_attributes( 'div', 'entry_thumb' ); ?>>
+					<?php
+					$img->output();
+					if ( (bool) $lazyload ) {
+						echo $bk_img;
+					}
+					echo $custom_html;
+					echo $schema;
+					?>
+				</div>
+				<?php
+				$html = ob_get_clean();
+			} else {
+				if ( ! empty( $custom_html ) ) {
+					$html .= '<div class="thumbnail-wrap">';
+				}
+				$class = 'post-thumbnail-loop entry-thumb post-thumbnail';
+				$atts  = '';
+				if ( $fancybox ) {
+					hocwp_add_string_with_space_before( $class, 'fancybox' );
+					$atts      = ' data-fancybox-group="gallery"';
+					$permalink = $original;
+				}
+				ob_start();
+				?>
+				<a class="<?php echo $class; ?>"<?php echo $atts; ?> href="<?php echo $permalink; ?>"
+				   aria-hidden="true"<?php hocwp_html_tag_attributes( 'a', 'entry_thumb' ); ?>>
+					<?php
+					$img->output();
+					if ( (bool) $lazyload ) {
+						echo $bk_img;
+					}
+					if ( $cover ) {
+						echo '<span class="cover"></span>';
+					}
+					echo $schema;
+					?>
+				</a>
+				<?php
+				$html .= ob_get_clean();
+				$html .= $custom_html;
+				if ( ! empty( $custom_html ) ) {
+					$html .= '</div>';
+				}
+			}
+			$html .= $after;
+		}
+		if ( ! empty( $html ) ) {
+			set_transient( $transient_name, $html, $cache );
+		}
 	}
-	echo $before;
-	if ( is_singular() && ! $loop ) : ?>
-		<div class="post-thumbnail entry-thumb"<?php hocwp_html_tag_attributes( 'div', 'entry_thumb' ); ?>>
-			<?php
-			$img->output();
-			if ( (bool) $lazyload ) {
-				echo $bk_img;
-			}
-			echo $custom_html;
-			if ( current_theme_supports( 'hocwp-schema' ) ) {
-				?>
-				<meta itemprop="url" content="<?php echo $thumbnail_url; ?>">
-				<meta itemprop="width" content="<?php echo $width; ?>">
-				<meta itemprop="height" content="<?php echo $height; ?>">
-				<?php
-			}
-			?>
-		</div>
-	<?php else : ?>
-		<?php if ( ! empty( $custom_html ) ) : ?>
-			<div class="thumbnail-wrap">
-		<?php endif; ?>
-		<a class="post-thumbnail-loop entry-thumb post-thumbnail" href="<?php echo $permalink; ?>"
-		   aria-hidden="true"<?php hocwp_html_tag_attributes( 'a', 'entry_thumb' ); ?>>
-			<?php
-			$img->output();
-			if ( (bool) $lazyload ) {
-				echo $bk_img;
-			}
-			if ( $cover ) {
-				echo '<span class="cover"></span>';
-			}
-			if ( current_theme_supports( 'hocwp-schema' ) ) {
-				?>
-				<meta itemprop="url" content="<?php echo $thumbnail_url; ?>">
-				<meta itemprop="width" content="<?php echo $width; ?>">
-				<meta itemprop="height" content="<?php echo $height; ?>">
-				<?php
-			}
-			?>
-		</a>
-		<?php echo $custom_html; ?>
-		<?php if ( ! empty( $custom_html ) ) : ?>
-			</div>
-		<?php endif; ?>
-		<?php
-	endif;
-	echo $after;
+	echo $html;
 }
 
 function hocwp_post_type_no_featured_field() {

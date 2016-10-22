@@ -731,8 +731,9 @@ if ( 'edit-tags.php' == $pagenow || 'term.php' == $pagenow ) {
 	$meta->init();
 }
 
-function hocwp_coupon_meta_box_init( $post_type, $post ) {
+function hocwp_coupon_meta_box_init( $post ) {
 	global $pagenow;
+	$post_type = $post->post_type;
 	if ( 'post-new.php' == $pagenow || 'post.php' == $pagenow ) {
 		hocwp_meta_box_post_attribute( array( 'coupon' ) );
 		$meta = new HOCWP_Meta( 'post' );
@@ -798,7 +799,7 @@ function hocwp_coupon_meta_box_init( $post_type, $post ) {
 	}
 }
 
-add_action( 'hocwp_coupon_meta_boxes', 'hocwp_coupon_meta_box_init', 10, 2 );
+add_action( 'hocwp_coupon_meta_boxes', 'hocwp_coupon_meta_box_init' );
 
 function hocwp_coupon_on_save_post( $post_id ) {
 	if ( ! hocwp_can_save_post( $post_id ) ) {
@@ -837,6 +838,20 @@ function hocwp_coupon_on_save_post( $post_id ) {
 			update_post_meta( $post_id, 'price', $price );
 			update_post_meta( $post_id, 'sale_price', $sale_price );
 		}
+		if ( isset( $_POST['percent_label'] ) ) {
+			update_post_meta( $post_id, 'percent_label', $_POST['percent_label'] );
+		}
+		if ( isset( $_POST['text_label'] ) ) {
+			update_post_meta( $post_id, 'text_label', $_POST['text_label'] );
+		}
+		if ( isset( $_POST['coupon_code'] ) ) {
+			update_post_meta( $post_id, 'coupon_code', $_POST['coupon_code'] );
+		}
+		if ( isset( $_POST['url'] ) ) {
+			update_post_meta( $post_id, 'url', $_POST['url'] );
+		}
+		$enable_countdown_timer = hocwp_get_method_value( 'enable_countdown_timer' );
+		update_post_meta( $post_id, 'enable_countdown_timer', $enable_countdown_timer );
 	}
 }
 
@@ -940,6 +955,20 @@ function hocwp_coupon_build_daily_deal_args( $args = array() ) {
 	$args                           = hocwp_query_sanitize_meta_query( $meta_item, $args );
 	$args['post_type']              = 'coupon';
 	$args['meta_query']['relation'] = 'AND';
+
+	return $args;
+}
+
+function hocwp_coupon_build_not_expired_query_args( $args = array() ) {
+	$meta_query = hocwp_coupon_build_not_expired_meta_query();
+	if ( isset( $args['meta_query'] ) ) {
+		$meta_query = array(
+			$meta_query,
+			$args['meta_query']
+		);
+
+	}
+	$args['meta_query'] = $meta_query;
 
 	return $args;
 }
