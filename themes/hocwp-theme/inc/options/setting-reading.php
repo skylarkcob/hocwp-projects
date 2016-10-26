@@ -108,7 +108,7 @@ $option->add_field( array(
 	'value'          => $excerpt_length
 ) );
 
-if ( hocwp_wc_installed() ) {
+if ( hocwp_wc_installed() || hocwp_is_shop_site() ) {
 	$value = hocwp_get_product_posts_per_page();
 	$option->add_field( array(
 		'id'             => 'products_per_page',
@@ -219,7 +219,6 @@ function hocwp_reading_content_none_title() {
 	if ( empty( $page_title ) ) {
 		$page_title = __( 'Nothing Found', 'hocwp-theme' );
 		$page_title = apply_filters( 'hocwp_content_none_title', $page_title );
-		$page_title = hocwp_translate_text( $page_title );
 	}
 
 	return $page_title;

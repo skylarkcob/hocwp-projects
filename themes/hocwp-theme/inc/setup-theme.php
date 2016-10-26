@@ -133,8 +133,7 @@ function hocwp_setup_theme_content_width() {
 add_action( 'after_setup_theme', 'hocwp_setup_theme_content_width', 0 );
 
 function hocwp_setup_theme_widgets_init() {
-	global $hocwp_reading_options;
-	$statistics = (bool) hocwp_get_value_by_key( $hocwp_reading_options, 'statistics' );
+	$statistics = (bool) hocwp_theme_get_reading_options( 'statistics' );
 	$statistics = apply_filters( 'hocwp_use_statistics', $statistics );
 	register_widget( 'HOCWP_Widget_Banner' );
 	register_widget( 'HOCWP_Widget_Facebook_Box' );
@@ -197,6 +196,15 @@ function hocwp_setup_theme_support_enqueue_media( $use ) {
 }
 
 add_filter( 'hocwp_wp_enqueue_media', 'hocwp_setup_theme_support_enqueue_media' );
+
+function hocwp_setup_theme_wp_core_scripts() {
+	$use = apply_filters( 'hocwp_load_core_common_and_dashicons_style', false );
+	if ( $use ) {
+		hocwp_theme_load_common_and_dashicons_style();
+	}
+}
+
+add_action( 'hocwp_enqueue_scripts', 'hocwp_setup_theme_wp_core_scripts' );
 
 function hocwp_setup_theme_scripts() {
 	do_action( 'hocwp_enqueue_scripts' );
@@ -628,21 +636,19 @@ if ( 'vi' == $lang && $dash_widget ) {
 }
 
 function hocwp_theme_on_upgrade() {
-	global $hocwp_reading_options;
 	$version = get_option( 'hocwp_version' );
 	if ( version_compare( $version, HOCWP_VERSION, '<' ) ) {
 		update_option( 'hocwp_version', HOCWP_VERSION );
 		do_action( 'hocwp_theme_upgrade' );
 	}
 	remove_meta_box( 'dashboard_quick_press', 'dashboard', 'side' );
-	$reading = $hocwp_reading_options;
-	if ( (bool) hocwp_get_value_by_key( $reading, 'trending' ) ) {
+	if ( (bool) hocwp_theme_get_reading_options( 'trending' ) ) {
 		hocwp_post_trending_table_init();
 	}
-	if ( (bool) hocwp_get_value_by_key( $reading, 'post_statistics' ) ) {
+	if ( (bool) hocwp_theme_get_reading_options( 'post_statistics' ) ) {
 		hocwp_statistics_table_init();
 	}
-	if ( (bool) hocwp_get_value_by_key( $reading, 'search_tracking' ) ) {
+	if ( (bool) hocwp_theme_get_reading_options( 'search_tracking' ) ) {
 		hocwp_search_tracking_table_init();
 	}
 }
@@ -999,47 +1005,50 @@ if ( ! is_admin() ) {
 }
 
 function hocwp_get_archive_title( $prefix = '' ) {
-	if ( is_tax() ) {
-		$title = single_term_title( '', false );
-	} elseif ( is_category() ) {
-		$title = single_cat_title( '', false );
-	} elseif ( is_tag() ) {
-		$title = single_tag_title( '', false );
-	} elseif ( is_post_type_archive() ) {
-		$title = post_type_archive_title( '', false );
-	} elseif ( is_author() ) {
-		$title = get_the_author();
-	} elseif ( is_year() ) {
-		$title = get_the_date( 'Y' );
-	} elseif ( is_month() ) {
-		if ( 'vi' == hocwp_get_language() ) {
-			$month = get_the_date( 'F' );
-			$title = hocwp_convert_month_name_to_vietnamese( $month );
-			hocwp_add_string_with_space_before( $title, get_the_date( 'Y' ) );
-		} else {
-			$title = get_the_date( 'F Y' );
-		}
-	} elseif ( is_day() ) {
-		if ( 'vi' == hocwp_get_language() ) {
-			$month = get_the_date( 'F' );
-			$title = hocwp_convert_month_name_to_vietnamese( $month );
-			hocwp_add_string_with_space_before( $title, get_the_date( 'Y' ) );
-			$title = 'Ngày ' . get_the_date( 'j' ) . ' ' . strtolower( $title );
-		} else {
-			$title = get_the_date( 'F j, Y' );
-		}
-	} else {
-		if ( is_search() ) {
-			$title = get_search_query();
-			if ( empty( $title ) ) {
-				$title = hocwp_text( 'Kết quả tìm kiếm', __( 'Search results', 'hocwp-theme' ), false );
+	$title = '';
+	if ( is_archive() ) {
+		if ( is_tax() ) {
+			$title = single_term_title( '', false );
+		} elseif ( is_category() ) {
+			$title = single_cat_title( '', false );
+		} elseif ( is_tag() ) {
+			$title = single_tag_title( '', false );
+		} elseif ( is_post_type_archive() ) {
+			$title = post_type_archive_title( '', false );
+		} elseif ( is_author() ) {
+			$title = get_the_author();
+		} elseif ( is_year() ) {
+			$title = get_the_date( 'Y' );
+		} elseif ( is_month() ) {
+			if ( 'vi' == hocwp_get_language() ) {
+				$month = get_the_date( 'F' );
+				$title = hocwp_convert_month_name_to_vietnamese( $month );
+				hocwp_add_string_with_space_before( $title, get_the_date( 'Y' ) );
+			} else {
+				$title = get_the_date( 'F Y' );
+			}
+		} elseif ( is_day() ) {
+			if ( 'vi' == hocwp_get_language() ) {
+				$month = get_the_date( 'F' );
+				$title = hocwp_convert_month_name_to_vietnamese( $month );
+				hocwp_add_string_with_space_before( $title, get_the_date( 'Y' ) );
+				$title = get_the_date( 'j' ) . ' ' . strtolower( $title );
+			} else {
+				$title = get_the_date( 'F j, Y' );
 			}
 		} else {
-			$title = hocwp_text( 'Lưu trữ', __( 'Archive', 'hocwp-theme' ), false );
+			if ( is_search() ) {
+				$title = get_search_query();
+				if ( empty( $title ) ) {
+					$title = __( 'Search results', 'hocwp-theme' );
+				}
+			} else {
+				$title = __( 'Archive', 'hocwp-theme' );
+			}
 		}
-	}
-	if ( ! empty( $prefix ) ) {
-		$title = $prefix . $title;
+		if ( ! empty( $prefix ) ) {
+			$title = $prefix . $title;
+		}
 	}
 
 	return apply_filters( 'hocwp_get_archive_title', $title, $prefix );
@@ -1154,5 +1163,11 @@ function hocwp_setup_theme_delete_menu_cache() {
 add_action( 'save_post', 'hocwp_setup_theme_delete_menu_cache' );
 add_action( 'wp_update_nav_menu', 'hocwp_setup_theme_delete_menu_cache' );
 add_action( 'hocwp_option_saved', 'hocwp_setup_theme_delete_menu_cache' );
+
+function hocwp_setup_theme_delete_post_cache() {
+	hocwp_delete_transient( 'hocwp_cache_post_thumbnail' );
+}
+
+add_action( 'save_post', 'hocwp_setup_theme_delete_post_cache' );
 
 unset( $lang, $dash_widget );

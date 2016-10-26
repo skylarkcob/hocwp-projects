@@ -269,6 +269,11 @@ function hocwp_setup_theme_save_post_meta_hook( $post_id ) {
 			if ( isset( $_POST['position'] ) ) {
 				update_post_meta( $post_id, 'position', $_POST['position'] );
 			}
+			$fit_width = hocwp_get_method_value( 'fit_width' );
+			update_post_meta( $post_id, 'fit_width', $fit_width );
+			if ( isset( $_POST['height'] ) ) {
+				update_post_meta( $post_id, 'height', $_POST['height'] );
+			}
 			break;
 		case 'hocwp_ads':
 			if ( isset( $_POST['position'] ) ) {
@@ -313,6 +318,14 @@ function hocwp_setup_theme_save_post_meta_hook( $post_id ) {
 				}
 			}
 			break;
+		case 'partner':
+			if ( isset( $_POST['url'] ) ) {
+				update_post_meta( $post_id, 'url', esc_url( $_POST['url'] ) );
+			}
+			if ( isset( $_POST['thumbnail'] ) ) {
+				update_post_meta( $post_id, 'thumbnail', $_POST['thumbnail'] );
+			}
+			break;
 	}
 
 	return $post_id;
@@ -347,7 +360,7 @@ function hocwp_theme_post_submitbox_misc_actions() {
 
 add_action( 'post_submitbox_misc_actions', 'hocwp_theme_post_submitbox_misc_actions' );
 
-function hocwp_theme_meta_product_tab_field_box( $post_type, $post ) {
+function hocwp_theme_more_product_meta_boxes_init( $post_type, $post ) {
 	if ( hocwp_wc_installed() ) {
 		$args  = array(
 			'posts_per_page' => - 1,
@@ -357,10 +370,14 @@ function hocwp_theme_meta_product_tab_field_box( $post_type, $post ) {
 		if ( $query->have_posts() ) {
 			hocwp_theme_meta_product_tab_field_box_helper( $query->posts );
 		}
+	} else {
+		if ( hocwp_is_shop_site() ) {
+			hocwp_shop_product_meta_boxes( $post_type, $post );
+		}
 	}
 }
 
-add_action( 'hocwp_theme_meta_boxes_init', 'hocwp_theme_meta_product_tab_field_box', 10, 2 );
+add_action( 'hocwp_theme_meta_boxes_init', 'hocwp_theme_more_product_meta_boxes_init', 10, 2 );
 
 function hocwp_theme_meta_product_tab_field_box_helper( $posts ) {
 	foreach ( $posts as $tab ) {
@@ -374,3 +391,28 @@ function hocwp_theme_meta_product_tab_field_box_helper( $posts ) {
 		hocwp_meta_box_editor( $args );
 	}
 }
+
+function hocwp_theme_meta_partner_information( $post ) {
+	$meta = new HOCWP_Meta( 'post' );
+	$meta->add_post_type( 'partner' );
+	$meta->set_id( 'hocwp_partner_information' );
+	$meta->set_title( __( 'Partner Information', 'hocwp-theme' ) );
+
+	$args = array(
+		'id'             => 'thumbnail',
+		'label'          => __( 'Thumbnail:', 'hocwp-theme' ),
+		'field_callback' => 'hocwp_field_media_upload',
+		'container'      => true
+	);
+	$meta->add_field( $args );
+
+	$args = array(
+		'id'    => 'url',
+		'label' => __( 'Url:', 'hocwp-theme' )
+	);
+	$meta->add_field( $args );
+
+	$meta->init();
+}
+
+add_action( 'hocwp_partner_meta_boxes', 'hocwp_theme_meta_partner_information' );

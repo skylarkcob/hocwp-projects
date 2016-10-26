@@ -287,6 +287,18 @@ function hocwp_theme_translation_gettext( $translation, $text ) {
 		case 'Close':
 			$translation = 'Đóng';
 			break;
+		case 'Previous Image':
+			$translation = 'Ảnh trước';
+			break;
+		case 'Next Image':
+			$translation = 'Ảnh kế tiếp';
+			break;
+		case 'Edit':
+			$translation = 'Chỉnh sửa';
+			break;
+		case 'Edit <span class="screen-reader-text"> "%s"</span>':
+			$translation = 'Chỉnh sửa <span class="screen-reader-text"> "%s"</span>';
+			break;
 	}
 
 	return $translation;

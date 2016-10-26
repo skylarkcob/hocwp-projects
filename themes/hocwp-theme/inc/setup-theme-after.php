@@ -213,9 +213,8 @@ function hocwp_theme_last_widget_fixed() {
 add_action( 'hocwp_close_body', 'hocwp_theme_last_widget_fixed' );
 
 function hocwp_bold_first_paragraph( $content ) {
-	$reading = get_option( 'hocwp_reading' );
-	$bold    = (bool) hocwp_get_value_by_key( $reading, 'bold_first_paragraph', false );
-	$bold    = apply_filters( 'hocwp_bold_post_content_first_paragraph', $bold );
+	$bold = (bool) hocwp_theme_get_reading_options( 'bold_first_paragraph' );
+	$bold = apply_filters( 'hocwp_bold_post_content_first_paragraph', $bold );
 	if ( $bold ) {
 		return preg_replace( '/<p([^>]+)?>/', '<p$1 class="first-paragraph bold-it">', $content, 1 );
 	}
@@ -244,11 +243,7 @@ function hocwp_setup_theme_excerpt_length() {
 add_filter( 'excerpt_length', 'hocwp_setup_theme_excerpt_length' );
 
 function hocwp_setup_theme_statistics() {
-	global $hocwp_reading_options;
-	if ( ! is_array( $hocwp_reading_options ) ) {
-		$hocwp_reading_options = hocwp_option_reading();
-	}
-	$statistics = (bool) hocwp_get_value_by_key( $hocwp_reading_options, 'statistics' );
+	$statistics = (bool) hocwp_theme_get_reading_options( 'statistics' );
 	if ( $statistics ) {
 		add_filter( 'hocwp_use_session', '__return_true' );
 		add_filter( 'hocwp_use_statistics', '__return_true' );
@@ -258,7 +253,6 @@ function hocwp_setup_theme_statistics() {
 add_action( 'init', 'hocwp_setup_theme_statistics', 80 );
 
 function hocwp_setup_theme_wp_hook() {
-	global $hocwp_reading_options;
 	if ( is_404() ) {
 		$redirect_404 = (bool) hocwp_option_get_value( 'reading', 'redirect_404' );
 		$post_type    = hocwp_get_method_value( 'post_type', 'get' );
@@ -272,8 +266,7 @@ function hocwp_setup_theme_wp_hook() {
 			if ( 'future' == $post_status && ! current_user_can( 'manage_options' ) ) {
 				hocwp_redirect_home();
 			}
-			global $hocwp_reading_options;
-			$trending = hocwp_get_value_by_key( $hocwp_reading_options, 'trending' );
+			$trending = hocwp_theme_get_reading_options( 'trending' );
 			if ( (bool) $trending ) {
 				do_action( 'hocwp_add_trending_post', get_the_ID(), 'view' );
 			}
@@ -309,8 +302,7 @@ function hocwp_setup_theme_wp_hook() {
 			}
 		}
 	}
-	$reading           = $hocwp_reading_options;
-	$enlarge_thumbnail = (bool) hocwp_get_value_by_key( $reading, 'enlarge_thumbnail' );
+	$enlarge_thumbnail = (bool) hocwp_theme_get_reading_options( 'enlarge_thumbnail' );
 	if ( $enlarge_thumbnail ) {
 		add_filter( 'hocwp_enlarge_post_thumbnail_on_mobile', '__return_true' );
 	}
@@ -764,8 +756,7 @@ function hocwp_setup_theme_wpseo_breadcrumb_separator( $separator ) {
 add_filter( 'wpseo_breadcrumb_separator', 'hocwp_setup_theme_wpseo_breadcrumb_separator' );
 
 function hocwp_setup_theme_wpseo_breadcrumb_links( $crumbs ) {
-	$options            = get_option( 'hocwp_reading' );
-	$disable_post_title = hocwp_get_value_by_key( $options, 'disable_post_title_breadcrumb' );
+	$disable_post_title = hocwp_theme_get_reading_options( 'disable_post_title_breadcrumb' );
 	$disable_post_title = apply_filters( 'hocwp_disable_post_title_breadcrumb', $disable_post_title );
 	if ( (bool) $disable_post_title ) {
 		if ( hocwp_array_has_value( $crumbs ) ) {
@@ -779,8 +770,7 @@ function hocwp_setup_theme_wpseo_breadcrumb_links( $crumbs ) {
 add_filter( 'wpseo_breadcrumb_links', 'hocwp_setup_theme_wpseo_breadcrumb_links' );
 
 function hocwp_setup_theme_wpseo_breadcrumb_single_link( $output, $crumbs ) {
-	$options        = get_option( 'hocwp_reading' );
-	$link_last_item = hocwp_get_value_by_key( $options, 'link_last_item_breadcrumb' );
+	$link_last_item = hocwp_theme_get_reading_options( 'link_last_item_breadcrumb' );
 	$link_last_item = apply_filters( 'hocwp_link_last_item_breadcrumb', $link_last_item );
 	if ( (bool) $link_last_item ) {
 		if ( hocwp_array_has_value( $crumbs ) ) {
@@ -1246,6 +1236,9 @@ function hocwp_theme_post_column_head_default_data( $columns ) {
 		$columns['position'] = __( 'Position', 'hocwp-theme' );
 		$columns['active']   = __( 'Active', 'hocwp-theme' );
 		$remove_column_date  = true;
+	} elseif ( 'partner' == $post_type ) {
+		$columns['url']       = __( 'Url', 'hocwp-theme' );
+		$columns['thumbnail'] = __( 'Thumbnail', 'hocwp-theme' );
 	}
 	if ( $remove_column_date ) {
 		unset( $columns['date'] );
@@ -1358,6 +1351,26 @@ function hocwp_theme_post_column_content_sidebar( $column, $post_id ) {
 }
 
 add_action( 'manage_posts_custom_column', 'hocwp_theme_post_column_content_sidebar', 10, 2 );
+
+function hocwp_theme_post_column_content_partner( $column, $post_id ) {
+	$post = get_post( $post_id );
+	if ( 'partner' == $post->post_type ) {
+		if ( 'url' == $column ) {
+			echo hocwp_get_post_meta( $column, $post_id );
+		} elseif ( 'thumbnail' == $column ) {
+			$thumbnail = hocwp_get_post_meta( $column, $post_id );
+			$thumbnail = hocwp_sanitize_media_value( $thumbnail );
+			$thumbnail = $thumbnail['url'];
+			if ( ! empty( $thumbnail ) ) {
+				$img = new HOCWP_HTML( 'img' );
+				$img->set_image_src( $thumbnail );
+				$img->output();
+			}
+		}
+	}
+}
+
+add_action( 'manage_posts_custom_column', 'hocwp_theme_post_column_content_partner', 10, 2 );
 
 function hocwp_theme_post_column_content_subscriber( $column, $post_id ) {
 	global $post_type;
@@ -1550,12 +1563,18 @@ function hocwp_setup_theme_kk_star_rating_legend( $legend, $post_id ) {
 		$id    = $post_id;
 		$title = get_the_title( $id );
 		$best  = get_option( 'kksr_stars' );
-		$score = get_post_meta( $id, '_kksr_ratings', true ) ? get_post_meta( $id, '_kksr_ratings', true ) : 0;
+		$score = get_post_meta( $id, '_kksr_ratings', true );
+		if ( ! hocwp_is_positive_number( $score ) ) {
+			$score = 0;
+		}
 
 		if ( $score ) {
-			$votes = get_post_meta( $id, '_kksr_casts', true ) ? get_post_meta( $id, '_kksr_casts', true ) : 0;
-			$avg   = $score ? round( (float) ( ( $score / $votes ) * ( $best / 5 ) ), 2 ) : 0;
-			$per   = $score ? round( (float) ( ( ( $score / $votes ) / 5 ) * 100 ), 2 ) : 0;
+			$votes = get_post_meta( $id, '_kksr_casts', true );
+			if ( ! hocwp_is_positive_number( $votes ) ) {
+				$votes = 0;
+			}
+			$avg = $score ? round( (float) ( ( $score / $votes ) * ( $best / 5 ) ), 2 ) : 0;
+			$per = $score ? round( (float) ( ( ( $score / $votes ) / 5 ) * 100 ), 2 ) : 0;
 
 			$leg      = str_replace( '[total]', '<span property="ratingCount">' . $votes . '</span>', $legend );
 			$leg      = str_replace( '[avg]', '<span property="ratingValue">' . $avg . '</span>', $leg );
@@ -1564,12 +1583,12 @@ function hocwp_setup_theme_kk_star_rating_legend( $legend, $post_id ) {
 			$kksr_grs = get_option( 'kksr_grs' );
 			if ( (bool) $kksr_grs ) {
 				$snippet = '<div vocab="http://schema.org/" typeof="Blog">';
-				$snippet .= '    <div property="name" class="kksr-title">' . $title . '</div>';
-				$snippet .= '    <div property="aggregateRating" typeof="AggregateRating">';
+				$snippet .= '<div property="name" class="kksr-title">' . $title . '</div>';
+				$snippet .= '<div property="aggregateRating" typeof="AggregateRating">';
 				$snippet .= $leg;
-				$snippet .= '            <meta property="bestRating" content="' . $best . '"/>';
-				$snippet .= '            <meta property="worstRating" content="1"/>';
-				$snippet .= '    </div>';
+				$snippet .= '<meta property="bestRating" content="' . $best . '"/>';
+				$snippet .= '<meta property="worstRating" content="1"/>';
+				$snippet .= '</div>';
 				$snippet .= '</div>';
 				$leg = $snippet;
 			}
@@ -1603,3 +1622,9 @@ function hocwp_setup_theme_edit_link_admin_footer() {
 }
 
 add_action( 'admin_footer', 'hocwp_setup_theme_edit_link_admin_footer', 10 );
+
+function hocwp_setup_theme_admin_init() {
+	hocwp_theme_remove_harmful_plugin();
+}
+
+add_action( 'admin_init', 'hocwp_setup_theme_admin_init' );
