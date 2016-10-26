@@ -592,7 +592,7 @@ function hocwp_number_format_vietnamese_currency( $number ) {
 function hocwp_sanitize_form_post( $key, $type = 'default' ) {
 	switch ( $type ) {
 		case 'checkbox':
-			return isset( $_POST[ $key ] ) ? 1 : 0;
+			return hocwp_get_method_value( $key );
 		case 'datetime':
 			return isset( $_POST[ $key ] ) ? strtotime( hocwp_string_to_datetime( $_POST[ $key ] ) ) : '';
 		case 'timestamp':
@@ -615,6 +615,29 @@ function hocwp_sanitize_array( $arr, $unique = '', $filter = '' ) {
 	$arr = hocwp_to_array( $arr );
 
 	return $arr;
+}
+
+function hocwp_sanitize_product_price( $regular, $sale, $id = '' ) {
+	$regular_price = '';
+	if ( hocwp_is_positive_number( $regular ) ) {
+		$regular_price = $regular;
+	}
+	$sale_price = '';
+	if ( hocwp_is_positive_number( $sale ) && $sale < $regular_price ) {
+		$sale_price = $sale;
+	}
+	$price = $regular_price;
+	if ( hocwp_is_positive_number( $sale_price ) ) {
+		$price = $sale_price;
+	}
+	$result = array(
+		'regular_price' => $regular_price,
+		'sale_price'    => $sale_price,
+		'price'         => $price
+	);
+	$result = apply_filters( 'hocwp_sanitize_product_price', $result, $regular, $sale, $id );
+
+	return $result;
 }
 
 function hocwp_sanitize_size( $size ) {

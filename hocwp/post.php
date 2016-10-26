@@ -428,7 +428,8 @@ function hocwp_post_thumbnail( $args = array() ) {
 				$atts  = '';
 				if ( $fancybox ) {
 					hocwp_add_string_with_space_before( $class, 'fancybox' );
-					$atts      = ' data-fancybox-group="gallery"';
+					$atts = ' data-fancybox-group="gallery"';
+					$atts .= ' rel="gallery"';
 					$permalink = $original;
 				}
 				ob_start();
@@ -468,6 +469,12 @@ function hocwp_post_type_no_featured_field() {
 
 function hocwp_get_pages( $args = array() ) {
 	return get_pages( $args );
+}
+
+function hocwp_get_child_pages( $parent, $args = array() ) {
+	$args['child_of'] = $parent->ID;
+
+	return hocwp_get_pages( $args );
 }
 
 function hocwp_get_pages_by_template( $template_name, $args = array() ) {
@@ -522,6 +529,8 @@ function hocwp_post_link_only( WP_Post $post, $list = false ) {
 		$a = new HOCWP_HTML( 'a' );
 		$a->set_href( get_permalink( $post ) );
 		$a->set_text( $post->post_title );
+		$a->add_class( 'post-link' );
+		$a->add_class( 'link-only' );
 		if ( $list ) {
 			$li = new HOCWP_HTML( 'li' );
 			$li->set_class( get_post_class( '', $post->ID ) );

@@ -1525,7 +1525,16 @@ jQuery(document).ready(function ($) {
         this._defaults = HocWPSlider.DEFAULTS;
         this._name = HocWPSlider.NAME;
         this.init();
-        var $element = this.$element;
+        var $element = this.$element,
+            fit_width = parseInt($element.attr('data-fit-width')),
+            height = parseInt($element.attr('data-height'));
+        if (!$.isNumeric(height)) {
+            height = this.options.height;
+        }
+        if (this.options.fitWidth || ($.isNumeric(fit_width) && 1 == fit_width)) {
+            $element.find('img.slider-image').css({width: '100%'});
+        }
+        $element.find('img.slider-image').css({height: height + 'px'});
         $element.addClass('hocwp-slider');
         if (this.options.customArrow) {
             $element.addClass('custom-arrow');
@@ -1569,7 +1578,8 @@ jQuery(document).ready(function ($) {
         thumbnailPager: 0,
         useLazyLoad: 0,
         customArrow: 0,
-        fontAwesome: 0
+        fontAwesome: 0,
+        height: 350
     };
 
     HocWPSlider.prototype.init = function () {

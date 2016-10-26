@@ -842,7 +842,7 @@ function hocwp_wc_body_classes( $classes ) {
 		}
 		unset( $thumbnail_preview );
 	}
-	if ( is_woocommerce() ) {
+	if ( hocwp_wc_installed() && is_woocommerce() ) {
 		$classes[] = 'archive-product';
 	}
 

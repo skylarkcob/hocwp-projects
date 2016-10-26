@@ -112,9 +112,15 @@ function hocwp_star_rating_result( $args = array() ) {
 	$votes = 0;
 	if ( ! isset( $args['rating'] ) ) {
 		$id    = hocwp_get_value_by_key( $args, 'post_id', get_the_ID() );
-		$score = get_post_meta( $id, '_kksr_ratings', true ) ? get_post_meta( $id, '_kksr_ratings', true ) : 0;
+		$score = get_post_meta( $id, '_kksr_ratings', true );
+		if ( ! hocwp_is_positive_number( $score ) ) {
+			$score = 0;
+		}
 		if ( ! isset( $args['number'] ) ) {
-			$votes = get_post_meta( $id, '_kksr_casts', true ) ? get_post_meta( $id, '_kksr_casts', true ) : 0;
+			$votes = get_post_meta( $id, '_kksr_casts', true );
+			if ( ! hocwp_is_positive_number( $votes ) ) {
+				$votes = 0;
+			}
 		}
 		$args['number'] = $votes;
 		if ( $votes != 0 ) {
@@ -123,6 +129,15 @@ function hocwp_star_rating_result( $args = array() ) {
 		}
 		$args['rating'] = $score;
 	}
+	$hide_empty = hocwp_get_value_by_key( $args, 'hide_empty' );
+	if ( $hide_empty ) {
+		$rating = $args['rating'];
+		if ( ! hocwp_is_positive_number( $rating ) ) {
+			return;
+		}
+	}
+	$before = hocwp_get_value_by_key( $args, 'before' );
+	echo $before;
 	wp_star_rating( $args );
 	$show_count = hocwp_get_value_by_key( $args, 'show_count', true );
 	$number     = hocwp_get_value_by_key( $args, 'number' );
@@ -130,6 +145,8 @@ function hocwp_star_rating_result( $args = array() ) {
 	if ( $show_count ) {
 		echo '<span aria-hidden="true" class="num-ratings">(' . $number . ')</span>';
 	}
+	$after = hocwp_get_value_by_key( $args, 'after' );
+	echo $after;
 }
 
 function hocwp_bootstrap_color_select_options() {
@@ -373,6 +390,26 @@ function hocwp_get_default_lat_long() {
 	}
 
 	return apply_filters( 'hocwp_default_lat_lng', $lat_long );
+}
+
+function hocwp_register_taxonomy_filter( $post_type = '' ) {
+	$args = array(
+		'name'          => __( 'Filters', 'hocwp-theme' ),
+		'singular_name' => __( 'Filter', 'hocwp-theme' ),
+		'taxonomy'      => 'hocwp_filter',
+		'slug'          => 'filter',
+		'post_types'    => $post_type
+	);
+	hocwp_register_taxonomy( $args );
+}
+
+function hocwp_register_post_type_partner() {
+	$args = array(
+		'name'          => __( 'Partners', 'hocwp-theme' ),
+		'singular_name' => __( 'Partner', 'hocwp-theme' ),
+		'slug'          => 'partner'
+	);
+	hocwp_register_post_type( $args );
 }
 
 function hocwp_register_post_type_news( $args = array() ) {

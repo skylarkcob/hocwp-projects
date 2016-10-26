@@ -284,6 +284,10 @@
     left: 65px;
 }
 
+.hocwp-meta-box.side .meta-row label + .widefat.regular-text {
+    margin-top: 2px;
+}
+
 /**
  * Option Page
  */

@@ -33,6 +33,19 @@ function hocwp_query( $args = array() ) {
 	return new WP_Query( $args );
 }
 
+function hocwp_query_images( $args = array() ) {
+	$mimes    = array( 'image/jpeg', 'image/gif', 'image/png', 'image/bmp', 'image/tiff' );
+	$mimes    = apply_filters( 'hocwp_image_mime_type', $mimes );
+	$defaults = array(
+		'post_type'      => 'attachment',
+		'post_status'    => 'inherit',
+		'post_mime_type' => $mimes
+	);
+	$args     = wp_parse_args( $args, $defaults );
+
+	return hocwp_query( $args );
+}
+
 function hocwp_query_trending( $args = array(), $fallback_args = array() ) {
 	$post_type        = hocwp_get_value_by_key( $args, 'post_type' );
 	$post_ids         = hocwp_get_all_treding_post_ids( $post_type );
@@ -404,7 +417,7 @@ function hocwp_query_related_post( $args = array() ) {
 	}
 	$keep_current   = (bool) hocwp_get_value_by_key( $args, 'keep_current' );
 	$posts_per_page = hocwp_get_value_by_key( $args, 'posts_per_page', hocwp_get_posts_per_page() );
-	$transient_name = 'hocwp_query_post_' . $post_id . '_related_%s';
+	$transient_name = 'hocwp_cache_post_' . $post_id . '_related_%s';
 	$transient_name = hocwp_build_transient_name( $transient_name, $args );
 	$cache          = isset( $args['cache'] ) ? $args['cache'] : true;
 	$query          = new WP_Query();
@@ -426,13 +439,17 @@ function hocwp_query_related_post( $args = array() ) {
 				$defaults = hocwp_query_sanitize_tax_query( $tax_item, $defaults );
 			}
 		}
-		if ( ! $keep_current ) {
-			$defaults['post__not_in'] = array( $post_id );
+		if ( hocwp_array_has_value( $defaults ) ) {
+			if ( ! $keep_current ) {
+				$defaults['post__not_in'] = array( $post_id );
+			}
+			$defaults['tax_query']['relation'] = 'OR';
+			$query_args                        = wp_parse_args( $args, $defaults );
+			$query                             = hocwp_query( $query_args );
 		}
-		$defaults['tax_query']['relation'] = 'OR';
-		$args                              = wp_parse_args( $args, $defaults );
-		$query                             = hocwp_query( $args );
-		$posts_per_page                    = isset( $query->query_vars['posts_per_page'] ) ? $query->query_vars['posts_per_page'] : hocwp_get_posts_per_page();
+		if ( ! is_a( $query, 'WP_Query' ) ) {
+			$query = new WP_Query();
+		}
 		if ( $query->post_count < $posts_per_page ) {
 			$missing  = $posts_per_page - $query->post_count;
 			$defaults = array();
@@ -460,11 +477,15 @@ function hocwp_query_related_post( $args = array() ) {
 			$args      = wp_parse_args( $args, $defaults );
 			$cat_query = hocwp_query( $args );
 			$post_ids  = array();
-			foreach ( $query->posts as $post ) {
-				array_push( $post_ids, $post->ID );
+			if ( hocwp_array_has_value( $query->posts ) ) {
+				foreach ( $query->posts as $post ) {
+					array_push( $post_ids, $post->ID );
+				}
 			}
-			foreach ( $cat_query->posts as $post ) {
-				array_push( $post_ids, $post->ID );
+			if ( hocwp_array_has_value( $cat_query->posts ) ) {
+				foreach ( $cat_query->posts as $post ) {
+					array_push( $post_ids, $post->ID );
+				}
 			}
 			$args['posts_per_page'] = $posts_per_page;
 			$args['post__in']       = $post_ids;
@@ -482,8 +503,11 @@ function hocwp_query_related_post( $args = array() ) {
 		if ( ! $query->have_posts() ) {
 			$cache_days = 1;
 		}
-		if ( $cache && $query->have_posts() ) {
-			set_transient( $transient_name, $query, $cache_days * DAY_IN_SECONDS );
+		if ( ( $cache || hocwp_is_positive_number( $cache ) ) && $query->have_posts() ) {
+			if ( ! hocwp_is_positive_number( $cache ) ) {
+				$cache = $cache_days * DAY_IN_SECONDS;
+			}
+			set_transient( $transient_name, $query, $cache );
 		}
 	}
 

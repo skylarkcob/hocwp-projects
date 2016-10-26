@@ -630,15 +630,19 @@ function hocwp_query_upcoming_coupon( $args = array() ) {
 	return hocwp_query( $args );
 }
 
-function hocwp_coupon_store_select( $taxonomy = 'store' ) {
+function hocwp_coupon_store_select( $taxonomy = 'store', $name = '' ) {
 	$stores = hocwp_get_terms( $taxonomy );
+	if ( empty( $name ) ) {
+		$name = 'sstore';
+	}
 	?>
-	<select name="sstore" class="form-control select-<?php echo hocwp_sanitize_html_class( $taxonomy ); ?>"
+	<select name="<?php echo $name; ?>"
+	        class="form-control select-<?php echo hocwp_sanitize_html_class( $taxonomy ); ?>"
 	        autocomplete="off">
-		<option value=""><?php echo __( 'All stores', 'hocwp-theme' ); ?></option>
+		<option value=""><?php _e( 'All stores', 'hocwp-theme' ); ?></option>
 		<?php
 		if ( hocwp_array_has_value( $stores ) ) {
-			$sstore = hocwp_get_method_value( 'sstore', 'request' );
+			$sstore = hocwp_get_method_value( $name, 'request' );
 			foreach ( $stores as $term ) {
 				$option = hocwp_field_get_option( array(
 					'text'     => $term->name,

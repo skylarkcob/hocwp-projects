@@ -11,6 +11,14 @@ function hocwp_get_current_language() {
 	return hocwp_get_language();
 }
 
+function hocwp_is_post_type_archive( $post_type ) {
+	if ( is_tax( get_object_taxonomies( $post_type ) ) || is_post_type_archive( $post_type ) ) {
+		return true;
+	}
+
+	return false;
+}
+
 function hocwp_dashboard_widget_loading() {
 	$loading = '<p class="hocwp-widget-loading widget-loading hide-if-no-js">' . __( 'Loading&#8230;', 'hocwp-theme' ) . '</p>';
 	$loading .= '<p class="hide-if-js">' . __( 'This widget requires JavaScript.', 'hocwp-theme' ) . '</p>';
@@ -45,8 +53,8 @@ function hocwp_build_transient_name( $format, $dynamic ) {
 }
 
 function hocwp_dashboard_widget_cache( $widget_id, $callback, $args = array() ) {
-	$loading   = hocwp_dashboard_widget_loading();
-	$locale    = get_locale();
+	$loading        = hocwp_dashboard_widget_loading();
+	$locale         = get_locale();
 	$transient_name = 'hocwp_dashboard_%s';
 	$transient_name = hocwp_build_transient_name( $transient_name, $widget_id . '_' . $locale );
 	if ( false !== ( $output = get_transient( $transient_name ) ) && ! empty( $output ) ) {

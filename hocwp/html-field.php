@@ -636,7 +636,7 @@ function hocwp_field_input( $args ) {
 	if ( $required ) {
 		$attributes['required'] = 'true';
 	}
-	if ( hocwp_string_empty( $value ) ) {
+	if ( hocwp_string_empty( $value ) && ! isset( $args['value'] ) ) {
 		$value = isset( $args['default'] ) ? $args['default'] : '';
 	}
 	if ( is_array( $value ) ) {

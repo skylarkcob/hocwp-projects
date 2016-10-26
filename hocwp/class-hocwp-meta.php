@@ -212,6 +212,8 @@ class HOCWP_Meta {
 			$this->set_use_media_upload( true );
 		} elseif ( 'hocwp_field_select_chosen' == $callback ) {
 			$this->set_use_select_chosen( true );
+		} elseif ( 'hocwp_field_input_number' ) {
+			$data_type = 'checkbox';
 		}
 
 		$this->sanitize_field_args( $field_args );
@@ -579,7 +581,9 @@ class HOCWP_Meta {
 					$field_args = isset( $field['field_args'] ) ? $field['field_args'] : array();
 					$callback   = isset( $field['field_callback'] ) ? $field['field_callback'] : 'hocwp_field_input';
 					if ( ! isset( $field_args['value'] ) ) {
-						$field_args['value'] = get_post_meta( $post_id, $field_args['name'], true );
+						$name                = $field_args['name'];
+						$value               = hocwp_get_post_meta( $name, $post_id );
+						$field_args['value'] = $value;
 					}
 					if ( hocwp_callback_exists( $callback ) ) {
 						call_user_func( $callback, $field_args );

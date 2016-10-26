@@ -31,6 +31,16 @@ function hocwp_the_terms( $args = array() ) {
 		if ( ! empty( $taxonomy ) && ! in_array( $taxonomy, $taxonomies ) ) {
 			$taxonomies[] = $taxonomy;
 		}
+		$has_term = false;
+		foreach ( $taxonomies as $taxonomy ) {
+			if ( has_term( '', $taxonomy, $post_id ) ) {
+				$has_term = true;
+				break;
+			}
+		}
+		if ( ! $has_term ) {
+			return;
+		}
 		echo $before;
 		ob_start();
 		foreach ( $taxonomies as $taxonomy ) {

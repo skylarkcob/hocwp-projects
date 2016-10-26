@@ -67,10 +67,16 @@ class HOCWP_HTML {
 	}
 
 	public function set_image_src( $src ) {
+		if ( 'img' != strtolower( $this->get_name() ) ) {
+			return;
+		}
 		$this->set_attribute( 'src', $src );
 	}
 
 	public function set_image_alt( $alt ) {
+		if ( 'img' != strtolower( $this->get_name() ) ) {
+			return;
+		}
 		$this->set_attribute( 'alt', $alt );
 	}
 
@@ -93,6 +99,9 @@ class HOCWP_HTML {
 	}
 
 	public function set_href( $href ) {
+		if ( 'a' != strtolower( $this->get_name() ) ) {
+			return;
+		}
 		if ( 'javascript:' != $href ) {
 			$href = esc_url( $href );
 		}
@@ -126,7 +135,7 @@ class HOCWP_HTML {
 		}
 	}
 
-	public function text_exsits() {
+	public function text_exists() {
 		$text = $this->get_attribute( 'text' );
 		if ( ! empty( $text ) ) {
 			return true;
@@ -140,7 +149,7 @@ class HOCWP_HTML {
 	}
 
 	private function make_outlink_nofollow() {
-		if ( 'a' == $this->get_name() ) {
+		if ( 'a' == strtolower( $this->get_name() ) ) {
 			$href = $this->get_attribute( 'href' );
 			if ( ! empty( $href ) ) {
 				if ( ! hocwp_is_site_domain( $href ) && ! hocwp_string_contain( $href, 'javascript' ) ) {

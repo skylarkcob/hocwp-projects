@@ -65,6 +65,7 @@ function hocwp_slider_meta_box_field( $post_type, $post ) {
 		$post_id = $post->ID;
 		$meta    = new HOCWP_Meta( 'post' );
 		$meta->add_post_type( 'hocwp_slider' );
+		$meta->set_id( 'hocwp_slider_information' );
 		$meta->set_title( __( 'Slider Information', 'hocwp-theme' ) );
 		$meta->is_on_sidebar( true );
 
@@ -97,6 +98,31 @@ function hocwp_slider_meta_box_field( $post_type, $post ) {
 				'id'             => 'active',
 				'label'          => __( 'Make slider active?', 'hocwp-theme' ),
 				'field_callback' => 'hocwp_field_checkbox'
+			)
+		);
+		$meta->init();
+
+		$meta = new HOCWP_Meta( 'post' );
+		$meta->add_post_type( 'hocwp_slider' );
+		$meta->set_title( __( 'Advanced Settings', 'hocwp-theme' ) );
+		$meta->set_id( 'hocwp_slider_advanced_settings' );
+		$meta->is_on_sidebar( true );
+
+		$meta->add_field(
+			array(
+				'id'             => 'height',
+				'label'          => __( 'Height:', 'hocwp-theme' ),
+				'field_callback' => 'hocwp_field_input_number',
+				'default'        => 350
+			)
+		);
+
+		$meta->add_field(
+			array(
+				'id'             => 'fit_width',
+				'label'          => __( 'Stretch slider to fit site width.', 'hocwp-theme' ),
+				'field_callback' => 'hocwp_field_checkbox',
+				'default'        => 1
 			)
 		);
 		$meta->init();
@@ -298,9 +324,32 @@ function hocwp_slider_html( $args = array() ) {
 			if ( $custom_arrow ) {
 				$slider_class = hocwp_add_more_class( $slider_class, 'custom-arrow' );
 			}
+
+			$fit_width = hocwp_get_post_meta( 'fit_width', $slider->ID );
+			$fit_width = hocwp_int_to_bool( $fit_width );
+
+			$height = hocwp_get_post_meta( 'height', $slider->ID );
+			if ( ! hocwp_is_positive_number( $height ) ) {
+				$height = 350;
+			}
+
+			$atts = array(
+				'data-height="' . $height . '"'
+			);
+
+			if ( $fit_width ) {
+				$atts[] = 'data-fit-width="1"';
+			}
+			$atts = implode( ' ', $atts );
+			if ( ! empty( $atts ) ) {
+				$atts = ' ' . $atts;
+				$atts = rtrim( $atts );
+			}
+
 			echo '<div class="' . $slider_class . '">';
-			echo '<ul class="list-unstyled list-items slickslide list-inline">';
+			echo '<ul class="list-unstyled list-items slickslide list-inline"' . $atts . '>';
 			$list_paging = '';
+			$lazyload    = hocwp_get_value_by_key( $args, 'lazyload' );
 			foreach ( $order as $item_id ) {
 				$item = hocwp_get_value_by_key( $items, $item_id );
 				if ( hocwp_array_has_value( $item ) ) {
@@ -312,9 +361,15 @@ function hocwp_slider_html( $args = array() ) {
 					$image_url   = hocwp_return_media_url( $image_url, $image_id );
 					$img         = new HOCWP_HTML( 'img' );
 					$img->set_image_src( $image_url );
+					$img->add_class( 'slider-image' );
 					$li = new HOCWP_HTML( 'li' );
 					$li->set_text( $img );
 					$li->add_class( 'slider-item' );
+					if ( $lazyload ) {
+						$li->add_class( 'lazyload' );
+						$img->set_attribute( 'data-original', $image_url );
+						$img->set_image_src( hocwp_get_image_url( 'transparent.gif' ) );
+					}
 					$list_paging .= $li->build();
 					if ( ! empty( $link ) ) {
 						$a = new HOCWP_HTML( 'a' );
