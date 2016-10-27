@@ -35,6 +35,12 @@ If you have any questions, please visit [hocwp.net](http://hocwp.net/) for more 
 
 == Changelog ==
 
+= 5.2.3 - 26/10/16 =
+* Add theme template to show static front page.
+* Add function to remove harmful plugin.
+* Update function to load fancybox script.
+* Update function to get archive title.
+
 = 5.2.2 - 01/10/16 =
 * Update - the core requirement version 3.4.5.
 * Add - readme file to describe code and changelog.

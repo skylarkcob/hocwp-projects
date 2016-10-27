@@ -21,7 +21,7 @@ if ( version_compare( $GLOBALS['wp_version'], HOCWP_REQUIRE_WP_VERSION, '<' ) ) 
 	return;
 }
 
-define( 'HOCWP_THEME_CORE_VERSION', '5.2.2' );
+define( 'HOCWP_THEME_CORE_VERSION', '5.2.3' );
 
 define( 'HOCWP_THEME_REQUIRE_CORE_VERSION', '3.4.5' );
 
