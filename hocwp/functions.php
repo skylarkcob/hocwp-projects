@@ -605,11 +605,8 @@ function hocwp_sanitize_form_post( $key, $type = 'default' ) {
 	}
 }
 
-function hocwp_sanitize_array( $arr, $unique = '', $filter = '' ) {
-	if ( is_bool( $unique ) || '' !== $unique ) {
-		_deprecated_argument( __FUNCTION__, '3.3.3' );
-	}
-	if ( is_bool( $filter ) || '' !== $filter ) {
+function hocwp_sanitize_array( $arr, $deprecated = '', $deprecated = '' ) {
+	if ( is_bool( $deprecated ) || '' !== $deprecated ) {
 		_deprecated_argument( __FUNCTION__, '3.3.3' );
 	}
 	$arr = hocwp_to_array( $arr );

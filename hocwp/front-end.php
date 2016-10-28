@@ -64,6 +64,9 @@ function hocwp_post_gallery( $args = array() ) {
 }
 
 function hocwp_breadcrumb( $args = array() ) {
+	if ( is_home() ) {
+		return;
+	}
 	$before = hocwp_get_value_by_key( $args, 'before' );
 	$after  = hocwp_get_value_by_key( $args, 'after' );
 	if ( function_exists( 'yoast_breadcrumb' ) && hocwp_wpseo_breadcrumb_enabled() ) {
@@ -493,6 +496,7 @@ function hocwp_entry_summary( $length = null, $class = '' ) {
 	}
 	$class = hocwp_sanitize_html_class( $class );
 	hocwp_add_string_with_space_before( $class, 'entry-summary' );
+	$class = esc_attr( $class );
 	echo '<div class="' . $class . '" itemprop="text">';
 	if ( is_numeric( $length ) ) {
 		echo wpautop( hocwp_substr( get_the_excerpt(), $length ) );
@@ -502,10 +506,85 @@ function hocwp_entry_summary( $length = null, $class = '' ) {
 	echo '</div>';
 }
 
+function hocwp_entry_author_avatar() {
+	$author_avatar_size = apply_filters( 'hocwp_author_avatar_size', 49 );
+	printf( '<span class="byline"><span class="author vcard">%1$s<span class="screen-reader-text">%2$s </span> <a class="url fn n" href="%3$s">%4$s</a></span></span>',
+		get_avatar( get_the_author_meta( 'user_email' ), $author_avatar_size ),
+		_x( 'Author', 'Used before post author name.', 'hocwp-theme' ),
+		esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ),
+		get_the_author()
+	);
+}
+
+function hocwp_entry_date() {
+	$time_string = '<time class="entry-date published updated" datetime="%1$s">%2$s</time>';
+
+	if ( get_the_time( 'U' ) !== get_the_modified_time( 'U' ) ) {
+		$time_string = '<time class="entry-date published" datetime="%1$s">%2$s</time><time class="updated" datetime="%3$s">%4$s</time>';
+	}
+
+	$time_string = sprintf( $time_string,
+		esc_attr( get_the_date( 'c' ) ),
+		get_the_date(),
+		esc_attr( get_the_modified_date( 'c' ) ),
+		get_the_modified_date()
+	);
+
+	printf( '<span class="posted-on"><span class="screen-reader-text">%1$s </span><a href="%2$s" rel="bookmark">%3$s</a></span>',
+		_x( 'Posted on', 'Used before publish date.', 'hocwp-theme' ),
+		esc_url( get_permalink() ),
+		$time_string
+	);
+}
+
+function hocwp_entry_format() {
+	$format = get_post_format();
+	if ( current_theme_supports( 'post-formats', $format ) ) {
+		printf( '<span class="entry-format">%1$s<a href="%2$s">%3$s</a></span>',
+			sprintf( '<span class="screen-reader-text">%s </span>', _x( 'Format', 'Used before post format.', 'hocwp-theme' ) ),
+			esc_url( get_post_format_link( $format ) ),
+			get_post_format_string( $format )
+		);
+	}
+}
+
+function hocwp_entry_categories_and_tags() {
+	$separator       = _x( ', ', 'Used between list items, there is a space after the comma.', 'hocwp-theme' );
+	$categories_list = get_the_category_list( $separator );
+	if ( $categories_list ) {
+		printf( '<span class="cat-links"><span class="screen-reader-text">%1$s </span>%2$s</span>',
+			_x( 'Categories', 'Used before category names.', 'hocwp-theme' ),
+			$categories_list
+		);
+	}
+
+	$tags_list = get_the_tag_list( '', $separator );
+	if ( $tags_list ) {
+		printf( '<span class="tags-links"><span class="screen-reader-text">%1$s </span>%2$s</span>',
+			_x( 'Tags', 'Used before tag names.', 'hocwp-theme' ),
+			$tags_list
+		);
+	}
+}
+
+function hocwp_entry_comments_popup_link() {
+	if ( comments_open() || get_comments_number() ) {
+		echo '<span class="comments-link">';
+		comments_popup_link( sprintf( __( 'Leave a comment<span class="screen-reader-text"> on %s</span>', 'hocwp-theme' ), get_the_title() ) );
+		echo '</span>';
+	}
+}
+
 function hocwp_entry_tags() {
 	echo '<div class="entry-tags">';
 	the_tags( '<span class="tag-label"><i class="fa fa-tag icon-left"></i><span class="text">Tags:</span></span>&nbsp;', ' ', '' );
 	echo '</div>';
+}
+
+function hocwp_the_custom_logo() {
+	if ( function_exists( 'the_custom_logo' ) ) {
+		the_custom_logo();
+	}
 }
 
 function hocwp_button_vote_group() {

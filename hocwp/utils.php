@@ -417,7 +417,7 @@ function hocwp_auto_reload_script( $delay = 2000 ) {
 
 			function refresh() {
 				if (new Date().getTime() - time >= <?php echo $delay; ?>) {
-					window.location.href = window.location.href;
+					location.reload();
 				} else {
 					setTimeout(refresh, 1000);
 				}

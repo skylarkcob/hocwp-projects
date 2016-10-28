@@ -648,7 +648,8 @@ class HOCWP_Option {
 			$base_name = $name;
 			unset( $args['class'] );
 			if ( ! isset( $args['value'] ) ) {
-				$value = $this->get_by_key( $name, hocwp_get_value_by_key( $args, 'default' ) );
+				$default = hocwp_get_value_by_key( $args, 'default' );
+				$value = $this->get_by_key( $name, $default );
 				if ( is_array( $value ) && 'hocwp_field_input' == $callback ) {
 					$value = '';
 				}
@@ -857,8 +858,11 @@ class HOCWP_Option {
 			$args['field_class'] = $class;
 		}
 		hocwp_transmit_id_and_name( $id, $name );
-		$args['id']     = $id;
-		$args['name']   = $name;
+		$args['id']   = $id;
+		$args['name'] = $name;
+		if ( isset( $args['default'] ) ) {
+			$args['field_args']['default'] = $args['default'];
+		}
 		$this->fields[] = $args;
 	}
 

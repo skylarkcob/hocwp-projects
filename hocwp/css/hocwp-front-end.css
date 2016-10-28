@@ -466,6 +466,61 @@ img.center {
 }
 
 /**
+ * Navigation
+ */
+
+.hocwp.single-attachment .hocwp-post .navigation .nav-links > div {
+    background-color: #eee;
+    height: 48px;
+    margin-top: -24px;
+    overflow: hidden;
+    padding: 0;
+    position: fixed;
+    text-align: center;
+    top: 50%;
+    width: 24px;
+}
+
+.hocwp.single-attachment .hocwp-post .navigation .nav-links > div:hover {
+    background-color: #ddd;
+}
+
+.hocwp.single-attachment .hocwp-post .navigation .nav-links > div a {
+    color: transparent;
+    display: block;
+    font-size: 0;
+    height: 48px;
+    width: 24px;
+}
+
+.hocwp.single-attachment .hocwp-post .navigation .nav-links > div i {
+
+}
+
+.hocwp.single-attachment .hocwp-post .navigation .nav-links > div a:before {
+    color: #888;
+    font-family: "FontAwesome";
+    font-size: 24px;
+    line-height: 48px;
+}
+
+.hocwp.single-attachment .hocwp-post .navigation .nav-links > div.nav-previous a:before {
+    content: "\f104";
+}
+
+.hocwp.single-attachment .hocwp-post .navigation .nav-links > div.nav-previous {
+    left: 0;
+}
+
+.hocwp.single-attachment .hocwp-post .navigation .nav-links > div.nav-next a:before {
+    content: "\f105";
+}
+
+.hocwp.single-attachment .hocwp-post .navigation .nav-links > div.nav-next {
+    right: 0;
+}
+
+/**
  * Form
  */
 
@@ -1342,6 +1397,7 @@ img.center {
     text-transform: uppercase;
 }
 
+.hocwp .site-main > h2.entry-title,
 .hocwp h1.entry-title {
     font-size: 28px;
     line-height: 32px;
