@@ -1,34 +1,72 @@
 <?php
 /*
-Plugin Name: HocWP Plugin Default
+Plugin Name: Default Plugin by HocWP
 Plugin URI: http://hocwp.net/
 Description: This plugin is created by HocWP.
 Author: HocWP
 Version: 1.0.0
 Author URI: http://hocwp.net/
-Text Domain: hocwp-plugin-default
+Text Domain: hocwp-default-plugin
 Domain Path: /languages/
 */
-if(!function_exists('add_filter')) exit;
+function hocwp_default_plugin_missing_core_notice() {
+	$plugin_data = get_plugin_data( __FILE__ );
+	?>
+	<div class="updated notice settings-error error">
+		<p>
+			<strong><?php _e( 'Error:', 'hocwp-default-plugin' ); ?></strong> <?php printf( __( 'Plugin %s cannot be run properly because of missing core.', 'hocwp-default-plugin' ), '<strong>' . $plugin_data['Name'] . '</strong>' ); ?>
+		</p>
+	</div>
+	<?php
+}
 
-define('HOCWP_PLUGIN_DEFAULT_VERSION', '1.0.0');
+$path = get_template_directory() . '/hocwp/load.php';
 
-define('HOCWP_PLUGIN_DEFAULT_FILE', __FILE__);
+if ( ! defined( 'HOCWP_PATH' ) ) {
+	$load = $path;
+	if ( ! file_exists( $load ) ) {
+		$load = untrailingslashit( plugin_dir_path( __FILE__ ) ) . '/hocwp/load.php';
+	}
 
-define('HOCWP_PLUGIN_DEFAULT_PATH', untrailingslashit(plugin_dir_path(HOCWP_PLUGIN_DEFAULT_FILE)));
+	if ( ! file_exists( $load ) ) {
+		add_action( 'admin_notices', 'hocwp_default_plugin_missing_core_notice' );
 
-define('HOCWP_PLUGIN_DEFAULT_URL', plugins_url('', HOCWP_PLUGIN_DEFAULT_FILE));
+		return;
+	}
 
-define('HOCWP_PLUGIN_DEFAULT_INC_PATH', HOCWP_PLUGIN_DEFAULT_PATH . '/inc');
+	require_once( $load );
+}
 
-define('HOCWP_PLUGIN_DEFAULT_CUSTOM_PATH', HOCWP_PLUGIN_DEFAULT_PATH . '/custom');
+if ( ! defined( 'HOCWP_URL' ) ) {
+	if ( file_exists( $path ) ) {
+		define( 'HOCWP_URL', untrailingslashit( get_template_directory_uri() ) . '/hocwp' );
+	} else {
+		define( 'HOCWP_URL', untrailingslashit( plugins_url( '', __FILE__ ) ) . '/hocwp' );
+	}
+}
 
-define('HOCWP_PLUGIN_DEFAULT_BASENAME', plugin_basename(HOCWP_PLUGIN_DEFAULT_FILE));
+class HOCWP_Doc_Man extends HOCWP_Plugin {
+	public $name = 'hocwp_default_plugin';
+	public $textdomain = 'hocwp-default-plugin';
+	public $version = '1.0.0';
+	public $file = __FILE__;
 
-define('HOCWP_PLUGIN_DEFAULT_DIRNAME', dirname(HOCWP_PLUGIN_DEFAULT_BASENAME));
+	public function __construct() {
+		$this->option_name = 'hocwp_default_plugin';
+		//$this->setting_url = 'admin.php?page=' . $this->option_name;
+		parent::__construct();
+	}
 
-define('HOCWP_PLUGIN_DEFAULT_OPTION_NAME', 'hocwp_plugin_default');
+	public function license_data() {
+		$data = array(
+			'hashed'  => '',
+			'key_map' => '',
+			'domain'  => ''
+		);
 
-define('HOCWP_PLUGIN_DEFAULT_SETTINGS_URL', 'options-general.php?page=' . HOCWP_PLUGIN_DEFAULT_OPTION_NAME);
+		return $data;
+	}
+}
 
-require_once(HOCWP_PLUGIN_DEFAULT_PATH . '/load.php');
+global $hocwp_plugin_default_plugin;
+$hocwp_plugin_default_plugin = new HOCWP_Doc_Man();
