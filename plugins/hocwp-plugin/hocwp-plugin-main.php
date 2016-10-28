@@ -45,7 +45,7 @@ if ( ! defined( 'HOCWP_URL' ) ) {
 	}
 }
 
-class HOCWP_Doc_Man extends HOCWP_Plugin {
+class HOCWP_Default_Plugin extends HOCWP_Plugin {
 	public $name = 'hocwp_default_plugin';
 	public $textdomain = 'hocwp-default-plugin';
 	public $version = '1.0.0';
@@ -69,4 +69,4 @@ class HOCWP_Doc_Man extends HOCWP_Plugin {
 }
 
 global $hocwp_plugin_default_plugin;
-$hocwp_plugin_default_plugin = new HOCWP_Doc_Man();
+$hocwp_plugin_default_plugin = new HOCWP_Default_Plugin();
