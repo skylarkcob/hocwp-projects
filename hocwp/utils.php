@@ -441,6 +441,9 @@ function hocwp_get_sidebar_info( $post ) {
 	if ( empty( $sidebar_name ) ) {
 		$sidebar_name = $post->post_title;
 	}
+	if ( hocwp_qtranslate_x_installed() ) {
+		$sidebar_name = apply_filters( 'translate_text', $sidebar_name, $lang = null, $flags = 0 );
+	}
 	$sidebar_description = hocwp_get_post_meta( 'sidebar_description', $post_id );
 	$sidebar_tag         = hocwp_get_post_meta( 'sidebar_tag', $post_id );
 	if ( empty( $sidebar_tag ) ) {

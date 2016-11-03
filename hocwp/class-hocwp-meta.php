@@ -254,6 +254,65 @@ class HOCWP_Meta {
 		}
 	}
 
+	public function attachment_meta_init() {
+		add_filter( 'attachment_fields_to_edit', array( $this, 'attachment_meta_fields' ), 10, 2 );
+		add_filter( 'attachment_fields_to_save', array( $this, 'attachment_meta_fields_saved' ), 10, 2 );
+	}
+
+	public function attachment_meta_fields_saved( $post_data, $attachment_data ) {
+		$post_id = hocwp_get_value_by_key( $post_data, 'ID' );
+		if ( hocwp_id_number_valid( $post_id ) ) {
+			$fields = $this->get_fields();
+			if ( hocwp_array_has_value( $fields ) ) {
+				foreach ( $fields as $field ) {
+					$this->sanitize_field_args( $field );
+					$callback = hocwp_get_value_by_key( $field, 'field_callback', hocwp_get_value_by_key( $field, 'callback' ) );
+					if ( hocwp_callback_exists( $callback ) ) {
+						$name = hocwp_get_value_by_key( $field, 'name' );
+						if ( ! empty( $name ) ) {
+							if ( isset( $_REQUEST[ $name ] ) ) {
+								update_post_meta( $post_id, $name, $_REQUEST[ $name ] );
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return $post_data;
+	}
+
+	public function attachment_meta_fields( $form_fields, $post ) {
+		$fields = $this->get_fields();
+		if ( hocwp_array_has_value( $fields ) ) {
+			foreach ( $fields as $field ) {
+				$this->sanitize_field_args( $field );
+				$callback = hocwp_get_value_by_key( $field, 'field_callback', hocwp_get_value_by_key( $field, 'callback' ) );
+				if ( hocwp_callback_exists( $callback ) ) {
+					$name = hocwp_get_value_by_key( $field, 'name' );
+					if ( ! empty( $name ) ) {
+						if ( ! isset( $field['value'] ) && hocwp_is_post( $post ) ) {
+							$value          = hocwp_get_post_meta( $name, $post->ID );
+							$field['value'] = $value;
+						}
+						if ( isset( $field['input'] ) ) {
+							$field_args = $field;
+							unset( $field_args['label'] );
+							unset( $field_args['title'] );
+							ob_start();
+							call_user_func( $callback, $field_args );
+							$html                     = ob_get_clean();
+							$field[ $field['input'] ] = $html;
+						}
+						$form_fields[ $name ] = $field;
+					}
+				}
+			}
+		}
+
+		return $form_fields;
+	}
+
 	public function init() {
 		global $pagenow, $hocwp_metas;
 		if ( ! is_array( $hocwp_metas ) ) {
@@ -266,8 +325,12 @@ class HOCWP_Meta {
 		} elseif ( $this->is_menu_item_meta() ) {
 			$this->menu_item_meta_init();
 		} else {
-			if ( 'post-new.php' == $pagenow || 'post.php' == $pagenow ) {
-				$this->post_meta_box_init();
+			if ( 'attachment' == $this->get_type() || 'media' == $this->get_type() ) {
+				$this->attachment_meta_init();
+			} else {
+				if ( 'post-new.php' == $pagenow || 'post.php' == $pagenow ) {
+					$this->post_meta_box_init();
+				}
 			}
 		}
 		$hocwp_metas[] = $this;

@@ -412,6 +412,16 @@ function hocwp_register_post_type_partner() {
 	hocwp_register_post_type( $args );
 }
 
+function hocwp_register_post_type_album() {
+	$args = array(
+		'name'          => __( 'Albums', 'hocwp-theme' ),
+		'singular_name' => __( 'Album', 'hocwp-theme' ),
+		'slug'          => 'album',
+		'supports'      => array( 'thumbnail', 'editor' )
+	);
+	hocwp_register_post_type( $args );
+}
+
 function hocwp_register_post_type_news( $args = array() ) {
 	$lang = hocwp_get_language();
 	$slug = 'news';

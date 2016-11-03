@@ -67,6 +67,7 @@ class HOCWP_Menu_Walker extends Walker_Nav_Menu {
 	public function end_el( &$output, $item, $depth = 0, $args = array() ) {
 		$html = apply_filters( 'hocwp_menu_end_el_html', '', $item, $depth, $args );
 		hocwp_add_string_with_space_before( $html, "</li>\n" );
+		//$html = apply_filters( 'hocwp_menu_end_el_html_after', $html, $item, $depth, $args );
 		$output .= $html;
 	}
 }

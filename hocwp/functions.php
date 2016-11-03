@@ -968,6 +968,7 @@ function hocwp_register_post_type_normal( $args ) {
 }
 
 function hocwp_register_post_type( $args = array() ) {
+	$args                = apply_filters( 'hocwp_post_type_args', $args );
 	$name                = isset( $args['name'] ) ? $args['name'] : '';
 	$singular_name       = isset( $args['singular_name'] ) ? $args['singular_name'] : '';
 	$menu_name           = hocwp_get_value_by_key( $args, 'menu_name', $name );

@@ -521,7 +521,7 @@ function hocwp_get_force_mobile() {
 
 function hocwp_is_force_mobile() {
 	$mobile = hocwp_get_force_mobile();
-	if ( 'true' == $mobile || 1 == absint( $mobile ) ) {
+	if ( 'true' == $mobile || 1 == absint( $mobile ) || true === $mobile ) {
 		return true;
 	}
 
@@ -534,6 +534,19 @@ function hocwp_is_force_mobile_session( $session ) {
 	}
 
 	return false;
+}
+
+function hocwp_set_cookie( $name, $value, $expire = null, $path = '/', $domain = null, $secure = null, $http_only = null ) {
+	if ( empty( $domain ) ) {
+		$url    = home_url();
+		$domain = hocwp_get_domain_name( $url );
+	}
+	setcookie( $name, $value, $expire, $path, $domain, $secure, $http_only );
+	$_COOKIE[ $name ] = $value;
+}
+
+function hocwp_set_session( $name, $value ) {
+	$_SESSION[ $name ] = $value;
 }
 
 function hocwp_is_force_mobile_cookie( $cookie ) {

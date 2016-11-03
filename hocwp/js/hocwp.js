@@ -1533,11 +1533,15 @@ jQuery(document).ready(function ($) {
         }
         if (this.options.fitWidth || ($.isNumeric(fit_width) && 1 == fit_width)) {
             $element.find('img.slider-image').css({width: '100%'});
+            $element.find('.gallery-item img.attachment-thumbnail').css({width: '100%'});
         }
         $element.find('img.slider-image').css({height: height + 'px'});
         $element.addClass('hocwp-slider');
         if (this.options.customArrow) {
             $element.addClass('custom-arrow');
+        }
+        if (1 == this.options.removeGalleryImageSize) {
+            $element.find('.gallery-item img').attr('sizes', '');
         }
         if (this.options.fontAwesome) {
             $element.addClass('font-awesome');
@@ -1547,6 +1551,9 @@ jQuery(document).ready(function ($) {
             $element.addClass('thumbs-paging thumbnail-pager');
             this.options.customPaging = function (slider, i) {
                 var $slick_thumbs = $element.find('.slick-thumbs');
+                if (!$slick_thumbs.length) {
+
+                }
                 $slick_thumbs.hide();
                 return '<button class="tab">' + $('.slick-thumbs li:nth-child(' + (i + 1) + ')').html() + '</button>';
             };
@@ -1579,7 +1586,8 @@ jQuery(document).ready(function ($) {
         useLazyLoad: 0,
         customArrow: 0,
         fontAwesome: 0,
-        height: 350
+        height: 350,
+        removeGalleryImageSize: 0
     };
 
     HocWPSlider.prototype.init = function () {

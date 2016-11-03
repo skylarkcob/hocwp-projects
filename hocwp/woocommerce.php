@@ -315,7 +315,7 @@ function hocwp_wc_get_cart( $args = array() ) {
 		}
 		if ( $show_item ) {
 			$count_cart = hocwp_wc_count_cart();
-			$item_text  = sprintf( _n( '%d item', '%d items', $count_cart, 'hocwp-theme' ), $count_cart );
+			$item_text  = sprintf( _nx( '%d item', '%d items', $count_cart, 'shopping cart item number', 'hocwp-theme' ), $count_cart );
 			$cart .= '<span class="product-number">' . $item_text . '</span>';
 			if ( $show_price ) {
 				if ( isset( $args['separator'] ) ) {

@@ -352,6 +352,7 @@ class HOCWP_License {
 					if ( ! empty( $data_hashed ) && ! empty( $data_key_map ) ) {
 						$from_data_param = true;
 					}
+					unset( $data_hashed, $data_key_map );
 				} else {
 					foreach ( $data as $per_data ) {
 						$valid = $this->check_valid( $per_data );

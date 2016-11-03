@@ -24,7 +24,7 @@ class HOCWP_Plugin {
 	public $license_data;
 	public $textdomain;
 	public $load_core_scripts;
-
+	public $admin_menu_parent = 'hocwp_plugin_option';
 
 	public function __construct() {
 		$this->init();
@@ -40,6 +40,9 @@ class HOCWP_Plugin {
 		$this->custom_path = $this->path . '/custom';
 		$this->basename    = plugin_basename( $this->file );
 		$this->dirname     = dirname( $this->basename );
+		if ( ! empty( $this->option_name ) ) {
+			$this->setting_url = admin_url( 'admin.php?page=' . $this->option_name );
+		}
 	}
 
 	private function pre_hook() {
@@ -63,6 +66,22 @@ class HOCWP_Plugin {
 		}
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
+		add_filter( 'body_class', array( $this, 'body_class' ) );
+		if ( ! is_admin() ) {
+			add_action( 'admin_bar_menu', array( $this, 'admin_bar_menu_front_end' ), 99 );
+		}
+	}
+
+	public function admin_bar_menu_front_end( $wp_admin_bar ) {
+
+	}
+
+	public function body_class( $classes ) {
+		if ( ! $this->license_valid() ) {
+			$classes[] = 'hocwp-invalid-license';
+		}
+
+		return $classes;
 	}
 
 	public function enqueue_scripts() {
@@ -111,7 +130,7 @@ class HOCWP_Plugin {
 		}
 	}
 
-	public function admin_bar_menu( $wp_admin_bar ) {
+	final function admin_bar_menu( $wp_admin_bar ) {
 		$args = array(
 			'id'     => 'plugin-license',
 			'title'  => __( 'Plugin Licenses', 'hocwp-theme' ),
@@ -148,29 +167,13 @@ class HOCWP_Plugin {
 	}
 
 	public function load() {
-		require_once( $this->custom_path . '/hocwp-plugin-pre-hook.php' );
+		require( $this->custom_path . '/hocwp-plugin-pre-hook.php' );
 
 		require_once( HOCWP_PATH . '/plugin-functions.php' );
 
 		require_once( HOCWP_PATH . '/options/plugin-option.php' );
 
-		require_once( $this->inc_path . '/setup-plugin.php' );
-
-		require_once( $this->custom_path . '/hocwp-plugin-functions.php' );
-
-		require_once( $this->custom_path . '/hocwp-plugin-shortcode.php' );
-
-		require_once( $this->custom_path . '/hocwp-plugin-admin.php' );
-
-		require_once( $this->custom_path . '/hocwp-plugin-post-type-and-taxonomy.php' );
-
-		require_once( $this->custom_path . '/hocwp-plugin-meta.php' );
-
-		require_once( $this->custom_path . '/hocwp-plugin-hook.php' );
-
-		require_once( $this->custom_path . '/hocwp-plugin-ajax.php' );
-
-		require_once( $this->custom_path . '/hocwp-plugin-translation.php' );
+		require( $this->inc_path . '/setup-plugin.php' );
 	}
 
 	public function get_option() {
@@ -184,12 +187,26 @@ class HOCWP_Plugin {
 		return apply_filters( $this->option_name . '_options', $option );
 	}
 
+	public function license_data() {
+		$data = array(
+			'hashed'  => '',
+			'key_map' => '',
+			'domain'  => ''
+		);
+
+		return $data;
+	}
+
 	public function license_valid() {
 		$license = new HOCWP_License();
 		$license->set_type( 'plugin' );
 		$license->set_use_for( $this->basename );
-		$license->set_option_name( $this->option_name );
-		$result = $license->check_valid( $this->license_data );
+		$license->set_option_name( 'hocwp_plugin_license' );
+		$data = $this->license_data;
+		if ( ! hocwp_array_has_value( $data ) ) {
+			$data = $this->license_data();
+		}
+		$result = $license->check_valid( $data );
 		unset( $license );
 
 		return $result;
@@ -211,7 +228,7 @@ class HOCWP_Plugin {
 		do_action( $this->name . '_deactivation' );
 	}
 
-	public function settings_link( $links ) {
+	final function settings_link( $links ) {
 		if ( ! empty( $this->setting_url ) ) {
 			$settings_link = sprintf( '<a href="' . $this->setting_url . '">%s</a>', __( 'Settings', 'hocwp-theme' ) );
 			array_unshift( $links, $settings_link );
@@ -220,17 +237,28 @@ class HOCWP_Plugin {
 		return $links;
 	}
 
-	public function load_textdomain() {
+	final function load_textdomain() {
 		load_plugin_textdomain( $this->textdomain, false, $this->path . '/languages/' );
 	}
 
-	public function admin_init() {
+	final function admin_init() {
 		$plugin_base_name = md5( $this->basename );
 		$option_name      = 'plugin_' . $plugin_base_name . '_version';
 		$version          = get_option( $option_name );
 		if ( $version != $this->version ) {
 			update_option( $option_name, $this->version );
 			flush_rewrite_rules();
+		}
+	}
+
+	final function add_option_to_sidebar_tab( HOCWP_Option $option ) {
+		if ( ! hocwp_menu_page_exists( $this->option_name ) ) {
+			global $hocwp_pos_tabs;
+			$option->set_parent_slug( $this->admin_menu_parent );
+			$option->add_option_tab( $hocwp_pos_tabs );
+			$option->set_page_header_callback( 'hocwp_plugin_option_page_header' );
+			$option->set_page_footer_callback( 'hocwp_plugin_option_page_footer' );
+			$option->set_page_sidebar_callback( 'hocwp_plugin_option_page_sidebar' );
 		}
 	}
 }
