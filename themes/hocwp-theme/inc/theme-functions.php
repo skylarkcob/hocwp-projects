@@ -452,6 +452,13 @@ function hocwp_theme_the_social_list( $args = array() ) {
 	hocwp_the_social_list( $args );
 }
 
+function hocwp_theme_get_list_socials_html( $args = array() ) {
+	ob_start();
+	hocwp_theme_the_social_list( $args );
+
+	return ob_get_clean();
+}
+
 function hocwp_theme_add_setting_field_term_sortable( $name, $title, $taxonomies = 'category', $only_parent = true ) {
 	$taxonomies = hocwp_sanitize_array( $taxonomies );
 	$term_args  = array();

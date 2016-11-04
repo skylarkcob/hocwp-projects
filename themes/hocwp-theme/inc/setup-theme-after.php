@@ -1423,7 +1423,7 @@ function hocwp_setup_theme_register_user_sidebar() {
 	}
 }
 
-add_action( 'widgets_init', 'hocwp_setup_theme_register_user_sidebar' );
+add_action( 'widgets_init', 'hocwp_setup_theme_register_user_sidebar', 99 );
 
 function hocwp_setup_theme_pre_get_posts( WP_Query $query ) {
 	if ( $query->is_main_query() ) {

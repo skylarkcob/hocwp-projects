@@ -98,9 +98,9 @@ function hocwp_theme_load_init_action() {
 
 add_action( 'init', 'hocwp_theme_load_init_action' );
 
-require_once( HOCWP_THEME_INC_PATH . '/options/theme-option.php' );
-
 require_once( HOCWP_THEME_INC_PATH . '/theme-functions.php' );
+
+require_once( HOCWP_THEME_INC_PATH . '/options/theme-option.php' );
 
 require_once( HOCWP_THEME_INC_PATH . '/setup-theme.php' );
 

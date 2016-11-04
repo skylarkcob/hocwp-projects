@@ -299,6 +299,18 @@ function hocwp_theme_translation_gettext( $translation, $text ) {
 		case 'Edit <span class="screen-reader-text"> "%s"</span>':
 			$translation = 'Chỉnh sửa <span class="screen-reader-text"> "%s"</span>';
 			break;
+		case 'Home':
+			$translation = 'Trang chủ';
+			break;
+		case 'View your shopping cart':
+			$translation = 'Xem giỏ hàng của bạn';
+			break;
+		case 'Your cart':
+			$translation = 'Giỏ hàng của bạn';
+			break;
+		case 'Your cart is empty now.':
+			$translation = 'Hiện tại giỏ hàng của bạn đang trống.';
+			break;
 	}
 
 	return $translation;
@@ -386,6 +398,23 @@ function hocwp_theme_translation_ngettext( $translation, $single, $plural, $numb
 }
 
 add_filter( 'ngettext', 'hocwp_theme_translation_ngettext', 10, 4 );
+
+function hocwp_theme_translation_ngettext_with_context( $translation, $single, $plural, $number, $context, $domain = 'default' ) {
+	$translations = get_translations_for_domain( $domain );
+	$translation  = $translations->translate_plural( $single, $plural, $number );
+	switch ( $translation ) {
+		case '%d item':
+		case '%d items':
+			if('Shopping cart item number' == $context) {
+				$translation = '%d sản phẩm';
+			}
+			break;
+	}
+
+	return $translation;
+}
+
+add_filter( 'ngettext_with_context', 'hocwp_theme_translation_ngettext_with_context', 10, 6 );
 
 function hocwp_theme_translation_gettext_woocommerce( $translation, $text ) {
 	switch ( $text ) {
@@ -906,6 +935,15 @@ function hocwp_theme_translation_gettext_woocommerce( $translation, $text ) {
 			break;
 		case 'Checkout is not available whilst your cart is empty.':
 			$translation = 'Bạn không thể thanh toán khi giỏ hàng đang trống.';
+			break;
+		case 'Home':
+			$translation = 'Trang chủ';
+			break;
+		case 'Sale!':
+			$translation = 'Giảm giá!';
+			break;
+		case 'Add to cart':
+			$translation = 'Thêm vào giỏ hàng';
 			break;
 	}
 
