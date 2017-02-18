@@ -7,7 +7,7 @@ if ( defined( 'HOCWP_PATH' ) ) {
 	return;
 }
 
-define( 'HOCWP_VERSION', '3.4.6' );
+define( 'HOCWP_VERSION', '3.4.7' );
 
 define( 'HOCWP_PATH', dirname( __FILE__ ) );
 
@@ -17,7 +17,7 @@ define( 'HOCWP_NAME', 'HocWP' );
 
 define( 'HOCWP_EMAIL', 'hocwp.net@gmail.com' );
 
-define( 'HOCWP_HOMEPAGE', 'http://hocwp.net' );
+define( 'HOCWP_HOMEPAGE', 'https://hocwp.net' );
 
 define( 'HOCWP_API_SERVER', HOCWP_HOMEPAGE );
 
@@ -64,6 +64,10 @@ define( 'HOCWP_PLUGIN_LICENSE_ADMIN_URL', admin_url( 'admin.php?page=hocwp_plugi
 define( 'HOCWP_FACEBOOK_JAVASCRIPT_SDK_VERSION', 2.7 );
 
 define( 'HOCWP_FACEBOOK_GRAPH_API_VERSION', HOCWP_FACEBOOK_JAVASCRIPT_SDK_VERSION );
+
+if ( ! class_exists( 'Mobile_Detect' ) ) {
+	require( HOCWP_PATH . '/lib/mobile-detect/Mobile_Detect.php' );
+}
 
 require( HOCWP_PATH . '/lib/bfi-thumb/BFI_Thumb.php' );
 
@@ -150,6 +154,8 @@ require( HOCWP_PATH . '/api.php' );
 require( HOCWP_PATH . '/language.php' );
 
 require( HOCWP_PATH . '/ads.php' );
+
+require( HOCWP_PATH . '/ext/ads.php' );
 
 require( HOCWP_PATH . '/video.php' );
 

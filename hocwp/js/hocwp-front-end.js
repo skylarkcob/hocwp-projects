@@ -459,7 +459,11 @@ jQuery(document).ready(function ($) {
                     action = $element.attr('data-action'),
                     text = $element.text(),
                     data_text = $element.attr('data-text'),
-                    type = $element.attr('data-type');
+                    type = $element.attr('data-type'),
+                    prevent_default = parseInt($element.attr('data-prevent-default'));
+                if (1 == prevent_default) {
+                    return false;
+                }
                 $element.addClass('disabled');
                 $.ajax({
                     type: 'POST',
@@ -478,8 +482,10 @@ jQuery(document).ready(function ($) {
                                 $element.html(response.html_data);
                             }
                             if ('do' == action) {
+                                $element.addClass('active');
                                 action = 'undo';
                             } else {
+                                $element.removeClass('active');
                                 action = 'do';
                             }
                             if ('undo' != action) {

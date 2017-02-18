@@ -267,7 +267,8 @@ function hocwp_execute_register() {
 			$user_email     = sanitize_email( $user_email );
 			$transient_name = hocwp_build_transient_name( 'hocwp_register_user_%s', $user_email );
 			if ( false === ( $transient = get_transient( $transient_name ) ) ) {
-				if ( empty( $user_login ) || empty( $user_email ) || empty( $pwd ) || empty( $pwd_again ) || empty( $phone ) || empty( $captcha ) ) {
+				$use_captcha = hocwp_use_captcha_for_login_page();
+				if ( empty( $user_login ) || empty( $user_email ) || empty( $pwd ) || empty( $pwd_again ) || empty( $phone ) || ( empty( $captcha ) && $use_captcha ) ) {
 					$error   = true;
 					$message = __( 'Please enter your complete registration information.', 'hocwp-theme' );
 				} elseif ( ! is_email( $user_email ) ) {
@@ -283,7 +284,7 @@ function hocwp_execute_register() {
 					$error   = true;
 					$message = __( 'The email address already exists.', 'hocwp-theme' );
 				} else {
-					if ( isset( $_POST['captcha'] ) ) {
+					if ( $use_captcha && isset( $_POST['captcha'] ) ) {
 						$capt = new HOCWP_Captcha();
 						if ( ! $capt->check( $captcha ) ) {
 							$error   = true;

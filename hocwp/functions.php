@@ -75,10 +75,6 @@ function hocwp_get_timezone_string() {
 }
 
 function hocwp_get_current_date( $format = 'Y-m-d', $timestamp = null ) {
-	$timezone = hocwp_get_timezone_string();
-	if ( ! empty( $timezone ) ) {
-		date_default_timezone_set( $timezone );
-	}
 	if ( hocwp_id_number_valid( $timestamp ) ) {
 		$result = date( $format, $timestamp );
 	} else {
@@ -220,6 +216,61 @@ function hocwp_get_terms( $taxonomy, $args = array() ) {
 	}
 
 	return $terms;
+}
+
+function hocwp_get_tags_by_category( $args ) {
+	global $wpdb;
+	if ( ! hocwp_array_has_value( $args ) ) {
+		if ( hocwp_id_number_valid( $args ) ) {
+			$args = array(
+				'taxonomy' => 'category',
+				'term_ids' => array( $args )
+			);
+		} elseif ( is_a( $args, 'WP_Term' ) ) {
+			$args = array(
+				'taxonomy' => $args->taxonomy,
+				'term_ids' => array( $args->term_id )
+			);
+		}
+	}
+	$taxonomy     = hocwp_get_value_by_key( $args, 'taxonomy', 'category' );
+	$term_ids     = hocwp_get_value_by_key( $args, 'term_ids' );
+	$tag_taxonomy = hocwp_get_value_by_key( $args, 'tag_taxonomy', 'post_tag' );
+	if ( ! hocwp_array_has_value( $term_ids ) ) {
+		return null;
+	}
+	$term_ids = implode( ',', $term_ids );
+	$tags     = $wpdb->get_results( "
+		SELECT DISTINCT terms2.term_id as tag_id, terms2.name as tag_name, null as tag_link
+		FROM $wpdb->posts as p1
+			LEFT JOIN $wpdb->term_relationships as r1 ON p1.ID = r1.object_ID
+			LEFT JOIN $wpdb->term_taxonomy as t1 ON r1.term_taxonomy_id = t1.term_taxonomy_id
+			LEFT JOIN $wpdb->terms as terms1 ON t1.term_id = terms1.term_id,
+			$wpdb->posts as p2
+			LEFT JOIN $wpdb->term_relationships as r2 ON p2.ID = r2.object_ID
+			LEFT JOIN $wpdb->term_taxonomy as t2 ON r2.term_taxonomy_id = t2.term_taxonomy_id
+			LEFT JOIN $wpdb->terms as terms2 ON t2.term_id = terms2.term_id
+		WHERE
+			t1.taxonomy = '$taxonomy' AND p1.post_status = 'publish' AND terms1.term_id IN (" . $term_ids . ") AND
+			t2.taxonomy = '$tag_taxonomy' AND p2.post_status = 'publish'
+			AND p1.ID = p2.ID
+		ORDER by tag_name
+	" );
+	$result   = array();
+	foreach ( $tags as $tag ) {
+		$term = get_term_by( 'id', $tag->tag_id, $tag_taxonomy );
+		if ( is_a( $term, 'WP_Term' ) ) {
+			$result[] = $term;
+		}
+	}
+	if ( hocwp_array_has_value( $result ) ) {
+		$number = hocwp_get_value_by_key( $args, 'number' );
+		if ( hocwp_id_number_valid( $number ) && count( $result ) > $number ) {
+			$result = array_slice( $result, 0, $number );
+		}
+	}
+
+	return $result;
 }
 
 function hocwp_object_valid( $object ) {
@@ -917,6 +968,13 @@ function hocwp_get_current_new_post() {
 	return $result;
 }
 
+function hocwp_get_post_types( $args = array() ) {
+	$defaults = array( '_builtin' => false, 'public' => true );
+	$args     = wp_parse_args( $args, $defaults );
+
+	return get_post_types( $args, 'objects' );
+}
+
 function hocwp_register_sidebar( $sidebar_id, $sidebar_name, $sidebar_description = '', $html_tag = 'aside' ) {
 	$widget_class = apply_filters( 'hocwp_widget_class', '', $sidebar_id );
 	hocwp_add_string_with_space_before( $widget_class, 'widget' );
@@ -1098,10 +1156,17 @@ function hocwp_register_taxonomy( $args = array() ) {
 	if ( ! is_array( $post_types ) ) {
 		$post_types = array( $post_types );
 	}
+	if ( ! hocwp_array_has_value( $post_types ) ) {
+		$post_type  = hocwp_get_value_by_key( $args, 'post_type' );
+		$post_types = array( $post_type );
+	}
 	$slug    = isset( $args['slug'] ) ? $args['slug'] : '';
 	$private = isset( $args['private'] ) ? $args['private'] : false;
 	if ( empty( $singular_name ) ) {
 		$singular_name = $name;
+	}
+	if ( empty( $slug ) ) {
+		$slug = $singular_name;
 	}
 	if ( empty( $name ) || empty( $slug ) || taxonomy_exists( $slug ) ) {
 		return;
@@ -1160,7 +1225,9 @@ function hocwp_register_taxonomy( $args = array() ) {
 		$args['rest_base']             = $rewrite_slug . '-api';
 		$args['rest_controller_class'] = 'WP_REST_Terms_Controller';
 	}
-	$args = wp_parse_args( $args, $old_args );
+	$args = wp_parse_args( $old_args, $args );
+	unset( $args['name'] );
+	unset( $args['singular_name'] );
 	register_taxonomy( $taxonomy, $post_types, $args );
 }
 
@@ -1709,24 +1776,29 @@ function hocwp_return_media_url( $url, $media_id ) {
 }
 
 function hocwp_sanitize_media_value( $value ) {
-	$url     = isset( $value['url'] ) ? $value['url'] : '';
-	$has_url = false;
-	if ( ! empty( $url ) ) {
-		$has_url = true;
+	$id   = 0;
+	$url  = '';
+	$icon = '';
+	$size = '';
+	if ( ! is_array( $value ) ) {
+		if ( is_numeric( $value ) ) {
+			$id = $value;
+		} else {
+			$url = $value;
+		}
+	} else {
+		$url = isset( $value['url'] ) ? $value['url'] : '';
+		$id  = isset( $value['id'] ) ? $value['id'] : '';
+		$id  = absint( $id );
 	}
-	$id = isset( $value['id'] ) ? $value['id'] : '';
-	$id = absint( $id );
-	if ( 0 < $id && hocwp_media_file_exists( $id ) ) {
-		$url = hocwp_get_media_image_url( $id );
+	if ( ! hocwp_id_number_valid( $id ) ) {
+		$id = hocwp_get_media_id( $url );
 	}
-	if ( 0 >= $id && ! is_array( $value ) && ! empty( $value ) ) {
-		$url = $value;
+	if ( hocwp_id_number_valid( $id ) ) {
+		$url  = hocwp_return_media_url( $url, $id );
+		$icon = wp_mime_type_icon( $id );
+		$size = hocwp_get_media_size( $id );
 	}
-	if ( $has_url && empty( $url ) ) {
-		$url = wp_get_attachment_url( $id );
-	}
-	$icon   = wp_mime_type_icon( $id );
-	$size   = hocwp_get_media_size( $id );
 	$result = array(
 		'id'          => $id,
 		'url'         => $url,
@@ -1852,6 +1924,10 @@ function hocwp_feedburner_form( $args = array() ) {
 		$submit_button_text = __( 'Subscribe', 'hocwp-theme' );
 	}
 	$placeholder = isset( $args['placeholder'] ) ? $args['placeholder'] : __( 'Your email address...', 'hocwp-theme' );
+	$button      = hocwp_get_value_by_key( $args, 'button' );
+	if ( empty( $button ) ) {
+		$button = '<input class="btn btn-submit" type="submit" value="' . $submit_button_text . '">';
+	}
 	?>
 	<form class="feedburner-form" action="https://feedburner.google.com/fb/a/mailverify" method="post"
 	      target="popupwindow"
@@ -1861,8 +1937,10 @@ function hocwp_feedburner_form( $args = array() ) {
 		       autocomplete="off">
 		<input type="hidden" value="<?php echo $name; ?>" name="uri">
 		<input type="hidden" name="loc" value="<?php echo $locale; ?>">
-		<input class="btn btn-submit" type="submit" value="<?php echo $submit_button_text; ?>">
-		<?php do_action( 'hocwp_feedburner_after' ); ?>
+		<?php
+		echo $button;
+		do_action( 'hocwp_feedburner_after' );
+		?>
 	</form>
 	<?php
 }
@@ -1946,16 +2024,18 @@ function hocwp_default_script_localize_object() {
 		'shortcodes'      => $shortcodes,
 		'logged_in'       => hocwp_bool_to_int( is_user_logged_in() ),
 		'i18n'            => array(
-			'jquery_undefined_error'     => __( 'HocWP\'s JavaScript requires jQuery', 'hocwp-theme' ),
-			'jquery_version_error'       => sprintf( __( 'HocWP\'s JavaScript requires jQuery version %s or higher', 'hocwp-theme' ), HOCWP_MINIMUM_JQUERY_VERSION ),
-			'insert_media_title'         => __( 'Insert media', 'hocwp-theme' ),
-			'insert_media_button_text'   => __( 'Use this media', 'hocwp-theme' ),
-			'insert_media_button_texts'  => __( 'Use these medias', 'hocwp-theme' ),
-			'confirm_message'            => __( 'Are you sure?', 'hocwp-theme' ),
-			'disconnect_confirm_message' => __( 'Are you sure you want to disconnect?', 'hocwp-theme' ),
-			'delete_confirm_message'     => __( 'Are you sure you want to delete this?', 'hocwp-theme' ),
-			'processing_text'            => __( 'Processing...', 'hocwp-theme' ),
-			'max_file_item_select_error' => __( 'You can not select more than %s files.', 'hocwp-theme' )
+			'jquery_undefined_error'      => __( 'HocWP\'s JavaScript requires jQuery', 'hocwp-theme' ),
+			'jquery_version_error'        => sprintf( __( 'HocWP\'s JavaScript requires jQuery version %s or higher', 'hocwp-theme' ), HOCWP_MINIMUM_JQUERY_VERSION ),
+			'insert_media_title'          => __( 'Insert media', 'hocwp-theme' ),
+			'insert_media_button_text'    => __( 'Use this media', 'hocwp-theme' ),
+			'insert_media_button_texts'   => __( 'Use these medias', 'hocwp-theme' ),
+			'confirm_message'             => __( 'Are you sure?', 'hocwp-theme' ),
+			'disconnect_confirm_message'  => __( 'Are you sure you want to disconnect?', 'hocwp-theme' ),
+			'delete_confirm_message'      => __( 'Are you sure you want to delete this?', 'hocwp-theme' ),
+			'processing_text'             => __( 'Processing...', 'hocwp-theme' ),
+			'max_file_item_select_error'  => __( 'You can not select more than %s files.', 'hocwp-theme' ),
+			'there_was_an_error_occurred' => __( 'There was an error occurred, please try again.', 'hocwp-theme' ),
+			'password_not_match'          => __( 'Passwords do not match.', 'hocwp-theme' )
 		),
 		'ajax_loading'    => '<p class="ajax-wrap"><img class="ajax-loading" src="' . hocwp_get_image_url( 'icon-loading-circle-light-full.gif' ) . '" alt=""></p>'
 	);
@@ -2175,8 +2255,15 @@ function hocwp_delete_transient_with_condition( $transient_name, $condition = ''
 	if ( '_' == $last_char ) {
 		$transient_name = hocwp_remove_last_char( $transient_name, $last_char );
 	}
-	$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->options WHERE option_name like %s" . $condition, '_transient_' . $transient_name . '_%' ) );
-	$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->options WHERE option_name like %s" . $condition, '_transient_timeout_' . $transient_name . '_%' ) );
+	$query_root = "DELETE FROM $wpdb->options WHERE option_name like %s" . $condition;
+	$key_1      = '_transient_';
+	$key_2      = '_transient_timeout_';
+	if ( ! empty( $transient_name ) ) {
+		$key_1 .= $transient_name;
+		$key_2 .= $transient_name;
+	}
+	$wpdb->query( $wpdb->prepare( $query_root, $key_1 ) );
+	$wpdb->query( $wpdb->prepare( $query_root, $key_2 ) );
 }
 
 function hocwp_delete_transient( $transient_name, $blog_id = '' ) {
@@ -2209,23 +2296,25 @@ function hocwp_get_upload_folder_details() {
 }
 
 function hocwp_upload( $args = array() ) {
-	$name                   = isset( $args['name'] ) ? $args['name'] : '';
-	$path                   = isset( $args['path'] ) ? $args['path'] : '';
-	$size                   = isset( $args['size'] ) ? $args['size'] : 0;
-	$max_size               = isset( $args['max_size'] ) ? $args['max_size'] : - 1;
-	$is_image               = isset( $args['is_image'] ) ? $args['is_image'] : false;
-	$extensions             = isset( $args['extensions'] ) ? $args['extensions'] : array();
-	$tmp_name               = isset( $args['tmp_name'] ) ? $args['tmp_name'] : '';
-	$duplicate_exists       = isset( $args['duplicate_exists'] ) ? $args['duplicate_exists'] : true;
-	$result                 = array(
+	$name             = isset( $args['name'] ) ? $args['name'] : '';
+	$path             = isset( $args['path'] ) ? $args['path'] : '';
+	$size             = isset( $args['size'] ) ? $args['size'] : 0;
+	$max_size         = isset( $args['max_size'] ) ? $args['max_size'] : - 1;
+	$is_image         = isset( $args['is_image'] ) ? $args['is_image'] : false;
+	$extensions       = isset( $args['extensions'] ) ? $args['extensions'] : array();
+	$tmp_name         = isset( $args['tmp_name'] ) ? $args['tmp_name'] : '';
+	$duplicate_exists = isset( $args['duplicate_exists'] ) ? $args['duplicate_exists'] : true;
+	$result           = array(
 		'success' => false
 	);
-	$result['image_base64'] = hocwp_image_base64( $tmp_name );
-	$name                   = strtolower( $name );
-	$basename               = basename( $name );
-	$basename               = hocwp_sanitize_file_name( $basename );
-	$file_path              = $path . '/' . $basename;
-	$file_type              = pathinfo( $file_path, PATHINFO_EXTENSION );
+	if ( $is_image ) {
+		$result['image_base64'] = hocwp_image_base64( $tmp_name );
+	}
+	$name      = strtolower( $name );
+	$basename  = basename( $name );
+	$basename  = hocwp_sanitize_file_name( $basename );
+	$file_path = $path . '/' . $basename;
+	$file_type = pathinfo( $file_path, PATHINFO_EXTENSION );
 	if ( $is_image && ! empty( $tmp_name ) ) {
 		$check = getimagesize( $tmp_name );
 		if ( $check === false ) {
@@ -2287,23 +2376,28 @@ function hocwp_execute_upload( $args = array() ) {
 		$upload_path = $target_dir;
 	}
 	$file_names = isset( $files['name'] ) ? $files['name'] : array();
-	$file_count = count( $file_names );
 	$list_files = array();
-	for ( $i = 0; $i < $file_count; $i ++ ) {
-		$name         = isset( $files['name'][ $i ] ) ? $files['name'][ $i ] : '';
-		$type         = isset( $files['type'][ $i ] ) ? $files['type'][ $i ] : '';
-		$tmp_name     = isset( $files['tmp_name'][ $i ] ) ? $files['tmp_name'][ $i ] : '';
-		$error        = isset( $files['error'][ $i ] ) ? $files['error'][ $i ] : '';
-		$size         = isset( $files['size'][ $i ] ) ? $files['size'][ $i ] : '';
-		$file_item    = array(
-			'name'     => $name,
-			'type'     => $type,
-			'tmp_name' => $tmp_name,
-			'error'    => $error,
-			'size'     => $size
-		);
-		$list_files[] = $file_item;
+	if ( hocwp_array_has_value( $file_names ) ) {
+		$file_count = count( $file_names );
+		for ( $i = 0; $i < $file_count; $i ++ ) {
+			$name         = isset( $files['name'][ $i ] ) ? $files['name'][ $i ] : '';
+			$type         = isset( $files['type'][ $i ] ) ? $files['type'][ $i ] : '';
+			$tmp_name     = isset( $files['tmp_name'][ $i ] ) ? $files['tmp_name'][ $i ] : '';
+			$error        = isset( $files['error'][ $i ] ) ? $files['error'][ $i ] : '';
+			$size         = isset( $files['size'][ $i ] ) ? $files['size'][ $i ] : '';
+			$file_item    = array(
+				'name'     => $name,
+				'type'     => $type,
+				'tmp_name' => $tmp_name,
+				'error'    => $error,
+				'size'     => $size
+			);
+			$list_files[] = $file_item;
+		}
+	} else {
+		$list_files[] = $files;
 	}
+
 	$list_results = array();
 	foreach ( $list_files as $key => $file ) {
 		$file['path'] = $upload_path;

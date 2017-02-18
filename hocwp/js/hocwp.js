@@ -1129,6 +1129,7 @@ jQuery(document).ready(function ($) {
         }
         this.$element.css({position: 'fixed'});
         $body.addClass('responsive');
+        this.$element.find('.sub-menu').hide();
     };
 
     MobileMenu.prototype.click = function (e) {

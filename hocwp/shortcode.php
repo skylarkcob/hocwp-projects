@@ -423,3 +423,52 @@ function hocwp_shortcode_support_form_callback( $atts = array(), $content = null
 }
 
 add_shortcode( 'hocwp_support_form', 'hocwp_shortcode_support_form_callback' );
+
+function hocwp_shortcode_feedburner_form( $atts = array(), $content = null ) {
+	$defaults       = array(
+		'name'          => '',
+		'button_html'   => '',
+		'button_text'   => '',
+		'placeholder'   => '',
+		'description'   => '',
+		'desc_position' => 'after',
+		'title'         => '',
+		'style'         => '',
+		'max_width'     => '',
+		'class'         => ''
+	);
+	$attributes     = shortcode_atts( $defaults, $atts );
+	$transient_name = hocwp_build_transient_name( 'shortcode_feedburner_form_%s', $attributes );
+	if ( false === ( $html = get_transient( $transient_name ) ) || true || empty( $html ) ) {
+		$name = hocwp_get_value_by_key( $attributes, 'name' );
+		if ( ! empty( $name ) ) {
+			$button_text   = hocwp_get_value_by_key( $attributes, 'button_text' );
+			$placeholder   = hocwp_get_value_by_key( $attributes, 'placeholder' );
+			$description   = hocwp_get_value_by_key( $attributes, 'description' );
+			$desc_position = hocwp_get_value_by_key( $attributes, 'desc_position' );
+			$html          = hocwp_shortcode_before( 'subscribe-box', $attributes );
+			ob_start();
+			if ( ! empty( $description ) && 'before' == $desc_position ) {
+				echo '<p class="description">' . $description . '</p>';
+			}
+			$fb_args = array(
+				'button_text' => $button_text,
+				'name'        => $name,
+				'placeholder' => $placeholder,
+				'button'      => $attributes['button_html']
+			);
+			$fb_args = wp_parse_args( $fb_args, $attributes );
+			hocwp_feedburner_form( $fb_args );
+			if ( ! empty( $description ) && 'after' == $desc_position ) {
+				echo '<p class="description">' . $description . '</p>';
+			}
+			$html .= ob_get_clean();
+			$html .= hocwp_shortcode_after();
+			set_transient( $transient_name, $html, HOUR_IN_SECONDS );
+		}
+	}
+
+	return apply_filters( 'hocwp_shortcode_feedburner_form', $html, $attributes, $content );
+}
+
+add_shortcode( 'hocwp_feedburner_form', 'hocwp_shortcode_feedburner_form' );

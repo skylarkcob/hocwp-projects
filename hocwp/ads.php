@@ -7,10 +7,22 @@ function hocwp_get_ads_positions() {
 	global $hocwp_ads_positions;
 	$hocwp_ads_positions = hocwp_sanitize_array( $hocwp_ads_positions );
 	$defaults            = array(
-		'leaderboard' => array(
+		'leaderboard'           => array(
 			'id'          => 'leaderboard',
 			'name'        => __( 'Leaderboard', 'hocwp-theme' ),
 			'description' => __( 'Display beside logo in header area.', 'hocwp-theme' )
+		),
+		'after_first_paragraph' => array(
+			'id'   => 'after_first_paragraph',
+			'name' => __( 'After first paragraph in post content', 'hocwp-theme' )
+		),
+		'middle_post_content'   => array(
+			'id'   => 'middle_post_content',
+			'name' => __( 'Middle post content', 'hocwp-theme' )
+		),
+		'before_last_paragraph' => array(
+			'id'   => 'before_last_paragraph',
+			'name' => __( 'Before last paragraph in post content', 'hocwp-theme' )
 		)
 	);
 	$hocwp_ads_positions = wp_parse_args( $hocwp_ads_positions, $defaults );
@@ -41,6 +53,7 @@ function hocwp_show_ads( $args = array() ) {
 		$position = hocwp_get_value_by_key( $args, 'position' );
 		if ( ! empty( $position ) ) {
 			$random           = (bool) hocwp_get_value_by_key( $args, 'random' );
+			$random           = apply_filters( 'hocwp_show_ads_random', $random, $args );
 			$current_datetime = date( hocwp_get_date_format() );
 			$current_datetime = strtotime( $current_datetime );
 			$query_args       = array(
@@ -89,6 +102,48 @@ function hocwp_show_ads( $args = array() ) {
 		}
 	}
 	if ( hocwp_is_post( $ads ) && 'hocwp_ads' == $ads->post_type ) {
+		$device = get_post_meta( $ads->ID, 'device', true );
+		if ( 'all' != $device ) {
+			$detect = new Mobile_Detect();
+			switch ( $device ) {
+				case 'mobile':
+					if ( ! $detect->isMobile() ) {
+						return;
+					}
+					break;
+				case 'tablet':
+					if ( ! $detect->isTablet() ) {
+						return;
+					}
+					break;
+				case 'pc':
+					if ( $detect->isMobile() || $detect->isTablet() ) {
+						return;
+					}
+					break;
+				case 'mobile_and_tablet':
+					if ( ! $detect->isMobile() && ! $detect->isTablet() ) {
+						return;
+					}
+					break;
+			}
+		}
+		$in_post_types = get_post_meta( $ads->ID, 'in_post_types', true );
+		$in_post_types = hocwp_json_string_to_array( $in_post_types );
+		$in_post_types = hocwp_remove_empty_array_item( $in_post_types );
+		if ( hocwp_array_has_value( $in_post_types ) ) {
+			$in_type = false;
+			foreach ( $in_post_types as $post_type ) {
+				$value = isset( $post_type['value'] ) ? $post_type['value'] : '';
+				if ( ! empty( $value ) && $value = $ads->post_type ) {
+					$in_type = true;
+					break;
+				}
+			}
+			if ( ! $in_type ) {
+				return;
+			}
+		}
 		$code = hocwp_get_post_meta( 'code', $ads->ID );
 		if ( empty( $code ) ) {
 			$image = hocwp_get_post_meta( 'image', $ads->ID );

@@ -59,8 +59,8 @@ class HOCWP_Widget_Icon extends WP_Widget {
 		$text = hocwp_get_value_by_key( $instance, 'text' );
 		hocwp_widget_before( $args, $instance, false );
 		$widget_html = '';
-		if ( ! empty( $icon_url ) ) {
-			$icon_html = $icon_html = '<img class="icon" src="' . $icon_url . '" alt="" data-hover="' . $icon_hover_url . '">';
+		if ( ! empty( $icon_url ) && empty( $icon_html ) ) {
+			$icon_html = '<img class="icon" src="' . $icon_url . '" alt="" data-hover="' . $icon_hover_url . '">';
 		}
 		if ( ! empty( $icon_html ) ) {
 			$widget_html .= '<a href="' . $link . '" class="icon-link icon-url">' . $icon_html . '</a>';
@@ -76,7 +76,8 @@ class HOCWP_Widget_Icon extends WP_Widget {
 			$title        = apply_filters( 'hocwp_widget_icon_title_html', $title, $args, $instance, $this );
 		}
 		$widget_html .= $title;
-		$widget_html .= '<div class="text">' . hocwp_get_rich_text( $text ) . '</div>';
+		$text = hocwp_get_rich_text( $text );
+		$widget_html .= '<div class="text">' . $text . '</div>';
 		$widget_html = apply_filters( $this->option_name . '_html', $widget_html, $instance, $widget_args = $args, $widget_number = $this->number, $sidebar_id = $sidebar );
 		$widget_html = apply_filters( $this->option_name . '_' . $sidebar . '_html', $widget_html, $instance, $widget_args = $args, $widget_number = $this->number );
 		$widget_html = apply_filters( 'hocwp_widget_icon_html', $widget_html, $args, $instance, $this );

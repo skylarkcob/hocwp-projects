@@ -120,6 +120,10 @@
     padding: 10px 0;
 }
 
+.hocwp-meta-box .meta-row .chosen-container {
+    max-width: 60%;
+}
+
 .hocwp-meta-box div.meta-row input[type="checkbox"],
 .hocwp-meta-box div.meta-row input[type="radio"] {
     margin-top: 0;
@@ -524,6 +528,10 @@
 .postbox .hocwp-meta-box .meta-row .field-group {
     display: inline-block;
     vertical-align: top;
+}
+
+.postbox .hocwp-meta-box .meta-row label + .media-container {
+    max-width: 75%;
 }
 
 .hocwp-meta-box .media-preview img,

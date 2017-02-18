@@ -187,21 +187,32 @@ class HOCWP_Widget_Post extends WP_Widget {
 				$query_args['orderby'] = 'comment_count';
 				break;
 			case 'category':
-				foreach ( $category as $cvalue ) {
-					$term_id = isset( $cvalue['value'] ) ? $cvalue['value'] : '';
-					$term_id = absint( $term_id );
-					if ( $term_id > 0 ) {
-						$taxonomy = isset( $cvalue['taxonomy'] ) ? $cvalue['taxonomy'] : '';
-						if ( ! empty( $taxonomy ) ) {
-							$tax_item   = array(
-								'taxonomy' => $taxonomy,
-								'field'    => 'term_id',
-								'terms'    => $term_id
-							);
-							$query_args = hocwp_query_sanitize_tax_query( $tax_item, $query_args );
-							$get_by     = true;
+				if ( hocwp_array_has_value( $category ) ) {
+					foreach ( $category as $cvalue ) {
+						$term_id = isset( $cvalue['value'] ) ? $cvalue['value'] : '';
+						$term_id = absint( $term_id );
+						if ( $term_id > 0 ) {
+							$taxonomy = isset( $cvalue['taxonomy'] ) ? $cvalue['taxonomy'] : '';
+							if ( ! empty( $taxonomy ) ) {
+								$tax_item   = array(
+									'taxonomy' => $taxonomy,
+									'field'    => 'term_id',
+									'terms'    => $term_id
+								);
+								$query_args = hocwp_query_sanitize_tax_query( $tax_item, $query_args );
+								$get_by     = true;
+							}
 						}
 					}
+				} elseif ( is_tax() || is_category() ) {
+					$term       = hocwp_term_get_current();
+					$tax_item   = array(
+						'taxonomy' => $term->taxonomy,
+						'field'    => 'term_id',
+						'terms'    => $term->term_id
+					);
+					$query_args = hocwp_query_sanitize_tax_query( $tax_item, $query_args );
+					$get_by     = true;
 				}
 				break;
 			case 'related':

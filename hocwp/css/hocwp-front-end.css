@@ -851,6 +851,17 @@ img.center {
     opacity: 1;
 }
 
+.row-xs {
+    margin-left: -3px;
+    margin-right: -3px;
+}
+
+.row-xs > [class*="col"],
+.row-xs > [class^="col"] {
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
 .row-small {
     margin-left: -5px;
     margin-right: -5px;

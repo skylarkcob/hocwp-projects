@@ -273,6 +273,12 @@ function hocwp_google_login_script( $args = array() ) {
 						}
 						if (response.logged_in) {
 							window.location.href = href;
+						}  else {
+							if ($.trim(response.message)) {
+								alert(response.message);
+							} else {
+								alert(hocwp.i18n.there_was_an_error_occurred);
+							}
 						}
 					}
 				});
@@ -353,6 +359,12 @@ function hocwp_facebook_login_script( $args = array() ) {
 							}
 							if (response.logged_in) {
 								window.location.href = href;
+							} else {
+								if ($.trim(response.message)) {
+									alert(response.message);
+								} else {
+									alert(hocwp.i18n.there_was_an_error_occurred);
+								}
 							}
 						}
 					});

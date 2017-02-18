@@ -177,6 +177,7 @@ function hocwp_favorite_post_ajax_callback() {
 		if ( 'undo' == $action ) {
 			$result['remove'] = true;
 		}
+		do_action( 'hocwp_favorite_post_ajax', $post_id, $action );
 	}
 	wp_send_json( $result );
 }
@@ -299,6 +300,7 @@ function hocwp_social_login_facebook_ajax_callback() {
 	$data    = hocwp_json_string_to_array( $data );
 	$connect = (bool) hocwp_get_method_value( 'connect' );
 	if ( hocwp_array_has_value( $data ) ) {
+		$result['connect']  = $connect;
 		$verified           = (bool) hocwp_get_value_by_key( $data, 'verified' );
 		$allow_not_verified = apply_filters( 'hocwp_allow_social_user_signup_not_verified', true );
 		if ( $verified || $allow_not_verified ) {
@@ -312,11 +314,17 @@ function hocwp_social_login_facebook_ajax_callback() {
 				$user    = wp_get_current_user();
 				$user_id = $user->ID;
 			}
-			$find_users = get_users( array( 'meta_key' => 'facebook', 'meta_value' => $id ) );
-			if ( hocwp_array_has_value( $find_users ) ) {
-				$user    = $find_users[0];
-				$user_id = $user->ID;
+			if ( ! hocwp_id_number_valid( $user_id ) ) {
+				$find_users = get_users( array( 'meta_key' => 'facebook', 'meta_value' => $id ) );
+				if ( hocwp_array_has_value( $find_users ) ) {
+					$user    = $find_users[0];
+					$user_id = $user->ID;
+				}
 			}
+			$result['user_id']       = $user_id;
+			$result['user']          = $user;
+			$result['facebook_id']   = $id;
+			$result['facebook_data'] = $data;
 			if ( false === $user_id || ! hocwp_id_number_valid( $user_id ) || ! is_a( $user, 'WP_User' ) || $connect ) {
 				$avatar = hocwp_get_value_by_key( $data, array( 'picture', 'data', 'url' ) );
 				if ( $connect ) {
@@ -343,14 +351,18 @@ function hocwp_social_login_facebook_ajax_callback() {
 						}
 						$old_user = true;
 						if ( ! hocwp_id_number_valid( $user_id ) ) {
-							$user_data = array(
-								'username' => $email,
-								'email'    => $email,
-								'password' => $password
-							);
-							$user_id   = hocwp_add_user( $user_data );
-							if ( hocwp_id_number_valid( $user_id ) ) {
-								$old_user = false;
+							if ( hocwp_users_can_register() ) {
+								$user_data = array(
+									'username' => $email,
+									'email'    => $email,
+									'password' => $password
+								);
+								$user_id   = hocwp_add_user( $user_data );
+								if ( hocwp_id_number_valid( $user_id ) ) {
+									$old_user = false;
+								}
+							} else {
+								$result['message'] = __( 'This site does not allow new user signup.', 'hocwp-theme' );
 							}
 						}
 						if ( hocwp_id_number_valid( $user_id ) ) {
@@ -443,14 +455,18 @@ function hocwp_social_login_google_ajax_callback() {
 						}
 						$old_user = true;
 						if ( ! hocwp_id_number_valid( $user_id ) ) {
-							$user_data = array(
-								'username' => $email,
-								'email'    => $email,
-								'password' => $password
-							);
-							$user_id   = hocwp_add_user( $user_data );
-							if ( hocwp_id_number_valid( $user_id ) ) {
-								$old_user = false;
+							if ( hocwp_users_can_register() ) {
+								$user_data = array(
+									'username' => $email,
+									'email'    => $email,
+									'password' => $password
+								);
+								$user_id   = hocwp_add_user( $user_data );
+								if ( hocwp_id_number_valid( $user_id ) ) {
+									$old_user = false;
+								}
+							} else {
+								$result['message'] = __( 'This site does not allow new user signup.', 'hocwp-theme' );
 							}
 						}
 						if ( hocwp_id_number_valid( $user_id ) ) {
@@ -490,6 +506,85 @@ function hocwp_social_login_google_ajax_callback() {
 
 add_action( 'wp_ajax_hocwp_social_login_google', 'hocwp_social_login_google_ajax_callback' );
 add_action( 'wp_ajax_nopriv_hocwp_social_login_google', 'hocwp_social_login_google_ajax_callback' );
+
+function hocwp_login_ajax_callback() {
+	$result     = array(
+		'success' => false
+	);
+	$log        = hocwp_get_method_value( 'log' );
+	$pwd        = hocwp_get_method_value( 'pwd' );
+	$rememberme = hocwp_get_method_value( 'rememberme' );
+	$user       = hocwp_user_login( $log, $pwd, $rememberme );
+	if ( is_a( $user, 'WP_User' ) ) {
+		$result['success'] = true;
+	}
+
+	wp_send_json( $result );
+}
+
+add_action( 'wp_ajax_nopriv_hocwp_login_ajax', 'hocwp_login_ajax_callback' );
+
+function hocwp_signup_ajax_callback() {
+	$result     = array(
+		'success' => false,
+		'message' => ''
+	);
+	$user_login = hocwp_get_method_value( 'user_login' );
+	$user_pass  = hocwp_get_method_value( 'user_pass' );
+	$user_email = hocwp_get_method_value( 'user_email' );
+	if ( ! is_email( $user_email ) ) {
+		$result['message'] = __( 'Email is not valid.', 'hocwp-theme' );
+	} elseif ( email_exists( $user_email ) ) {
+		$result['message'] = __( 'Email address already exists.', 'hocwp-theme' );
+	} elseif ( username_exists( $user_login ) ) {
+		$result['message'] = __( 'Username already exists.', 'hocwp-theme' );
+	} else {
+		$user_data = array(
+			'username' => $user_login,
+			'email'    => $user_email,
+			'password' => $user_pass
+		);
+		$user_id   = hocwp_add_user( $user_data );
+		if ( hocwp_id_number_valid( $user_id ) ) {
+			$result['success'] = true;
+			hocwp_user_force_login( $user_id );
+		}
+	}
+	wp_send_json( $result );
+}
+
+add_action( 'wp_ajax_nopriv_hocwp_signup', 'hocwp_signup_ajax_callback' );
+
+function hocwp_forgot_password_ajax_callback() {
+	$result     = array(
+		'success'   => false,
+		'message'   => '',
+		'html_data' => ''
+	);
+	$user_login = hocwp_get_method_value( 'user_login' );
+	if ( ! empty( $user_login ) ) {
+		$user = hocwp_get_user_by( $user_login );
+		if ( is_a( $user, 'WP_User' ) ) {
+			$transient_name = hocwp_build_transient_name( 'user_%s_lost_password', $user_login );
+			if ( false === ( $sent = get_transient( $transient_name ) ) ) {
+				$sent = hocwp_retrieve_password();
+				if ( $sent ) {
+					set_transient( $transient_name, $sent, HOUR_IN_SECONDS );
+				}
+			}
+			if ( $sent ) {
+				$result['success'] = true;
+				$result['message'] = __( 'Please check email inbox to reset your password.', 'hocwp-theme' );
+			}
+		}
+	}
+	if ( $result['success'] ) {
+		$result['html_data'] = hocwp_wrap_tag( $result['message'], 'p', 'alert alert-success' );
+	}
+	wp_send_json( $result );
+}
+
+add_action( 'wp_ajax_nopriv_hocwp_forgot_password', 'hocwp_forgot_password_ajax_callback' );
 
 function hocwp_disconnect_social_account_ajax_callback() {
 	$social  = hocwp_get_method_value( 'social' );

@@ -99,6 +99,10 @@ function hocwp_array_insert( &$array, $position, $insert ) {
 }
 
 function hocwp_string_empty( $string ) {
+	if ( is_array( $string ) || ! is_string( $string ) ) {
+		return false;
+	}
+	$string = trim( $string );
 	if ( '' === $string ) {
 		return true;
 	}
@@ -394,6 +398,9 @@ function hocwp_number_format_vietnamese( $number ) {
 }
 
 function hocwp_to_array( $needle, $filter_and_unique = false ) {
+	if ( hocwp_string_empty( $needle ) ) {
+		return array();
+	}
 	$result = $needle;
 	if ( ! is_array( $result ) ) {
 		$result = (array) $result;
@@ -824,6 +831,21 @@ function hocwp_bool_to_string( $value ) {
 	}
 
 	return 'false';
+}
+
+function hocwp_to_bool( $value ) {
+	if ( 1 == $value ) {
+		return true;
+	}
+	$value = strtolower( $value );
+	if ( 'true' == $value ) {
+		return true;
+	}
+	if ( 'yes' == $value || 'ok' == $value ) {
+		return true;
+	}
+
+	return false;
 }
 
 function hocwp_string_to_bool( $string ) {

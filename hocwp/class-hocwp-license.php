@@ -29,6 +29,10 @@ class HOCWP_License {
 	}
 
 	public function get_generated() {
+		if ( empty( $this->generated ) ) {
+			$this->generate();
+		}
+
 		return $this->generated;
 	}
 
@@ -179,15 +183,29 @@ class HOCWP_License {
 		return $this->key_map;
 	}
 
-	public function __construct() {
-		$this->set_hashed_password( HOCWP_HASHED_PASSWORD );
-		$this->set_key( '' );
-		$this->set_type( 'theme' );
-		$this->set_use_for( get_option( 'template' ) );
-		$this->set_domain( home_url() );
-		$this->set_customer_url( home_url( '/' ) );
-		$this->set_customer_email( get_option( 'admin_email' ) );
-		$option = hocwp_option_get_object_from_list( 'theme_license' );
+	public function __construct( $args = array() ) {
+		$home_url = home_url();
+		$defaults = array(
+			'hashed_password' => HOCWP_HASHED_PASSWORD,
+			'key'             => '',
+			'type'            => 'theme',
+			'use_for'         => get_option( 'template' ),
+			'domain'          => $home_url,
+			'customer_url'    => trailingslashit( $home_url ),
+			'customer_email'  => get_option( 'admin_email' ),
+			'option'          => hocwp_option_get_object_from_list( 'theme_license' ),
+			'code'            => ''
+		);
+		$args     = wp_parse_args( $args, $defaults );
+		$this->set_hashed_password( $args['hashed_password'] );
+		$this->set_key( $args['key'] );
+		$this->set_code( $args['code'] );
+		$this->set_type( $args['type'] );
+		$this->set_use_for( $args['use_for'] );
+		$this->set_domain( $args['domain'] );
+		$this->set_customer_url( $args['customer_url'] );
+		$this->set_customer_email( $args['customer_email'] );
+		$option = $args['option'];
 		if ( hocwp_object_valid( $option ) ) {
 			$this->set_option( $option );
 		}
@@ -307,16 +325,18 @@ class HOCWP_License {
 		} else {
 			$this->set_generation( true );
 			$this->create_key();
-			$this->set_hashed_code( wp_hash_password( $this->get_key() ) );
+			$hashed_code = wp_hash_password( $this->get_key() );
+			$this->set_hashed_code( $hashed_code );
 			$url = $this->get_customer_url();
 			if ( ! empty( $url ) ) {
-				$url           = add_query_arg( array(
+				$params        = array(
 					'hashed'         => $this->get_hashed_code(),
 					'key_map'        => $this->get_key_map(),
 					'type'           => $this->get_type(),
 					'use_for'        => $this->get_use_for(),
 					'hocwp_password' => $this->get_password()
-				), $url );
+				);
+				$url           = add_query_arg( $params, $url );
 				$result['url'] = $url;
 			}
 			$result['code']           = $this->get_code();
@@ -341,20 +361,29 @@ class HOCWP_License {
 		return hocwp_build_license_transient_name( $this->get_type(), $this->get_use_for() );
 	}
 
+	public function set_data( $data ) {
+		if ( isset( $data['hashed'] ) && isset( $data['key_map'] ) ) {
+			$data_hashed  = hocwp_get_value_by_key( $data, 'hashed' );
+			$data_key_map = hocwp_get_value_by_key( $data, 'key_map' );
+			$key_map      = maybe_unserialize( $data_key_map );
+			$this->set_key_map( $key_map );
+			$this->set_hashed_code( $data_hashed );
+			unset( $data_hashed, $data_key_map );
+
+			return true;
+		}
+
+		return false;
+	}
+
 	public function check_valid( $data = array() ) {
 		$transient_name = $this->get_transient_name();
 		if ( false === ( $valid = get_transient( $transient_name ) ) ) {
-			$from_data_param = false;
-			if ( hocwp_array_has_value( $data ) ) {
-				if ( isset( $data['hashed'] ) && isset( $data['key_map'] ) ) {
-					$data_hashed  = hocwp_get_value_by_key( $data, 'hashed' );
-					$data_key_map = hocwp_get_value_by_key( $data, 'key_map' );
-					if ( ! empty( $data_hashed ) && ! empty( $data_key_map ) ) {
-						$from_data_param = true;
-					}
-					unset( $data_hashed, $data_key_map );
-				} else {
-					foreach ( $data as $per_data ) {
+			$from_data_param = $this->set_data( $data );
+			if ( ! $from_data_param && hocwp_array_has_value( $data ) ) {
+				foreach ( $data as $per_data ) {
+					$domain = hocwp_get_value_by_key( $per_data, 'domain' );
+					if ( ! empty( $domain ) && $domain == $this->get_domain() ) {
 						$valid = $this->check_valid( $per_data );
 						if ( $valid ) {
 							break;
@@ -362,13 +391,12 @@ class HOCWP_License {
 					}
 				}
 			}
-			if ( ! $from_data_param ) {
+			if ( ! $from_data_param || ! $valid ) {
 				$data = $this->get_saved_generated_data();
+				$this->set_data( $data );
 			}
-			$hashed_license = hocwp_get_value_by_key( $data, 'hashed' );
+			$hashed_license = $this->get_hashed_code();
 			if ( ! empty( $hashed_license ) ) {
-				$key_map = maybe_unserialize( hocwp_get_value_by_key( $data, 'key_map' ) );
-				$this->set_key_map( $key_map );
 				$license_info = $this->get_saved_license_data();
 				if ( $this->for_theme() ) {
 					$code = hocwp_get_value_by_key( $license_info, 'license_code' );
@@ -388,32 +416,24 @@ class HOCWP_License {
 				if ( ! function_exists( 'wp_check_password' ) ) {
 					require( ABSPATH . WPINC . '/pluggable.php' );
 				}
-				if ( wp_check_password( $key, $hashed_license ) ) {
-					$valid = true;
-				}
+				$valid = (bool) wp_check_password( $key, $hashed_license );
+				$this->set_valid( $valid );
 			}
-			$valid = (bool) $valid;
-			$this->set_valid( $valid );
-			if ( ! $valid && $from_data_param ) {
-				$valid = $this->check_valid();
+			if ( ! $valid ) {
+				$license_info = $this->get_saved_license_data();
+				$code         = hocwp_get_value_by_key( $license_info, 'license_code' );
+				$email        = hocwp_get_value_by_key( $license_info, 'customer_email' );
+				$use_for      = $this->get_use_for();
+				$data         = array(
+					'customer_email' => $email,
+					'license_code'   => $code,
+					'use_for'        => $use_for
+				);
+				$valid        = $this->check_from_server( $data );
 			}
 			if ( $valid ) {
 				set_transient( $transient_name, $valid, WEEK_IN_SECONDS );
 			}
-		}
-		if ( ! $valid ) {
-			$license_info = $this->get_saved_license_data();
-			$code         = hocwp_get_value_by_key( $license_info, 'license_code' );
-			$email        = hocwp_get_value_by_key( $license_info, 'customer_email' );
-			$use_for      = $this->get_use_for();
-			$valid        = $this->check_from_server( array(
-				'customer_email' => $email,
-				'license_code'   => $code,
-				'use_for'        => $use_for
-			) );
-		}
-		if ( $valid ) {
-			set_transient( $transient_name, $valid, WEEK_IN_SECONDS );
 		}
 
 		return (bool) $valid;

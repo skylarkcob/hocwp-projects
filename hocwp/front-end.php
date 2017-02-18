@@ -69,6 +69,15 @@ function hocwp_breadcrumb( $args = array() ) {
 	}
 	$before = hocwp_get_value_by_key( $args, 'before' );
 	$after  = hocwp_get_value_by_key( $args, 'after' );
+	if ( function_exists( 'bcn_display' ) ) {
+		echo '<div class="hocwp-breadcrumb breadcrumbs" typeof="BreadcrumbList" vocab="https://schema.org/">';
+		echo $before;
+		bcn_display();
+		echo $after;
+		echo '</div>';
+
+		return;
+	}
 	if ( function_exists( 'yoast_breadcrumb' ) && hocwp_wpseo_breadcrumb_enabled() ) {
 		yoast_breadcrumb( '<nav class="hocwp-breadcrumb breadcrumb yoast clearfix">' . $before, $after . '</nav>' );
 

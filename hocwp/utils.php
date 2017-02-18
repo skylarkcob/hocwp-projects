@@ -45,6 +45,7 @@ function hocwp_build_transient_name( $format, $dynamic ) {
 		$dynamic = json_encode( $dynamic );
 	}
 	$dynamic .= HOCWP_VERSION;
+	$dynamic .= hocwp_get_domain_name( home_url() );
 	$dynamic        = md5( $dynamic );
 	$transient_name = sprintf( $format, $dynamic );
 	$transient_name = apply_filters( 'hocwp_build_transient_name', $transient_name, $format, $dynamic );
@@ -810,7 +811,11 @@ function hocwp_get_plugin_icon_url( $plugin ) {
 	return $plugin_icon_url;
 }
 
-function hocwp_get_image_url( $name ) {
+function hocwp_get_image_url( $name = '' ) {
+	if ( empty( $name ) ) {
+		$name = 'transparent.gif';
+	}
+
 	return HOCWP_URL . '/images/' . $name;
 }
 

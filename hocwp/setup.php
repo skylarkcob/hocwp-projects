@@ -47,10 +47,6 @@ function hocwp_init() {
 	if ( ! is_admin() ) {
 		do_action( 'hocwp_front_end_init' );
 	}
-	$timezone = hocwp_get_timezone_string();
-	if ( ! empty( $timezone ) ) {
-		date_default_timezone_set( $timezone );
-	}
 }
 
 add_action( 'init', 'hocwp_init' );
